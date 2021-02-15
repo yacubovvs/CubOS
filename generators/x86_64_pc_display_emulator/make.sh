@@ -22,10 +22,43 @@ echo "
 cat "sdk/platforms/x86_64_pc.cpp"       >> $OUTPUT_DIRECTORY/cubos/main.cpp
 echo "
 "   >> $OUTPUT_DIRECTORY/cubos/main.cpp
+cat "sdk/drivers/driver_display_emulator.ino"       >> $OUTPUT_DIRECTORY/cubos/main.cpp
+echo "
+"   >> $OUTPUT_DIRECTORY/cubos/main.cpp
+
+# Platform libs
+#cp sdk/platforms/core_esp8266_noniso.c  $OUTPUT_DIRECTORY/cubos/
+cp sdk/platforms/noniso.c               $OUTPUT_DIRECTORY/cubos/
+cp sdk/platforms/stdlib_noniso.h        $OUTPUT_DIRECTORY/cubos/
+cp sdk/platforms/WString.cpp            $OUTPUT_DIRECTORY/cubos/
+cp sdk/platforms/WString.h              $OUTPUT_DIRECTORY/cubos/
+
+echo "
+"   >> $OUTPUT_DIRECTORY/cubos/main.cpp
 cat sdk/cubos.ino                       >> $OUTPUT_DIRECTORY/cubos/main.cpp
 echo "
 "   >> $OUTPUT_DIRECTORY/cubos/main.cpp
 cat $APPS_FILE                          >> $OUTPUT_DIRECTORY/cubos/main.cpp
+
+# Core
+echo "
+"   >> $OUTPUT_DIRECTORY/cubos/main.cpp
+cat sdk/core/core_basic.ino              >> $OUTPUT_DIRECTORY/cubos/main.cpp
+echo "
+"   >> $OUTPUT_DIRECTORY/cubos/main.cpp
+cat sdk/core/core_shared_functions.ino   >> $OUTPUT_DIRECTORY/cubos/main.cpp
+echo "
+"   >> $OUTPUT_DIRECTORY/cubos/main.cpp
+cat sdk/core/core_views.ino              >> $OUTPUT_DIRECTORY/cubos/main.cpp
+echo "
+"   >> $OUTPUT_DIRECTORY/cubos/main.cpp
+cat sdk/core/core_display.ino            >> $OUTPUT_DIRECTORY/cubos/main.cpp
+echo "
+"   >> $OUTPUT_DIRECTORY/cubos/main.cpp
+cat sdk/core/core_time.ino               >> $OUTPUT_DIRECTORY/cubos/main.cpp
+echo "
+"   >> $OUTPUT_DIRECTORY/cubos/main.cpp
+
 
 # Applications
 echo "
@@ -63,26 +96,6 @@ echo "
 cat sdk/apps/app_z_menu.ino          >> $OUTPUT_DIRECTORY/cubos/main.cpp
 echo "
 "   >> $OUTPUT_DIRECTORY/cubos/main.cpp
-
-# Core
-echo "
-"   >> $OUTPUT_DIRECTORY/cubos/main.cpp
-cat sdk/core/core_basic.ino              >> $OUTPUT_DIRECTORY/cubos/main.cpp
-echo "
-"   >> $OUTPUT_DIRECTORY/cubos/main.cpp
-cat sdk/core/core_shared_functions.ino   >> $OUTPUT_DIRECTORY/cubos/main.cpp
-echo "
-"   >> $OUTPUT_DIRECTORY/cubos/main.cpp
-cat sdk/core/core_views.ino              >> $OUTPUT_DIRECTORY/cubos/main.cpp
-echo "
-"   >> $OUTPUT_DIRECTORY/cubos/main.cpp
-cat sdk/core/core_display.ino            >> $OUTPUT_DIRECTORY/cubos/main.cpp
-echo "
-"   >> $OUTPUT_DIRECTORY/cubos/main.cpp
-cat sdk/core/core_time.ino               >> $OUTPUT_DIRECTORY/cubos/main.cpp
-echo "
-"   >> $OUTPUT_DIRECTORY/cubos/main.cpp
-
 
 #cat sdk/libs/Arduino_ST7789.cpp          $OUTPUT_DIRECTORY/cubos/main.cpp
 #cat sdk/libs/Arduino_ST7789.h            $OUTPUT_DIRECTORY/cubos/main.cpp
