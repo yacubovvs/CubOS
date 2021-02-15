@@ -1,0 +1,564 @@
+<html>
+    <head>
+
+        <script type='text/javascript' src='js/jquery-3.3.1.min.js'></script>
+        <style>
+            .inline{
+                display: inline-block;
+            }
+
+            body, html{
+                font-family: 'PT Sans', arial;
+                color: rgb(20, 20, 20);
+            }
+
+            .input-line{
+                border: 1px solid black;
+                border-radius: 5px;
+                width: 100px;
+                margin-right: 20px;
+                padding: 5px 10px;                
+            }
+
+            .palette{
+                padding: 20px 20px;
+            }
+
+            .palette-element{
+                display: inline-block;
+                width: 40px;
+                height: 40px;
+                transition-property: transform;
+                transition-duration: 0.4s;
+            }
+
+            .palette-element:hover{
+                border: 2px solid rgb(179, 179, 179);
+                transform: scale(1.4);
+                /*position: relative;*/
+                z-index: 100;
+                width: 36px;
+                height: 36px;
+            }
+
+            .palette-element-active{
+                border: 2px solid rgb(179, 179, 179);
+                transform: scale(1.4);
+                /*position: relative;*/
+                z-index: 100;
+                width: 36px;
+                height: 36px;
+            }
+
+            
+            /*
+            ############################################################
+            #                                                          #
+            #                      PAINTING  AREA                      #
+            #                                                          #
+            ############################################################
+            */
+
+            .paint-area{
+                overflow: hidden;
+                user-select: none;
+            }
+
+            .paintelement{
+                display: inline-block;
+                border: 1px solid rgb(90, 90, 90);
+                width: 36px;
+                height: 36px;
+                padding:0;
+                margin:0;
+                background: url(img/transparent.png);
+                background-size:  100% 100%;
+
+                /*
+                transition-property: width, height;
+                transition-duration: 1s;
+                */
+            }
+
+            /*
+            ############################################################
+            #                                                          #
+            #                       TOOLS  PANEL                       #
+            #                                                          #
+            ############################################################
+            */
+
+            /*free-panel free-panel-right*/
+
+            .free-panel{
+                z-index: 100;
+                position: absolute;
+                background-color: rgb(54, 59, 112);
+                color: white;
+                border-radius: 5px 0 0 5px;
+            }
+
+            .free-panel-right{
+                right: 0px;
+                top: calc(50% - 50px);
+            }
+
+            .free-panel-btn-scale{
+                width: 60px;
+                text-align: center;
+                line-height: 60px;
+                font-size: 20px;
+                font-weight: bold;
+            }
+
+            .free-panel-btn-scale:hover{
+                background-color: rgba(255, 255, 255, 0.199);
+                user-select: none;
+                cursor: pointer;
+            }
+
+            .change_image_size_wrapper{
+                width: 20px;
+                color: white;
+                position: relative;
+                top: 10px;
+                right: 20px;
+                cursor: pointer;
+            }
+
+            .change_image_size{
+                text-align: center;
+                font-weight: bold;
+                background-color:  rgb(54, 59, 112);
+                border-radius: 3px;
+                margin-bottom: 2px;
+                padding-right: 1px;
+                user-select: none;
+
+            }
+
+            .change_image_size:hover{
+                background-color:  rgb(74, 82, 165);
+            }
+
+
+            .btn{
+                margin: 10px;
+                display: inline-block;
+                text-align: center;
+                font-weight: bold;
+                background-color:  rgb(54, 59, 112);
+                border-radius: 3px;
+                padding: 10px;
+                user-select: none;
+                cursor: pointer;
+                color: aliceblue;
+            }
+
+            .btn:hover{
+                background-color:  rgb(74, 82, 165);
+            }
+
+
+            /*
+            ############################################################
+            #                                                          #
+            #                       RESULT PANEL                       #
+            #                                                          #
+            ############################################################
+            */
+            .result{
+                border-radius: 3px;
+                border: solid black 1px;
+                padding: 10px 10px;
+                margin: 10px 0;
+            }
+
+        </style>
+
+        <script>
+            var mouse_pressed = false;
+        </script>
+            
+    </head>
+
+    <body onmousedown="mouse_pressed=true;" onmouseup="mouse_pressed=false;">
+        <div>
+            <div class="input-line-header inline">Width:</div>
+            <div class="input-line inline" id="painting-area-width-input">32</div>
+            <div class="inline change_image_size_wrapper">
+                <div class="change_image_size" onclick="width_plus()">+</div>
+                <div class="change_image_size" onclick="width_minus()">-</div>
+            </div>
+
+            <div class="input-line-header inline">Height:</div>
+            <div class="input-line inline" id="painting-area-height-input">32</div>
+            <div class="inline change_image_size_wrapper">
+                <div class="change_image_size" onclick="height_plus()">+</div>
+                <div class="change_image_size" onclick="height_minus()">-</div>
+            </div>
+            <!--
+            <div class="inline">
+                Is not nokia5110 screen
+            </div>
+            -->
+            
+
+            <div class="palette">
+                <div class="palette-element"></div>
+            </div>
+        </div>
+
+        <div class="free-panel free-panel-right">
+            <div class="free-panel-btn-scale" onclick="scale_plus()">
+                +
+            </div>
+            <div class="free-panel-btn-scale" onclick="scale_minus()">
+                -
+            </div>
+        </div>
+
+        <div class="paint-area">
+            <div class="paint-image">
+                <div class="paintelements-line"></div>
+            </div>
+        </div>
+        <div class="result" contenteditable> 
+        </div>
+
+        <div class="btn" onclick="loadImageFromHex();">
+            Load from HEX data
+        </div>
+
+        <script>
+
+            function width_plus(){
+                image_width += 8;
+                if (image_width>256) image_width = 256; 
+
+                update_image_size();
+            }
+
+            function width_minus(){
+                image_width -= 8;
+                if (image_width<8) image_width = 8; 
+
+                update_image_size();
+            }
+
+            function height_plus(){
+                image_height += 8;
+                if (image_height>256) image_height = 256;
+
+                update_image_size();
+            }
+
+            function height_minus(){
+                image_height -= 8;
+                if (image_height<8) image_height = 8; 
+
+                update_image_size();
+            }
+
+            function update_image_size(){
+                $('#painting-area-width-input').text(image_width);
+                $('#painting-area-height-input').text(image_height);
+
+                drawPaintingArea();
+                generate_result();
+            }
+
+            var image_width = 16;
+            var image_height = 16;
+
+            var cell_size = 20;
+
+            var image_map = [];
+            var current_color = 0;
+
+            
+
+            /*
+            ############################################################
+            #                                                          #
+            #                       PALETTE AREA                       #
+            #                                                          #
+            ############################################################
+            */
+
+            var palette_arr = [
+                "transparent",
+                "ff0000",
+                "ffd900",
+                "33ff00",
+                "00ffea",
+                "0066ff",
+                "00245a",
+                "6f00ff",
+                "ff008c",
+                "ffffff",
+                "d8d8d8",
+                "b4b4b4",
+                "8f8f8f",
+                "6b6b6b",
+                "474747",
+                "000000",
+            ];
+
+            function get_color_style(color){
+                var style = "";
+                //console.log("!" + color)
+                if (color=="transparent" || color==undefined){
+                    style = "background: url(img/transparent.png); background-size:  100% 100%;";
+                }else{
+                    style = "background: unset; background-color: #" + color + ";";
+                }
+                return style + " height: " + cell_size + "px; width:" + cell_size + "px;";
+            }
+
+            var outer = "";
+            for(i in palette_arr){
+                var style = get_color_style(palette_arr[i]);
+                outer += "<div class=\"palette-element\" id=\"color-pallete" + i + "\" onclick=\"set_currentColor(" + i + ")\" style=\"" + style + ";\"></div>";
+            }
+
+            $(".palette").html(outer);
+
+            function set_currentColor(color){
+                current_color = color;
+                //console.log("Setting current color " + color);
+                $('.palette-element-active').removeClass('palette-element-active');
+                $('#color-pallete' + color).addClass('palette-element-active');
+            }
+
+            set_currentColor(15);
+
+            /*
+            ############################################################
+            #                                                          #
+            #                       PAINTING AREA                      #
+            #                                                          #
+            ############################################################
+            */
+            
+            function drawPaintingArea(){
+                var outer = "";
+
+                for(var y=0; y<image_height; y++){
+                    outer += "<div class=\"paintelements-line\">";
+                    for(var x=0; x<image_width; x++){
+                        if (image_map[x]==undefined) image_map[x] = [];
+                        if (image_map[x][y]==undefined) image_map[x][y] = "transparent";
+
+                        var style = get_color_style(palette_arr[image_map[x][y]]);
+                        //console.log(style);
+
+                        outer += "<div class=\"paintelement\" style=\"" + style + "\" id='paintelement" + x + "-" + y + "' onclick='paint_pixel(" + x + "," + y + ")' onmousemove='paint_pixel_mouse(" + x + "," + y + ")'></div>";
+                    }
+                    outer += "</div>";
+                }
+                
+                $('.paint-image').html(outer);
+            }
+
+            drawPaintingArea();
+
+            function paint_pixel_mouse(x,y){
+                if(mouse_pressed) paint_pixel(x,y);
+            }
+
+            function paint_pixel(x, y, prevent_result_generation){
+                image_map[x][y] = palette_arr[current_color];
+                //$('#paintelement' + x + '-' + y).attr('style', get_color_style(palette_arr[image_map[x][y]]));
+                $('#paintelement' + x + '-' + y).attr('style', get_color_style(image_map[x][y]));
+
+                if(prevent_result_generation!=true) generate_result();
+            }
+
+            function scale_minus(){
+                cell_size *= 0.8;
+                changeSize();
+            }
+
+            function scale_plus(){
+                cell_size /= 0.8;
+                changeSize();
+            }
+
+            function changeSize(){
+                $('.paintelement').width(cell_size).height(cell_size);
+            }
+
+            /*
+            #############################################################
+            #                                                           #
+            #                           RESULT                          #
+            #                                                           #
+            #############################################################
+            */
+            
+
+            var mas=["0","1","2","3","4","5","6","7","8","9","A","B","C","D","E","F"];
+            
+            function convert_to_HEX(a, size_bytes){
+                a = parseInt(a);
+
+                var mas1=[];
+                b=16
+                while(a>=1){
+                    c=Math.floor(a/b);
+                    d=a-b*c;
+                    mas1.push(d);
+                    a=c;
+                }
+                var result="";
+                for(i=0;i<mas1.length;i++){
+                    result+=mas[mas1[mas1.length-1-i]]+"";
+                }
+                
+                result = "0000000000000000000000000" + result;
+                return result.substr(result.length - size_bytes*2);
+            }
+
+            function getAllCollors(){
+                return palette_arr;
+            }
+
+            function generate_result(){
+                var result = "";
+
+                result += "0x" + convert_to_HEX(2,1) + ",0x" + convert_to_HEX(1,1) + ",";               // Icon format 1
+                result += "0x" + convert_to_HEX(2,1) + ",0x" + convert_to_HEX(image_width,1) + ",";     // Icon width
+                result += "0x" + convert_to_HEX(2,1) + ",0x" + convert_to_HEX(image_height,1) + ",";    // Icon height
+                result += "";
+
+                for(color_i in getAllCollors()){
+                    var color = palette_arr[color_i];
+                    if (color=="transparent") continue;
+                    
+                    var outer = ""; //convert_to_HEX(4,1) + color + " ";
+                    var colorEnabled = false;
+
+                    for(var y=0; y<image_height; y++){
+                        for(var x=0; x<image_width; x++){
+                            if(image_map[x][y]==color){
+                                outer += "1";
+                                colorEnabled = true;
+                            }else outer += "0"
+                        }
+                    }
+
+                    if (colorEnabled){
+
+                        //result += convert_to_HEX(4,1) + color_to_hex(color) + " ";
+                        result += "0x04," + color_to_hex(color) + "";
+                        //outer = (outer + "00000000").substr(0, Math.floor(outer.length/8 + 1)*8);
+                        if (outer.length%8!=0){
+                            outer += "00000000".substr(0, 8 - outer.length%8 );
+                        }
+
+                        for (var hex_i = 0; hex_i<outer.length/8; hex_i++){
+                            var h0 = outer[hex_i*8 + 7];
+                            var h1 = outer[hex_i*8 + 6];
+                            var h2 = outer[hex_i*8 + 5];
+                            var h3 = outer[hex_i*8 + 4];
+                            var h4 = outer[hex_i*8 + 3];
+                            var h5 = outer[hex_i*8 + 2];
+                            var h6 = outer[hex_i*8 + 1];
+                            var h7 = outer[hex_i*8 + 0];
+
+                            result += "0x" + convert_to_HEX( h0*1 + h1*2 + h2*4 + h3*8 + h4*16 + h5*32 + h6*64 + h7*128, 1) + ","; 
+                        }
+                        result += "";
+
+                        // Convert binary outer to the hex
+
+                    }
+                }
+
+                //result += convert_to_HEX(2,1);
+
+                $(".result").html(result);
+            }
+
+            function color_to_hex(color){
+                var c_a = color.split("");
+                return "0x" + c_a[0] + c_a[1] + "," + "0x" + c_a[2] + c_a[3] + "," + "0x" + c_a[4] + c_a[5] + ",";
+            }
+
+            function loadImageFromHex(){
+                let text = $('.result').text();
+                let text_arr_hex = text.split(",");
+                let text_arr = [];
+                for(let i in text_arr_hex){
+                    text_arr[i]  = parseInt(text_arr_hex[i], 16);
+                }
+
+                //console.log(text_arr);
+
+                image_width     = text_arr[3];
+                image_height    = text_arr[5];
+                update_image_size();
+
+                let layer_byte_length = image_width*image_height/8;
+                //console.log("Layer length " + layer_byte_length + " bytes");
+
+                let current_position = 7;
+
+                //console.log("image_width " + image_width);
+                //console.log("image_height " + image_height);
+
+                for(let x=0; x<image_width; x++){
+                    for(let y=0; y<image_height; y++){
+                        image_map[x][y] = "transparent";
+                        $('#paintelement' + x + '-' + y).attr('style', get_color_style(image_map[x][y]));
+                    }
+                }
+
+                while (current_position<text_arr.length){
+                    let r = text_arr_hex[current_position]; current_position++;
+                    let g = text_arr_hex[current_position]; current_position++;
+                    let b = text_arr_hex[current_position]; current_position++;
+
+                    //console.log("New layer");
+                    //console.log("" + r + ", " + g + ", " + b);
+
+                    let x = 0;
+                    let y = 0;
+                    for(let i=0; i<layer_byte_length; i++){
+                        data = dec2bin(text_arr[current_position]); current_position++;
+                        for(let ii=0; ii<data.length; ii++){
+                            if(data[ii]==1){
+                                
+                                image_map[x][y] = "" + r.substr(-2) + g.substr(-2) + b.substr(-2);
+
+                                //console.log("# " +x + ", " + y);
+                                //$('#paintelement' + x + '-' + y).attr('style', "background: unset; background-color: #" + image_map[x][y] + ";");
+                                $('#paintelement' + x + '-' + y).attr('style', get_color_style(image_map[x][y]));
+                            }
+
+                            x++;
+                            if(x>=image_width){
+                                y++;
+                                if(y>=image_height) y=0;
+                                x=0;
+                            }
+                        }
+                    }
+                    //console.log("*** " + current_position);
+                    current_position++;
+                }
+
+                $('.result').text(text);
+            }
+
+            update_image_size();
+
+            function dec2bin(dec){
+                return ("00000000" + (dec >>> 0).toString(2)).substr(-8);
+            }
+            
+        </script> 
+
+    </body>
+</html>

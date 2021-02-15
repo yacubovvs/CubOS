@@ -1,0 +1,1087 @@
+<html>
+    <head>
+
+        <style>
+
+        </style>
+
+        <script defer type='text/javascript' src='js/jquery-3.3.1.min.js'></script> 
+        <script src="js/ace/src-min-noconflict/ace.js" type="text/javascript" charset="utf-8"></script>
+
+        <pre id="editor">
+                                                                                                                                                                                                                                                               
+        </pre>
+
+        <div id="pre-result-title">
+            Pre Result:
+        </div>
+
+        <pre id="pre-result"></pre>
+
+        <div id="result-title">
+            Result:
+        </div>
+
+        <pre id="result"></pre>
+
+        <style type="text/css" media="screen">
+            body {
+                overflow: hidden;
+            }
+        
+            #editor {
+                margin: 0;
+                position: absolute;
+                top: 0;
+                bottom: 67%;
+                left: 0;
+                right: 0;
+                z-index: 100;
+            }
+
+            #pre-result {
+                margin: 0;
+                position: absolute;
+                top: calc(33% + 20px);
+                bottom: 34%;
+                left: 0;
+                right: 0;
+                z-index: 100;
+            }
+
+            #pre-result-title{
+                margin: 0;
+                position: absolute;
+                top: calc(33%);
+                left: 0;
+                right: 0;
+                height: 20px;
+                color: white;
+                background-color: black;
+            }
+
+            #result {
+                margin: 0;
+                position: absolute;
+                top: calc(66% + 20px);
+                bottom: 0;
+                left: 0;
+                right: 0;
+                z-index: 100;
+            }
+
+            #result-title{
+                margin: 0;
+                position: absolute;
+                top: calc(66%);
+                left: 0;
+                right: 0;
+                height: 20px;
+                color: white;
+                background-color: black;
+            }
+        </style>
+            
+        <script>
+            var editor = ace.edit("editor");
+            editor.setTheme("ace/theme/twilight");
+
+            var result = ace.edit("result");
+            result.setTheme("ace/theme/twilight");
+
+            var pre_result = ace.edit("pre-result");
+            pre_result.setTheme("ace/theme/twilight");
+            /*editor.session.setMode("ace/mode/javascript");*/
+
+            editor.$blockScrolling = Infinity;
+            result.$blockScrolling = Infinity;
+            pre_result.$blockScrolling = Infinity;
+
+            function compile(){
+                console.clear();
+                error_list = [];
+                var code = editor.getValue();
+                code = unwrap_constructs(code);
+                compile_preresult(code);
+
+                if(error_list.length>0){
+                    console.error("Errors while compile:")
+                    for (var i=0; i<error_list.length; i++){
+                        console.log("{" + error_list[i].string_num + "}   " + error_list[i].error);
+                    }
+                }else{
+                    console.log("Compile success");
+                }
+            }
+
+            /*
+            ##################################################################
+
+            UNWRAP "if", "while", "for", "do" 
+
+            ##################################################################
+            */
+
+            var if_map = [];
+            var current_if_level_arr = [];
+
+            var while_map = [];
+            var current_while_level_arr = [];
+
+            var func_map = [];
+            var current_func = "";
+
+            function unwrap_constructs(code){
+                // Get all if constructions
+                while_map = [];
+                current_while_level_arr = [];
+
+                current_if_level_arr = [];
+                if_map = [];
+
+                current_func = "";
+                func_map = [];
+
+                code = "//--compile-nostr \nu_int4 sys_if_wrapper_condition \n" + code;
+                code = "//--compile-nostr \nu_int4 sys_func_back_label \n" + code;
+
+                var strings_arr = code.split("\n");
+                var if_level_counter = 0;
+                var while_level_counter = 0;
+                
+                var if_counter = 0;
+                var while_counter = 0;
+                var string_num_counter = 0;
+                
+                for (var i in strings_arr){
+                    string_num_counter ++;
+                    var string = strings_arr[i].trim();
+
+                    /*
+                    ##################################################################
+                    #
+                    #   UNWRAPING IF
+                    #
+                    ##################################################################
+                    */
+
+                    if (string.substr(0,2).toUpperCase()=="IF"){
+                        if_level_counter++;
+                        if_counter ++;
+
+                        if_map.push(
+                            {
+                                command:    "IF",
+                                string:     string_num_counter,
+                                level:      if_level_counter,
+                                counter:    if_counter,
+                                condition:  "",
+                            }
+                        );
+
+                        strings_arr[i] = ""
+                            + "//--compile-nostr \nsys_if_wrapper_condition = " + string.match(/\((.*)\)/).pop() + " \n"
+                            + "gocon(:sys_start_if_" + if_counter + ", sys_if_wrapper_condition) \n" 
+                            + "//--compile-nostr \n"
+                            + "goto(:sys_else_" + if_counter + ") \n"
+                            + "//--compile-nostr \n"
+                            + ":sys_start_if_" + if_counter + ""; 
+
+                        current_if_level_arr.push(if_counter);
+
+                    }else if (string.substr(0,6).toUpperCase()=="ELSEIF"){
+                        //if (if_level_counter==0) create_compile_error("" + string_num_counter, "No IF for this ELSE");
+                        create_compile_error("" + string_num_counter, "ELSEIF not available yet");
+
+                    }else if (string.substr(0,4).toUpperCase()=="ELSE"){
+                        if (if_level_counter==0) create_compile_error("" + string_num_counter, "No IF for this ELSE");
+
+                        if_map.push(
+                            {
+                                command:    "ELSE",
+                                string:     string_num_counter,
+                                level:      if_level_counter,
+                                counter:    current_if_level_arr[current_if_level_arr.length-1],
+                                condition:  "",
+                            }
+                        );
+
+                        strings_arr[i] = 
+                            "goto(:sys_endif_" + current_if_level_arr[current_if_level_arr.length-1] + ")\n"
+                            + "//--compile-nostr \n" 
+                            + ":sys_else_" + current_if_level_arr[current_if_level_arr.length-1] + "";
+                            ;
+
+                    }else if (string.substr(0,5).toUpperCase()=="ENDIF"){
+                            
+                        if_map.push(
+                            {
+                                command:    "ENDIF",
+                                string:     string_num_counter,
+                                level:      if_level_counter,
+                                counter:    current_if_level_arr[current_if_level_arr.length-1],
+                                condition:  "",
+                            }
+                        );
+
+                        if_level_counter--;
+                        if (if_level_counter<0) create_compile_error("" + string_num_counter, "No IF for this ENDIF")
+                        
+                        var current_if_num = current_if_level_arr[current_if_level_arr.length-1];
+                        strings_arr[i] = "";
+
+                        //Search if ELSE command was use for this IF
+                        var else_command = if_map.find(function(e){if(e.counter==current_if_level_arr[current_if_level_arr.length-1] && e.command=="ELSE") return true});
+                        if (else_command==undefined) strings_arr[i]+= "//--compile-nostr \n" + ":sys_else_" + current_if_level_arr[current_if_level_arr.length-1] + "\n";
+
+                            
+                        strings_arr[i]+=":sys_endif_" + current_if_level_arr[current_if_level_arr.length-1] + "";
+
+                        current_if_level_arr = current_if_level_arr.slice(0,current_if_level_arr.length-1)
+                        
+                    }
+
+                     /*
+                    ##################################################################
+                    #
+                    #   UNWRAPING SUBFUNCTIONS
+                    #
+                    ##################################################################
+                    */
+
+                    else if (string.substr(0,4).toUpperCase()=="FUNC"){
+
+                        //if_map = [];
+                        //current_func = "";
+
+                        if (current_func!="") create_compile_error(string_num_counter, "FUNC can not be declarate in IF-ENDIF construct");
+
+                        current_func = string.substr(4).trim();
+                        strings_arr[i] = 
+                            "goto(:sys_func_" + current_func + "_wrapper)\n"
+                            + "//--compile-nostr \n"
+                            + ":sys_func_" + current_func;
+
+                        func_map.push({
+                            start_string:   string_num_counter,
+                            name:           current_func,
+                        });
+
+                    }else if (string.substr(0,7).toUpperCase()=="ENDFUNC"){
+                        if (current_func=="") create_compile_error("ENDFUNC cant't be without FUNC");
+
+                        func_map_element = func_map.find(function(element){ if(element.name == current_func) return element; });
+                        func_map_element.end_string = string_num_counter;
+
+                        strings_arr[i] = 
+                            "goto(sys_func_back_label)\n"
+                            + "//--compile-nostr \n"
+                            + ":sys_func_" + current_func + "_wrapper";
+
+                        current_func = "";
+                    }else if (string.substr(0,6).toUpperCase()=="RETURN"){
+                        if (current_func=="") create_compile_error("RETURN shoud be inside FUNC-ENDFUNC");
+                        strings_arr[i] = "goto(sys_func_back_label)";
+
+                    }else if (string.substr(0,3).toUpperCase()=="RUN"){
+                        if (current_func!="") create_compile_error("RUN is not available inside FUNC");
+                        var func_name = string.substr(4).trim();
+                        
+                        strings_arr[i] = ""
+                        + "//--compile-nostr \n" 
+                        + "sys_func_back_label = :callLabel_" + string_num_counter + "\n"
+                        + "//--compile-nostr \n" 
+                        + "goto(:sys_func_" + func_name + ")\n"
+                        + "//--compile-nostr \n" 
+                        + ":callLabel_" + string_num_counter + "\n";
+                        
+                    }else 
+
+                        /*
+                        ##################################################################
+                        #
+                        #   UNWRAPING WHILE LOOP
+                        #
+                        ##################################################################
+                        */
+
+                        //while_map = [];
+                        //current_while_level_arr = [];
+
+                        if (string.substr(0,5).toUpperCase()=="WHILE"){
+                            while_level_counter++;
+                            while_counter ++;
+
+                            while_map.push(
+                                {
+                                    command:    "WHILE",
+                                    string:     string_num_counter,
+                                    level:      while_level_counter,
+                                    counter:    while_counter,
+                                    condition:  "",
+                                }
+                            );
+
+                            strings_arr[i] = ""
+                                + ":sys_loop_wrapper_start_" + while_counter + "\n"
+                                + "//--compile-nostr \n"
+                                + "sys_if_wrapper_condition = " + string.match(/\((.*)\)/).pop() + " \n"
+                                + "//--compile-nostr \n"
+                                + "gocon(:sys_loop_start_" + while_counter + ", sys_if_wrapper_condition) \n" 
+                                + "//--compile-nostr \n"
+                                + "goto(:sys_loop_wrapper_" + while_counter + ") \n"
+                                + "//--compile-nostr \n"
+                                + ":sys_loop_start_" + while_counter + ""; 
+                                //////////////
+                                
+
+                            current_while_level_arr.push(while_counter);
+
+                        }else if (string.substr(0,5).toUpperCase()=="BREAK"){
+                            if (while_level_counter==0) create_compile_error("" + string_num_counter, "BREAK can't be used outside loop");
+
+                            strings_arr[i] = 
+                                + "goto(:sys_loop_wrapper_start_" + current_while_level_arr[current_while_level_arr.length-1] + ")";
+
+                        }else if (string.substr(0,7).toUpperCase()=="ENDLOOP"){
+                                
+                            while_map.push(
+                                {
+                                    command:    "ENDLOOP",
+                                    string:     string_num_counter,
+                                    level:      while_level_counter,
+                                    counter:    current_while_level_arr[current_while_level_arr.length-1],
+                                    condition:  "",
+                                }
+                            );
+
+                            while_level_counter--;
+                            if (while_level_counter<0) create_compile_error("" + string_num_counter, "ENDLOOP can't be used outside loop")
+                            
+                            //var current_while_num = current_while_level_arr[current_while_level_arr.length-1];
+
+                            strings_arr[i] = ""
+                                + "goto(:sys_loop_wrapper_start_" + current_while_level_arr[current_while_level_arr.length-1] + ")\n"
+                                + "//--compile-nostr \n"
+                                + ":sys_loop_wrapper_" + current_while_level_arr[current_while_level_arr.length-1] + "";
+
+                            current_while_level_arr = current_while_level_arr.slice(0,current_while_level_arr.length-1)
+                            
+                        }
+                }
+
+                if(if_level_counter!=0) create_compile_error("" + string_num_counter, "ENDIF expected")
+
+                code = strings_arr.join("\n");
+                //console.log(code);
+                return code;
+            }
+
+            /*
+            ##################################################################
+
+            PRERESULT
+
+            ##################################################################
+            */
+
+            var error_list = [];
+            var code_strings_arr;
+            var code_variables;
+            var code_variables_maxAdress;
+
+            function add_var(var_name, size){
+                code_variables[var_name] = 
+                {
+                    size: size,
+                    address: code_variables_maxAdress,
+                };
+
+                code_variables_maxAdress += size;
+
+                return code_variables_maxAdress;
+            }
+
+            function compile_preresult(code){
+                code_strings_arr = code.split("\n");
+                code_variables = {};
+                code_variables_maxAdress = 0;
+
+                var string_num_counter = 0;
+
+                var preresult_code = "";
+                for (var i=0; i<code_strings_arr.length; i++){
+                    var string = code_strings_arr[i].trim();
+                    string_num_counter ++;
+                    //console.log(string.split(" ")[0].trim().toUpperCase());
+                    
+                    if (string.split("(")[0].trim().toUpperCase()=="IMAGE"){
+                        preresult_code += "IMAGE";
+
+                        var prestring = "";
+                        var params_app = compile_preresult_getParams(prestring, string);
+                        for (var ii=0; ii<params_app.length; ii++){
+                            preresult_code += "\n" + params_app[ii];
+                        }
+
+                        preresult_code += "\nENDSTRING\n\n";
+                        
+                    }else if (string.split("(")[0].trim().toUpperCase()=="LINE"){
+                        preresult_code += "LINE";
+
+                        var prestring = "";
+                        var params_app = compile_preresult_getParams(prestring, string);
+                        for (var ii=0; ii<params_app.length; ii++){
+                            preresult_code += "\n" + params_app[ii];
+                        }
+
+                        preresult_code += "\nENDSTRING\n\n";
+                    }else if (string.substr(0,17)=="//--compile-nostr"){
+                        string_num_counter-=2;
+                        //Do nothing it is a comment
+                    }else if (string.substr(0,2)=="//"){
+                        //Do nothing it is a comment
+                    }else if (string.trim()[0]==":"){
+                        preresult_code += "LABEL " + string.substr(1,string.length).trim() + "\n\n";
+                        //code_variables
+                    }else if (
+                        string.split(" ")[0]=="boolean"  || 
+                        string.split(" ")[0]=="u_byte"  || 
+                        string.split(" ")[0]=="u_int1"  ||
+                        string.split(" ")[0]=="u_int2"  ||
+                        string.split(" ")[0]=="u_int3"  ||
+                        string.split(" ")[0]=="u_int4"  ||
+                        string.split(" ")[0]=="u_int6"  ||
+                        string.split(" ")[0]=="u_int8"  ||
+                        string.split(" ")[0]=="u_bytes" ||
+                        string.split(" ")[0]=="string" 
+                        )
+                    {
+                        var var_type = string.split(" ")[0];
+                        var var_name = string.substr(var_type.length).trim().split("=")[0];
+                        var var_size;
+                        
+                        if(var_type=="boolean" || var_type=="u_byte" || var_type=="u_int1"){
+                            var_size = 1;
+                        }else if(var_type=="u_int2"){
+                            var_size = 2;
+                        }else if(var_type=="u_int3"){
+                            var_size = 3;
+                        }else if(var_type=="u_int4"){
+                            var_size = 4;
+                        }else if(var_type=="u_int6"){
+                            var_size = 6;
+                        }else if(var_type=="u_int8"){
+                            var_size = 8;
+                        }else if(var_type=="u_bytes" || var_type=="string"){
+                            var_size = var_name.split("[")[1].split("]")[0].trim();
+                        }
+
+                        if(code_variables[var_name]!=null) create_compile_error("" + string_num_counter, "Dublicate variable initing " + var_name)
+                        else{
+                            var address = add_var(var_name, parseInt(var_size));
+
+                            var var_value = string.split("=")[1];
+                            if(var_value && var_value.trim()){
+                                //console.log(var_value);
+                                preresult_code += "SET_VAR\n";
+                                var prestring = "";
+                                
+                                preresult_code += compile_preresult_getParams_comma_string("","" + address) + "\n";
+                                preresult_code += compile_preresult_getParams_comma_string("","" + var_size) + "\n";
+                                preresult_code += compile_preresult_getParams_comma_string("",var_value) + "\n";
+                                preresult_code += "ENDSTRING\n\n";
+                            }
+                        }
+
+                    }else if (string.split("(")[0].trim().toUpperCase()=="GOTO"){
+                        preresult_code += "GOTO";
+
+                        var prestring = "";
+                        var params_app = compile_preresult_getParams(prestring, string);
+                        for (var ii=0; ii<params_app.length; ii++){
+                            preresult_code += "\n" + params_app[ii];
+                        }
+
+                        preresult_code += "\nENDSTRING\n\n";
+
+                    }else if (string.split("(")[0].trim().toUpperCase()=="GOCON"){
+                        preresult_code += "GOCON";
+
+                        var prestring = "";
+                        var params_app = compile_preresult_getParams(prestring, string);
+                        for (var ii=0; ii<params_app.length; ii++){
+                            preresult_code += "\n" + params_app[ii];
+                        }
+
+                        preresult_code += "\nENDSTRING\n\n";
+
+                    }else if (string.split("(")[0].trim().toUpperCase()=="PRINT"){
+                        preresult_code += "PRINT";
+
+                        var prestring = "";
+                        var params_app = compile_preresult_getParams(prestring, string);
+                        for (var ii=0; ii<params_app.length; ii++){
+                            preresult_code += "\n" + params_app[ii];
+                        }
+
+                        preresult_code += "\nENDSTRING\n\n";
+
+                    }else if(string.replace(/\ /g, "").indexOf("+=")!=-1){
+
+                        var str_split = string.replace(/\ /g, "").split("+=");
+                        preresult_code += "MATH_ADDITION\n";
+                        preresult_code += (get_Param_type(str_split[0]) + str_split[0]) + "\n";
+                        preresult_code += (get_Param_type(str_split[1]) + str_split[1]) + "\n";
+                        preresult_code += "ENDSTRING\n\n";
+
+                    }else if(string.replace(/\ /g, "").indexOf("-=")!=-1){
+
+                        var str_split = string.replace(/\ /g, "").split("-=");
+                        preresult_code += "MATH_SUBTRACTION\n";
+                        preresult_code += (get_Param_type(str_split[0]) + str_split[0]) + "\n";
+                        preresult_code += (get_Param_type(str_split[1]) + str_split[1]) + "\n";
+                        preresult_code += "ENDSTRING\n\n";
+
+                    }else if(string.replace(/\ /g, "").indexOf("*=")!=-1){
+
+                        var str_split = string.replace(/\ /g, "").split("*=");
+                        preresult_code += "MATH_MULTIPLICATION\n";
+                        preresult_code += (get_Param_type(str_split[0]) + str_split[0]) + "\n";
+                        preresult_code += (get_Param_type(str_split[1]) + str_split[1]) + "\n";
+                        preresult_code += "ENDSTRING\n\n";
+
+                    }else if(string.replace(/\ /g, "").indexOf("/=")!=-1){
+
+                        var str_split = string.replace(/\ /g, "").split("/=");
+                        preresult_code += "MATH_DIVISION\n";
+                        preresult_code += (get_Param_type(str_split[0]) + str_split[0]) + "\n";
+                        preresult_code += (get_Param_type(str_split[1]) + str_split[1]) + "\n";
+                        preresult_code += "ENDSTRING\n\n";
+
+                    }else if(string.replace(/\ /g, "").indexOf("%=")!=-1){
+
+                        var str_split = string.replace(/\ /g, "").split("%=");
+                        preresult_code += "MATH_REMAINDER_OF_DIVISION\n";
+                        preresult_code += (get_Param_type(str_split[0]) + str_split[0]) + "\n";
+                        preresult_code += (get_Param_type(str_split[1]) + str_split[1]) + "\n";
+                        preresult_code += "ENDSTRING\n\n";
+
+                    }else if(string.replace(/\ /g, "").indexOf("=!")!=-1){
+
+                        var str_split = string.replace(/\ /g, "").split("=!");
+                        preresult_code += "MATH_REVERSE\n";
+                        preresult_code += (get_Param_type(str_split[0]) + str_split[0]) + "\n";
+                        preresult_code += (get_Param_type(str_split[1]) + str_split[1]) + "\n";
+                        preresult_code += "ENDSTRING\n\n";
+
+                    }else if(string.replace(/\ /g, "").indexOf(">>")!=-1){
+
+                        var str_split = string.replace(/\ /g, "").split(">>");
+                        preresult_code += "MATH_SHIFT_RIGHT\n";
+                        preresult_code += (get_Param_type(str_split[0]) + str_split[0]) + "\n";
+                        preresult_code += (get_Param_type(str_split[1]) + str_split[1]) + "\n";
+                        preresult_code += "ENDSTRING\n\n";
+
+                    }else if(string.replace(/\ /g, "").indexOf("<<")!=-1){
+
+                        var str_split = string.replace(/\ /g, "").split("<<");
+                        preresult_code += "MATH_SHIFT_LEFT\n";
+                        preresult_code += (get_Param_type(str_split[0]) + str_split[0]) + "\n";
+                        preresult_code += (get_Param_type(str_split[1]) + str_split[1]) + "\n";
+                        preresult_code += "ENDSTRING\n\n";
+
+                    }else if(string.replace(/\ /g, "").indexOf("==")!=-1){
+
+                        var str_split = string.replace(/\ /g, "").split("==");
+                        preresult_code += "MATH_EQUAL\n";
+                        preresult_code += (get_Param_type(str_split[0]) + str_split[0]) + "\n";
+                        preresult_code += (get_Param_type(str_split[1]) + str_split[1]) + "\n";
+                        preresult_code += "ENDSTRING\n\n";
+
+                    }else if(string.replace(/\ /g, "").toUpperCase().indexOf("=RANDOM(")!=-1){
+
+                        var command_position = string.replace(/\ /g, "").toUpperCase().indexOf("=RANDOM(");
+                        var str_split = string.replace(/\ /g, "").split(string.replace(/\ /g, "").substr(command_position, 8)); 
+
+                        preresult_code += "MATH_RANDOM\n";
+                        //console.log(str_split[0]);
+                        //console.log(str_split[1]);
+                        preresult_code += (get_Param_type(str_split[0]) + str_split[0]) + "\n";
+                        preresult_code += (get_Param_type(str_split[1].split(")")[0]) + str_split[1].split(")")[0]) + "\n";
+                        //preresult_code += (get_Param_type(str_split[1]) + str_split[1]) + "\n";
+                        preresult_code += "ENDSTRING\n\n";
+
+                    }else if(string.replace(/\ /g, "").indexOf(">")!=-1){
+
+                        var str_split = string.replace(/\ /g, "").split(">");
+                        preresult_code += "MATH_ISMORE\n";
+                        preresult_code += (get_Param_type(str_split[0]) + str_split[0]) + "\n";
+                        preresult_code += (get_Param_type(str_split[1]) + str_split[1]) + "\n";
+                        preresult_code += "ENDSTRING\n\n";
+
+                    }else if(string==""){
+                        // empty string
+                    }else if(code_variables[string.split("=")[0].trim()]!=undefined){
+                        // setting variable
+                        var var_data = code_variables[string.split("=")[0].trim()];
+
+                        preresult_code += "SET_VAR\n";
+                        preresult_code += compile_preresult_getParams_comma_string("","" + var_data.address) + "\n";
+                        preresult_code += compile_preresult_getParams_comma_string("","" + var_data.size) + "\n";
+                        preresult_code += compile_preresult_getParams_comma_string("",string.split("=")[1].trim()) + "\n";
+                        preresult_code += "ENDSTRING\n\n";
+                    }else if(string.trim().toUpperCase()=="SYS_CLEARSCREEN()"){
+                        preresult_code += "SYS_CLEARSCREEN\n";
+                        preresult_code += "ENDSTRING\n\n";
+                    }else if(string.trim().toUpperCase()=="SYS_ENABLE_AUTOREDRAW_SCREEN()"){
+                        preresult_code += "SYS_ENABLE_AUTOREDRAW_SCREEN\n";
+                        preresult_code += "ENDSTRING\n\n";
+                    }else if(string.trim().toUpperCase()=="SYS_DISABLE_AUTOREDRAW_SCREEN()"){
+                        preresult_code += "SYS_DISABLE_AUTOREDRAW_SCREEN\n";
+                        preresult_code += "ENDSTRING\n\n";
+                    }else if(string.trim().toUpperCase()=="SYS_FINISH_APP()"){
+                        preresult_code += "SYS_FINISH_APP\n";
+                        preresult_code += "ENDSTRING\n\n";
+                    }else{
+                        create_compile_error("" + string_num_counter, "Unknown command " + string)
+                    }
+                }
+                
+                pre_result.setValue(preresult_code);
+                compile_result(preresult_code);
+            }
+
+            function compile_preresult_getParams(prestring, string){
+                //Params string
+                var paramsString = (string).match(/\((.*)\)/).pop();
+                return compile_preresult_getParams_comma_string(prestring, paramsString);
+            }
+
+            function compile_preresult_getParams_comma_string(prestring, paramsString){
+                var com_count=0;
+                var brack_count = 0;
+
+                var params = [];
+
+                var temp_param = "";
+                //Нафиг этот regexp, потратил очень много времени, сил больше нет. Буду быдлокодить, уж простите
+                for (var i=0; i<paramsString.length; i++){
+                    var char = paramsString[i];
+
+                    if (char=="\""){
+                        if (com_count==0) com_count = 1;
+                        else if (com_count==1) com_count = 0;
+                    }else if(char=="(" || char=="["){
+                        brack_count ++;
+                    }else if(char==")" || char=="]"){
+                        brack_count --;
+                    }else if(char==","){
+                        if(com_count==0 && brack_count==0){
+                            temp_param = temp_param.trim();
+                            params.push(get_Param_type(temp_param) + temp_param);
+                            temp_param = "";    
+                        }  
+                    }
+
+                    if(char!="," || com_count!=0 || brack_count!=0){
+                        temp_param += char;
+                    }
+                }
+
+                temp_param = temp_param.trim();
+                var param_type = get_Param_type(temp_param);
+                if (param_type=="(string)"){
+                    temp_param = temp_param.substr(1, temp_param.length-2);
+                }
+
+                if (param_type=="(bytes)"){
+                    temp_param = temp_param.replace(/\s/g, '').replace(/0x/g, '').replace(/\,/g, '');
+                }
+
+
+                params.push( param_type + temp_param);
+                temp_param = "";    
+
+                return params;
+            }
+
+            function get_hex_size_of_preresult(string){
+                if(string.substr(0,8)=="(u_byte)"){
+                    return 2;
+                }else if(string.substr(0,8)=="(u_int2)"){
+                    return 3;
+                }else if(string.substr(0,8)=="(u_int3)"){
+                    return 4;
+                }else if(string.substr(0,8)=="(u_int4)"){
+                    return 5;
+                }else if(string.substr(0,8)=="(u_int6)"){
+                    return 7;
+                }else if(string.substr(0,8)=="(u_int8)"){
+                    return 9;
+                }else if(string.substr(0,7)=="(label)"){
+                    return 5;
+                }else if(string.substr(0,5)=="(var)"){
+                    return 1 + get_hex_size_of_preresult(compile_preresult_getParams_comma_string("","" + code_variables[string.split(")")[1].trim()].address)[0]) + get_hex_size_of_preresult(compile_preresult_getParams_comma_string("","" + code_variables[string.split(")")[1].trim()].size)[0]);
+                }else if(string.substr(0,7)=="(bytes)"){
+                    return Math.round((string.replace(/\s/g, '').trim().length - 9)/2);
+                }else if(string.substr(0,8)=="(string)"){
+                    //????
+                    return string.trim().length - 7;
+                }
+                /*
+                /////////////////////////////////
+                //      COMMANDS
+                */
+                else if(
+                        string.substr(0,4)=="LINE"      ||
+                        string.substr(0,4)=="GOTO"      ||
+                        string.substr(0,5)=="GOCON"     ||
+                        string.substr(0,5)=="PRINT"     ||
+                        string.substr(0,7)=="SET_VAR"   ||
+                        string.substr(0,9)=="ENDSTRING"
+                    )
+                {
+                    return 2;
+                }else if(
+                    string.substr(0,13)=="MATH_ADDITION"        ||
+                    string.substr(0,16)=="MATH_SUBTRACTION"     ||
+                    string.substr(0,19)=="MATH_MULTIPLICATION"  ||
+                    string.substr(0,13)=="MATH_DIVISION"        ||
+                    string.substr(0,12)=="MATH_REVERSE"         ||
+                    string.substr(0,12)=="MATH_ISMORE"         ||
+                    string.substr(0,26)=="MATH_REMAINDER_OF_DIVISION" ||
+                    string.substr(0,15)=="MATH_SHIFT_LEFT" ||
+                    string.substr(0,16)=="MATH_SHIFT_RIGHT" ||
+                    string.substr(0,11)=="MATH_RANDOM"  ||
+                    string.substr(0,10)=="MATH_EQUAL"
+                ){
+                    return 3;
+                }else if(string.trim()==""){
+                }else if(string.substr(0,9)=="IMAGE"){
+                    return 2;
+                }else if(
+                    string.substr(0,29)=="SYS_DISABLE_AUTOREDRAW_SCREEN" ||
+                    string.substr(0,28)=="SYS_ENABLE_AUTOREDRAW_SCREEN"  ||
+                    string.substr(0,15)=="SYS_CLEARSCREEN"               ||
+                    string.substr(0,15)=="SYS_FINISH_APP"
+                ){
+                    return 2;
+                }else if(string.substr(0,5)=="LABEL"){
+                }else if(
+                    string.substr(0,34)=="(sys_val)sys_touchscreen_istouched"       ||
+                    string.substr(0,32)=="(sys_val)sys_touchscreen_enabled"         ||
+                    string.substr(0,32)=="(sys_val)sys_touchscreen_touch_x"         ||
+                    string.substr(0,32)=="(sys_val)sys_touchscreen_touch_y"         ||
+                    string.substr(0,26)=="(sys_val)sys_buttons_count"               ||
+                    string.substr(0,37)=="(sys_val)sys_buttons_left_click_start"    ||
+                    string.substr(0,38)=="(sys_val)sys_buttons_right_click_start"   ||
+                    string.substr(0,39)=="(sys_val)sys_buttons_select_click_start"  ||
+                    string.substr(0,25)=="(sys_val)sys_screen_width"                ||
+                    string.substr(0,26)=="(sys_val)sys_screen_height" 
+                ){
+                    return 2;
+                }else{
+                    console.log("Unknown preresult command in string " + string);
+                }
+
+                return 0;
+            }
+
+            function get_Param_type(param){
+                //console.log(param);
+
+                if ("" + parseInt(param) == param){
+                    //integer
+                    i_param = parseInt(param);
+                    if (i_param>=0 && i_param<Math.pow(2,8*1)){
+                        return "(u_byte)";
+                    }else if (i_param>=0 && i_param<Math.pow(2,8*2)){
+                        return "(u_int2)";
+                    }else if (i_param>=0 && i_param<Math.pow(2,8*3)){
+                        return "(u_int3)";
+                    }else if (i_param>=0 && i_param<Math.pow(2,8*4)){
+                        return "(u_int4)";
+                    }else if (i_param>=0 && i_param<Math.pow(2,8*6)){
+                        return "(u_int6)";
+                    }else if (i_param>=0 && i_param<Math.pow(2,8*8)){
+                        return "(u_int8)";
+                    }
+                    
+                    return "(int?)";
+                }else if("" + parseFloat(param) == param){
+                    //float
+                    return "(float?)";
+                }else if(param[0]=="\"" && param[param.length-1]=="\""){
+                    //string
+                    return "(string)";
+                }else if(param[0]=="[" && param[param.length-1]=="]"){
+                    //string
+                    return "(bytes)";
+                }else if(param[0]==":"){
+                    //string
+                    return "(label)";
+                }else if(code_variables[param]){
+                    return "(var)";
+                }else if(
+                    param=="sys_touchscreen_istouched"          ||
+                    param=="sys_touchscreen_enabled"            ||
+                    param=="sys_touchscreen_touch_x"            ||
+                    param=="sys_touchscreen_touch_y"            ||
+                    param=="sys_buttons_count"                  ||
+                    param=="sys_buttons_left_click_start"       ||
+                    param=="sys_buttons_right_click_start"      ||
+                    param=="sys_buttons_select_click_start"     ||
+                    param=="sys_screen_width"                   ||
+                    param=="sys_screen_height" 
+                ){
+                    return "(sys_val)";
+                }else{
+                    //var
+                    //function
+                    //expression
+                    return "(unknow_parametr?)";
+                }
+
+                return "(unknow_parametr?)";
+            }
+
+            /*
+            ##################################################################
+
+            RESULT
+
+            ##################################################################
+            */
+            var labels_map;
+            var result_code = "";
+
+            function compile_result(code){
+                code_strings = code.split("\n");
+                result_code = "";
+
+                //greating labels map
+                length=0;
+                labels_map = {};
+                for (var i=0; i<code_strings.length; i++ ){
+                    var string = code_strings[i];
+                    length += get_hex_size_of_preresult(string);
+                    //console.log(string + " " + get_hex_size_of_preresult(string));
+                    if (string.substr(0,5)=="LABEL"){
+                        var labelname = string.substr(5, string.length);
+                        if(labels_map[labelname]!=undefined){
+                            console.error("Dublicate of labels " + labelname);
+                        }
+
+                        labels_map[":" + labelname.trim()] = length;
+                    }
+                }
+                
+                // COMPILING
+
+                for (var i=0; i<code_strings.length; i++ ){
+                    var string = code_strings[i].trim();
+                    add_result_code_bytes(string);
+                    
+                }
+
+                result.setValue(result_code);
+            }
+
+            function add_result_code_bytes(string){
+                if(string=="LINE"){
+                    result_code += "0103 ";
+                }else if(string=="ENDSTRING"){
+                    result_code += "0000 \n";
+                }else if(string=="PRINT"){
+                    result_code += "0102 ";
+                }else if(string=="GOTO"){
+                    result_code += "0201 ";
+                }else if(string=="GOCON"){
+                    result_code += "0202 ";
+                }else if(string=="SET_VAR"){
+                    result_code += "0301 ";
+                }else if(string=="IMAGE"){
+                    result_code += "0104 ";
+                }else if(string.substr(0,7)=="(label)"){
+                    result_code += "0B";
+                    result_code += convert_to_HEX(labels_map[string.substr(7)],4) + " ";
+                }else if(string.substr(0,8)=="(u_byte)"){
+                    result_code += "02";
+                    result_code += convert_to_HEX(string.substr(8).trim(),1) + " ";
+
+                    /*
+                    boolean     var0
+                    u_byte      var1
+                    u_int1      var2
+                    u_int2      var3
+                    u_int3      var4
+                    u_int4      var5
+                    u_int6      var6
+                    u_int8      var7
+                    u_bytes     var9[20]
+                    string      var10[1]
+                    string      var11[12]
+                    string      var12[50]
+                    */
+                }else if(string.substr(0,8)=="(boolean)"){
+                    result_code += "01";
+                    result_code += convert_to_HEX(string.substr(8).trim(),1) + " ";
+                }else if(string.substr(0,8)=="(u_int1)"){
+                    result_code += "02";
+                    result_code += convert_to_HEX(string.substr(8).trim(),1) + " ";
+                }else if(string.substr(0,8)=="(u_int2)"){
+                    result_code += "03";
+                    result_code += convert_to_HEX(string.substr(8).trim(),2) + " ";
+                }else if(string.substr(0,8)=="(u_int3)"){
+                    result_code += "04";
+                    result_code += convert_to_HEX(string.substr(8).trim(),3) + " ";
+                }else if(string.substr(0,8)=="(u_int4)"){
+                    result_code += "05";
+                    result_code += convert_to_HEX(string.substr(8).trim(),4) + " ";
+                }else if(string.substr(0,8)=="(u_int6)"){
+                    result_code += "06";
+                    result_code += convert_to_HEX(string.substr(8).trim(),6) + " ";
+                }else if(string.substr(0,8)=="(u_int8)"){
+                    result_code += "07";
+                    result_code += convert_to_HEX(string.substr(8).trim(),8) + " ";
+                }else if(string.substr(0,5)=="(var)"){
+                    result_code += "08";
+                    //get_Param_type
+                    var var_data = code_variables[string.split(")")[1].trim()];
+                    add_result_code_bytes(get_Param_type("" + var_data.address) + var_data.address);
+                    add_result_code_bytes(get_Param_type("" + var_data.size) + var_data.size);
+                }else if(string.substr(0,8)=="(u_bytes)"){
+                    result_code += "09";
+                    var text = string.substr(8).trim();
+
+                    for (var ii=0; ii<text.length; ii++){
+                        var ccode = text.charCodeAt(ii);
+                        if (!isNaN(ii) && ii<256) result_code += convert_to_HEX(ccode,1) + " ";
+                    }
+                }else if(string.substr(0,8)=="(string)"){
+                    result_code += "09";
+                    var text = string.substr(8).trim();
+
+                    for (var ii=0; ii<text.length; ii++){
+                        var ccode = text.charCodeAt(ii);
+                        if (!isNaN(ii) && ii<256) result_code += convert_to_HEX(ccode,1) + " ";
+                    }
+                }else if(string.substr(0,7)=="(bytes)"){
+                    //result_code += "09"; // raw data, no param sign
+                    var text = string.substr(8, string.length-7-2).trim();
+                    result_code += text + " ";
+                    
+                }else if(string=="" || string.substr(0,5)=="LABEL"){
+                    //Nothing
+                }else if(string.substr(0,13)=="MATH_ADDITION"){
+                    result_code += "030301 ";
+                }else if(string.substr(0,16)=="MATH_SUBTRACTION"){
+                    result_code += "030302 ";
+                }else if(string.substr(0,19)=="MATH_MULTIPLICATION"){
+                    result_code += "030303 ";
+                }else if(string.substr(0,13)=="MATH_DIVISION"){
+                    result_code += "030304 ";
+                }else if(string.substr(0,26)=="MATH_REMAINDER_OF_DIVISION"){
+                    result_code += "030305 ";
+                }else if(string.substr(0,26)=="MATH_REVERSE"){
+                    result_code += "030306 ";
+                }else if(string.substr(0,26)=="MATH_ISMORE"){
+                    result_code += "030307 ";    
+                }else if(string.substr(0,26)=="MATH_SHIFT_LEFT"){
+                    result_code += "030308 ";    
+                }else if(string.substr(0,26)=="MATH_SHIFT_RIGHT"){
+                    result_code += "030309 ";    
+                }else if(string.substr(0,26)=="MATH_RANDOM"){
+                    result_code += "03030A ";    
+                }else if(string.substr(0,26)=="MATH_EQUAL"){
+                    result_code += "03030B "; 
+                    
+                }else if(string.substr(0,29)=="SYS_DISABLE_AUTOREDRAW_SCREEN"){
+                    result_code += "0403 "; 
+                }else if(string.substr(0,28)=="SYS_ENABLE_AUTOREDRAW_SCREEN"){
+                    result_code += "0402 "; 
+                }else if(string.substr(0,15)=="SYS_CLEARSCREEN"){
+                    result_code += "0401 "; 
+                }else if(string.substr(0,14)=="SYS_FINISH_APP"){
+                    result_code += "0404 "; 
+                    
+                    
+                }else if(string.substr(0,9)=="(sys_val)"){
+                    if (string.substr(9,string.length)=="sys_touchscreen_istouched"){
+                        result_code += "0A02 ";
+                    }else if (string.substr(9,string.length)=="sys_touchscreen_enabled"){    
+                        result_code += "0A01 ";
+                    }else if (string.substr(9,string.length)=="sys_touchscreen_touch_x"){    
+                        result_code += "0A03 ";
+                    }else if (string.substr(9,string.length)=="sys_touchscreen_touch_y"){    
+                        result_code += "0A04 ";
+                    }else if (string.substr(9,string.length)=="sys_buttons_count"){    
+                        result_code += "0A05 ";
+                    }else if (string.substr(9,string.length)=="sys_buttons_left_click_start"){    
+                        result_code += "0A07 ";
+                    }else if (string.substr(9,string.length)=="sys_buttons_right_click_start"){    
+                        result_code += "0A08 ";
+                    }else if (string.substr(9,string.length)=="sys_buttons_select_click_start"){    
+                        result_code += "0A09 ";
+                    }else if (string.substr(9,string.length)=="sys_screen_width"){    
+                        result_code += "0A0A ";
+                    }else if (string.substr(9,string.length)=="sys_screen_height"){    
+                        result_code += "0A0B ";
+                    }else{
+                        console.log("Can't compile string sys val" + string);
+                    }
+                }else{
+                    console.log("Can't compile string " + string);
+                }
+            }
+
+            window.onload = function(){
+                $('#editor textarea').on('change keyup paste', compile);
+                compile();
+            };
+
+            function create_compile_error(string_num, error){
+                error_list.push({
+                    string_num: string_num,
+                    error: error
+                });
+            }
+            
+            /*
+            ##################################################################
+
+            CONVERT TO HEX
+
+            ##################################################################
+            */
+
+            var mas=["0","1","2","3","4","5","6","7","8","9","A","B","C","D","E","F"];
+            
+            function convert_to_HEX(a, size_bytes){
+                a = parseInt(a);
+
+                var mas1=[];
+                b=16
+                while(a>=1){
+                    c=Math.floor(a/b);
+                    d=a-b*c;
+                    mas1.push(d);
+                    a=c;
+                }
+                var result="";
+                for(i=0;i<mas1.length;i++){
+                    result+=mas[mas1[mas1.length-1-i]]+"";
+                }
+                
+                result = "0000000000000000000000000" + result;
+                return result.substr(result.length - size_bytes*2);
+            }
+            
+        </script>
+        
+        
+    <body>
+
+    </body>
+</html>

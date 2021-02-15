@@ -1,4 +1,3 @@
-clear
 BSOLUTE_FILENAME=`readlink -e "$0"`
 DIRECTORY=`dirname "$0"`
 cd $DIRECTORY
@@ -8,9 +7,10 @@ mkdir outputs/esp8266_cubwatch7
 mkdir outputs/esp8266_cubwatch7/cubos
 
 # Generating Arduino project
-cat generators/default_settings.ino > outputs/esp8266_cubwatch7/cubos/cubos.ino
-cat generators/esp8266_cubwatch7/esp8266_cubwatch7_setiings.ino >> outputs/esp8266_cubwatch7/cubos/cubos.ino
-cat sdk/cubos.ino >> outputs/esp8266_cubwatch7/cubos/cubos.ino >> outputs/esp8266_cubwatch7/cubos/cubos.ino
+cat generators/default_settings.ino                                 > outputs/esp8266_cubwatch7/cubos/cubos.ino
+cat generators/esp8266_cubwatch7/esp8266_cubwatch7_settings.ino     >> outputs/esp8266_cubwatch7/cubos/cubos.ino
+cat sdk/cubos.ino >> outputs/esp8266_cubwatch7/cubos/cubos.ino      >> outputs/esp8266_cubwatch7/cubos/cubos.ino
+cat generators/esp8266_cubwatch7/esp8266_cubwatch7_apps.ino         >> outputs/esp8266_cubwatch7/cubos/cubos.ino
 
 # Applications
 cp sdk/apps/app_alarm.ino           outputs/esp8266_cubwatch7/cubos/     
@@ -43,5 +43,4 @@ cp sdk/core/core_time.ino               outputs/esp8266_cubwatch7/cubos/
 cp sdk/libs/Arduino_ST7789.cpp          outputs/esp8266_cubwatch7/cubos/ 
 cp sdk/libs/Arduino_ST7789.h            outputs/esp8266_cubwatch7/cubos/
 
-clear
 echo Finished
