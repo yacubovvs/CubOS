@@ -20,6 +20,8 @@
 #include "WString.cpp"
 #include <ctime>
 
+#include <unistd.h>
+
 unsigned long millis(){
     return clock();
 }
@@ -41,7 +43,8 @@ unsigned char min(unsigned char a, unsigned char b){
 }
 
 void delay(int x){
-    _sleep(x/1000);
+    //sleep(x/1000);
+    usleep(x);
 }
 
 // PREDEFINED
@@ -61,6 +64,22 @@ void core_time_setup();
 class Application;
 Application *getApp(byte i);
 
+void setup();
+void loop();
+
 #ifdef CPU_CONTROLL_ENABLE
     void driver_cpu_setup();
 #endif
+
+// START
+int main()
+{
+  printf("Start1");
+  debug("Start");
+  printf("Start1");
+  setup();
+  while(true){
+      loop();
+      delay(100);
+  }
+}

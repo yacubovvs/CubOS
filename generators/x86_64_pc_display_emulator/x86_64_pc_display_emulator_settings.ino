@@ -13,7 +13,6 @@
 //#define serialDebug
 //#define screenDebug
 #define TERMINAL_DEBUG
-#define TERMINAL_DEBUG_COMMAND printf
 
 #define SCREEN_WIDTH            240     // Screen resolution width
 #define SCREEN_HEIGHT           240     // Screen resolution height

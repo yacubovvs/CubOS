@@ -201,6 +201,13 @@ void debug(String string){
 }
 
 void debug(String string, int delaytime){
+    #ifdef TERMINAL_DEBUG
+      int str_len = string.length() + 1;
+      char element_value[str_len];
+      string.toCharArray(element_value, str_len);
+      printf(element_value);
+    #endif
+
     #ifdef serialDebug
       Serial.println(string);
     #endif
@@ -213,6 +220,16 @@ void debug(String string, int delaytime){
       drawString(string, 5, STYLE_STATUSBAR_HEIGHT + 10, 2);
     #endif
 }
+
+/*
+void debug(const char* string, int delaytime){
+  debug(String(string), delaytime);
+}
+
+void debug(const char* string){
+  debug(String(string));
+}*/
+
 
 /*
     ############################################################################################

@@ -13,7 +13,6 @@
 //#define serialDebug
 //#define screenDebug
 #define TERMINAL_DEBUG
-#define TERMINAL_DEBUG_COMMAND printf
 
 #define SCREEN_WIDTH            240     // Screen resolution width
 #define SCREEN_HEIGHT           240     // Screen resolution height
@@ -94,6 +93,8 @@
 #include "WString.cpp"
 #include <ctime>
 
+#include <unistd.h>
+
 unsigned long millis(){
     return clock();
 }
@@ -115,7 +116,8 @@ unsigned char min(unsigned char a, unsigned char b){
 }
 
 void delay(int x){
-    _sleep(x/1000);
+    //sleep(x/1000);
+    usleep(x);
 }
 
 // PREDEFINED
@@ -135,9 +137,25 @@ void core_time_setup();
 class Application;
 Application *getApp(byte i);
 
+void setup();
+void loop();
+
 #ifdef CPU_CONTROLL_ENABLE
     void driver_cpu_setup();
 #endif
+
+// START
+int main()
+{
+  printf("Start1");
+  debug("Start");
+  printf("Start1");
+  setup();
+  while(true){
+      loop();
+      delay(100);
+  }
+}
 
 uint16_t get_uint16Color(byte red, byte green, byte blue){
   return ( (red*31/255) <<11)|( (green*31/255) <<6)|( (blue*31/255) <<0);
@@ -430,6 +448,13 @@ void debug(String string){
 }
 
 void debug(String string, int delaytime){
+    #ifdef TERMINAL_DEBUG
+      int str_len = string.length() + 1;
+      char element_value[str_len];
+      string.toCharArray(element_value, str_len);
+      printf(element_value);
+    #endif
+
     #ifdef serialDebug
       Serial.println(string);
     #endif
@@ -442,6 +467,16 @@ void debug(String string, int delaytime){
       drawString(string, 5, STYLE_STATUSBAR_HEIGHT + 10, 2);
     #endif
 }
+
+/*
+void debug(const char* string, int delaytime){
+  debug(String(string), delaytime);
+}
+
+void debug(const char* string){
+  debug(String(string));
+}*/
+
 
 /*
     ############################################################################################
