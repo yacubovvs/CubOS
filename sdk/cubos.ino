@@ -206,6 +206,7 @@ void debug(String string, int delaytime){
       char element_value[str_len];
       string.toCharArray(element_value, str_len);
       printf(element_value);
+      printf("\n");
     #endif
 
     #ifdef serialDebug

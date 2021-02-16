@@ -74,12 +74,9 @@ void loop();
 // START
 int main()
 {
-  printf("Start1");
-  debug("Start");
-  printf("Start1");
+  debug("App started");
   setup();
   while(true){
       loop();
-      delay(100);
   }
 }

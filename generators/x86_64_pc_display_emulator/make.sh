@@ -99,4 +99,7 @@ echo "
 #cat sdk/libs/Arduino_ST7789.cpp          $OUTPUT_DIRECTORY/cubos/main.cpp
 #cat sdk/libs/Arduino_ST7789.h            $OUTPUT_DIRECTORY/cubos/main.cpp
 
+#mkdir $OUTPUT_DIRECTORY/cubos/tools
+cp tools/screenemulator/out/artifacts/screenemulator_jar/screenemulator.jar $OUTPUT_DIRECTORY/cubos/
+
 echo Finished
