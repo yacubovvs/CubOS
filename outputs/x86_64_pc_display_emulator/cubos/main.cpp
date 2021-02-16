@@ -81,8 +81,7 @@
 #define max MAX
 #define min MIN
 
-#define MAX(X,Y) 
-#define MIN(X,Y) ( ((X) < (Y)) ? (X) : (Y) )
+#define PLATFORM_x86_64
 
 #include <stdio.h>
 #include <stdint.h>
