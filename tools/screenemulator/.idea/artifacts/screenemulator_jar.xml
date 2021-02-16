@@ -1,0 +1,8 @@
+<component name="ArtifactManager">
+  <artifact type="jar" name="screenemulator:jar">
+    <output-path>$PROJECT_DIR$/out/artifacts/screenemulator_jar</output-path>
+    <root id="archive" name="screenemulator.jar">
+      <element id="module-output" name="screenemulator" />
+    </root>
+  </artifact>
+</component>

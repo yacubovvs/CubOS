@@ -16,7 +16,7 @@ public class Emulator extends JFrame {
     public Emulator(int width, int height){
         imageWrapper = new EmulatorImagePanel(this);
         setContentPane(imageWrapper);
-        setTitle("CubOS2 Emulator");
+        setTitle("CubOS3 Emulator");
 
         setScreenWidth(width);
         setScreenHeight(height);
@@ -94,7 +94,7 @@ public class Emulator extends JFrame {
         image.setRGB(x,y, color.getRGB());
     }
 
-    protected void drawPixel(int x, int y, Color color){
+    public void drawPixel(int x, int y, Color color){
         image.setRGB(x,y, color.getRGB());
     }
 
