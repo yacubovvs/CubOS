@@ -29,7 +29,7 @@
 
 #define ON_TIME_CHANGE_EVERY_MS 1000
 
-#define hasHardwareButtons              // Conf of controls with hardware btns    
+//#define hasHardwareButtons              // Conf of controls with hardware btns    
 //#define isTouchScreen                 // Conf of controls
 
 #define colorScreen                     // Screen is colored
@@ -48,7 +48,7 @@
 #define BUTTON_DOWN     2
 #define BUTTON_BACK     3
 
-#define BATTERY_ENABLE
+//#define BATTERY_ENABLE
 #define CLOCK_ENABLE
 #define USE_PRIMITIVE_HARDWARE_DRAW_ACCELERATION
 
@@ -62,6 +62,8 @@
 #define STYLE_STATUSBAR_HEIGHT  40
 
 #undef I2C_ENABLE
+#undef CPU_CONTROLL_ENABLE
+
 /*
     ############################################################################################
     #                                                                                          #

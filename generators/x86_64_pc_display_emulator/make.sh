@@ -12,10 +12,10 @@ mkdir $OUTPUT_DIRECTORY/cubos
 cp $BUILDSCRIPT_DIRECTORY  $OUTPUT_DIRECTORY
 
 # Generating project
-cat $SETTINGS_FILE                      > $OUTPUT_DIRECTORY/cubos/main.cpp
+cat "generators/default_settings.ino"   >> $OUTPUT_DIRECTORY/cubos/main.cpp
 echo "
 "   >> $OUTPUT_DIRECTORY/cubos/main.cpp
-cat "generators/default_settings.ino"   >> $OUTPUT_DIRECTORY/cubos/main.cpp
+cat $SETTINGS_FILE                      > $OUTPUT_DIRECTORY/cubos/main.cpp
 echo "
 "   >> $OUTPUT_DIRECTORY/cubos/main.cpp
 # Drivers
@@ -28,10 +28,12 @@ echo "
 
 # Platform libs
 #cp sdk/platforms/core_esp8266_noniso.c  $OUTPUT_DIRECTORY/cubos/
-cp sdk/platforms/noniso.c               $OUTPUT_DIRECTORY/cubos/
-cp sdk/platforms/stdlib_noniso.h        $OUTPUT_DIRECTORY/cubos/
-cp sdk/platforms/WString.cpp            $OUTPUT_DIRECTORY/cubos/
-cp sdk/platforms/WString.h              $OUTPUT_DIRECTORY/cubos/
+cp sdk/platforms/noniso.c                   $OUTPUT_DIRECTORY/cubos/
+cp sdk/platforms/stdlib_noniso.h            $OUTPUT_DIRECTORY/cubos/
+cp sdk/platforms/stdlib_noniso.cpp          $OUTPUT_DIRECTORY/cubos/
+cp sdk/platforms/core_esp8266_noniso.cpp    $OUTPUT_DIRECTORY/cubos/
+cp sdk/platforms/WString.cpp                $OUTPUT_DIRECTORY/cubos/
+cp sdk/platforms/WString.h                  $OUTPUT_DIRECTORY/cubos/
 
 echo "
 "   >> $OUTPUT_DIRECTORY/cubos/main.cpp
@@ -49,13 +51,13 @@ echo "
 cat sdk/core/core_shared_functions.ino   >> $OUTPUT_DIRECTORY/cubos/main.cpp
 echo "
 "   >> $OUTPUT_DIRECTORY/cubos/main.cpp
-cat sdk/core/core_views.ino              >> $OUTPUT_DIRECTORY/cubos/main.cpp
-echo "
-"   >> $OUTPUT_DIRECTORY/cubos/main.cpp
 cat sdk/core/core_display.ino            >> $OUTPUT_DIRECTORY/cubos/main.cpp
 echo "
 "   >> $OUTPUT_DIRECTORY/cubos/main.cpp
 cat sdk/core/core_time.ino               >> $OUTPUT_DIRECTORY/cubos/main.cpp
+echo "
+"   >> $OUTPUT_DIRECTORY/cubos/main.cpp
+cat sdk/core/core_views.ino              >> $OUTPUT_DIRECTORY/cubos/main.cpp
 echo "
 "   >> $OUTPUT_DIRECTORY/cubos/main.cpp
 
@@ -64,9 +66,6 @@ echo "
 echo "
 "   >> $OUTPUT_DIRECTORY/cubos/main.cpp
 cat sdk/apps/app_alarm.ino           >> $OUTPUT_DIRECTORY/cubos/main.cpp
-echo "
-"   >> $OUTPUT_DIRECTORY/cubos/main.cpp
-cat sdk/apps/app_battery.ino         >> $OUTPUT_DIRECTORY/cubos/main.cpp
 echo "
 "   >> $OUTPUT_DIRECTORY/cubos/main.cpp
 cat sdk/apps/app_compass.ino         >> $OUTPUT_DIRECTORY/cubos/main.cpp

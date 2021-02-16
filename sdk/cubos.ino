@@ -114,35 +114,51 @@ Application* currentApp;
 
 void setup()
 { 
+  #ifdef BATTERY_ENABLE
     driver_battery_setup();
+  #endif
 
-    #ifdef USE_RTC
-        driver_RTC_setup();
-    #endif
+  #ifdef USE_RTC
+      driver_RTC_setup();
+  #endif
 
-    #ifdef serialDebug
-        Serial.begin(115200);
-        debug("Serial debug started");
-    #endif
+  #ifdef serialDebug
+      Serial.begin(115200);
+      debug("Serial debug started");
+  #endif
 
-    #ifdef ESP8266
-        ESP.wdtDisable();
-    #endif
-    
+  #ifdef ESP8266
+      ESP.wdtDisable();
+  #endif
+
+  #ifdef CPU_CONTROLL_ENABLE
     driver_cpu_setup();
-    
-    setup_displayDriver();
+  #endif
+  
+  setup_displayDriver();
+
+  #ifdef hasHardwareButtons
     driver_controls_setup();
-    
-    currentApp = getApp(STARTING_APP_NUMM);
+  #endif
+  
+  currentApp = getApp(STARTING_APP_NUMM);
   
 }
 
 bool isInSleep = false;
 void loop(){
-  driver_controls_loop();
-  driver_battery_loop();
-  core_time_loop();
+  #ifdef hasHardwareButtons
+    driver_controls_loop();
+  #endif
+
+  #ifdef BATTERY_ENABLE
+    driver_battery_loop();
+  #endif
+
+  #ifdef CLOCK_ENABLE
+    core_time_loop();
+  #endif
+
   currentApp->onLoop(); 
   //currentApp->onLoop(); 
 

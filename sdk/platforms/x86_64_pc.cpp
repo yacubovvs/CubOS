@@ -2,6 +2,7 @@
 #define boolean bool
 #define PROGMEM /**/
 #define pgm_read_byte *
+#define pgm_read_word *
 
 #define max MAX
 #define min MIN
@@ -10,10 +11,18 @@
 #define MIN(X,Y) ( ((X) < (Y)) ? (X) : (Y) )
 
 #include <stdio.h>
+#include <stdint.h>
 #include "WString.h"
+#include "stdlib_noniso.h"
+
+#include "core_esp8266_noniso.cpp"
+#include "stdlib_noniso.cpp"
+#include "noniso.c"
+#include "WString.cpp"
+#include <ctime>
 
 unsigned long millis(){
-    return clock()/4;
+    return clock();
 }
 
 int max(int a, int b){
@@ -32,4 +41,27 @@ unsigned char min(unsigned char a, unsigned char b){
     return ((a<b)?a:b);
 }
 
+void delay(int x){
+    _sleep(x/1000);
+}
+
 // PREDEFINED
+const byte *getAppParams(char i, byte type);
+void startApp(char num);
+boolean getBitInByte(byte currentByte, byte bitNum);
+void debug(String string);
+void debug(String string, int delaytime);
+
+void driver_controls_loop();
+void driver_battery_loop();
+void core_time_loop();
+void driver_controls_setup();
+void driver_battery_setup();
+void core_time_setup();
+
+class Application;
+Application *getApp(byte i);
+
+#ifdef CPU_CONTROLL_ENABLE
+    void driver_cpu_setup();
+#endif

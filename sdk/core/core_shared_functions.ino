@@ -1,7 +1,3 @@
-String getHexStringFromByte(byte b){
-    return "0x" + getHexNumberFromNumber(b/16) + getHexNumberFromNumber(b%16);
-}
-
 String getHexNumberFromNumber(byte b){
     switch(b){
         case 0:
@@ -31,4 +27,8 @@ String getHexNumberFromNumber(byte b){
             return "";
     }
 
+}
+
+String getHexStringFromByte(byte b){
+    return "0x" + getHexNumberFromNumber(b/16) + getHexNumberFromNumber(b%16);
 }
