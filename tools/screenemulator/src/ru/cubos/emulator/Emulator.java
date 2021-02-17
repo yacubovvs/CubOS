@@ -109,11 +109,11 @@ public class Emulator extends JFrame {
 
     public void drawString(int x, int y, String string, Color color, int fontSize){
 
-        unsigned char[] stringBytes = string.getBytes();
+        byte[] stringBytes = string.getBytes();
         for (int i=0; i<string.length(); i++){
 
             for (char char_part=0; char_part<5; char_part++){
-                unsigned char char_part_element = (unsigned char)(font_cubos[stringBytes[i] *5 + char_part] - 128);
+                byte char_part_element = (byte)(font_cubos[stringBytes[i] *5 + char_part] - 128);
                 for (char bit=0; bit<8; bit++){
 
                     if (((char_part_element >> (bit)) & 1) == (bit!=(char)7?1:0) ){

@@ -13,8 +13,8 @@ public class EmulatorImagePanel extends ImagePanel {
 
         MouseAdapter mouseAdapter = new MouseAdapter() {
 
-            unsigned char[] startPosition = null;
-            unsigned char[] lastPosition = null;
+            byte[] startPosition = null;
+            byte[] lastPosition = null;
             int[] startPositionCoords = null;
             int[] lastPositionCoords = null;
 
@@ -31,10 +31,10 @@ public class EmulatorImagePanel extends ImagePanel {
 
                 int mousePosition[] = getPositionOnScreen(xPosition, yPosition);
 
-                unsigned char x_bytes[] = ByteConverter.char_to_bytes((char)(mousePosition[0]));
-                unsigned char y_bytes[] = ByteConverter.char_to_bytes((char)(mousePosition[1]));
+                byte x_bytes[] = ByteConverter.char_to_bytes((char)(mousePosition[0]));
+                byte y_bytes[] = ByteConverter.char_to_bytes((char)(mousePosition[1]));
 
-                unsigned char eventData[] = new unsigned char[5];
+                byte eventData[] = new byte[5];
 
                 eventData[1] = x_bytes[0];
                 eventData[2] = x_bytes[1];
@@ -44,7 +44,7 @@ public class EmulatorImagePanel extends ImagePanel {
                 startPositionCoords = mousePosition;
                 lastPositionCoords = mousePosition;
 
-                startPosition = new unsigned char[4];
+                startPosition = new byte[4];
                 startPosition[0] = x_bytes[0];
                 startPosition[1] = x_bytes[1];
                 startPosition[2] = y_bytes[0];
@@ -65,13 +65,13 @@ public class EmulatorImagePanel extends ImagePanel {
 
                 int mousePosition[] = getPositionOnScreen(xPosition, yPosition);
 
-                unsigned char x_bytes[] = ByteConverter.char_to_bytes((char)(mousePosition[0]));
-                unsigned char y_bytes[] = ByteConverter.char_to_bytes((char)(mousePosition[1]));
+                byte x_bytes[] = ByteConverter.char_to_bytes((char)(mousePosition[0]));
+                byte y_bytes[] = ByteConverter.char_to_bytes((char)(mousePosition[1]));
 
-                unsigned char eventData[];
+                byte eventData[];
 
                 if(Math.abs(mousePosition[0] - startPositionCoords[0])<minClickPositionDiff && Math.abs(mousePosition[1] - startPositionCoords[1])<minClickPositionDiff){
-                    eventData = new unsigned char[5];
+                    eventData = new byte[5];
                     //eventData[0] = Protocol._1_1_EVENT_TOUCH_TAP;
                     eventData[1] = x_bytes[0];
                     eventData[2] = x_bytes[1];
@@ -80,7 +80,7 @@ public class EmulatorImagePanel extends ImagePanel {
 
                     //emulator.sendToServer(eventData);
                 }else{
-                    eventData = new unsigned char[9];
+                    eventData = new byte[9];
                     //eventData[0] = Protocol._1_5_EVENT_TOUCH_MOVE_FINISHED;
                     eventData[1] = x_bytes[0];
                     eventData[2] = x_bytes[1];
@@ -94,7 +94,7 @@ public class EmulatorImagePanel extends ImagePanel {
                     //emulator.sendToServer(eventData);
                 }
 
-                eventData = new unsigned char[5];
+                eventData = new byte[5];
                 //eventData[0] = Protocol._1_2_EVENT_TOUCH_UP;
                 eventData[1] = x_bytes[0];
                 eventData[2] = x_bytes[1];
@@ -123,13 +123,13 @@ public class EmulatorImagePanel extends ImagePanel {
 
                 if(
                         (Math.abs(mousePosition[0] - startPositionCoords[0])>minClickPositionDiff || Math.abs(mousePosition[1] - startPositionCoords[1])>minClickPositionDiff)
-                        && (lastPositionCoords[0]!=mousePosition[0] || lastPositionCoords[1]!=mousePosition[1])
+                                && (lastPositionCoords[0]!=mousePosition[0] || lastPositionCoords[1]!=mousePosition[1])
                 ) {
 
-                    unsigned char x_bytes[] = ByteConverter.char_to_bytes((char) (mousePosition[0]));
-                    unsigned char y_bytes[] = ByteConverter.char_to_bytes((char) (mousePosition[1]));
+                    byte x_bytes[] = ByteConverter.char_to_bytes((char) (mousePosition[0]));
+                    byte y_bytes[] = ByteConverter.char_to_bytes((char) (mousePosition[1]));
 
-                    unsigned char eventData[] = new unsigned char[13];
+                    byte eventData[] = new byte[13];
 
                     if (lastPosition == null) lastPosition = startPosition;
 
@@ -148,7 +148,7 @@ public class EmulatorImagePanel extends ImagePanel {
                     eventData[11] = startPosition[2];
                     eventData[12] = startPosition[3];
 
-                    lastPosition = new unsigned char[4];
+                    lastPosition = new byte[4];
                     lastPosition[0] = x_bytes[0];
                     lastPosition[1] = x_bytes[1];
                     lastPosition[2] = y_bytes[0];
