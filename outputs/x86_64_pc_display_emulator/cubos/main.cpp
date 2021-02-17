@@ -71,7 +71,7 @@
     ############################################################################################
 */
 
-//#define byte unsigned char
+//#define unsigned char unsigned char
 //#define bool bool
 #define PROGMEM /**/
 #define pgm_read_byte *
@@ -93,7 +93,10 @@
 #include "WString.cpp"
 #include <ctime>
 #include <chrono>
-#include <dos.h>
+
+#if defined(_WIN32) || defined(_WIN64)
+    #include <dos.h>
+#endif
 
 #include <unistd.h>
 
@@ -120,7 +123,9 @@ unsigned char min(unsigned char a, unsigned char b){
 
 void delay(int x){
     //sleep(x/1000);
-    _sleep(x);
+    #if defined(_WIN32) || defined(_WIN64)
+        _sleep(x);
+    #endif
 }
 
 // PREDEFINED
@@ -195,7 +200,7 @@ int main()
 
 bool driver_display_needToUpdateScreen = false;
 
-uint16_t get_uint16Color(byte red, byte green, byte blue){
+uint16_t get_uint16Color(unsigned char red, unsigned char green, unsigned char blue){
   return ( (red*31/255) <<11)|( (green*31/255) <<6)|( (blue*31/255) <<0);
 }
 
@@ -296,11 +301,11 @@ void setPixel(int x, int y){
   #endif
 }
 
-void setDrawColor(byte red_new, byte green_new, byte blue_new){
+void setDrawColor(unsigned char red_new, unsigned char green_new, unsigned char blue_new){
   sendMessageToDisplay("C " + String(red_new) + " " + String(green_new) + " " + String(blue_new) + "\n");
 }
 
-void fillScreen(byte red, byte green, byte blue){
+void fillScreen(unsigned char red, unsigned char green, unsigned char blue){
   //debug("Fill screen");
   setDrawColor(red, green, blue);
   sendMessageToDisplay("F\n");

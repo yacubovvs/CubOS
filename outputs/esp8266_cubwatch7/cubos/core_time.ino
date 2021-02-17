@@ -13,7 +13,7 @@ String core_time_getHourMinuteSecondsTime(){
     return core_time_getHours_String() + ":" + core_time_getMinutes_String() + ":" + core_time_getSeconds_String();
 }
 
-String core_time_byteToTimeStringWithLeaderNull(byte byteIn){
+String core_time_byteToTimeStringWithLeaderNull(unsigned char byteIn){
     if(byteIn<10){
         return "0" + String(byteIn);
     }else{
@@ -33,7 +33,7 @@ String core_time_getSeconds_String(){
     return core_time_byteToTimeStringWithLeaderNull(core_time_getSeconds_byte());
 }
 
-byte core_time_getHours_byte(){
+unsigned char core_time_getHours_byte(){
     #ifdef USE_RTC
         return driver_RTC_getHours();
     #else
@@ -41,7 +41,7 @@ byte core_time_getHours_byte(){
     #endif
 }
 
-byte core_time_getMinutes_byte(){
+unsigned char core_time_getMinutes_byte(){
     #ifdef USE_RTC
         return driver_RTC_getMinutes();
     #else
@@ -50,7 +50,7 @@ byte core_time_getMinutes_byte(){
 }
 
 
-byte core_time_getSeconds_byte(){
+unsigned char core_time_getSeconds_byte(){
     #ifdef USE_RTC
         return driver_RTC_getSeconds();
     #else

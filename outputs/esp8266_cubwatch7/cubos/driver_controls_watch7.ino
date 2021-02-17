@@ -4,7 +4,7 @@
 
 unsigned long last_user_activity = _millis();
 
-byte    driver_control_buttonsPins[]  = {12,   15,    3,    1};
+unsigned char    driver_control_buttonsPins[]  = {12,   15,    3,    1};
 boolean driver_control_isPositive[]   = {true, false, true, true};     
 // Do not change:
 boolean driver_control_pressed[]      = {false, false, false, false};
@@ -12,7 +12,7 @@ unsigned long driver_control_time_pressed[]    = {0, 0, 0, 0};
 
 
 void driver_controls_setup(){
-  for (byte i=0; i<DRIVER_CONTROLS_TOTALBUTTONS; i++){
+  for (unsigned char i=0; i<DRIVER_CONTROLS_TOTALBUTTONS; i++){
     pinMode(driver_control_buttonsPins[i], INPUT);
   }
   last_user_activity = _millis();
@@ -24,7 +24,7 @@ void driver_controls_setup(){
 #define EVENT_BUTTON_LONG_PRESS         0x02
 */
 void driver_controls_loop(){
-  for (byte i=0; i<DRIVER_CONTROLS_TOTALBUTTONS; i++){
+  for (unsigned char i=0; i<DRIVER_CONTROLS_TOTALBUTTONS; i++){
     //if (digitalRead(driver_control_buttonsPins[i])){
     if ((driver_control_isPositive[i]==true) ? (!digitalRead(driver_control_buttonsPins[i])) : (digitalRead(driver_control_buttonsPins[i]))){
 
@@ -63,7 +63,7 @@ void driver_control_set_last_user_avtivity(unsigned long time){
   last_user_activity = time;
 }
 
-void onButtonEvent(byte event, int button){
+void onButtonEvent(unsigned char event, int button){
   currentApp->onEvent(event, button, 0);
 }
 
@@ -73,28 +73,28 @@ void onButtonEvent(byte event, int button){
 
 //////////////////////////////////////////////////////////////////////////////
 //  Call to check is button started to press
-boolean isPressStart(byte num){
+boolean isPressStart(unsigned char num){
   if (num>=os_control_buttons) return false;
   else return os_control_pressStart[num];
 }
 
 //////////////////////////////////////////////////////////////////////////////
 //  Call to check is button [ress finished
-boolean isPressEnd(byte num){
+boolean isPressEnd(unsigned char num){
   if (num>=os_control_buttons) return false;
   else return os_control_pressEnd[num];
 }
 
 //////////////////////////////////////////////////////////////////////////////
 //  Call to check is button pressed
-boolean isPress(byte num){
+boolean isPress(unsigned char num){
   if (num>=os_control_buttons) return false;
   else return os_control_press[num];
 }
 
 void os_control_loop(){
   
-  for (byte i=0; i<os_control_buttons; i++){
+  for (unsigned char i=0; i<os_control_buttons; i++){
     if (digitalRead(os_control_buttonsAdr[i])){
 
       last_user_activity = _millis();

@@ -186,7 +186,7 @@ void Arduino_ST7789::writedata(uint8_t c) {
 }
 
 // Companion code to the above tables.  Reads and issues
-// a series of LCD commands stored in PROGMEM byte array.
+// a series of LCD commands stored in PROGMEM unsigned char array.
 void Arduino_ST7789::displayInit(const uint8_t *addr) {
 
   uint8_t  numCommands, numArgs;

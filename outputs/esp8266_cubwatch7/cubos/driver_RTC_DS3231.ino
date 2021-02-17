@@ -12,7 +12,7 @@ void driver_RTC_setup(){
 
 	// Only used once, then disabled
 	//rtc.set(0, 42, 16, 6, 2, 5, 15);
-	//  RTCLib::set(byte second, byte minute, byte hour, byte dayOfWeek, byte dayOfMonth, byte month, byte year)
+	//  RTCLib::set(unsigned char second, unsigned char minute, unsigned char hour, unsigned char dayOfWeek, unsigned char dayOfMonth, unsigned char month, unsigned char year)
 
     /*
 	if (rtc.enableBattery()) {
@@ -44,19 +44,19 @@ void driver_RTC_refresh(){
 	rtc.refresh();
 }
 
-byte driver_RTC_getMinutes(){
+unsigned char driver_RTC_getMinutes(){
 	return rtc.minute();
 }
 
-byte driver_RTC_getSeconds(){
+unsigned char driver_RTC_getSeconds(){
 	return rtc.second();
 }
 
-byte driver_RTC_getHours(){
+unsigned char driver_RTC_getHours(){
 	return rtc.hour();
 }
 
-byte driver_RTC_getTemperature(){
+unsigned char driver_RTC_getTemperature(){
 	return rtc.temp();
 }
 

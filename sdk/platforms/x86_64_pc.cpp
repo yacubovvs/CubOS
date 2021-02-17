@@ -1,4 +1,4 @@
-//#define byte unsigned char
+//#define unsigned char unsigned char
 //#define bool bool
 #define PROGMEM /**/
 #define pgm_read_byte *
@@ -20,7 +20,10 @@
 #include "WString.cpp"
 #include <ctime>
 #include <chrono>
-#include <dos.h>
+
+#if defined(_WIN32) || defined(_WIN64)
+    #include <dos.h>
+#endif
 
 #include <unistd.h>
 
@@ -47,7 +50,9 @@ unsigned char min(unsigned char a, unsigned char b){
 
 void delay(int x){
     //sleep(x/1000);
-    _sleep(x);
+    #if defined(_WIN32) || defined(_WIN64)
+        _sleep(x);
+    #endif
 }
 
 // PREDEFINED

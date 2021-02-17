@@ -5,7 +5,7 @@ class appNameClass: public Application{
     public:
         virtual void onLoop() override;
         virtual void onDestroy() override;
-        virtual void onEvent(byte event, int val1, int val2) override;
+        virtual void onEvent(unsigned char event, int val1, int val2) override;
 
         void onCreate();
         appNameClass(){ fillScreen(0, 0, 0); super_onCreate(); onCreate(); };
@@ -15,11 +15,11 @@ class appNameClass: public Application{
               case PARAM_TYPE_ICON: return icon;
               default: return (unsigned char*)""; }
         };
-        const static byte icon[] PROGMEM;
+        const static unsigned char icon[] PROGMEM;
 
     private:
         void drawStringOnScreen(String string);
-        byte currentString = 0;
+        unsigned char currentString = 0;
       
 };
 
@@ -33,7 +33,7 @@ void appNameClass::onCreate(){
     
 
     Wire.begin();
-    byte error, address;
+    unsigned char error, address;
     int nDevices;
 
     drawStringOnScreen("Scanning...");
@@ -84,7 +84,7 @@ void appNameClass::drawStringOnScreen(String string){
     currentString++;
 }
 
-void appNameClass::onEvent(byte event, int val1, int val2){
+void appNameClass::onEvent(unsigned char event, int val1, int val2){
     
     if(event==EVENT_BUTTON_PRESSED){
         // Write you code on [val1] button pressed here
@@ -101,7 +101,7 @@ void appNameClass::onEvent(byte event, int val1, int val2){
     
 }
 
-const byte appNameClass::icon[] PROGMEM = {
+const unsigned char appNameClass::icon[] PROGMEM = {
     
 	/*            PUT YOUR ICON HERE            */
 

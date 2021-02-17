@@ -23,7 +23,7 @@ public class SocketServer extends Emulator {
     private InputStream in; // поток чтения из сокета
     private OutputStream out; // поток записи в сокет
     private int port;
-    public List<byte[]> messagesToSend = new ArrayList<>();
+    public List<unsigned char[]> messagesToSend = new ArrayList<>();
 
     private Reader reader;
     private Writer writer;
@@ -86,7 +86,7 @@ public class SocketServer extends Emulator {
         });
     }
 
-    public void addMessage(byte[] message){
+    public void addMessage(unsigned char[] message){
         messagesToSend.add(message);
         messagesToSend.add("\n".getBytes());
 
@@ -164,8 +164,8 @@ public class SocketServer extends Emulator {
         @Override
         public void run() {
             int count;
-            //byte bytes[] = new byte[16 * 1024 * 1024];
-            byte bytes[] = new byte[serverBufferSize];
+            //unsigned char bytes[] = new unsigned char[16 * 1024 * 1024];
+            unsigned char bytes[] = new unsigned char[serverBufferSize];
 
             try {
                 while ((count = in.read(bytes)) > 0) {
@@ -215,7 +215,7 @@ public class SocketServer extends Emulator {
                 }
 
                 try {
-                    byte data[] = messagesToSend.get(0);
+                    unsigned char data[] = messagesToSend.get(0);
                     out.write(data);
                     out.flush();
                     messagesToSend.remove(data);

@@ -10,17 +10,17 @@
 
 Arduino_ST7789 tft = Arduino_ST7789(TFT_DC, TFT_RST); //for display without CS pin
 
-byte red;
-byte green;
-byte blue;
+unsigned char red;
+unsigned char green;
+unsigned char blue;
 
-byte red_bg     = 255;
-byte green_bg   = 255;
-byte blue_bg    = 255;
+unsigned char red_bg     = 255;
+unsigned char green_bg   = 255;
+unsigned char blue_bg    = 255;
 
 uint16_t current_drawColor;
 
-uint16_t get_uint16Color(byte red, byte green, byte blue){
+uint16_t get_uint16Color(unsigned char red, unsigned char green, unsigned char blue){
   return ( (red*31/255) <<11)|( (green*31/255) <<6)|( (blue*31/255) <<0);
 }
 
@@ -51,7 +51,7 @@ void powerOn_displayDriver(){
 }
 
 
-void fillScreen(byte red, byte green, byte blue){
+void fillScreen(unsigned char red, unsigned char green, unsigned char blue){
   tft.fillScreen(get_uint16Color(red, green, blue));
 }
 
@@ -67,7 +67,7 @@ void setPixel(int x, int y){
   #endif
 }
 
-void setDrawColor(byte red_new, byte green_new, byte blue_new){
+void setDrawColor(unsigned char red_new, unsigned char green_new, unsigned char blue_new){
   red = red_new;
   green = green_new;
   blue = blue_new;
