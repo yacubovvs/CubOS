@@ -1,5 +1,7 @@
 package ru.cubos.emulator;
 
+import ru.cubos.UserInterfaceListener;
+
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.KeyEvent;
@@ -12,6 +14,8 @@ public class Emulator extends JFrame {
 
     protected int width;
     protected int height;
+
+    private UserInterfaceListener userInterfaceListener;
 
     public Emulator(int width, int height){
         imageWrapper = new EmulatorImagePanel(this);
@@ -30,17 +34,17 @@ public class Emulator extends JFrame {
         addKeyListener(new KeyListener() {
             @Override
             public void keyTyped(KeyEvent keyEvent) {
-
+                if(userInterfaceListener!=null) userInterfaceListener.keyTyped(keyEvent);
             }
 
             @Override
             public void keyPressed(KeyEvent keyEvent) {
-                imageWrapper.onKeyPressed(keyEvent);
+                if(userInterfaceListener!=null) userInterfaceListener.keyPressed(keyEvent);
             }
 
             @Override
             public void keyReleased(KeyEvent keyEvent) {
-
+                if(userInterfaceListener!=null) userInterfaceListener.keyReleased(keyEvent);
             }
         });
     }
@@ -63,21 +67,6 @@ public class Emulator extends JFrame {
     private void createUIComponents() {
         //imageWrapper = new EmulatorImagePanel(this);
     }
-
-    /*
-    * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
-    * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
-    * *                                                                                                             * *
-    * *                                             SEND AND RECIEVE DATA                                           * *
-    * *                                                                                                             * *
-    * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
-    * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
-    */
-
-    public boolean OnDataGotFromServer(byte[] data) {
-        return true;
-    }
-
 
     /*
      * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
@@ -269,4 +258,7 @@ public class Emulator extends JFrame {
     }
 
 
+    public void setUserInterfaceListener(UserInterfaceListener userInterfaceListener) {
+        this.userInterfaceListener = userInterfaceListener;
+    }
 }

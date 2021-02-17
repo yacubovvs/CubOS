@@ -28,7 +28,7 @@
 
 #define ON_TIME_CHANGE_EVERY_MS 1000
 
-//#define hasHardwareButtons              // Conf of controls with hardware btns    
+#define hasHardwareButtons              // Conf of controls with hardware btns    
 //#define isTouchScreen                 // Conf of controls
 
 #define colorScreen                     // Screen is colored

@@ -10,11 +10,11 @@ public class Main {
 
     public static void main(String[] args) {
 	    // write your code here
-        Emulator emulator = new Emulator(240,240);
-        ReadServer readServer = new ReadServer(emulator);
+        //Emulator emulator = new Emulator(240,240);
+        //ReadServer readServer = new ReadServer(emulator);
 
-        //SocketServer socketServer = new SocketServer(9100, 240, 240);
-        //socketServer.start();
+        SocketServer socketServer = new SocketServer(9100, 240, 240);
+        socketServer.start();
 
     }
 }

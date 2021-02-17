@@ -6,7 +6,7 @@ class appNameClass: public Application{
         bool isfullScreen         = true;
         virtual void onLoop() override;
         virtual void onDestroy() override;
-        virtual void onEvent(byte event, int val1, int val2) override;
+        virtual void onEvent(unsigned char event, int val1, int val2) override;
 
         void onCreate();
         appNameClass(){ 
@@ -21,7 +21,7 @@ class appNameClass: public Application{
               case PARAM_TYPE_ICON: return icon;
               default: return (unsigned char*)""; }
         };
-        const static byte icon[] PROGMEM;
+        const static unsigned char icon[] PROGMEM;
 
         void draw_current_time();
       
@@ -46,7 +46,7 @@ void appNameClass::onDestroy(){
     */
 }
 
-void appNameClass::onEvent(byte event, int val1, int val2){
+void appNameClass::onEvent(unsigned char event, int val1, int val2){
     
     if(event==EVENT_BUTTON_PRESSED){
         // Write you code on [val1] button pressed here
@@ -80,7 +80,7 @@ void appNameClass::draw_current_time(){
     drawString(timeString, 2, 90, 5);
 }
 
-const byte appNameClass::icon[] PROGMEM = {
+const unsigned char appNameClass::icon[] PROGMEM = {
     
 	/*            PUT YOUR ICON HERE            */
 

@@ -1,17 +1,20 @@
 package ru.cubos.server;
 
+import ru.cubos.UserInterfaceListener;
 import ru.cubos.emulator.Emulator;
 
 import java.awt.*;
+import java.awt.event.KeyEvent;
 import java.util.Scanner;
 
-public class ReadServer {
+public class ReadServer implements UserInterfaceListener {
     Emulator emulator;
     Color currentColor;
 
     int x,y;
     public ReadServer(Emulator emulator){
         this.emulator = emulator;
+        emulator.setUserInterfaceListener(this);
         currentColor = new Color(0,0,0);
 
         Thread readThread = new Thread(new Runnable() {
@@ -41,7 +44,7 @@ public class ReadServer {
         readThread.start();
     }
 
-
+    int n=0;
 
     private void decodeCommand(String message) {
         String[] messages = message.split(" ");
@@ -83,6 +86,18 @@ public class ReadServer {
             case "F":       // Fill
                 emulator.drawRect(0, 0, emulator.getWidth(),emulator.getHeight(), currentColor);
                 break;
+            case "U":       // Update
+                emulator.updateImage();
+                break;
+            case "K":       // Read keys
+                if(n==2){
+                    System.out.println("1 0 0 0");
+                    n = 0;
+                }else{
+                    System.out.println("0 0 0 0");
+                }
+                n++;
+                break;
             case "C":       // Set color
                 try{
                     r = Integer.parseInt(messages[1]);
@@ -98,6 +113,49 @@ public class ReadServer {
                 return;
         }
 
-        emulator.updateImage();
+        //emulator.updateImage();
+    }
+
+    @Override
+    public void keyTyped(KeyEvent keyEvent) {
+        if(keyEvent.getKeyCode()==37){
+            // Left
+        }
+
+        if(keyEvent.getKeyCode()==38){
+            // Up
+        }
+
+        if(keyEvent.getKeyCode()==39){
+            // Right
+        }
+
+        if(keyEvent.getKeyCode()==40){
+            // Right
+        }
+
+        return;
+    }
+
+    @Override
+    public void keyPressed(KeyEvent keyEvent) {
+        return;
+    }
+
+    @Override
+    public void keyReleased(KeyEvent keyEvent) {
+        return;
+    }
+
+    void addUserEvent(){
+
+    }
+
+    enum UserEvent{
+        BUTTON_UP,
+        BUTTON_DOWN,
+        BUTTON_SELECT,
+        BUTTON_BACK,
+
     }
 }

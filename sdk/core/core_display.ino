@@ -3,23 +3,23 @@
                                   DISPLAY FUNCTIONS
 * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * 
 */
-byte background_red = 0;
-byte background_green = 0;
-byte background_blue = 0;
+unsigned char background_red = 0;
+unsigned char background_green = 0;
+unsigned char background_blue = 0;
 
-byte getBackgroundColor_red(){
+unsigned char getBackgroundColor_red(){
   return background_red;
 } 
 
-byte getBackgroundColor_green(){
+unsigned char getBackgroundColor_green(){
   return background_green;
 } 
 
-byte getBackgroundColor_blue(){
+unsigned char getBackgroundColor_blue(){
   return background_blue;
 } 
 
-void setBackgroundColor(byte r, byte g, byte b){
+void setBackgroundColor(unsigned char r, unsigned char g, unsigned char b){
   background_red    = r;
   background_green  = g;
   background_blue   = b;
@@ -287,20 +287,20 @@ static const unsigned char font_cubos[] PROGMEM = {
   0x00, 0x00, 0x00, 0x00, 0x00  // #255 NBSP
 };
 
-void setStr(char * dString, int x, int y, byte fontSize){
+void setStr(char * dString, int x, int y, unsigned char fontSize){
         
   int string_length = strlen(dString);
   for (int i=0; i<string_length; i++){
 
-    for (byte char_part=0; char_part<5; char_part++){
+    for (unsigned char char_part=0; char_part<5; char_part++){
       const unsigned char_part_element = pgm_read_byte(&font_cubos[dString[i] *5 + char_part]);
 
       for (unsigned char bit=0; bit<8; bit++){
 
         if (getBitInByte(char_part_element, bit)){
           #ifdef USE_PRIMITIVE_HARDWARE_DRAW_ACCELERATION
-            byte pixelsInLine=0;
-            for (byte i=bit+1; i<8; i++){
+            unsigned char pixelsInLine=0;
+            for (unsigned char i=bit+1; i<8; i++){
               if(getBitInByte(char_part_element, i)) {
                 pixelsInLine++;
               }else{
@@ -349,7 +349,7 @@ void drawString(char * dString, int x, int y){
   setStr(dString, x, y, 1);
 }
 
-void drawString(char * dString, int x, int y, byte fontSize){
+void drawString(char * dString, int x, int y, unsigned char fontSize){
   setStr(dString, x, y, fontSize);
 }
 
@@ -359,7 +359,7 @@ void drawString(int val, int x, int y){
   drawString( str, 0, y);
 }
 
-void drawString(String dString, int x, int y, byte fontSize){
+void drawString(String dString, int x, int y, unsigned char fontSize){
   int str_len = dString.length() + 1;
   char element_value[str_len];
   dString.toCharArray(element_value, str_len);
@@ -375,7 +375,7 @@ void drawString_centered(char * dString, int y){
   drawString(dString, (SCREEN_WIDTH - strlen(dString)*FONT_CHAR_WIDTH)/2, y);  
 }
 
-void clearString(char * dString, int x, int y, byte fontSize){
+void clearString(char * dString, int x, int y, unsigned char fontSize){
   #ifdef USE_PRIMITIVE_HARDWARE_DRAW_ACCELERATION
     if(fontSize==0) fontSize = 1;
     int string_length = strlen(dString);
@@ -389,7 +389,7 @@ void clearString_centered(char * dString, int y){
   clearString(dString, (SCREEN_WIDTH - strlen(dString)*FONT_CHAR_WIDTH)/2, y, 1);  
 }
 
-void clearString(String dString, int x, int y, byte fontSize){
+void clearString(String dString, int x, int y, unsigned char fontSize){
   int str_len = dString.length() + 1;
   char element_value[str_len];
   dString.toCharArray(element_value, str_len);
@@ -497,7 +497,7 @@ void drawRect(int x0, int y0, int x1, int y1){
   drawRect(x0, y0, x1, y1, false);
 }
 
-void drawRect(int x0, int y0, int x1, int y1, boolean fill){
+void drawRect(int x0, int y0, int x1, int y1, bool fill){
   // check if the rectangle is to be filled
   if (fill == 1)
   {
@@ -538,7 +538,7 @@ int treangle_area(int x0, int y0, int x1, int y1, int x2, int y2){
    return abs((x0 - x2)*(y1 - y2) + (x1-x2)*(y2-y0));
 }
 
-void drawRect_custom( int x0, int y0, int x1, int y1, int x2, int y2, int x3, int y3, boolean fill){
+void drawRect_custom( int x0, int y0, int x1, int y1, int x2, int y2, int x3, int y3, bool fill){
   if (fill){
     // all angles should be less thаn 180 degrees
     const int min_x = min(min(x0, x1), min(x2, x3));
@@ -572,7 +572,7 @@ void drawRect_custom( int x0, int y0, int x1, int y1, int x2, int y2, int x3, in
   }
 }
 
-void drawIcon(boolean draw, const unsigned char* data, int x, int y){
+void drawIcon(bool draw, const unsigned char* data, int x, int y){
 
   /*
   ################################################
@@ -584,7 +584,7 @@ void drawIcon(boolean draw, const unsigned char* data, int x, int y){
 
   long readPosition = 0;
   //int data_size = sizeof(data)/sizeof(data[0]);
-  byte current_byte;
+  unsigned char currentBbyte;
 
 
   int image_type = readRawParam(data, readPosition);    // type of image
@@ -597,13 +597,13 @@ void drawIcon(boolean draw, const unsigned char* data, int x, int y){
   if(image_type==0x01){
     
     while(1){
-      byte color_var = readRawChar(data, readPosition);
+      unsigned char color_var = readRawChar(data, readPosition);
       
       if (color_var==0x04){ // new color layout
     
-        byte red    = readRawChar(data, readPosition); 
-        byte green  = readRawChar(data, readPosition); 
-        byte blue   = readRawChar(data, readPosition); 
+        unsigned char red    = readRawChar(data, readPosition); 
+        unsigned char green  = readRawChar(data, readPosition); 
+        unsigned char blue   = readRawChar(data, readPosition); 
 
         if(draw){
           setDrawColor(red, green, blue);
@@ -619,25 +619,25 @@ void drawIcon(boolean draw, const unsigned char* data, int x, int y){
         icon_x = 0;
         icon_y = 0;
 
-        for (int reading_byte=0; reading_byte<(image_wigth*image_height%8==0?image_wigth*image_height/8:image_wigth*image_height/8+1); reading_byte++){
+        for (int readingBbyte=0; readingBbyte<(image_wigth*image_height%8==0?image_wigth*image_height/8:image_wigth*image_height/8+1); readingBbyte++){
           //if(data_size<=readPosition) break;
-          current_byte = readRawChar(data, readPosition);
+          currentBbyte = readRawChar(data, readPosition);
 
-          if(current_byte!=0x00 && current_byte!=0xFF){
-            for (byte d=0; d<8; d++){
+          if(currentBbyte!=0x00 && currentBbyte!=0xFF){
+            for (unsigned char d=0; d<8; d++){
               if (icon_x>=image_wigth){
                 icon_y+=icon_x/image_wigth;
                 icon_x %= image_wigth;
               }
 
-              //if (current_byte&1<<(7-d)) drawPixel(x + icon_x, y + icon_y);
-              //if (getBitInByte(current_byte, d)) drawPixel(x + icon_x, y + icon_y);
-              if (getBitInByte(current_byte, 7-d)){
+              //if (currentBbyte&1<<(7-d)) drawPixel(x + icon_x, y + icon_y);
+              //if (getBitInByte(currentBbyte, d)) drawPixel(x + icon_x, y + icon_y);
+              if (getBitInByte(currentBbyte, 7-d)){
                 #ifdef USE_PRIMITIVE_HARDWARE_DRAW_ACCELERATION
-                  byte pixelsInARow = 0;
+                  unsigned char pixelsInARow = 0;
                   if(d!=7){
-                    for (byte future_d=d+1; future_d<8; future_d++){
-                      if (getBitInByte(current_byte, 7-future_d)){
+                    for (unsigned char future_d=d+1; future_d<8; future_d++){
+                      if (getBitInByte(currentBbyte, 7-future_d)){
                         pixelsInARow++;
                       } else{
                         break;
@@ -658,7 +658,7 @@ void drawIcon(boolean draw, const unsigned char* data, int x, int y){
               }
               icon_x ++;
             }
-          }else if(current_byte==0xFF){ // Saving 1ms!!!!
+          }else if(currentBbyte==0xFF){ // Saving 1ms!!!!
 
             if (icon_x>=image_wigth){
               icon_y+=icon_x/image_wigth;
@@ -685,8 +685,8 @@ void drawIcon(boolean draw, const unsigned char* data, int x, int y){
 
 }
 
-boolean getBitInByte(byte currentByte, byte bitNum){
-  return currentByte&1<<(bitNum);
+bool getBitInByte(unsigned char currentbyte, unsigned char bitNum){
+  return currentbyte&1<<(bitNum);
 }
 
 //////////////////////////////////////////////////

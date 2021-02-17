@@ -1,21 +1,21 @@
 /*
 #include <M5Stack.h>
 
-byte red;
-byte green;
-byte blue;
+unsigned char red;
+unsigned char green;
+unsigned char blue;
 
-byte red_bg     = 255;
-byte green_bg   = 255;
-byte blue_bg    = 255;
+unsigned char red_bg     = 255;
+unsigned char green_bg   = 255;
+unsigned char blue_bg    = 255;
 
 uint32_t current_drawColor;
 
-uint32_t get_m5ColorFromPallette(byte red, byte green, byte blue){
+uint32_t get_m5ColorFromPallette(unsigned char red, unsigned char green, unsigned char blue){
   return ( (red*31/255) <<11)|( (green*31/255) <<6)|( (blue*31/255) <<0);
 }
 
-void setDrawColor(byte red, byte green, byte blue){
+void setDrawColor(unsigned char red, unsigned char green, unsigned char blue){
   current_drawColor = get_m5ColorFromPallette(red, green, blue);
 }
 
@@ -32,7 +32,7 @@ void setup_displayDriver(){
   M5.Lcd.setCursor(0, 0);
 }
 
-void fillScreen(byte red, byte green, byte blue){
+void fillScreen(unsigned char red, unsigned char green, unsigned char blue){
   M5.Lcd.fillScreen(get_m5ColorFromPallette(red, green, blue));
 }
 

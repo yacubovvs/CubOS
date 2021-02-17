@@ -30,7 +30,7 @@ int driver_battery_getmVoltage(){
     return (int)voltage;
 }
 
-byte driver_battery_getPercent(){
+unsigned char driver_battery_getPercent(){
     int mV = driver_battery_getmVoltage();
     if(mV>=400){
         return 100;

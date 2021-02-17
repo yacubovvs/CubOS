@@ -1,5 +1,5 @@
-#define byte unsigned char
-#define boolean bool
+//#define byte unsigned char
+//#define bool bool
 #define PROGMEM /**/
 #define pgm_read_byte *
 #define pgm_read_word *
@@ -19,6 +19,8 @@
 #include "noniso.c"
 #include "WString.cpp"
 #include <ctime>
+#include <chrono>
+#include <dos.h>
 
 #include <unistd.h>
 
@@ -42,15 +44,16 @@ unsigned char min(unsigned char a, unsigned char b){
     return ((a<b)?a:b);
 }
 
+
 void delay(int x){
     //sleep(x/1000);
-    usleep(x);
+    _sleep(x);
 }
 
 // PREDEFINED
-const byte *getAppParams(char i, byte type);
+const unsigned char *getAppParams(char i, unsigned char type);
 void startApp(char num);
-boolean getBitInByte(byte currentByte, byte bitNum);
+bool getBitInByte(unsigned char currentByte, unsigned char bitNum);
 void debug(String string);
 void debug(String string, int delaytime);
 
@@ -62,7 +65,7 @@ void driver_battery_setup();
 void core_time_setup();
 
 class Application;
-Application *getApp(byte i);
+Application *getApp(unsigned char i);
 
 void setup();
 void loop();

@@ -7,15 +7,6 @@ import java.awt.event.MouseEvent;
 public class EmulatorImagePanel extends ImagePanel {
     Emulator emulator;
 
-    @Override
-    public void onKeyPressed(KeyEvent keyEvent){
-        byte eventData[] = new byte[5];
-        byte keyCode[] = ByteConverter.char_to_bytes((char)(keyEvent.getKeyCode()));
-        byte keyChar[] = ByteConverter.char_to_bytes((char)(keyEvent.getKeyChar()));
-
-        //emulator.sendToServer(eventData);
-    }
-
     public EmulatorImagePanel(Emulator emulator){
         super();
         this.emulator = emulator;

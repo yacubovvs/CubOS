@@ -38,6 +38,11 @@ cp sdk/platforms/WString.h                  $OUTPUT_DIRECTORY/cubos/
 echo "
 "   >> $OUTPUT_DIRECTORY/cubos/main.cpp
 cat sdk/cubos.ino                       >> $OUTPUT_DIRECTORY/cubos/main.cpp
+
+echo "
+"   >> $OUTPUT_DIRECTORY/cubos/main.cpp
+cat "sdk/drivers/driver_controls_emulator.ino"       >> $OUTPUT_DIRECTORY/cubos/main.cpp
+
 echo "
 "   >> $OUTPUT_DIRECTORY/cubos/main.cpp
 cat $APPS_FILE                          >> $OUTPUT_DIRECTORY/cubos/main.cpp

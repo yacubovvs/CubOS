@@ -61,7 +61,7 @@ bool driver_controls_isPressed(int num){
     }
 }
 
-void onButtonEvent(byte event, int button){
+void onButtonEvent(unsigned char event, int button){
   currentApp->onEvent(event, button, 0);
 }
 */

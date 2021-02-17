@@ -1,4 +1,4 @@
-String getHexNumberFromNumber(byte b){
+String getHexNumberFromNumber(unsigned char b){
     switch(b){
         case 0:
         case 1:
@@ -29,6 +29,6 @@ String getHexNumberFromNumber(byte b){
 
 }
 
-String getHexStringFromByte(byte b){
+String getHexStringFromByte(unsigned char b){
     return "0x" + getHexNumberFromNumber(b/16) + getHexNumberFromNumber(b%16);
 }

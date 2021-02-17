@@ -20,10 +20,6 @@ public class ImagePanel extends JPanel {
         setImage(image);
     }
 
-    public void onKeyPressed(KeyEvent keyEvent){
-        return;
-    }
-
     public void setImage(BufferedImage image) {
         this.image = image;
     }

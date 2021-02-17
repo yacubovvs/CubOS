@@ -28,7 +28,7 @@
 
 #define ON_TIME_CHANGE_EVERY_MS 1000
 
-//#define hasHardwareButtons              // Conf of controls with hardware btns    
+#define hasHardwareButtons              // Conf of controls with hardware btns    
 //#define isTouchScreen                 // Conf of controls
 
 #define colorScreen                     // Screen is colored
@@ -71,8 +71,8 @@
     ############################################################################################
 */
 
-#define byte unsigned char
-#define boolean bool
+//#define byte unsigned char
+//#define bool bool
 #define PROGMEM /**/
 #define pgm_read_byte *
 #define pgm_read_word *
@@ -92,6 +92,8 @@
 #include "noniso.c"
 #include "WString.cpp"
 #include <ctime>
+#include <chrono>
+#include <dos.h>
 
 #include <unistd.h>
 
@@ -115,15 +117,16 @@ unsigned char min(unsigned char a, unsigned char b){
     return ((a<b)?a:b);
 }
 
+
 void delay(int x){
     //sleep(x/1000);
-    usleep(x);
+    _sleep(x);
 }
 
 // PREDEFINED
-const byte *getAppParams(char i, byte type);
+const unsigned char *getAppParams(char i, unsigned char type);
 void startApp(char num);
-boolean getBitInByte(byte currentByte, byte bitNum);
+bool getBitInByte(unsigned char currentByte, unsigned char bitNum);
 void debug(String string);
 void debug(String string, int delaytime);
 
@@ -135,7 +138,7 @@ void driver_battery_setup();
 void core_time_setup();
 
 class Application;
-Application *getApp(byte i);
+Application *getApp(unsigned char i);
 
 void setup();
 void loop();
@@ -155,38 +158,153 @@ int main()
 }
 
 
+
+/*
+#ifdef _WIN32
+  // See http://stackoverflow.com/questions/12765743/getaddrinfo-on-win32 
+  #ifndef _WIN32_WINNT
+    #define _WIN32_WINNT 0x0501
+  #endif
+  #include <winsock2.h>
+  #include <Ws2tcpip.h>
+#else
+  #include <sys/socket.h>
+  #include <arpa/inet.h>
+  #include <netdb.h>
+  #include <unistd.h>
+#endif
+*/
+
+#include <iostream>
+
+#if defined(_WIN32) || defined(_WIN64)
+    //#pragma comment(lib, "ws2_32")//включаем библиотеку для сокетов
+    //#include <winsock2.h>
+    #include <sys/types.h>
+#include <winsock2.h>
+#include <memory.h>
+#include <conio.h>
+    //#include <Ws2tcpip.h>
+#else
+    #include <sys/socket.h>
+    #include <arpa/inet.h>
+#endif
+
+#define MSG_SIZE 1024
+#define REPLY_SIZE 65536
+
+bool driver_display_needToUpdateScreen = false;
+
+void driver_display_loop(){
+  if(driver_display_needToUpdateScreen){
+    printf("U\n");
+    driver_display_needToUpdateScreen = false;
+  }
+}
+
 uint16_t get_uint16Color(byte red, byte green, byte blue){
   return ( (red*31/255) <<11)|( (green*31/255) <<6)|( (blue*31/255) <<0);
 }
 
 void setup_displayDriver(){
-  debug("Setup display");
+
+  WSADATA wData;
+	struct sockaddr_in addr,serv_addr;
+	SOCKET sock;
+	if(WSAStartup(MAKEWORD(1,1),&wData)!=0)
+	{
+		std::cout<<"socket not initialized\n";
+	}
+	std::cout<<"socket initialized\n";
+
+	sock=socket(AF_INET,SOCK_STREAM,0);
+	if(sock==-1)
+	{
+		std::cout<<"socket not created\n";
+	}
+	
+	addr.sin_family=AF_INET;
+	addr.sin_port=htons(9100);
+	addr.sin_addr.s_addr=htonl(INADDR_LOOPBACK);
+	bind(sock,(struct sockaddr *)&addr,sizeof(addr));
+
+	char HostName[1024];
+	DWORD HostIP = 0;
+	LPHOSTENT lphost;	
+	gethostname(HostName, 1024);
+	lphost=gethostbyname(HostName);
+	serv_addr.sin_family=AF_INET;
+	memcpy((char*)&serv_addr.sin_addr,lphost->h_addr,lphost->h_length);
+	serv_addr.sin_port=htons(9100);
+
+	int error;
+	if(connect(sock,(struct sockaddr *)&serv_addr,sizeof(serv_addr))<0)
+	{
+		std::cout<<"connect error\n";
+		error=WSAGetLastError();
+		std::cout<<error<<"\n";
+		//_getch();
+		return;
+	}
+	std::cout<<"connect success\n";
+
+
+  char message1[10];
+  char message2[10];
+  char message3[10];
+
+  char buff[15];
+
+  std::cout<<"insert value\n";
+  std::cin>>message1;
+  std::cin>>message2;
+  std::cin>>message3;
+
+	send(sock,message1,sizeof(message1),0);
+	send(sock,message2,sizeof(message2),0);
+	send(sock,message3,sizeof(message3),0);
+
+	recv(sock,buff,sizeof(buff),0);	//3 param -sizeof accepted data
+	std::cout<<"answer "<<buff<<"\n";
+	recv(sock,buff,sizeof(buff),0);
+	std::cout<<"answer "<<buff<<"\n";
+	//getch();
+
+	shutdown(sock,2);
+	closesocket(sock);
+	WSACleanup();
+	return;
 }
+ 
+
 
 void sleep_displayDriver(){
-  debug("Display sleep");
+  //debug("Display sleep");
 }
 
 void wakeup_displayDriver(){
-  debug("Display wakeup");
+  //debug("Display wakeup");
 }
 
 void powerOff_displayDriver(){
-  debug("Display poweroff");
+  //debug("Display poweroff");
 }
 
 void powerOn_displayDriver(){
-  debug("Display poweron");
+  //debug("Display poweron");
 }
 
 
 void fillScreen(byte red, byte green, byte blue){
-  debug("Fill screen");
+  //debug("Fill screen");
+  printf("F\n");
+  driver_display_needToUpdateScreen = true;
 }
 
 void setPixel(int x, int y){
+  delay(5);
   printf("P %d %d\n", x, y);
-  delay(100);
+  driver_display_needToUpdateScreen = true;
   #if defined(SCREEN_ROTATION_90)
     
   #elif defined(SCREEN_ROTATION_180)
@@ -204,7 +322,8 @@ void setDrawColor(byte red_new, byte green_new, byte blue_new){
 
 #ifdef USE_PRIMITIVE_HARDWARE_DRAW_ACCELERATION
   void driver_display_drawFastVLine(int16_t x, int16_t y, int16_t w){
-  printf("LV %d %d %d\n", x, y, w);
+    printf("LV %d %d %d\n", x, y, w);
+    driver_display_needToUpdateScreen = true;
     #if defined(SCREEN_ROTATION_90)
       
     #elif defined(SCREEN_ROTATION_180)
@@ -219,6 +338,7 @@ void setDrawColor(byte red_new, byte green_new, byte blue_new){
 
   void driver_display_drawFastHLine(int16_t x, int16_t y, int16_t h){
     printf("LH %d %d %d\n", x, y, h);
+    driver_display_needToUpdateScreen = true;
     #if defined(SCREEN_ROTATION_90)
       
     #elif defined(SCREEN_ROTATION_180)
@@ -232,6 +352,7 @@ void setDrawColor(byte red_new, byte green_new, byte blue_new){
 
   void driver_display_fillRect(int16_t x, int16_t y, int16_t w, int16_t h){
     printf("R %d %d %d %d\n", x, y, w, h);
+    driver_display_needToUpdateScreen = true;
     #if defined(SCREEN_ROTATION_90)
       
     #elif defined(SCREEN_ROTATION_180)
@@ -255,10 +376,10 @@ void setDrawColor(byte red_new, byte green_new, byte blue_new){
 */
 
 void core_views_statusBar_draw();
-void setBackgroundColor(byte r, byte g, byte b);
-void drawRect(int x0, int y0, int x1, int y1, boolean fill);
-void setDrawColor(byte red, byte green, byte blue);
-void fillScreen(byte red, byte green, byte blue);
+void setBackgroundColor(unsigned char r, unsigned char g, unsigned char b);
+void drawRect(int x0, int y0, int x1, int y1, bool fill);
+void setDrawColor(unsigned char red, unsigned char green, unsigned char blue);
+void fillScreen(unsigned char red, unsigned char green, unsigned char blue);
 
 /*
     ############################################################################################
@@ -313,7 +434,7 @@ class Application{
 
     virtual void onLoop()     = 0;
     virtual void onDestroy()  = 0;
-    virtual void onEvent(byte event, int val1, int val2) = 0;
+    virtual void onEvent(unsigned char event, int val1, int val2) = 0;
 
     void super_onCreate(){
       if(this->showStatusBar) core_views_statusBar_draw();
@@ -395,6 +516,8 @@ void setup()
 
 bool isInSleep = false;
 void loop(){
+  driver_display_loop();
+
   #ifdef hasHardwareButtons
     driver_controls_loop();
   #endif
@@ -435,6 +558,7 @@ void loop(){
     }
     //driver_cpu_wakeup();
   #endif
+
 
 }
 
@@ -526,6 +650,71 @@ void debug(const char* string){
 
 
 
+#define DRIVER_CONTROLS_TOTALBUTTONS 4
+#define _millis() millis()
+#define DRIVER_CONTROLS_DELAY_BEFOR_LONG_PRESS 350
+
+unsigned long last_user_activity = _millis();
+
+// Do not change:
+bool driver_control_pressed[]      = {false, false, false, false};
+unsigned long driver_control_time_pressed[]    = {0, 0, 0, 0};
+
+void onButtonEvent(unsigned char event, int button){
+  currentApp->onEvent(event, button, 0);
+}
+
+void driver_controls_setup(){
+  last_user_activity = _millis();
+}
+
+
+void driver_controls_loop(){
+    int b1=0, b2=0, b3=0, b4=0;
+    
+    scanf("%d %d %d %d", &b1, &b2, &b3, &b4);
+    //read(b1, b2, b3, b4);
+
+    int digRead[] = {b1,b2,b3,b4};
+
+    for (unsigned char i=0; i<DRIVER_CONTROLS_TOTALBUTTONS; i++){
+        if (digRead[i]){
+        last_user_activity = _millis();
+        if(driver_control_pressed[i]==false){
+            // press start
+            driver_control_pressed[i]=true;
+            driver_control_time_pressed[i] = _millis();
+            onButtonEvent(EVENT_BUTTON_PRESSED, i);
+        }else{
+            // was pressed
+            if(_millis()-driver_control_time_pressed[i]>DRIVER_CONTROLS_DELAY_BEFOR_LONG_PRESS){
+            // long press
+            driver_control_time_pressed[i]=-1;
+            onButtonEvent(EVENT_BUTTON_LONG_PRESS, i);
+            }
+        }
+
+        }else{
+        if(driver_control_pressed[i]==true){
+            // released
+            driver_control_pressed[i]=false;
+            onButtonEvent(EVENT_BUTTON_RELEASED, i);
+
+        }
+        }
+    }
+
+}
+
+unsigned long driver_control_get_last_user_avtivity(){
+  return last_user_activity;
+}
+
+void driver_control_set_last_user_avtivity(unsigned long time){
+  last_user_activity = time;
+}
+
+
 /*
     ############################################################################################
     #                                                                                          #
@@ -602,17 +791,17 @@ long readRawChar(const unsigned char* data, long &position){
 }   
 
 // Also this func need for B apps
-uint64_t bytes_to_value(byte byte0, byte byte1, byte byte2, byte byte3, byte byte4, byte byte5, byte byte6, byte byte7){
+uint64_t byte_to_value(unsigned char byte0, unsigned char byte1, unsigned char byte2, unsigned char byte3, unsigned char byte4, unsigned char byte5, unsigned char byte6, unsigned char byte7){
   return (byte7<<56)|(byte6<<48)|(byte5<<40)|(byte4<<32)|(byte3<<24)|(byte2<<16)|(byte1<<8)|byte0;
 }
 
 int readRawParam(const unsigned char* data, long &position){
-    byte paramType = readRawChar(data, position);
+    unsigned char paramType = readRawChar(data, position);
 
     if (paramType==0x02){
-      return (byte)readRawChar(data, position);
+      return (unsigned char)readRawChar(data, position);
     }else if(paramType==0x03){
-      return (unsigned int)bytes_to_value(readRawChar(data, position), readRawChar(data, position),0,0,0,0,0,0);
+      return (unsigned int)byte_to_value(readRawChar(data, position), readRawChar(data, position),0,0,0,0,0,0);
     }
 }
 
@@ -655,8 +844,8 @@ void int_to_char(char *string, int num, bool fillNull){
 }
 
 // 1 bit array operations
-void set_bit_to_byte(unsigned char &b, unsigned char position, bool value){ if (value) b|=1<<position; else b&=~(1<<position);}
-bool get_bit_from_byte(unsigned char b, unsigned char position){return (b&1<<position);}
+void set_bit_toBbyte(unsigned char &b, unsigned char position, bool value){ if (value) b|=1<<position; else b&=~(1<<position);}
+bool get_bit_fromBbyte(unsigned char b, unsigned char position){return (b&1<<position);}
 
 
 /*
@@ -683,7 +872,7 @@ bool get_bit_from_byte(unsigned char b, unsigned char position){return (b&1<<pos
     #endif
 #endif
 
-String getHexNumberFromNumber(byte b){
+String getHexNumberFromNumber(unsigned char b){
     switch(b){
         case 0:
         case 1:
@@ -714,7 +903,7 @@ String getHexNumberFromNumber(byte b){
 
 }
 
-String getHexStringFromByte(byte b){
+String getHexStringFromByte(unsigned char b){
     return "0x" + getHexNumberFromNumber(b/16) + getHexNumberFromNumber(b%16);
 }
 
@@ -724,23 +913,23 @@ String getHexStringFromByte(byte b){
                                   DISPLAY FUNCTIONS
 * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * 
 */
-byte background_red = 0;
-byte background_green = 0;
-byte background_blue = 0;
+unsigned char background_red = 0;
+unsigned char background_green = 0;
+unsigned char background_blue = 0;
 
-byte getBackgroundColor_red(){
+unsigned char getBackgroundColor_red(){
   return background_red;
 } 
 
-byte getBackgroundColor_green(){
+unsigned char getBackgroundColor_green(){
   return background_green;
 } 
 
-byte getBackgroundColor_blue(){
+unsigned char getBackgroundColor_blue(){
   return background_blue;
 } 
 
-void setBackgroundColor(byte r, byte g, byte b){
+void setBackgroundColor(unsigned char r, unsigned char g, unsigned char b){
   background_red    = r;
   background_green  = g;
   background_blue   = b;
@@ -1008,20 +1197,20 @@ static const unsigned char font_cubos[] PROGMEM = {
   0x00, 0x00, 0x00, 0x00, 0x00  // #255 NBSP
 };
 
-void setStr(char * dString, int x, int y, byte fontSize){
+void setStr(char * dString, int x, int y, unsigned char fontSize){
         
   int string_length = strlen(dString);
   for (int i=0; i<string_length; i++){
 
-    for (byte char_part=0; char_part<5; char_part++){
+    for (unsigned char char_part=0; char_part<5; char_part++){
       const unsigned char_part_element = pgm_read_byte(&font_cubos[dString[i] *5 + char_part]);
 
       for (unsigned char bit=0; bit<8; bit++){
 
         if (getBitInByte(char_part_element, bit)){
           #ifdef USE_PRIMITIVE_HARDWARE_DRAW_ACCELERATION
-            byte pixelsInLine=0;
-            for (byte i=bit+1; i<8; i++){
+            unsigned char pixelsInLine=0;
+            for (unsigned char i=bit+1; i<8; i++){
               if(getBitInByte(char_part_element, i)) {
                 pixelsInLine++;
               }else{
@@ -1070,7 +1259,7 @@ void drawString(char * dString, int x, int y){
   setStr(dString, x, y, 1);
 }
 
-void drawString(char * dString, int x, int y, byte fontSize){
+void drawString(char * dString, int x, int y, unsigned char fontSize){
   setStr(dString, x, y, fontSize);
 }
 
@@ -1080,7 +1269,7 @@ void drawString(int val, int x, int y){
   drawString( str, 0, y);
 }
 
-void drawString(String dString, int x, int y, byte fontSize){
+void drawString(String dString, int x, int y, unsigned char fontSize){
   int str_len = dString.length() + 1;
   char element_value[str_len];
   dString.toCharArray(element_value, str_len);
@@ -1096,7 +1285,7 @@ void drawString_centered(char * dString, int y){
   drawString(dString, (SCREEN_WIDTH - strlen(dString)*FONT_CHAR_WIDTH)/2, y);  
 }
 
-void clearString(char * dString, int x, int y, byte fontSize){
+void clearString(char * dString, int x, int y, unsigned char fontSize){
   #ifdef USE_PRIMITIVE_HARDWARE_DRAW_ACCELERATION
     if(fontSize==0) fontSize = 1;
     int string_length = strlen(dString);
@@ -1110,7 +1299,7 @@ void clearString_centered(char * dString, int y){
   clearString(dString, (SCREEN_WIDTH - strlen(dString)*FONT_CHAR_WIDTH)/2, y, 1);  
 }
 
-void clearString(String dString, int x, int y, byte fontSize){
+void clearString(String dString, int x, int y, unsigned char fontSize){
   int str_len = dString.length() + 1;
   char element_value[str_len];
   dString.toCharArray(element_value, str_len);
@@ -1218,7 +1407,7 @@ void drawRect(int x0, int y0, int x1, int y1){
   drawRect(x0, y0, x1, y1, false);
 }
 
-void drawRect(int x0, int y0, int x1, int y1, boolean fill){
+void drawRect(int x0, int y0, int x1, int y1, bool fill){
   // check if the rectangle is to be filled
   if (fill == 1)
   {
@@ -1259,7 +1448,7 @@ int treangle_area(int x0, int y0, int x1, int y1, int x2, int y2){
    return abs((x0 - x2)*(y1 - y2) + (x1-x2)*(y2-y0));
 }
 
-void drawRect_custom( int x0, int y0, int x1, int y1, int x2, int y2, int x3, int y3, boolean fill){
+void drawRect_custom( int x0, int y0, int x1, int y1, int x2, int y2, int x3, int y3, bool fill){
   if (fill){
     // all angles should be less thаn 180 degrees
     const int min_x = min(min(x0, x1), min(x2, x3));
@@ -1293,7 +1482,7 @@ void drawRect_custom( int x0, int y0, int x1, int y1, int x2, int y2, int x3, in
   }
 }
 
-void drawIcon(boolean draw, const unsigned char* data, int x, int y){
+void drawIcon(bool draw, const unsigned char* data, int x, int y){
 
   /*
   ################################################
@@ -1305,7 +1494,7 @@ void drawIcon(boolean draw, const unsigned char* data, int x, int y){
 
   long readPosition = 0;
   //int data_size = sizeof(data)/sizeof(data[0]);
-  byte current_byte;
+  unsigned char currentBbyte;
 
 
   int image_type = readRawParam(data, readPosition);    // type of image
@@ -1318,13 +1507,13 @@ void drawIcon(boolean draw, const unsigned char* data, int x, int y){
   if(image_type==0x01){
     
     while(1){
-      byte color_var = readRawChar(data, readPosition);
+      unsigned char color_var = readRawChar(data, readPosition);
       
       if (color_var==0x04){ // new color layout
     
-        byte red    = readRawChar(data, readPosition); 
-        byte green  = readRawChar(data, readPosition); 
-        byte blue   = readRawChar(data, readPosition); 
+        unsigned char red    = readRawChar(data, readPosition); 
+        unsigned char green  = readRawChar(data, readPosition); 
+        unsigned char blue   = readRawChar(data, readPosition); 
 
         if(draw){
           setDrawColor(red, green, blue);
@@ -1340,25 +1529,25 @@ void drawIcon(boolean draw, const unsigned char* data, int x, int y){
         icon_x = 0;
         icon_y = 0;
 
-        for (int reading_byte=0; reading_byte<(image_wigth*image_height%8==0?image_wigth*image_height/8:image_wigth*image_height/8+1); reading_byte++){
+        for (int readingBbyte=0; readingBbyte<(image_wigth*image_height%8==0?image_wigth*image_height/8:image_wigth*image_height/8+1); readingBbyte++){
           //if(data_size<=readPosition) break;
-          current_byte = readRawChar(data, readPosition);
+          currentBbyte = readRawChar(data, readPosition);
 
-          if(current_byte!=0x00 && current_byte!=0xFF){
-            for (byte d=0; d<8; d++){
+          if(currentBbyte!=0x00 && currentBbyte!=0xFF){
+            for (unsigned char d=0; d<8; d++){
               if (icon_x>=image_wigth){
                 icon_y+=icon_x/image_wigth;
                 icon_x %= image_wigth;
               }
 
-              //if (current_byte&1<<(7-d)) drawPixel(x + icon_x, y + icon_y);
-              //if (getBitInByte(current_byte, d)) drawPixel(x + icon_x, y + icon_y);
-              if (getBitInByte(current_byte, 7-d)){
+              //if (currentBbyte&1<<(7-d)) drawPixel(x + icon_x, y + icon_y);
+              //if (getBitInByte(currentBbyte, d)) drawPixel(x + icon_x, y + icon_y);
+              if (getBitInByte(currentBbyte, 7-d)){
                 #ifdef USE_PRIMITIVE_HARDWARE_DRAW_ACCELERATION
-                  byte pixelsInARow = 0;
+                  unsigned char pixelsInARow = 0;
                   if(d!=7){
-                    for (byte future_d=d+1; future_d<8; future_d++){
-                      if (getBitInByte(current_byte, 7-future_d)){
+                    for (unsigned char future_d=d+1; future_d<8; future_d++){
+                      if (getBitInByte(currentBbyte, 7-future_d)){
                         pixelsInARow++;
                       } else{
                         break;
@@ -1379,7 +1568,7 @@ void drawIcon(boolean draw, const unsigned char* data, int x, int y){
               }
               icon_x ++;
             }
-          }else if(current_byte==0xFF){ // Saving 1ms!!!!
+          }else if(currentBbyte==0xFF){ // Saving 1ms!!!!
 
             if (icon_x>=image_wigth){
               icon_y+=icon_x/image_wigth;
@@ -1406,8 +1595,8 @@ void drawIcon(boolean draw, const unsigned char* data, int x, int y){
 
 }
 
-boolean getBitInByte(byte currentByte, byte bitNum){
-  return currentByte&1<<(bitNum);
+bool getBitInByte(unsigned char currentbyte, unsigned char bitNum){
+  return currentbyte&1<<(bitNum);
 }
 
 //////////////////////////////////////////////////
@@ -1433,7 +1622,7 @@ String core_time_getHourMinuteTime(){
     #endif
 }
 
-byte core_time_getHours_byte(){
+unsigned char core_time_getHours_byte(){
     #ifdef USE_RTC
         return driver_RTC_getHours();
     #else
@@ -1441,7 +1630,7 @@ byte core_time_getHours_byte(){
     #endif
 }
 
-byte core_time_getMinutes_byte(){
+unsigned char core_time_getMinutes_byte(){
     #ifdef USE_RTC
         return driver_RTC_getMinutes();
     #else
@@ -1450,7 +1639,7 @@ byte core_time_getMinutes_byte(){
 }
 
 
-byte core_time_getSeconds_byte(){
+unsigned char core_time_getSeconds_byte(){
     #ifdef USE_RTC
         return driver_RTC_getSeconds();
     #else
@@ -1458,7 +1647,7 @@ byte core_time_getSeconds_byte(){
     #endif
 }
 
-String core_time_byteToTimeStringWithLeaderNull(byte byteIn){
+String core_time_byteToTimeStringWithLeaderNull(unsigned char byteIn){
     if(byteIn<10){
         return "0" + String(byteIn);
     }else{
@@ -1515,7 +1704,7 @@ void core_time_loop(){
 
 #ifdef BATTERY_ENABLE
     // BATTERY 100% ICON
-    const byte battery100[] PROGMEM = {
+    const unsigned char battery100[] PROGMEM = {
         0x02,0x01,0x02,0x28,0x02,0x10,0x04,0x33,0xff,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x7F,0xFF,0xFF,0xFF,
         0xF0,0x7F,0xFF,0xFF,0xFF,0xF0,0x7F,0xFF,0xFF,0xFF,0xF0,0x7F,0xFF,0xFF,0xFF,0xFE,0x7F,0xFF,0xFF,0xFF,0xFE,0x7F,0xFF,0xFF,
         0xFF,0xFE,0x7F,0xFF,0xFF,0xFF,0xFE,0x7F,0xFF,0xFF,0xFF,0xFE,0x7F,0xFF,0xFF,0xFF,0xFE,0x7F,0xFF,0xFF,0xFF,0xF0,0x7F,0xFF,
@@ -1527,7 +1716,7 @@ void core_time_loop(){
     };
 
     // BATTERY 90% ICON
-    const byte battery90[] PROGMEM = {
+    const unsigned char battery90[] PROGMEM = {
         0x02,0x01,0x02,0x28,0x02,0x10,0x04,0x33,0xff,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x7F,0xFF,0xFF,0xFF,
         0xF0,0x7F,0xFF,0xFF,0xFF,0xF0,0x7F,0xFF,0xFF,0xFF,0xF0,0x7F,0xFF,0xFF,0xFF,0xF0,0x7F,0xFF,0xFF,0xFF,0xF0,0x7F,0xFF,0xFF,
         0xFF,0xF0,0x7F,0xFF,0xFF,0xFF,0xF0,0x7F,0xFF,0xFF,0xFF,0xF0,0x7F,0xFF,0xFF,0xFF,0xF0,0x7F,0xFF,0xFF,0xFF,0xF0,0x7F,0xFF,
@@ -1542,7 +1731,7 @@ void core_time_loop(){
     };
 
     // BATTERY 80% ICON
-    const byte battery80[] PROGMEM = {
+    const unsigned char battery80[] PROGMEM = {
         0x02,0x01,0x02,0x28,0x02,0x10,0x04,0x33,0xff,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x7F,0xFF,0xFF,0xFF,
         0x00,0x7F,0xFF,0xFF,0xFF,0x00,0x7F,0xFF,0xFF,0xFF,0x00,0x7F,0xFF,0xFF,0xFF,0x00,0x7F,0xFF,0xFF,0xFF,0x00,0x7F,0xFF,0xFF,
         0xFF,0x00,0x7F,0xFF,0xFF,0xFF,0x00,0x7F,0xFF,0xFF,0xFF,0x00,0x7F,0xFF,0xFF,0xFF,0x00,0x7F,0xFF,0xFF,0xFF,0x00,0x7F,0xFF,
@@ -1557,7 +1746,7 @@ void core_time_loop(){
     };
 
     // BATTERY 70% ICON
-    const byte battery70[] PROGMEM = {
+    const unsigned char battery70[] PROGMEM = {
         0x02,0x01,0x02,0x28,0x02,0x10,0x04,0x33,0xff,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x7F,0xFF,0xFF,0xF0,
         0x00,0x7F,0xFF,0xFF,0xF0,0x00,0x7F,0xFF,0xFF,0xF0,0x00,0x7F,0xFF,0xFF,0xF0,0x00,0x7F,0xFF,0xFF,0xF0,0x00,0x7F,0xFF,0xFF,
         0xF0,0x00,0x7F,0xFF,0xFF,0xF0,0x00,0x7F,0xFF,0xFF,0xF0,0x00,0x7F,0xFF,0xFF,0xF0,0x00,0x7F,0xFF,0xFF,0xF0,0x00,0x7F,0xFF,
@@ -1572,7 +1761,7 @@ void core_time_loop(){
     };
 
     // BATTERY 60% ICON
-    const byte battery60[] PROGMEM = {
+    const unsigned char battery60[] PROGMEM = {
         0x02,0x01,0x02,0x28,0x02,0x10,0x04,0x33,0xff,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x7F,0xFF,0xFF,0x00,
         0x00,0x7F,0xFF,0xFF,0x00,0x00,0x7F,0xFF,0xFF,0x00,0x00,0x7F,0xFF,0xFF,0x00,0x00,0x7F,0xFF,0xFF,0x00,0x00,0x7F,0xFF,0xFF,
         0x00,0x00,0x7F,0xFF,0xFF,0x00,0x00,0x7F,0xFF,0xFF,0x00,0x00,0x7F,0xFF,0xFF,0x00,0x00,0x7F,0xFF,0xFF,0x00,0x00,0x7F,0xFF,
@@ -1587,7 +1776,7 @@ void core_time_loop(){
     };
 
     // BATTERY 50% ICON
-    const byte battery50[] PROGMEM = {
+    const unsigned char battery50[] PROGMEM = {
         0x02,0x01,0x02,0x28,0x02,0x10,0x04,0x33,0xff,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x7F,0xFF,0xF0,0x00,
         0x00,0x7F,0xFF,0xF0,0x00,0x00,0x7F,0xFF,0xF0,0x00,0x00,0x7F,0xFF,0xF0,0x00,0x00,0x7F,0xFF,0xF0,0x00,0x00,0x7F,0xFF,0xF0,
         0x00,0x00,0x7F,0xFF,0xF0,0x00,0x00,0x7F,0xFF,0xF0,0x00,0x00,0x7F,0xFF,0xF0,0x00,0x00,0x7F,0xFF,0xF0,0x00,0x00,0x7F,0xFF,
@@ -1602,7 +1791,7 @@ void core_time_loop(){
     };
 
     // BATTERY 40% ICON
-    const byte battery40[] PROGMEM = {
+    const unsigned char battery40[] PROGMEM = {
         0x02,0x01,0x02,0x28,0x02,0x10,0x04,0x33,0xff,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x7F,0xFF,0x00,0x00,
         0x00,0x7F,0xFF,0x00,0x00,0x00,0x7F,0xFF,0x00,0x00,0x00,0x7F,0xFF,0x00,0x00,0x00,0x7F,0xFF,0x00,0x00,0x00,0x7F,0xFF,0x00,
         0x00,0x00,0x7F,0xFF,0x00,0x00,0x00,0x7F,0xFF,0x00,0x00,0x00,0x7F,0xFF,0x00,0x00,0x00,0x7F,0xFF,0x00,0x00,0x00,0x7F,0xFF,
@@ -1617,7 +1806,7 @@ void core_time_loop(){
     };
 
     // BATTERY 30% ICON
-    const byte battery30[] PROGMEM = {
+    const unsigned char battery30[] PROGMEM = {
         0x02,0x01,0x02,0x28,0x02,0x10,0x04,0x33,0xff,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x7F,0xF0,0x00,0x00,
         0x00,0x7F,0xF0,0x00,0x00,0x00,0x7F,0xF0,0x00,0x00,0x00,0x7F,0xF0,0x00,0x00,0x00,0x7F,0xF0,0x00,0x00,0x00,0x7F,0xF0,0x00,
         0x00,0x00,0x7F,0xF0,0x00,0x00,0x00,0x7F,0xF0,0x00,0x00,0x00,0x7F,0xF0,0x00,0x00,0x00,0x7F,0xF0,0x00,0x00,0x00,0x7F,0xF0,
@@ -1632,7 +1821,7 @@ void core_time_loop(){
     };
 
     // BATTERY 20% ICON
-    const byte battery20[] PROGMEM = {
+    const unsigned char battery20[] PROGMEM = {
         0x02,0x01,0x02,0x28,0x02,0x10,0x04,0x33,0xff,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x7F,0x00,0x00,0x00,
         0x00,0x7F,0x00,0x00,0x00,0x00,0x7F,0x00,0x00,0x00,0x00,0x7F,0x00,0x00,0x00,0x00,0x7F,0x00,0x00,0x00,0x00,0x7F,0x00,0x00,
         0x00,0x00,0x7F,0x00,0x00,0x00,0x00,0x7F,0x00,0x00,0x00,0x00,0x7F,0x00,0x00,0x00,0x00,0x7F,0x00,0x00,0x00,0x00,0x7F,0x00,
@@ -1647,7 +1836,7 @@ void core_time_loop(){
     };
 
     // BATTERY 10% ICON
-    const byte battery10[] PROGMEM = {
+    const unsigned char battery10[] PROGMEM = {
         0x02,0x01,0x02,0x28,0x02,0x10,0x04,0x33,0xff,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x70,0x00,0x00,0x00,
         0x00,0x70,0x00,0x00,0x00,0x00,0x70,0x00,0x00,0x00,0x00,0x70,0x00,0x00,0x00,0x00,0x70,0x00,0x00,0x00,0x00,0x70,0x00,0x00,
         0x00,0x00,0x70,0x00,0x00,0x00,0x00,0x70,0x00,0x00,0x00,0x00,0x70,0x00,0x00,0x00,0x00,0x70,0x00,0x00,0x00,0x00,0x70,0x00,
@@ -1662,7 +1851,7 @@ void core_time_loop(){
     };
 
     // BATTERY 0% ICON
-    const byte battery0[] PROGMEM = {
+    const unsigned char battery0[] PROGMEM = {
         0x02,0x01,0x02,0x28,0x02,0x10,0x04,0xff,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0xFF,0xFF,0xFF,0xFF,0xF0,0x80,0x00,0x00,0x00,
         0x08,0x80,0x00,0x00,0x00,0x08,0x80,0x00,0x00,0x00,0x0E,0x80,0x00,0x00,0x00,0x01,0x80,0x00,0x00,0x00,0x01,0x80,0x00,0x00,
         0x00,0x01,0x80,0x00,0x00,0x00,0x01,0x80,0x00,0x00,0x00,0x01,0x80,0x00,0x00,0x00,0x01,0x80,0x00,0x00,0x00,0x0E,0x80,0x00,
@@ -1721,9 +1910,9 @@ int core_views_pages_list_get_element_position_x(int pages_quantity, int positio
 }
 
 void core_views_draw_pages_list_simple(
-    boolean draw, // true - draw, false - clear
+    bool draw, // true - draw, false - clear
     int y0,
-    byte pages_quantity
+    unsigned char pages_quantity
 ){
     //SCREEN_WIDTH
     //SCREEN_HEIGHT
@@ -1739,10 +1928,10 @@ void core_views_draw_pages_list_simple(
 }
 
 void core_views_draw_active_page(
-    boolean draw, // true - draw, false - clear
+    bool draw, // true - draw, false - clear
     int y0,
-    byte pages_quantity,
-    byte position
+    unsigned char pages_quantity,
+    unsigned char position
 ){
 
     if(draw) setDrawColor(0, 255, 0);
@@ -1775,7 +1964,7 @@ void core_views_draw_active_page(
 #define CORE_VIEWS_APPICON_IMAGE_Y_OFFSET       -10
 #define CORE_VIEWS_APPICON_TITLE_Y_OFFSET       20
 
-void core_views_draw_app_icon(boolean draw, int x, int y, const byte* title, const unsigned char* icon){
+void core_views_draw_app_icon(bool draw, int x, int y, const unsigned char* title, const unsigned char* icon){
     // image
     drawIcon(draw, icon, x-CORE_VIEWS_APPICON_IMAGE_WIDTH/2, y-CORE_VIEWS_APPICON_IMAGE_HEIGHT/2 + CORE_VIEWS_APPICON_IMAGE_Y_OFFSET);
 
@@ -1821,7 +2010,7 @@ class appNameClass: public Application{
     public:
         virtual void onLoop() override;
         virtual void onDestroy() override;
-        virtual void onEvent(byte event, int val1, int val2) override;
+        virtual void onEvent(unsigned char event, int val1, int val2) override;
 
         void onCreate();
         appNameClass(){ fillScreen(0, 0, 0); super_onCreate(); onCreate(); };
@@ -1831,7 +2020,7 @@ class appNameClass: public Application{
               case PARAM_TYPE_ICON: return icon;
               default: return (unsigned char*)""; }
         };
-        const static byte icon[] PROGMEM;
+        const static unsigned char icon[] PROGMEM;
       
 };
 
@@ -1856,7 +2045,7 @@ void appNameClass::onDestroy(){
     */
 }
 
-void appNameClass::onEvent(byte event, int val1, int val2){
+void appNameClass::onEvent(unsigned char event, int val1, int val2){
     
     if(event==EVENT_BUTTON_PRESSED){
         // Write you code on [val1] button pressed here
@@ -1874,7 +2063,7 @@ void appNameClass::onEvent(byte event, int val1, int val2){
     
 }
 
-const byte appNameClass::icon[] PROGMEM = {
+const unsigned char appNameClass::icon[] PROGMEM = {
     
 	/*            PUT YOUR ICON HERE            */
 
@@ -1913,7 +2102,7 @@ class appNameClass: public Application{
     public:
         virtual void onLoop() override;
         virtual void onDestroy() override;
-        virtual void onEvent(byte event, int val1, int val2) override;
+        virtual void onEvent(unsigned char event, int val1, int val2) override;
 
         void onCreate();
         appNameClass(){ fillScreen(0, 0, 0); super_onCreate(); onCreate(); };
@@ -1923,7 +2112,7 @@ class appNameClass: public Application{
               case PARAM_TYPE_ICON: return icon;
               default: return (unsigned char*)""; }
         };
-        const static byte icon[] PROGMEM;
+        const static unsigned char icon[] PROGMEM;
       
 };
 
@@ -1947,7 +2136,7 @@ void appNameClass::onDestroy(){
     */
 }
 
-void appNameClass::onEvent(byte event, int val1, int val2){
+void appNameClass::onEvent(unsigned char event, int val1, int val2){
     
     if(event==EVENT_BUTTON_PRESSED){
         // Write you code on [val1] button pressed here
@@ -1964,7 +2153,7 @@ void appNameClass::onEvent(byte event, int val1, int val2){
     
 }
 
-const byte appNameClass::icon[] PROGMEM = {
+const unsigned char appNameClass::icon[] PROGMEM = {
 	/*            PUT YOUR ICON HERE            */
     0x02,0x01,0x02,0x20,0x02,0x20,0x04,0xff,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,
     0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,
@@ -2008,7 +2197,7 @@ class appNameClass: public Application{
     public:
         virtual void onLoop() override;
         virtual void onDestroy() override;
-        virtual void onEvent(byte event, int val1, int val2) override;
+        virtual void onEvent(unsigned char event, int val1, int val2) override;
         void onCreate();
         appNameClass(){ fillScreen(64, 64, 64); super_onCreate(); onCreate(); };
         static unsigned const char* getParams(const unsigned char type){
@@ -2017,14 +2206,14 @@ class appNameClass: public Application{
               case PARAM_TYPE_ICON: return icon;
               default: return (unsigned char*)""; }
         };
-        const static byte icon[] PROGMEM;
+        const static unsigned char icon[] PROGMEM;
 
-        const static byte icon_sound[]      PROGMEM;
-        const static byte icon_light[]      PROGMEM;
-        const static byte icon_time[]       PROGMEM;
-        const static byte icon_date[]       PROGMEM;
-        const static byte icon_battery[]    PROGMEM;
-        const static byte arrow[]           PROGMEM;
+        const static unsigned char icon_sound[]      PROGMEM;
+        const static unsigned char icon_light[]      PROGMEM;
+        const static unsigned char icon_time[]       PROGMEM;
+        const static unsigned char icon_date[]       PROGMEM;
+        const static unsigned char icon_battery[]    PROGMEM;
+        const static unsigned char arrow[]           PROGMEM;
       
 };
 
@@ -2054,7 +2243,7 @@ void appNameClass::onDestroy(){
     */
 }
 
-void appNameClass::onEvent(byte event, int val1, int val2){
+void appNameClass::onEvent(unsigned char event, int val1, int val2){
     
     if(event==EVENT_BUTTON_PRESSED){
         // Write you code on [val1] button pressed here
@@ -2071,26 +2260,26 @@ void appNameClass::onEvent(byte event, int val1, int val2){
     
 }
 
-const byte appNameClass::arrow[] PROGMEM = {
+const unsigned char appNameClass::arrow[] PROGMEM = {
     0x02,0x01,0x02,0x08,0x02,0x08,0x04,0xff,0xff,0xff,0x80,0xE0,0xF8,0xFF,0xFF,0xF8,0xE0,0x80,
 };
 
-const byte appNameClass::icon_sound[] PROGMEM = {
+const unsigned char appNameClass::icon_sound[] PROGMEM = {
     0x02,0x01,0x02,0x10,0x02,0x10,0x04,0xff,0xff,0xff,0x01,0x01,0x03,0x01,0x07,0x05,0x0F,0x05,0x1F,0x15,0xBF,
     0x15,0xBF,0x55,0xBF,0x55,0xBF,0x55,0xBF,0x55,0xBF,0x15,0x1F,0x15,0x0F,0x05,0x07,0x05,0x03,0x01,0x01,0x01,
 };
 
-const byte appNameClass::icon_light[] PROGMEM = {
+const unsigned char appNameClass::icon_light[] PROGMEM = {
     0x02,0x01,0x02,0x10,0x02,0x10,0x04,0xff,0xd9,0x00,0x03,0xC0,0x0F,0x30,0x1F,0x08,0x3F,0x04,0x7F,0x02,0x7F,
     0x02,0xFF,0x01,0xFF,0x01,0xFF,0x01,0xFF,0x01,0x7F,0x02,0x7F,0x02,0x3F,0x04,0x1F,0x08,0x0F,0x30,0x03,0xC0,
 };
 
-const byte appNameClass::icon_time[] PROGMEM = {
+const unsigned char appNameClass::icon_time[] PROGMEM = {
     0x02,0x01,0x02,0x10,0x02,0x10,0x04,0xff,0xff,0xff,0x03,0xC0,0x0C,0x30,0x10,0x08,0x20,0x04,0x48,0x32,0x44,
     0x72,0x82,0xE1,0x81,0xC1,0x81,0x81,0x80,0x01,0x40,0x02,0x40,0x02,0x20,0x04,0x10,0x08,0x0C,0x30,0x03,0xC0,
 };
 
-const byte appNameClass::icon_date[] PROGMEM = {
+const unsigned char appNameClass::icon_date[] PROGMEM = {
     0x02,0x01,0x02,0x10,0x02,0x10,0x04,0xff,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,
     0x18,0x00,0x18,0x00,0x00,0x00,0x18,0x00,0x18,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,
     0x04,0xff,0xff,0xff,0xFF,0xFF,0x80,0x01,0xFF,0xFF,0xFF,0xFF,0x80,0x01,0x80,0x01,0x80,0x01,0x80,0x01,0x80,
@@ -2099,14 +2288,14 @@ const byte appNameClass::icon_date[] PROGMEM = {
     0x80,0x19,0x80,0x00,0x00,0x00,0x00,0x00,0x00,
 };
 
-const byte appNameClass::icon_battery[] PROGMEM = {
+const unsigned char appNameClass::icon_battery[] PROGMEM = {
     0x02,0x01,0x02,0x10,0x02,0x10,0x04,0x33,0xff,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,
     0x00,0x1F,0xF8,0x1F,0xF8,0x1F,0xF8,0x1F,0xF8,0x1F,0xF8,0x1F,0xF8,0x1F,0xF8,0x1F,0xF8,0x1F,0xF8,0x00,0x00,
     0x04,0xff,0xff,0xff,0x01,0x80,0x1F,0xF8,0x20,0x04,0x20,0x04,0x20,0x04,0x20,0x04,0x20,0x04,0x20,0x04,0x20,
     0x04,0x20,0x04,0x20,0x04,0x20,0x04,0x20,0x04,0x20,0x04,0x20,0x04,0x3F,0xFC,
 };
 
-const byte appNameClass::icon[] PROGMEM = {
+const unsigned char appNameClass::icon[] PROGMEM = {
     
 	/*            PUT YOUR ICON HERE            */
 
@@ -2145,7 +2334,7 @@ class appNameClass: public Application{
     public:
         virtual void onLoop() override;
         virtual void onDestroy() override;
-        virtual void onEvent(byte event, int val1, int val2) override;
+        virtual void onEvent(unsigned char event, int val1, int val2) override;
 
         void onCreate();
         appNameClass(){ 
@@ -2160,7 +2349,7 @@ class appNameClass: public Application{
               case PARAM_TYPE_ICON: return icon;
               default: return (unsigned char*)""; }
         };
-        const static byte icon[] PROGMEM;
+        const static unsigned char icon[] PROGMEM;
       
 };
 
@@ -2175,7 +2364,7 @@ void appNameClass::onCreate(){
     time_start = millis();
     drawString("Rect test", 5, STYLE_STATUSBAR_HEIGHT + 10 + 16*0, 2);
     
-    for(byte i=0; i<61; i++){
+    for(unsigned char i=0; i<61; i++){
         drawRect(1+i, 120+i, 240-i, 240-i);      
     }
 
@@ -2190,7 +2379,7 @@ void appNameClass::onCreate(){
     // */
 
     /* * /
-    const byte testIcon[] = {
+    const unsigned char testIcon[] = {
         0x02,0x01,0x02,0x18,0x02,0x18,0x04,0xff,0x00,0x00,0x00,0x00,0x00,0x03,0xFF,0xC0,0x0F,0xFF,0xF0,0x1F,0xFF,0xF8,
         0x3F,0xFF,0xFC,0x3F,0xFF,0xFC,0x7F,0xFF,0xFE,0x7F,0xFF,0xFE,0x7F,0xFF,0xFE,0x7F,0xFF,0xFE,0x7F,0xFF,0xFE,0x7F,
         0xFF,0xFE,0x7F,0xFF,0xFE,0x7F,0xFF,0xFE,0x7F,0xFF,0xFE,0x7F,0xFF,0xFE,0x7F,0xFF,0xFE,0x7F,0xFF,0xFE,0x3F,0xFF,
@@ -2208,7 +2397,7 @@ void appNameClass::onCreate(){
     time_start = millis();
     drawString("Icon test", 5, STYLE_STATUSBAR_HEIGHT + 10 + 16*0, 2);
     
-    for(byte i=0; i<30; i++){
+    for(unsigned char i=0; i<30; i++){
         drawIcon(true, testIcon, 120, 120);      
         drawIcon(false, testIcon, 120, 120);      
     }
@@ -2230,7 +2419,7 @@ void appNameClass::onCreate(){
     // */
 
     /* * /
-    const byte testIcon[] = {
+    const unsigned char testIcon[] = {
         0x02,0x01,0x02,0x18,0x02,0x18,0x04,0xff,0x00,0x00,0x00,0x00,0x00,0x03,0xFF,0xC0,0x0F,0xFF,0xF0,0x1F,0xFF,0xF8,
         0x3F,0xFF,0xFC,0x3F,0xFF,0xFC,0x7F,0xFF,0xFE,0x7F,0xFF,0xFE,0x7F,0xFF,0xFE,0x7F,0xFF,0xFE,0x7F,0xFF,0xFE,0x7F,
         0xFF,0xFE,0x7F,0xFF,0xFE,0x7F,0xFF,0xFE,0x7F,0xFF,0xFE,0x7F,0xFF,0xFE,0x7F,0xFF,0xFE,0x7F,0xFF,0xFE,0x3F,0xFF,
@@ -2248,11 +2437,11 @@ void appNameClass::onCreate(){
     time_start = millis();
     drawString("String test", 5, STYLE_STATUSBAR_HEIGHT + 10 + 16*0, 2);
     
-    for(byte ii=0; ii<10; ii++){
+    for(unsigned char ii=0; ii<10; ii++){
         #ifdef ESP8266
             ESP.wdtDisable();
         #endif
-        for(byte i=0; i<10; i++){
+        for(unsigned char i=0; i<10; i++){
             setDrawColor(255, 255, 255);
             drawString("Blink string", 5, STYLE_STATUSBAR_HEIGHT + 10 + 16*5, 1);
             setDrawColor(0, 0, 0);
@@ -2275,7 +2464,7 @@ void appNameClass::onCreate(){
     // */
     
     /* */
-    const byte testIcon[] = {
+    const unsigned char testIcon[] = {
         0x02,0x01,0x02,0x18,0x02,0x18,0x04,0xff,0x00,0x00,0x00,0x00,0x00,0x03,0xFF,0xC0,0x0F,0xFF,0xF0,0x1F,0xFF,0xF8,
         0x3F,0xFF,0xFC,0x3F,0xFF,0xFC,0x7F,0xFF,0xFE,0x7F,0xFF,0xFE,0x7F,0xFF,0xFE,0x7F,0xFF,0xFE,0x7F,0xFF,0xFE,0x7F,
         0xFF,0xFE,0x7F,0xFF,0xFE,0x7F,0xFF,0xFE,0x7F,0xFF,0xFE,0x7F,0xFF,0xFE,0x7F,0xFF,0xFE,0x7F,0xFF,0xFE,0x3F,0xFF,
@@ -2293,7 +2482,7 @@ void appNameClass::onCreate(){
     time_start = millis();
     drawString("String test", 5, STYLE_STATUSBAR_HEIGHT + 10 + 16*0, 2);
     
-    for(byte ii=0; ii<5; ii++){
+    for(unsigned char ii=0; ii<5; ii++){
         #ifdef ESP8266
             ESP.wdtDisable();
         #endif
@@ -2333,7 +2522,7 @@ void appNameClass::onDestroy(){
     */
 }
 
-void appNameClass::onEvent(byte event, int val1, int val2){
+void appNameClass::onEvent(unsigned char event, int val1, int val2){
     
     if(event==EVENT_BUTTON_PRESSED){
         // Write you code on [val1] button pressed here
@@ -2350,7 +2539,7 @@ void appNameClass::onEvent(byte event, int val1, int val2){
     
 }
 
-const byte appNameClass::icon[] PROGMEM = {
+const unsigned char appNameClass::icon[] PROGMEM = {
     
 	/*            PUT YOUR ICON HERE            */
     0x02,0x01,0x02,0x20,0x02,0x20,0x04,0x6f,0x00,0xff,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,
@@ -2377,7 +2566,7 @@ class appNameClass: public Application{
     public:
         virtual void onLoop() override;
         virtual void onDestroy() override;
-        virtual void onEvent(byte event, int val1, int val2) override;
+        virtual void onEvent(unsigned char event, int val1, int val2) override;
 
         void onCreate();
         appNameClass(){ fillScreen(0, 0, 0); super_onCreate(); onCreate(); };
@@ -2387,7 +2576,7 @@ class appNameClass: public Application{
               case PARAM_TYPE_ICON: return icon;
               default: return (unsigned char*)""; }
         };
-        const static byte icon[] PROGMEM;
+        const static unsigned char icon[] PROGMEM;
       
 };
 
@@ -2411,7 +2600,7 @@ void appNameClass::onDestroy(){
     */
 }
 
-void appNameClass::onEvent(byte event, int val1, int val2){
+void appNameClass::onEvent(unsigned char event, int val1, int val2){
     
     if(event==EVENT_BUTTON_PRESSED){
         // Write you code on [val1] button pressed here
@@ -2428,7 +2617,7 @@ void appNameClass::onEvent(byte event, int val1, int val2){
     
 }
 
-const byte appNameClass::icon[] PROGMEM = {
+const unsigned char appNameClass::icon[] PROGMEM = {
     
 	/*            PUT YOUR ICON HERE            */
     0x02,0x01,0x02,0x20,0x02,0x20,0x04,0xff,0xd9,0x00,0x00,0x00,0x81,0x00,0x00,0x00,0x82,0x01,0x00,0x00,0x82,0x02,0x00,0x00,0x84,0x04,
@@ -2462,7 +2651,7 @@ class appNameClass: public Application{
         bool isfullScreen         = true;
         virtual void onLoop() override;
         virtual void onDestroy() override;
-        virtual void onEvent(byte event, int val1, int val2) override;
+        virtual void onEvent(unsigned char event, int val1, int val2) override;
 
         void onCreate();
         appNameClass(){ 
@@ -2477,7 +2666,7 @@ class appNameClass: public Application{
               case PARAM_TYPE_ICON: return icon;
               default: return (unsigned char*)""; }
         };
-        const static byte icon[] PROGMEM;
+        const static unsigned char icon[] PROGMEM;
 
         void draw_current_time();
       
@@ -2502,7 +2691,7 @@ void appNameClass::onDestroy(){
     */
 }
 
-void appNameClass::onEvent(byte event, int val1, int val2){
+void appNameClass::onEvent(unsigned char event, int val1, int val2){
     
     if(event==EVENT_BUTTON_PRESSED){
         // Write you code on [val1] button pressed here
@@ -2536,7 +2725,7 @@ void appNameClass::draw_current_time(){
     drawString(timeString, 2, 90, 5);
 }
 
-const byte appNameClass::icon[] PROGMEM = {
+const unsigned char appNameClass::icon[] PROGMEM = {
     
 	/*            PUT YOUR ICON HERE            */
 
@@ -2569,7 +2758,7 @@ class appNameClass: public Application{
     public:
         virtual void onLoop() override;
         virtual void onDestroy() override;
-        virtual void onEvent(byte event, int val1, int val2) override;
+        virtual void onEvent(unsigned char event, int val1, int val2) override;
 
         void onCreate();
         appNameClass(){ fillScreen(0, 0, 0); super_onCreate(); onCreate(); };
@@ -2579,7 +2768,7 @@ class appNameClass: public Application{
               case PARAM_TYPE_ICON: return icon;
               default: return (unsigned char*)""; }
         };
-        const static byte icon[] PROGMEM;
+        const static unsigned char icon[] PROGMEM;
       
 };
 
@@ -2603,7 +2792,7 @@ void appNameClass::onDestroy(){
     */
 }
 
-void appNameClass::onEvent(byte event, int val1, int val2){
+void appNameClass::onEvent(unsigned char event, int val1, int val2){
     
     if(event==EVENT_BUTTON_PRESSED){
         // Write you code on [val1] button pressed here
@@ -2620,7 +2809,7 @@ void appNameClass::onEvent(byte event, int val1, int val2){
     
 }
 
-const byte appNameClass::icon[] PROGMEM = {
+const unsigned char appNameClass::icon[] PROGMEM = {
     
 	/*            PUT YOUR ICON HERE            */
 
@@ -2661,7 +2850,7 @@ class appNameClass: public Application{
     public:
         virtual void onLoop() override;
         virtual void onDestroy() override;
-        virtual void onEvent(byte event, int val1, int val2) override;
+        virtual void onEvent(unsigned char event, int val1, int val2) override;
 
         void onCreate();
         appNameClass(){ fillScreen(0, 0, 0); super_onCreate(); onCreate(); };
@@ -2671,7 +2860,7 @@ class appNameClass: public Application{
               case PARAM_TYPE_ICON: return icon;
               default: return (unsigned char*)""; }
         };
-        const static byte icon[] PROGMEM;
+        const static unsigned char icon[] PROGMEM;
       
 };
 
@@ -2695,7 +2884,7 @@ void appNameClass::onDestroy(){
     */
 }
 
-void appNameClass::onEvent(byte event, int val1, int val2){
+void appNameClass::onEvent(unsigned char event, int val1, int val2){
     
     if(event==EVENT_BUTTON_PRESSED){
         // Write you code on [val1] button pressed here
@@ -2712,7 +2901,7 @@ void appNameClass::onEvent(byte event, int val1, int val2){
     
 }
 
-const byte appNameClass::icon[] PROGMEM = {
+const unsigned char appNameClass::icon[] PROGMEM = {
     
 	/*            PUT YOUR ICON HERE            */
 
@@ -2743,7 +2932,7 @@ class appNameClass: public Application{
     public:
         virtual void onLoop() override;
         virtual void onDestroy() override;
-        virtual void onEvent(byte event, int val1, int val2) override;
+        virtual void onEvent(unsigned char event, int val1, int val2) override;
 
         void onCreate();
         appNameClass(){ fillScreen(0, 0, 0); super_onCreate(); onCreate(); };
@@ -2753,7 +2942,7 @@ class appNameClass: public Application{
               case PARAM_TYPE_ICON: return icon;
               default: return (unsigned char*)""; }
         };
-        const static byte icon[] PROGMEM;
+        const static unsigned char icon[] PROGMEM;
       
 };
 
@@ -2777,7 +2966,7 @@ void appNameClass::onDestroy(){
     */
 }
 
-void appNameClass::onEvent(byte event, int val1, int val2){
+void appNameClass::onEvent(unsigned char event, int val1, int val2){
     
     if(event==EVENT_BUTTON_PRESSED){
         // Write you code on [val1] button pressed here
@@ -2795,7 +2984,7 @@ void appNameClass::onEvent(byte event, int val1, int val2){
     
 }
 
-const byte appNameClass::icon[] PROGMEM = {
+const unsigned char appNameClass::icon[] PROGMEM = {
     
 	/*            PUT YOUR ICON HERE            */
 
@@ -2948,7 +3137,7 @@ class appNameClass: public Application{
     public:
         virtual void onLoop() override;
         virtual void onDestroy() override;
-        virtual void onEvent(byte event, int val1, int val2) override;
+        virtual void onEvent(unsigned char event, int val1, int val2) override;
 
         void onCreate();
         appNameClass(){ fillScreen(0, 0, 0); super_onCreate(); onCreate(); };
@@ -2959,18 +3148,18 @@ class appNameClass: public Application{
             default: return (unsigned char*)""; 
           }
         };
-        const static byte icon[] PROGMEM;
+        const static unsigned char icon[] PROGMEM;
       
     private:
-        const byte* getApplicationTitle(int num);
+        const unsigned char* getApplicationTitle(int num);
         const unsigned char* getApplicationIcon(int num);
-        void drawIcons(boolean draw);
+        void drawIcons(bool draw);
         void updateActiveAppIndex(int newSelectedAppIndex);
-        void drawActiveAppFrame(boolean draw);
+        void drawActiveAppFrame(bool draw);
 
 };
 
-const byte appNameClass::icon[] PROGMEM = {
+const unsigned char appNameClass::icon[] PROGMEM = {
     
 	/*            PUT YOUR ICON HERE            */
 
@@ -2993,11 +3182,11 @@ const byte appNameClass::icon[] PROGMEM = {
 
 void appNameClass::onCreate(){
     
-    byte app_z_menu_selectedAppIndex_presaved = app_z_menu_selectedAppIndex;
+    unsigned char app_z_menu_selectedAppIndex_presaved = app_z_menu_selectedAppIndex;
     app_z_menu_selectedAppIndex=0;
     core_views_draw_pages_list_simple(true, PAGES_LIST_POSITION, TOTAL_PAGES);
 
-    byte currentPage = app_z_menu_selectedAppIndex_presaved/APPS_ON_SINGLE_PAGE;
+    unsigned char currentPage = app_z_menu_selectedAppIndex_presaved/APPS_ON_SINGLE_PAGE;
     if(currentPage==0) core_views_draw_active_page(true, PAGES_LIST_POSITION, TOTAL_PAGES, currentPage);
     //else this->updateActiveAppIndex(app_z_menu_selectedAppIndex_presaved);  
     this->updateActiveAppIndex(app_z_menu_selectedAppIndex_presaved);  
@@ -3032,10 +3221,10 @@ void appNameClass::updateActiveAppIndex(int newSelectedAppIndex){
   }
 }
 
-void appNameClass::drawActiveAppFrame(boolean draw){
-  byte positionOnScreen     = app_z_menu_selectedAppIndex%APPS_ON_SINGLE_PAGE;
-  byte positionOnScreen_x   = app_z_menu_selectedAppIndex%SINGLE_ELEMENTS_IN_X;
-  byte positionOnScreen_y   = positionOnScreen/SINGLE_ELEMENTS_IN_X;
+void appNameClass::drawActiveAppFrame(bool draw){
+  unsigned char positionOnScreen     = app_z_menu_selectedAppIndex%APPS_ON_SINGLE_PAGE;
+  unsigned char positionOnScreen_x   = app_z_menu_selectedAppIndex%SINGLE_ELEMENTS_IN_X;
+  unsigned char positionOnScreen_y   = positionOnScreen/SINGLE_ELEMENTS_IN_X;
 
   int x0 = positionOnScreen_x*SINGLE_ELEMENT_REAL_WIDTH;
   int y0 = positionOnScreen_y*SINGLE_ELEMENT_REAL_HEIGHT + STYLE_STATUSBAR_HEIGHT+1;
@@ -3045,16 +3234,16 @@ void appNameClass::drawActiveAppFrame(boolean draw){
   if(draw) setDrawColor(196, 196, 196);
   else setDrawColor(getBackgroundColor_red(), getBackgroundColor_green(), getBackgroundColor_blue());
 
-  for(byte i=0; i<4; i++){
-    byte delta = 5+i;
+  for(unsigned char i=0; i<4; i++){
+    unsigned char delta = 5+i;
     drawRect(x0+delta, y0+delta, x1-delta, y1-delta);  
   }
   
 }
 
-void appNameClass::drawIcons(boolean draw){
-  for (byte y_position=0; y_position<SINGLE_ELEMENTS_IN_Y; y_position++){
-        for (byte x_position=0; x_position<SINGLE_ELEMENTS_IN_X; x_position++){
+void appNameClass::drawIcons(bool draw){
+  for (unsigned char y_position=0; y_position<SINGLE_ELEMENTS_IN_Y; y_position++){
+        for (unsigned char x_position=0; x_position<SINGLE_ELEMENTS_IN_X; x_position++){
             int x0 = x_position*SINGLE_ELEMENT_REAL_WIDTH;
             int y0 = y_position*SINGLE_ELEMENT_REAL_HEIGHT + STYLE_STATUSBAR_HEIGHT+1;
             int x1 = x0+SINGLE_ELEMENT_REAL_WIDTH;
@@ -3075,7 +3264,7 @@ void appNameClass::drawIcons(boolean draw){
               core_views_draw_app_icon(
                 draw, 
                 x_center, y_center, 
-                (const byte*)this->getApplicationTitle(app_num), 
+                (const unsigned char*)this->getApplicationTitle(app_num), 
                 this->getApplicationIcon(app_num)
               );
             }
@@ -3098,7 +3287,7 @@ void appNameClass::onDestroy(){
     #endif
 }
 
-void appNameClass::onEvent(byte event, int val1, int val2){
+void appNameClass::onEvent(unsigned char event, int val1, int val2){
     
     if(event==EVENT_BUTTON_PRESSED){
       switch(val1){
@@ -3122,7 +3311,7 @@ void appNameClass::onEvent(byte event, int val1, int val2){
 
 }
 
-const byte* appNameClass::getApplicationTitle(int num){
+const unsigned char* appNameClass::getApplicationTitle(int num){
     return getAppParams(num,(PARAM_TYPE_NAME));
 }
 
@@ -3138,7 +3327,7 @@ const unsigned char*  appNameClass::getApplicationIcon(int num){
     ############################################################################################
 */
 
-Application *getApp(byte i){  
+Application *getApp(unsigned char i){  
     if (i==0) return new APP_MENU_APPLICATIONS_0; 
     #if APP_MENU_APPLICATIONS_QUANTITY > 1
       else if (i==1) return new APP_MENU_APPLICATIONS_1; 
@@ -3236,7 +3425,7 @@ Application *getApp(byte i){
     else return new appNameClass;
 }
 
-const byte *getAppParams(char i, byte type){
+const unsigned char *getAppParams(char i, unsigned char type){
     if(i==0){ APP_MENU_APPLICATIONS_0 *app; return ((*app).getParams(type));
     #if APP_MENU_APPLICATIONS_QUANTITY > 1
       }else if(i==1){ APP_MENU_APPLICATIONS_1 *app; return ((*app).getParams(type));
