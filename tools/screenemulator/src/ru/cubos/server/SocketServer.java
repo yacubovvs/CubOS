@@ -2,6 +2,9 @@ package ru.cubos.server;
 
 import ru.cubos.emulator.Emulator;
 
+import java.awt.*;
+import java.awt.event.KeyEvent;
+import java.awt.event.KeyListener;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -32,9 +35,55 @@ public class SocketServer extends Emulator {
     public static int serverBufferSize_max = serverBufferSize;
     public static int clientBufferSize_max = serverBufferSize;
 
+    String keys[] = {"0", "0", "0", "0"};
+
     public SocketServer(int port, int width, int height){
         super(width, height);
         this.port = port;
+
+        addKeyListener(new KeyListener() {
+            @Override
+            public void keyTyped(KeyEvent keyEvent) { }
+
+            @Override
+            public void keyPressed(KeyEvent keyEvent) {
+                //System.out.println("Pressed");
+                switch (keyEvent.getKeyCode()){
+                    case 37:
+                        keys[0] = "1";
+                        break;
+                    case 32:
+                        keys[1] = "1";
+                        break;
+                    case 39:
+                        keys[2] = "1";
+                        break;
+                    case 38:
+                        keys[3] = "1";
+                        break;
+                }
+            }
+
+            @Override
+            public void keyReleased(KeyEvent keyEvent) {
+                //System.out.println("Released");
+                switch (keyEvent.getKeyCode()){
+                    case 37:
+                        keys[0] = "0";
+                        break;
+                    case 32:
+                        keys[1] = "0";
+                        break;
+                    case 39:
+                        keys[2] = "0";
+                        break;
+                    case 38:
+                        keys[3] = "0";
+                        break;
+
+                }
+            }
+        });
     }
 
     public void addMessage(byte[] message){
@@ -181,71 +230,79 @@ public class SocketServer extends Emulator {
 
 
     String decoderMessage;
+    Color currentColor = new Color(0,0,0);
+
     void decodeString(String message){
-        decoderMessage = message;
-        /*
-        String command = readCommang();
-        System.out.print("Command found: " + command + " ");
+        String[] messages = message.split(" ");
+        int x, y, w, h, r, g, b;
 
-        long parametr1 = readLong();
-        int parametr2 = readInt();
-        int parametr3 = readInt();
-        System.out.print(" parametr1: " + parametr1);
-        System.out.print(" parametr2: " + parametr2);
-        System.out.println(" parametr3: " + parametr3);
-        */
-
-        String command = readCommand();
-
-        switch(command){
-            /*
-            case _BOARD_RESET:
-                reset();
+        switch(messages[0].trim()){
+            case "P":   // Pixel
+                try{
+                    x = Integer.parseInt(messages[1]);
+                    y = Integer.parseInt(messages[2]);
+                    this.drawPixel(x,y, currentColor);
+                }catch (Exception e){}
                 break;
-            case _0_SET_PIN_MODE_INPUT:
-                pin = readInt();
-                pinMode(pin, INPUT);
+            case "LH":      // Fast line hotizontal
+                try{
+                    x = Integer.parseInt(messages[1]);
+                    y = Integer.parseInt(messages[2]);
+                    w = Integer.parseInt(messages[3]);
+                    this.drawLine(x,y,x+w,y, currentColor);
+                }catch (Exception e){}
                 break;
-            case _1_SET_PIN_MODE_INPUT_PULLUP:
-                pin = readInt();
-                pinMode(pin, INPUT_PULLUP);
+            case "LV":      // Fast line vertical
+                try{
+                    x = Integer.parseInt(messages[1]);
+                    y = Integer.parseInt(messages[2]);
+                    h = Integer.parseInt(messages[3]);
+                    this.drawLine(x,y,x,y+h, currentColor);
+                }catch (Exception e){}
                 break;
-            case _2_SET_PIN_MODE_OUTPUT:
-                pin = readInt();
-                pinMode(pin, OUTPUT);
+            case "R":       // Rectangle
+                try{
+                    x = Integer.parseInt(messages[1]);
+                    y = Integer.parseInt(messages[2]);
+                    w = Integer.parseInt(messages[3]);
+                    h = Integer.parseInt(messages[4]);
+                    this.drawRect(x, y,x+w,y+h, currentColor);
+                }catch (Exception e){}
                 break;
-            case _3_SET_PIN_INTERRUPT:
-                pin = readInt();
-                setPinInterrupt(pin);
+            case "F":       // Fill
+                this.drawRect(0, 0, this.getWidth(),this.getHeight(), currentColor);
                 break;
-            case _4_CLEAR_PIN_INTERRUPT:
-                pin = readInt();
-                clearPinInterrupt(pin);
+            case "U":       // Update
+                this.updateImage();
                 break;
-            case _0_DIGITAL_READ:
-                pin = readInt();
-                write(_0_DIGITAL_READ + " " + pin + " " + (digitalRead(pin) == HIGH ? "1" : "0") + " ");
+            case "K":       // Read keys
+                addMessage(keys[0] + keys[1] + keys[2] + keys[3]);
+                /*
+                if(n==2){
+                    System.out.println("1 0 0 0");
+                    addMessage("1000");
+                    n = 0;
+                }else{
+                    System.out.println("0 0 0 0");
+                    addMessage("0000");
+                }
+                n++;*/
                 break;
-            case _1_DIGITAL_WRITE:
-                pin = readInt();
-                value = readInt();
-                digitalWrite(pin, value);
+            case "C":       // Set color
+                try{
+                    r = Integer.parseInt(messages[1]);
+                    g = Integer.parseInt(messages[2]);
+                    b = Integer.parseInt(messages[3]);
+                    currentColor = new Color(r,g,b);
+                }catch (Exception e){}
                 break;
-            case _2_ANALOG_READ:
-                pin = readInt();
-                value = analogRead(pin);
-                write(_2_ANALOG_READ + " " + pin + " " + value + " ");
+            case "Ready":   // Ask for ready
+                System.out.println("Ready");
                 break;
-            case _3_ANALOG_WRITE:
-                pin = readInt();
-                value = readInt();
-                analogWrite(pin, value);
-                break;*/
             default:
-                //write(_0_ERROR_UNKNOWN_COMMAND);
-                System.out.println(command);
-                break;
+                return;
         }
+
     }
 
 

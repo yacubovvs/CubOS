@@ -36,22 +36,24 @@
 
 bool driver_display_needToUpdateScreen = false;
 
-void driver_display_loop(){
-  if(driver_display_needToUpdateScreen){
-    printf("U\n");
-    driver_display_needToUpdateScreen = false;
-  }
-}
-
 uint16_t get_uint16Color(byte red, byte green, byte blue){
   return ( (red*31/255) <<11)|( (green*31/255) <<6)|( (blue*31/255) <<0);
+}
+
+SOCKET sock;
+
+void sendMessageToDisplay(String message){
+  const int str_len = message.length() + 1; 
+  char char_array[str_len];
+  message.toCharArray(char_array, str_len);
+  send(sock,char_array,sizeof(char_array),0);
 }
 
 void setup_displayDriver(){
 
   WSADATA wData;
 	struct sockaddr_in addr,serv_addr;
-	SOCKET sock;
+	
 	if(WSAStartup(MAKEWORD(1,1),&wData)!=0)
 	{
 		std::cout<<"socket not initialized\n";
@@ -85,7 +87,6 @@ void setup_displayDriver(){
 		error=WSAGetLastError();
 		std::cout<<error<<"\n";
 		//_getch();
-		return;
 	}
 	std::cout<<"connect success\n";
 
@@ -95,29 +96,9 @@ void setup_displayDriver(){
   char message3[10];
 
   char buff[15];
+  
 
-  std::cout<<"insert value\n";
-  std::cin>>message1;
-  std::cin>>message2;
-  std::cin>>message3;
-
-	send(sock,message1,sizeof(message1),0);
-	send(sock,message2,sizeof(message2),0);
-	send(sock,message3,sizeof(message3),0);
-
-	recv(sock,buff,sizeof(buff),0);	//3 param -sizeof accepted data
-	std::cout<<"answer "<<buff<<"\n";
-	recv(sock,buff,sizeof(buff),0);
-	std::cout<<"answer "<<buff<<"\n";
-	//getch();
-
-	shutdown(sock,2);
-	closesocket(sock);
-	WSACleanup();
-	return;
 }
- 
-
 
 void sleep_displayDriver(){
   //debug("Display sleep");
@@ -135,16 +116,15 @@ void powerOn_displayDriver(){
   //debug("Display poweron");
 }
 
-
-void fillScreen(byte red, byte green, byte blue){
-  //debug("Fill screen");
-  printf("F\n");
-  driver_display_needToUpdateScreen = true;
+void driver_display_loop(){
+  if(driver_display_needToUpdateScreen){
+    sendMessageToDisplay("U\n");
+    driver_display_needToUpdateScreen = false;
+  }
 }
 
 void setPixel(int x, int y){
-  delay(5);
-  printf("P %d %d\n", x, y);
+  sendMessageToDisplay("P " + String(x) + " " + String(y) + "\n");
   driver_display_needToUpdateScreen = true;
   #if defined(SCREEN_ROTATION_90)
     
@@ -158,12 +138,44 @@ void setPixel(int x, int y){
 }
 
 void setDrawColor(byte red_new, byte green_new, byte blue_new){
-  printf("C %d %d %d\n", red_new, green_new, blue_new);
+  sendMessageToDisplay("C " + String(red_new) + " " + String(green_new) + " " + String(blue_new) + "\n");
 }
+
+void fillScreen(byte red, byte green, byte blue){
+  //debug("Fill screen");
+  setDrawColor(red, green, blue);
+  sendMessageToDisplay("F\n");
+  driver_display_needToUpdateScreen = true;
+}
+
+bool button[] = {false, false, false, false};
+bool digRead(unsigned char b){
+  return button[b];
+}
+
+void driver_display_updateControls(){
+  char buff[15];
+  sendMessageToDisplay("K\n");
+	recv(sock,buff,sizeof(buff),0);
+  //printf(buff);
+
+  button[0] = (buff[0]=='1');
+  button[1] = (buff[1]=='1');
+  button[2] = (buff[2]=='1');
+  button[3] = (buff[3]=='1');
+  /*
+  printf("%d-", (int)(buff[0]=='1'));
+  printf("%d-", (int)(buff[1]=='1'));
+  printf("%d-", (int)(buff[2]=='1'));
+  printf("%d\n", (int)(buff[3]=='1'));
+  */
+
+}
+
 
 #ifdef USE_PRIMITIVE_HARDWARE_DRAW_ACCELERATION
   void driver_display_drawFastVLine(int16_t x, int16_t y, int16_t w){
-    printf("LV %d %d %d\n", x, y, w);
+    sendMessageToDisplay("LV " + String(x) + " " + String(y) + " " + String(w) + "\n");
     driver_display_needToUpdateScreen = true;
     #if defined(SCREEN_ROTATION_90)
       
@@ -178,7 +190,7 @@ void setDrawColor(byte red_new, byte green_new, byte blue_new){
   }
 
   void driver_display_drawFastHLine(int16_t x, int16_t y, int16_t h){
-    printf("LH %d %d %d\n", x, y, h);
+    sendMessageToDisplay("LH " + String(x) + " " + String(y) + " " + String(h) + "\n");
     driver_display_needToUpdateScreen = true;
     #if defined(SCREEN_ROTATION_90)
       
@@ -192,7 +204,7 @@ void setDrawColor(byte red_new, byte green_new, byte blue_new){
   }
 
   void driver_display_fillRect(int16_t x, int16_t y, int16_t w, int16_t h){
-    printf("R %d %d %d %d\n", x, y, w, h);
+    sendMessageToDisplay("R " + String(x) + " " + String(y) + " " + String(w) + " " + String(h) + "\n");
     driver_display_needToUpdateScreen = true;
     #if defined(SCREEN_ROTATION_90)
       

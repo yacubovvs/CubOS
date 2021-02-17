@@ -14,7 +14,6 @@ public class ReadServer implements UserInterfaceListener {
     int x,y;
     public ReadServer(Emulator emulator){
         this.emulator = emulator;
-        emulator.setUserInterfaceListener(this);
         currentColor = new Color(0,0,0);
 
         Thread readThread = new Thread(new Runnable() {

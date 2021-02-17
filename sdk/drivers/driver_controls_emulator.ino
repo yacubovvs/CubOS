@@ -18,15 +18,12 @@ void driver_controls_setup(){
 
 
 void driver_controls_loop(){
-    int b1=0, b2=0, b3=0, b4=0;
-    
-    scanf("%d %d %d %d", &b1, &b2, &b3, &b4);
-    //read(b1, b2, b3, b4);
 
-    int digRead[] = {b1,b2,b3,b4};
+    driver_display_updateControls();
+    
 
     for (unsigned char i=0; i<DRIVER_CONTROLS_TOTALBUTTONS; i++){
-        if (digRead[i]){
+        if (digRead(i)){
         last_user_activity = _millis();
         if(driver_control_pressed[i]==false){
             // press start

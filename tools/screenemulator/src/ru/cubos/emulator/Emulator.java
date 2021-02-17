@@ -15,8 +15,6 @@ public class Emulator extends JFrame {
     protected int width;
     protected int height;
 
-    private UserInterfaceListener userInterfaceListener;
-
     public Emulator(int width, int height){
         imageWrapper = new EmulatorImagePanel(this);
         setContentPane(imageWrapper);
@@ -30,23 +28,6 @@ public class Emulator extends JFrame {
         image = new BufferedImage(getScreenWidth(), getScreenHeight(), BufferedImage.TYPE_INT_RGB);
         updateImage();
         setVisible(true);
-
-        addKeyListener(new KeyListener() {
-            @Override
-            public void keyTyped(KeyEvent keyEvent) {
-                if(userInterfaceListener!=null) userInterfaceListener.keyTyped(keyEvent);
-            }
-
-            @Override
-            public void keyPressed(KeyEvent keyEvent) {
-                if(userInterfaceListener!=null) userInterfaceListener.keyPressed(keyEvent);
-            }
-
-            @Override
-            public void keyReleased(KeyEvent keyEvent) {
-                if(userInterfaceListener!=null) userInterfaceListener.keyReleased(keyEvent);
-            }
-        });
     }
 
     public BufferedImage getImage(){
@@ -257,8 +238,4 @@ public class Emulator extends JFrame {
         return height;
     }
 
-
-    public void setUserInterfaceListener(UserInterfaceListener userInterfaceListener) {
-        this.userInterfaceListener = userInterfaceListener;
-    }
 }
