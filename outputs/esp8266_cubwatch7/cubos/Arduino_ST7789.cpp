@@ -471,7 +471,7 @@ uint16_t Arduino_ST7789::Color565(uint8_t r, uint8_t g, uint8_t b) {
   return ((r & 0xF8) << 8) | ((g & 0xFC) << 3) | (b >> 3);
 }
 
-void Arduino_ST7789::invertDisplay(boolean i) {
+void Arduino_ST7789::invertDisplay(bool i) {
   writecommand(i ? ST7789_INVON : ST7789_INVOFF);
 }
 

@@ -103,7 +103,7 @@ class Arduino_ST7789 : public Adafruit_GFX {
            drawFastHLine(int16_t x, int16_t y, int16_t w, uint16_t color),
            fillRect(int16_t x, int16_t y, int16_t w, int16_t h, uint16_t color),
            setRotation(uint8_t r),
-           invertDisplay(boolean i),
+           invertDisplay(bool i),
            sleep(),
            wakeup(),
        init(uint16_t width, uint16_t height);
@@ -126,9 +126,9 @@ class Arduino_ST7789 : public Adafruit_GFX {
   inline void DC_HIGH(void);
   inline void DC_LOW(void);
 
-  boolean  _hwSPI;
-  boolean  _SPI9bit;
-  boolean  _DCbit;
+  bool  _hwSPI;
+  bool  _SPI9bit;
+  bool  _DCbit;
 
   int8_t  _cs, _dc, _rst, _sid, _sclk;
 

@@ -28,346 +28,6 @@ void setBackgroundColor(unsigned char r, unsigned char g, unsigned char b){
 //////////////////////////////////////////////////
 // Function needed for CubOS
 
-void drawString(char * dString, int x, int y){
-  setStr(dString, x, y, 1);
-}
-
-void drawString(char * dString, int x, int y, unsigned char fontSize){
-  setStr(dString, x, y, fontSize);
-}
-
-void drawString(int val, int x, int y){
-  char str[16];
-  sprintf(str, "%d", val);
-  drawString( str, 0, y);
-}
-
-void drawString(String dString, int x, int y, unsigned char fontSize){
-  int str_len = dString.length() + 1;
-  char element_value[str_len];
-  dString.toCharArray(element_value, str_len);
-
-  drawString(element_value, x, y, fontSize);
-}
-
-void drawString(String dString, int x, int y){
-  drawString(dString, x, y, 1);
-}
-
-void drawString_centered(char * dString, int y){
-  drawString(dString, (SCREEN_WIDTH - strlen(dString)*FONT_CHAR_WIDTH)/2, y);  
-}
-
-void clearString_centered(char * dString, int y){
-  clearString(dString, (SCREEN_WIDTH - strlen(dString)*FONT_CHAR_WIDTH)/2, y, 1);  
-}
-
-void drawString_centered(char * dString, int x, int y){
-  drawString(dString, x - strlen(dString)*FONT_CHAR_WIDTH/2, y);  
-}
-
-void clearString_centered(char * dString, int x, int y){
-  clearString(dString, x - strlen(dString)*FONT_CHAR_WIDTH/2, y, 1);    
-}
-
-
-void drawString_centered(String dString, int y){
-  drawString(dString, (SCREEN_WIDTH - dString.length()*FONT_CHAR_WIDTH)/2, y);  
-}
-
-void drawString_centered(String dString, int x, int y){
-  drawString(dString, x - dString.length()*FONT_CHAR_WIDTH/2, y);  
-}
-
-void drawString_rightAlign(String dString, int x, int y){
-  drawString(dString, x - dString.length()*FONT_CHAR_WIDTH, y);  
-}
-
-void drawPixel(int x, int y){
-  setPixel(x, y);
-}
-
-void drawLine(int x0, int y0, int x1, int y1){
-
-  #ifdef USE_PRIMITIVE_HARDWARE_DRAW_ACCELERATION
-    if(x0==x1){
-      driver_display_drawFastVLine(x0, min(y0, y1), abs(y0-y1));
-      return;
-    }
-
-    if(y0==y1){
-      driver_display_drawFastHLine(min(x0, x1), y0, abs(x0-x1));
-      return;
-    }
-  #endif
-
-  int dy = y1 - y0; // Difference between y0 and y1
-  int dx = x1 - x0; // Difference between x0 and x1
-  int stepx, stepy;
-
-  if (dy < 0)
-  {
-    dy = -dy;
-    stepy = -1;
-  }
-  else
-    stepy = 1;
-
-  if (dx < 0)
-  {
-    dx = -dx;
-    stepx = -1;
-  }
-  else
-    stepx = 1;
-
-  dy <<= 1; // dy is now 2*dy
-  dx <<= 1; // dx is now 2*dx
-  drawPixel(x0, y0); // Draw the first pixel.
-
-  if (dx > dy) 
-  {
-    int fraction = dy - (dx >> 1);
-    while (x0 != x1)
-    {
-      if (fraction >= 0)
-      {
-        y0 += stepy;
-        fraction -= dx;
-      }
-      x0 += stepx;
-      fraction += dy;
-      drawPixel(x0, y0);
-    }
-  }
-  else
-  {
-    int fraction = dx - (dy >> 1);
-    while (y0 != y1)
-    {
-      if (fraction >= 0)
-      {
-        x0 += stepx;
-        fraction -= dy;
-      }
-      y0 += stepy;
-      fraction += dx;
-      drawPixel(x0, y0);
-    }
-  }
-}
-
-void drawRect(int x0, int y0, int x1, int y1){
-  drawRect(x0, y0, x1, y1, false);
-}
-
-void drawRect(int x0, int y0, int x1, int y1, boolean fill){
-  // check if the rectangle is to be filled
-  if (fill == 1)
-  {
-    #ifdef USE_PRIMITIVE_HARDWARE_DRAW_ACCELERATION
-      driver_display_fillRect(min(x0, x1), min(y0, y1), abs(x0-x1), abs(y0-y1));
-      return;
-    #else
-      int xDiff;
-
-      if(x0 > x1)
-        xDiff = x0 - x1; //Find the difference between the x vars
-      else
-        xDiff = x1 - x0;
-
-      while(xDiff >= 0)
-      {
-        drawLine(x0, y0, x0, y1);
-
-        if(x0 > x1)
-          x0--;
-        else
-          x0++;
-
-        xDiff--;
-      }
-    #endif
-  }else{
-    // best way to draw an unfilled rectangle is to draw four lines
-    drawLine(x0, y0, x1, y0);
-    drawLine(x0, y1, x1, y1);
-    drawLine(x0, y0, x0, y1);
-    drawLine(x1, y0, x1, y1);
-  }
-}
-
-// System function
-int treangle_area(int x0, int y0, int x1, int y1, int x2, int y2){
-   return round(abs((x0 - x2)*(y1 - y2) + (x1-x2)*(y2-y0)));
-}
-
-void drawRect_custom( int x0, int y0, int x1, int y1, int x2, int y2, int x3, int y3, boolean fill){
-  if (fill){
-    // all angles should be less thаn 180 degrees
-    const int min_x = min(min(x0, x1), min(x2, x3));
-    const int max_x = max(max(x0, x1), max(x2, x3));
-    const int min_y = min(min(y0, y1), min(y2, y3));
-    const int max_y = max(max(y0, y1), max(y2, y3));
-
-    for (int i_x=min_x; i_x<max_x; i_x++){
-      for (int i_y=min_y; i_y<max_y; i_y++){
-
-        if (
-          treangle_area(x0, y0, x1, y1, x2, y2) ==
-          treangle_area(x0, y0, x1, y1, i_x, i_y) + 
-          treangle_area(x0, y0, x2, y2, i_x, i_y) + 
-          treangle_area(x2, y2, x1, y1, i_x, i_y)
-          || 
-          treangle_area(x0, y0, x3, y3, x2, y2) ==
-          treangle_area(x0, y0, x3, y3, i_x, i_y) + 
-          treangle_area(x0, y0, x2, y2, i_x, i_y) + 
-          treangle_area(x2, y2, x3, y3, i_x, i_y)
-        ){
-          drawPixel(i_x, i_y);
-        }
-      }
-    }    
-  }else{
-    drawLine(x0, y0, x1, y1);
-    drawLine(x1, y1, x2, y2);
-    drawLine(x2, y2, x3, y3);
-    drawLine(x3, y3, x0, y0);
-  }
-}
-
-void drawIcon(boolean draw, const unsigned char* data, int x, int y){
-
-  /*
-  ################################################
-  #                                              #
-  #               NEW IMAGE FORMAT               #
-  #                                              #
-  ################################################
-  */
-
-  long readPosition = 0;
-  //int data_size = sizeof(data)/sizeof(data[0]);
-  unsigned char current_byte;
-
-
-  int image_type = readRawParam(data, readPosition);    // type of image
-  int image_wigth = readRawParam(data, readPosition);   // width
-  int image_height = readRawParam(data, readPosition);  // height
-
-  int icon_x=0;
-  int icon_y=0;
-
-  if(image_type==0x01){
-    
-    while(1){
-      unsigned char color_var = readRawChar(data, readPosition);
-      
-      if (color_var==0x04){ // new color layout
-    
-        unsigned char red    = readRawChar(data, readPosition); 
-        unsigned char green  = readRawChar(data, readPosition); 
-        unsigned char blue   = readRawChar(data, readPosition); 
-
-        if(draw){
-          setDrawColor(red, green, blue);
-        }else{
-          setDrawColor(getBackgroundColor_red(), getBackgroundColor_green(), getBackgroundColor_blue());
-          #ifdef USE_PRIMITIVE_HARDWARE_DRAW_ACCELERATION
-            drawRect(x, y, x+image_wigth, y+image_height, true);
-            return;
-          #endif
-        }
-        //else setDrawColor(getBackgroundColor_red(), getBackgroundColor_green(), getBackgroundColor_blue());
-        
-        icon_x = 0;
-        icon_y = 0;
-
-        for (int reading_byte=0; reading_byte<(image_wigth*image_height%8==0?image_wigth*image_height/8:image_wigth*image_height/8+1); reading_byte++){
-          //if(data_size<=readPosition) break;
-          current_byte = readRawChar(data, readPosition);
-
-          if(current_byte!=0x00 && current_byte!=0xFF){
-            for (unsigned char d=0; d<8; d++){
-              if (icon_x>=image_wigth){
-                icon_y+=icon_x/image_wigth;
-                icon_x %= image_wigth;
-              }
-
-              //if (current_byte&1<<(7-d)) drawPixel(x + icon_x, y + icon_y);
-              //if (getBitInByte(current_byte, d)) drawPixel(x + icon_x, y + icon_y);
-              if (getBitInByte(current_byte, 7-d)){
-                #ifdef USE_PRIMITIVE_HARDWARE_DRAW_ACCELERATION
-                  unsigned char pixelsInARow = 0;
-                  if(d!=7){
-                    for (unsigned char future_d=d+1; future_d<8; future_d++){
-                      if (getBitInByte(current_byte, 7-future_d)){
-                        pixelsInARow++;
-                      } else{
-                        break;
-                      }
-                    }
-                  }
-
-                  if(pixelsInARow>1){
-                    driver_display_drawFastHLine(x + icon_x, y + icon_y, pixelsInARow);
-                    d+=pixelsInARow-1;
-                    icon_x+=pixelsInARow-1;
-                  }else{
-                    drawPixel(x + icon_x, y + icon_y);  
-                  }
-                #else
-                  drawPixel(x + icon_x, y + icon_y);
-                #endif
-              }
-              icon_x ++;
-            }
-          }else if(current_byte==0xFF){ // Saving 1ms!!!!
-
-            if (icon_x>=image_wigth){
-              icon_y+=icon_x/image_wigth;
-              icon_x %= image_wigth;
-            }
-
-            drawLine(x + icon_x, y + icon_y, x + icon_x+7, y + icon_y); 
-            icon_x+=8;
-          }else{ // Saving 1ms!!!!
-            icon_x+=8;
-          }
-        }
-        
-      }else{
-        break;
-      } 
-
-    }
-      
-  }else{
-    // Unknow type of image
-
-  }
-
-}
-
-boolean getBitInByte(unsigned char currentByte, unsigned char bitNum){
-  return currentByte&1<<(bitNum);
-}
-
-//////////////////////////////////////////////////
-// For debugging
-void drawIntString(long val, int x, int y){  
-  char str[14];
-  sprintf(str, "%d", val);
-  drawString( str, x, y);
-}
-
-//////////////////////////////////////////////////
-// For debugging
-void drawDebugString(int val, int y){  
-  drawString(val, 0, y);
-}
-
-
 static const unsigned char font_cubos[] PROGMEM = {
   0x00, 0x00, 0x00, 0x00, 0x00,
   0x3E, 0x5B, 0x4F, 0x5B, 0x3E,
@@ -627,24 +287,6 @@ static const unsigned char font_cubos[] PROGMEM = {
   0x00, 0x00, 0x00, 0x00, 0x00  // #255 NBSP
 };
 
-void clearString(String dString, int x, int y, unsigned char fontSize){
-  int str_len = dString.length() + 1;
-  char element_value[str_len];
-  dString.toCharArray(element_value, str_len);
-
-  clearString(element_value, x, y, fontSize);
-}
-
-void clearString(char * dString, int x, int y, unsigned char fontSize){
-  #ifdef USE_PRIMITIVE_HARDWARE_DRAW_ACCELERATION
-    if(fontSize==0) fontSize = 1;
-    int string_length = strlen(dString);
-    drawRect(x,y-fontSize, x+string_length*fontSize*FONT_CHAR_WIDTH, y+fontSize*(FONT_CHAR_HEIGHT-1),true);
-  #else
-    setStr(dString, x, y, fontSize);
-  #endif
-}
-
 void setStr(char * dString, int x, int y, unsigned char fontSize){
         
   int string_length = strlen(dString);
@@ -701,4 +343,362 @@ void setStr(char * dString, int x, int y, unsigned char fontSize){
     }
 
   }
+}
+
+void drawString(char * dString, int x, int y){
+  setStr(dString, x, y, 1);
+}
+
+void drawString(char * dString, int x, int y, unsigned char fontSize){
+  setStr(dString, x, y, fontSize);
+}
+
+void drawString(int val, int x, int y){
+  char str[16];
+  sprintf(str, "%d", val);
+  drawString( str, 0, y);
+}
+
+void drawString(String dString, int x, int y, unsigned char fontSize){
+  int str_len = dString.length() + 1;
+  char element_value[str_len];
+  dString.toCharArray(element_value, str_len);
+
+  drawString(element_value, x, y, fontSize);
+}
+
+void drawString(String dString, int x, int y){
+  drawString(dString, x, y, 1);
+}
+
+void drawString_centered(char * dString, int y){
+  drawString(dString, (SCREEN_WIDTH - strlen(dString)*FONT_CHAR_WIDTH)/2, y);  
+}
+
+void clearString(char * dString, int x, int y, unsigned char fontSize){
+  #ifdef USE_PRIMITIVE_HARDWARE_DRAW_ACCELERATION
+    if(fontSize==0) fontSize = 1;
+    int string_length = strlen(dString);
+    drawRect(x,y-fontSize, x+string_length*fontSize*FONT_CHAR_WIDTH, y+fontSize*(FONT_CHAR_HEIGHT-1),true);
+  #else
+    setStr(dString, x, y, fontSize);
+  #endif
+}
+
+void clearString_centered(char * dString, int y){
+  clearString(dString, (SCREEN_WIDTH - strlen(dString)*FONT_CHAR_WIDTH)/2, y, 1);  
+}
+
+void clearString(String dString, int x, int y, unsigned char fontSize){
+  int str_len = dString.length() + 1;
+  char element_value[str_len];
+  dString.toCharArray(element_value, str_len);
+
+  clearString(element_value, x, y, fontSize);
+}
+
+void drawString_centered(char * dString, int x, int y){
+  drawString(dString, x - strlen(dString)*FONT_CHAR_WIDTH/2, y);  
+}
+
+void clearString_centered(char * dString, int x, int y){
+  clearString(dString, x - strlen(dString)*FONT_CHAR_WIDTH/2, y, 1);    
+}
+
+void drawString_centered(String dString, int y){
+  drawString(dString, (SCREEN_WIDTH - dString.length()*FONT_CHAR_WIDTH)/2, y);  
+}
+
+void drawString_centered(String dString, int x, int y){
+  drawString(dString, x - dString.length()*FONT_CHAR_WIDTH/2, y);  
+}
+
+void drawString_rightAlign(String dString, int x, int y){
+  drawString(dString, x - dString.length()*FONT_CHAR_WIDTH, y);  
+}
+
+void drawPixel(int x, int y){
+  setPixel(x, y);
+}
+
+
+
+void drawLine(int x0, int y0, int x1, int y1){
+
+  #ifdef USE_PRIMITIVE_HARDWARE_DRAW_ACCELERATION
+    if(x0==x1){
+      driver_display_drawFastVLine(x0, min(y0, y1), abs(y0-y1));
+      return;
+    }
+
+    if(y0==y1){
+      driver_display_drawFastHLine(min(x0, x1), y0, abs(x0-x1));
+      return;
+    }
+  #endif
+
+  int dy = y1 - y0; // Difference between y0 and y1
+  int dx = x1 - x0; // Difference between x0 and x1
+  int stepx, stepy;
+
+  if (dy < 0)
+  {
+    dy = -dy;
+    stepy = -1;
+  }
+  else
+    stepy = 1;
+
+  if (dx < 0)
+  {
+    dx = -dx;
+    stepx = -1;
+  }
+  else
+    stepx = 1;
+
+  dy <<= 1; // dy is now 2*dy
+  dx <<= 1; // dx is now 2*dx
+  drawPixel(x0, y0); // Draw the first pixel.
+
+  if (dx > dy) 
+  {
+    int fraction = dy - (dx >> 1);
+    while (x0 != x1)
+    {
+      if (fraction >= 0)
+      {
+        y0 += stepy;
+        fraction -= dx;
+      }
+      x0 += stepx;
+      fraction += dy;
+      drawPixel(x0, y0);
+    }
+  }
+  else
+  {
+    int fraction = dx - (dy >> 1);
+    while (y0 != y1)
+    {
+      if (fraction >= 0)
+      {
+        x0 += stepx;
+        fraction -= dy;
+      }
+      y0 += stepy;
+      fraction += dx;
+      drawPixel(x0, y0);
+    }
+  }
+}
+
+void drawRect(int x0, int y0, int x1, int y1){
+  drawRect(x0, y0, x1, y1, false);
+}
+
+void drawRect(int x0, int y0, int x1, int y1, bool fill){
+  // check if the rectangle is to be filled
+  if (fill == 1)
+  {
+    #ifdef USE_PRIMITIVE_HARDWARE_DRAW_ACCELERATION
+      driver_display_fillRect(min(x0, x1), min(y0, y1), abs(x0-x1), abs(y0-y1));
+      return;
+    #else
+      int xDiff;
+
+      if(x0 > x1)
+        xDiff = x0 - x1; //Find the difference between the x vars
+      else
+        xDiff = x1 - x0;
+
+      while(xDiff >= 0)
+      {
+        drawLine(x0, y0, x0, y1);
+
+        if(x0 > x1)
+          x0--;
+        else
+          x0++;
+
+        xDiff--;
+      }
+    #endif
+  }else{
+    // best way to draw an unfilled rectangle is to draw four lines
+    drawLine(x0, y0, x1, y0);
+    drawLine(x0, y1, x1, y1);
+    drawLine(x0, y0, x0, y1);
+    drawLine(x1, y0, x1, y1);
+  }
+}
+
+// System function
+int treangle_area(int x0, int y0, int x1, int y1, int x2, int y2){
+   return abs((x0 - x2)*(y1 - y2) + (x1-x2)*(y2-y0));
+}
+
+void drawRect_custom( int x0, int y0, int x1, int y1, int x2, int y2, int x3, int y3, bool fill){
+  if (fill){
+    // all angles should be less thаn 180 degrees
+    const int min_x = min(min(x0, x1), min(x2, x3));
+    const int max_x = max(max(x0, x1), max(x2, x3));
+    const int min_y = min(min(y0, y1), min(y2, y3));
+    const int max_y = max(max(y0, y1), max(y2, y3));
+
+    for (int i_x=min_x; i_x<max_x; i_x++){
+      for (int i_y=min_y; i_y<max_y; i_y++){
+
+        if (
+          treangle_area(x0, y0, x1, y1, x2, y2) ==
+          treangle_area(x0, y0, x1, y1, i_x, i_y) + 
+          treangle_area(x0, y0, x2, y2, i_x, i_y) + 
+          treangle_area(x2, y2, x1, y1, i_x, i_y)
+          || 
+          treangle_area(x0, y0, x3, y3, x2, y2) ==
+          treangle_area(x0, y0, x3, y3, i_x, i_y) + 
+          treangle_area(x0, y0, x2, y2, i_x, i_y) + 
+          treangle_area(x2, y2, x3, y3, i_x, i_y)
+        ){
+          drawPixel(i_x, i_y);
+        }
+      }
+    }    
+  }else{
+    drawLine(x0, y0, x1, y1);
+    drawLine(x1, y1, x2, y2);
+    drawLine(x2, y2, x3, y3);
+    drawLine(x3, y3, x0, y0);
+  }
+}
+
+void drawIcon(bool draw, const unsigned char* data, int x, int y){
+
+  /*
+  ################################################
+  #                                              #
+  #               NEW IMAGE FORMAT               #
+  #                                              #
+  ################################################
+  */
+
+  long readPosition = 0;
+  //int data_size = sizeof(data)/sizeof(data[0]);
+  unsigned char currentBbyte;
+
+
+  int image_type = readRawParam(data, readPosition);    // type of image
+  int image_wigth = readRawParam(data, readPosition);   // width
+  int image_height = readRawParam(data, readPosition);  // height
+
+  int icon_x=0;
+  int icon_y=0;
+
+  if(image_type==0x01){
+    
+    while(1){
+      unsigned char color_var = readRawChar(data, readPosition);
+      
+      if (color_var==0x04){ // new color layout
+    
+        unsigned char red    = readRawChar(data, readPosition); 
+        unsigned char green  = readRawChar(data, readPosition); 
+        unsigned char blue   = readRawChar(data, readPosition); 
+
+        if(draw){
+          setDrawColor(red, green, blue);
+        }else{
+          setDrawColor(getBackgroundColor_red(), getBackgroundColor_green(), getBackgroundColor_blue());
+          #ifdef USE_PRIMITIVE_HARDWARE_DRAW_ACCELERATION
+            drawRect(x, y, x+image_wigth, y+image_height, true);
+            return;
+          #endif
+        }
+        //else setDrawColor(getBackgroundColor_red(), getBackgroundColor_green(), getBackgroundColor_blue());
+        
+        icon_x = 0;
+        icon_y = 0;
+
+        for (int readingBbyte=0; readingBbyte<(image_wigth*image_height%8==0?image_wigth*image_height/8:image_wigth*image_height/8+1); readingBbyte++){
+          //if(data_size<=readPosition) break;
+          currentBbyte = readRawChar(data, readPosition);
+
+          if(currentBbyte!=0x00 && currentBbyte!=0xFF){
+            for (unsigned char d=0; d<8; d++){
+              if (icon_x>=image_wigth){
+                icon_y+=icon_x/image_wigth;
+                icon_x %= image_wigth;
+              }
+
+              //if (currentBbyte&1<<(7-d)) drawPixel(x + icon_x, y + icon_y);
+              //if (getBitInByte(currentBbyte, d)) drawPixel(x + icon_x, y + icon_y);
+              if (getBitInByte(currentBbyte, 7-d)){
+                #ifdef USE_PRIMITIVE_HARDWARE_DRAW_ACCELERATION
+                  unsigned char pixelsInARow = 0;
+                  if(d!=7){
+                    for (unsigned char future_d=d+1; future_d<8; future_d++){
+                      if (getBitInByte(currentBbyte, 7-future_d)){
+                        pixelsInARow++;
+                      } else{
+                        break;
+                      }
+                    }
+                  }
+
+                  if(pixelsInARow>1){
+                    driver_display_drawFastHLine(x + icon_x, y + icon_y, pixelsInARow);
+                    d+=pixelsInARow-1;
+                    icon_x+=pixelsInARow-1;
+                  }else{
+                    drawPixel(x + icon_x, y + icon_y);  
+                  }
+                #else
+                  drawPixel(x + icon_x, y + icon_y);
+                #endif
+              }
+              icon_x ++;
+            }
+          }else if(currentBbyte==0xFF){ // Saving 1ms!!!!
+
+            if (icon_x>=image_wigth){
+              icon_y+=icon_x/image_wigth;
+              icon_x %= image_wigth;
+            }
+
+            drawLine(x + icon_x, y + icon_y, x + icon_x+7, y + icon_y); 
+            icon_x+=8;
+          }else{ // Saving 1ms!!!!
+            icon_x+=8;
+          }
+        }
+        
+      }else{
+        break;
+      } 
+
+    }
+      
+  }else{
+    // Unknow type of image
+
+  }
+
+}
+
+bool getBitInByte(unsigned char currentbyte, unsigned char bitNum){
+  return currentbyte&1<<(bitNum);
+}
+
+//////////////////////////////////////////////////
+// For debugging
+void drawIntString(long val, int x, int y){  
+  char str[14];
+  sprintf(str, "%d", val);
+  drawString( str, x, y);
+}
+
+//////////////////////////////////////////////////
+// For debugging
+void drawDebugString(int val, int y){  
+  drawString(val, 0, y);
 }

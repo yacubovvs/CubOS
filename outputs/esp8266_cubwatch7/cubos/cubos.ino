@@ -7,11 +7,79 @@
 */
 
 #define I2C_ENABLE
+#define CPU_CONTROLL_ENABLE
 
 /*
     ############################################################################################
     #                                                                                          #
     #                                    DEFAULT SETTINGS +                                    #
+    #                                                                                          #
+    ############################################################################################
+*//*
+    ############################################################################################
+    #                                                                                          #
+    #                                    WATCH7 SETTINGS +                                     #
+    #                                                                                          #
+    ############################################################################################
+*/
+
+// ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! !
+//      FOR ESP8266 USE NONOSSDK 2.2.2 +
+// ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! !
+
+//#define serialDebug
+#define screenDebug
+
+#define SCREEN_WIDTH            240     // Screen resolution width
+#define SCREEN_HEIGHT           240     // Screen resolution height
+
+#define FONT_CHAR_WIDTH         6     // Font letter size width
+#define FONT_CHAR_HEIGHT        8     // Font letter size height
+
+#define device_has_battery
+
+#define platform_esp32
+#define device_has_bluetooth
+#define device_has_wifi
+
+#define ON_TIME_CHANGE_EVERY_MS 1000
+
+#define hasHardwareButtons              // Conf of controls with hardware btns    
+//#define isTouchScreen                 // Conf of controls
+
+#define colorScreen                     // Screen is colored
+#define noAnimation                     // Caurse of framebuffer type
+
+//#define toDefaultApp_onLeftLongPress
+
+#define STARTING_APP_NUMM   -1    // for Mainmenu (default app)
+//#define STARTING_APP_NUMM   7     // for App number 7
+
+#define CPU_SLEEP_ENABLE
+#define DELAY_BEFORE_SLEEP 25000
+
+#define BUTTON_UP       0
+#define BUTTON_SELECT   1
+#define BUTTON_DOWN     2
+#define BUTTON_BACK     3
+
+#define BATTERY_ENABLE
+#define CLOCK_ENABLE
+#define USE_PRIMITIVE_HARDWARE_DRAW_ACCELERATION
+
+#define USE_RTC
+
+//#define SCREEN_ROTATION_0
+//#define SCREEN_ROTATION_90
+#define SCREEN_ROTATION_180
+//#define SCREEN_ROTATION_270
+
+#define STYLE_STATUSBAR_HEIGHT  40
+
+/*
+    ############################################################################################
+    #                                                                                          #
+    #                                    WATCH7 SETTINGS -                                     #
     #                                                                                          #
     ############################################################################################
 */
@@ -24,7 +92,7 @@
 
 void core_views_statusBar_draw();
 void setBackgroundColor(unsigned char r, unsigned char g, unsigned char b);
-void drawRect(int x0, int y0, int x1, int y1, boolean fill);
+void drawRect(int x0, int y0, int x1, int y1, bool fill);
 void setDrawColor(unsigned char red, unsigned char green, unsigned char blue);
 void fillScreen(unsigned char red, unsigned char green, unsigned char blue);
 
@@ -130,35 +198,53 @@ Application* currentApp;
 
 void setup()
 { 
+  #ifdef BATTERY_ENABLE
     driver_battery_setup();
+  #endif
 
-    #ifdef USE_RTC
-        driver_RTC_setup();
-    #endif
+  #ifdef USE_RTC
+      driver_RTC_setup();
+  #endif
 
-    #ifdef serialDebug
-        Serial.begin(115200);
-        debug("Serial debug started");
-    #endif
+  #ifdef serialDebug
+      Serial.begin(115200);
+      debug("Serial debug started");
+  #endif
 
-    #ifdef ESP8266
-        ESP.wdtDisable();
-    #endif
-    
+  #ifdef ESP8266
+      ESP.wdtDisable();
+  #endif
+
+  #ifdef CPU_CONTROLL_ENABLE
     driver_cpu_setup();
-    
-    setup_displayDriver();
+  #endif
+  
+  setup_displayDriver();
+
+  #ifdef hasHardwareButtons
     driver_controls_setup();
-    
-    currentApp = getApp(STARTING_APP_NUMM);
+  #endif
+  
+  currentApp = getApp(STARTING_APP_NUMM);
   
 }
 
 bool isInSleep = false;
 void loop(){
-  driver_controls_loop();
-  driver_battery_loop();
-  core_time_loop();
+  driver_display_loop();
+
+  #ifdef hasHardwareButtons
+    driver_controls_loop();
+  #endif
+
+  #ifdef BATTERY_ENABLE
+    driver_battery_loop();
+  #endif
+
+  #ifdef CLOCK_ENABLE
+    core_time_loop();
+  #endif
+
   currentApp->onLoop(); 
   //currentApp->onLoop(); 
 
@@ -188,6 +274,7 @@ void loop(){
     //driver_cpu_wakeup();
   #endif
 
+
 }
 
 #ifdef CPU_SLEEP_ENABLE
@@ -201,6 +288,14 @@ void debug(String string){
 }
 
 void debug(String string, int delaytime){
+    #ifdef TERMINAL_DEBUG
+      int str_len = string.length() + 1;
+      char element_value[str_len];
+      string.toCharArray(element_value, str_len);
+      printf(element_value);
+      printf("\n");
+    #endif
+
     #ifdef serialDebug
       Serial.println(string);
     #endif
@@ -213,6 +308,16 @@ void debug(String string, int delaytime){
       drawString(string, 5, STYLE_STATUSBAR_HEIGHT + 10, 2);
     #endif
 }
+
+/*
+void debug(const char* string, int delaytime){
+  debug(String(string), delaytime);
+}
+
+void debug(const char* string){
+  debug(String(string));
+}*/
+
 
 /*
     ############################################################################################
@@ -258,3 +363,64 @@ void debug(String string, int delaytime){
     ############################################################################################
 */
 
+/*
+    ############################################################################################
+    #                                                                                          #
+    #                                       APPLICATIONS +                                     #
+    #                                                                                          #
+    ############################################################################################
+*/
+
+#define APP_MENU_APPLICATIONS_0             AlarmApp
+#define APP_MENU_APPLICATIONS_1             BarometerApp
+#define APP_MENU_APPLICATIONS_2             ClockApp
+#define APP_MENU_APPLICATIONS_3             CompassApp
+#define APP_MENU_APPLICATIONS_4             FileManagerApp
+#define APP_MENU_APPLICATIONS_5             I2CScannerApp
+#define APP_MENU_APPLICATIONS_6             InternetApp
+#define APP_MENU_APPLICATIONS_7             SettingsApp
+#define APP_MENU_APPLICATIONS_8             SimpleGameApp
+#define APP_MENU_APPLICATIONS_9             TestApplicationApp
+#define APP_MENU_APPLICATIONS_10            BatteryApp
+
+/*
+    # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
+    #                                                                       #
+    #                    -->> Add your application here                     #
+    #                                                                       #
+    # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
+*/
+
+/*
+#define APP_MENU_APPLICATIONS_10            AppName
+#define APP_MENU_APPLICATIONS_11            AppName
+#define APP_MENU_APPLICATIONS_12            AppName
+#define APP_MENU_APPLICATIONS_13            AppName
+#define APP_MENU_APPLICATIONS_14            AppName
+#define APP_MENU_APPLICATIONS_15            AppName
+#define APP_MENU_APPLICATIONS_16            AppName
+#define APP_MENU_APPLICATIONS_17            AppName
+#define APP_MENU_APPLICATIONS_18            AppName
+#define APP_MENU_APPLICATIONS_19            AppName
+#define APP_MENU_APPLICATIONS_20            AppName
+#define APP_MENU_APPLICATIONS_21            AppName
+#define APP_MENU_APPLICATIONS_22            AppName
+#define APP_MENU_APPLICATIONS_23            AppName
+#define APP_MENU_APPLICATIONS_24            AppName
+#define APP_MENU_APPLICATIONS_25            AppName
+#define APP_MENU_APPLICATIONS_26            AppName
+#define APP_MENU_APPLICATIONS_27            AppName
+#define APP_MENU_APPLICATIONS_28            AppName
+#define APP_MENU_APPLICATIONS_29            AppName
+#define APP_MENU_APPLICATIONS_30            AppName
+#define APP_MENU_APPLICATIONS_31            AppName
+*/
+
+
+/*
+    ############################################################################################
+    #                                                                                          #
+    #                                       APPLICATIONS -                                     #
+    #                                                                                          #
+    ############################################################################################
+*/

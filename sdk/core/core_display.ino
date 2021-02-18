@@ -573,7 +573,6 @@ void drawRect_custom( int x0, int y0, int x1, int y1, int x2, int y2, int x3, in
 }
 
 void drawIcon(bool draw, const unsigned char* data, int x, int y){
-
   /*
   ################################################
   #                                              #
@@ -591,6 +590,14 @@ void drawIcon(bool draw, const unsigned char* data, int x, int y){
   int image_wigth = readRawParam(data, readPosition);   // width
   int image_height = readRawParam(data, readPosition);  // height
 
+  if(!draw){
+    setDrawColor(getBackgroundColor_red(), getBackgroundColor_green(), getBackgroundColor_blue());
+    #ifdef USE_PRIMITIVE_HARDWARE_DRAW_ACCELERATION
+      drawRect(x, y, x+image_wigth, y+image_height, true);
+      return;
+    #endif
+  }
+
   int icon_x=0;
   int icon_y=0;
 
@@ -607,12 +614,6 @@ void drawIcon(bool draw, const unsigned char* data, int x, int y){
 
         if(draw){
           setDrawColor(red, green, blue);
-        }else{
-          setDrawColor(getBackgroundColor_red(), getBackgroundColor_green(), getBackgroundColor_blue());
-          #ifdef USE_PRIMITIVE_HARDWARE_DRAW_ACCELERATION
-            drawRect(x, y, x+image_wigth, y+image_height, true);
-            return;
-          #endif
         }
         //else setDrawColor(getBackgroundColor_red(), getBackgroundColor_green(), getBackgroundColor_blue());
         
@@ -647,8 +648,8 @@ void drawIcon(bool draw, const unsigned char* data, int x, int y){
 
                   if(pixelsInARow>1){
                     driver_display_drawFastHLine(x + icon_x, y + icon_y, pixelsInARow);
-                    d+=pixelsInARow-1;
-                    icon_x+=pixelsInARow-1;
+                    d+=pixelsInARow;
+                    icon_x+=pixelsInARow;
                   }else{
                     drawPixel(x + icon_x, y + icon_y);  
                   }
@@ -683,6 +684,10 @@ void drawIcon(bool draw, const unsigned char* data, int x, int y){
 
   }
 
+}
+
+void drawIcon(const unsigned char* data, int x, int y){
+  drawIcon(1, data, x, y);
 }
 
 bool getBitInByte(unsigned char currentbyte, unsigned char bitNum){

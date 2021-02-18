@@ -218,8 +218,13 @@ void core_views_statusBar_draw(){
 #define CORE_VIEWS_PAGES_LIST_ELEMENT_SIZE                  4
 #define CORE_VIEWS_PAGES_LIST_BETWEEN_ELEMENTS_SIZE         20
 
+
+int core_views_pages_list_get_element_position_x(int pages_quantity, int position){
+    return ( (pages_quantity%2==1) ? (-pages_quantity/2 + position) * CORE_VIEWS_PAGES_LIST_BETWEEN_ELEMENTS_SIZE : -((-CORE_VIEWS_PAGES_LIST_BETWEEN_ELEMENTS_SIZE/2) ) + (-pages_quantity/2 + position) * CORE_VIEWS_PAGES_LIST_BETWEEN_ELEMENTS_SIZE);
+}
+
 void core_views_draw_pages_list_simple(
-    boolean draw, // true - draw, false - clear
+    bool draw, // true - draw, false - clear
     int y0,
     unsigned char pages_quantity
 ){
@@ -237,7 +242,7 @@ void core_views_draw_pages_list_simple(
 }
 
 void core_views_draw_active_page(
-    boolean draw, // true - draw, false - clear
+    bool draw, // true - draw, false - clear
     int y0,
     unsigned char pages_quantity,
     unsigned char position
@@ -250,10 +255,6 @@ void core_views_draw_active_page(
     int element_y = y0;
     drawRect(element_x - (CORE_VIEWS_PAGES_LIST_ELEMENT_SIZE-1), element_y - (CORE_VIEWS_PAGES_LIST_ELEMENT_SIZE-1), element_x + (CORE_VIEWS_PAGES_LIST_ELEMENT_SIZE-1), element_y + (CORE_VIEWS_PAGES_LIST_ELEMENT_SIZE-1), true);
 
-}
-
-int core_views_pages_list_get_element_position_x(int pages_quantity, int position){
-    return ( (pages_quantity%2==1) ? (-pages_quantity/2 + position) * CORE_VIEWS_PAGES_LIST_BETWEEN_ELEMENTS_SIZE : -((-CORE_VIEWS_PAGES_LIST_BETWEEN_ELEMENTS_SIZE/2) ) + (-pages_quantity/2 + position) * CORE_VIEWS_PAGES_LIST_BETWEEN_ELEMENTS_SIZE);
 }
 
 /*
@@ -277,7 +278,7 @@ int core_views_pages_list_get_element_position_x(int pages_quantity, int positio
 #define CORE_VIEWS_APPICON_IMAGE_Y_OFFSET       -10
 #define CORE_VIEWS_APPICON_TITLE_Y_OFFSET       20
 
-void core_views_draw_app_icon(boolean draw, int x, int y, const unsigned char* title, const unsigned char* icon){
+void core_views_draw_app_icon(bool draw, int x, int y, const unsigned char* title, const unsigned char* icon){
     // image
     drawIcon(draw, icon, x-CORE_VIEWS_APPICON_IMAGE_WIDTH/2, y-CORE_VIEWS_APPICON_IMAGE_HEIGHT/2 + CORE_VIEWS_APPICON_IMAGE_Y_OFFSET);
 

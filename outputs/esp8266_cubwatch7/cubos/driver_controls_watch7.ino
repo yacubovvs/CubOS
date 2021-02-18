@@ -5,9 +5,9 @@
 unsigned long last_user_activity = _millis();
 
 unsigned char    driver_control_buttonsPins[]  = {12,   15,    3,    1};
-boolean driver_control_isPositive[]   = {true, false, true, true};     
+bool driver_control_isPositive[]   = {true, false, true, true};     
 // Do not change:
-boolean driver_control_pressed[]      = {false, false, false, false};
+bool driver_control_pressed[]      = {false, false, false, false};
 unsigned long driver_control_time_pressed[]    = {0, 0, 0, 0};
 
 
@@ -73,21 +73,21 @@ void onButtonEvent(unsigned char event, int button){
 
 //////////////////////////////////////////////////////////////////////////////
 //  Call to check is button started to press
-boolean isPressStart(unsigned char num){
+bool isPressStart(unsigned char num){
   if (num>=os_control_buttons) return false;
   else return os_control_pressStart[num];
 }
 
 //////////////////////////////////////////////////////////////////////////////
 //  Call to check is button [ress finished
-boolean isPressEnd(unsigned char num){
+bool isPressEnd(unsigned char num){
   if (num>=os_control_buttons) return false;
   else return os_control_pressEnd[num];
 }
 
 //////////////////////////////////////////////////////////////////////////////
 //  Call to check is button pressed
-boolean isPress(unsigned char num){
+bool isPress(unsigned char num){
   if (num>=os_control_buttons) return false;
   else return os_control_press[num];
 }
@@ -134,15 +134,15 @@ void os_control_loop(){
 
 //////////////////////////////////////////////////////////////////////////////
 //  Events for apps
-boolean isPressStart_Right(){
+bool isPressStart_Right(){
   return isPressStart(0);
 }
 
-boolean isPressStart_Select(){
+bool isPressStart_Select(){
   return isPressStart(2);
 }
 
-boolean isPressStart_Left(){
+bool isPressStart_Left(){
   return isPressStart(1);
 }
 //

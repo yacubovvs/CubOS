@@ -1,4 +1,33 @@
 /*
+    # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
+    #                                                                   #
+    #                           READ RAW DATA                           #
+    #                                                                   #
+    # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
+*/
+
+long readRawChar(const unsigned char* data, long &position){
+    unsigned char data_char = (char)pgm_read_word(&(data[position]));
+    position ++;
+    return data_char;
+}   
+
+// Also this func need for B apps
+uint64_t byte_to_value(unsigned char byte0, unsigned char byte1, unsigned char byte2, unsigned char byte3, unsigned char byte4, unsigned char byte5, unsigned char byte6, unsigned char byte7){
+  return (byte7<<56)|(byte6<<48)|(byte5<<40)|(byte4<<32)|(byte3<<24)|(byte2<<16)|(byte1<<8)|byte0;
+}
+
+int readRawParam(const unsigned char* data, long &position){
+    unsigned char paramType = readRawChar(data, position);
+
+    if (paramType==0x02){
+      return (unsigned char)readRawChar(data, position);
+    }else if(paramType==0x03){
+      return (unsigned int)byte_to_value(readRawChar(data, position), readRawChar(data, position),0,0,0,0,0,0);
+    }
+}
+
+/*
 *************************************
 *                                   *
 *          BASIC FUNCTIONS          *
@@ -37,37 +66,9 @@ void int_to_char(char *string, int num, bool fillNull){
 }
 
 // 1 bit array operations
-void set_bit_to_byte(unsigned char &b, unsigned char position, bool value){ if (value) b|=1<<position; else b&=~(1<<position);}
-bool get_bit_from_byte(unsigned char b, unsigned char position){return (b&1<<position);}
+void set_bit_toBbyte(unsigned char &b, unsigned char position, bool value){ if (value) b|=1<<position; else b&=~(1<<position);}
+bool get_bit_fromBbyte(unsigned char b, unsigned char position){return (b&1<<position);}
 
-/*
-    # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
-    #                                                                   #
-    #                           READ RAW DATA                           #
-    #                                                                   #
-    # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
-*/
-
-// Also this func need for B apps
-uint64_t bytes_to_value(unsigned char byte0, unsigned char byte1, unsigned char byte2, unsigned char byte3, unsigned char byte4, unsigned char byte5, unsigned char byte6, unsigned char byte7){
-  return (byte7<<56)|(byte6<<48)|(byte5<<40)|(byte4<<32)|(byte3<<24)|(byte2<<16)|(byte1<<8)|byte0;
-}
-
-int readRawParam(const unsigned char* data, long &position){
-    unsigned char paramType = readRawChar(data, position);
-
-    if (paramType==0x02){
-      return (unsigned char)readRawChar(data, position);
-    }else if(paramType==0x03){
-      return (unsigned int)bytes_to_value(readRawChar(data, position), readRawChar(data, position),0,0,0,0,0,0);
-    }
-}
-
-long readRawChar(const unsigned char* data, long &position){
-    unsigned char data_char = (char)pgm_read_word(&(data[position]));
-    position ++;
-    return data_char;
-}   
 
 /*
     # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #

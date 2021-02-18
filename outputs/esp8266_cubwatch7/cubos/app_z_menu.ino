@@ -143,9 +143,9 @@ class appNameClass: public Application{
     private:
         const unsigned char* getApplicationTitle(int num);
         const unsigned char* getApplicationIcon(int num);
-        void drawIcons(boolean draw);
+        void drawIcons(bool draw);
         void updateActiveAppIndex(int newSelectedAppIndex);
-        void drawActiveAppFrame(boolean draw);
+        void drawActiveAppFrame(bool draw);
 
 };
 
@@ -211,7 +211,7 @@ void appNameClass::updateActiveAppIndex(int newSelectedAppIndex){
   }
 }
 
-void appNameClass::drawActiveAppFrame(boolean draw){
+void appNameClass::drawActiveAppFrame(bool draw){
   unsigned char positionOnScreen     = app_z_menu_selectedAppIndex%APPS_ON_SINGLE_PAGE;
   unsigned char positionOnScreen_x   = app_z_menu_selectedAppIndex%SINGLE_ELEMENTS_IN_X;
   unsigned char positionOnScreen_y   = positionOnScreen/SINGLE_ELEMENTS_IN_X;
@@ -231,7 +231,7 @@ void appNameClass::drawActiveAppFrame(boolean draw){
   
 }
 
-void appNameClass::drawIcons(boolean draw){
+void appNameClass::drawIcons(bool draw){
   for (unsigned char y_position=0; y_position<SINGLE_ELEMENTS_IN_Y; y_position++){
         for (unsigned char x_position=0; x_position<SINGLE_ELEMENTS_IN_X; x_position++){
             int x0 = x_position*SINGLE_ELEMENT_REAL_WIDTH;

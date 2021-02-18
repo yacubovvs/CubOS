@@ -36,8 +36,8 @@
 
 //#define toDefaultApp_onLeftLongPress
 
-#define STARTING_APP_NUMM   -1    // for Mainmenu (default app)
-//#define STARTING_APP_NUMM   7     // for App number 7
+//#define STARTING_APP_NUMM   -1    // for Mainmenu (default app)
+#define STARTING_APP_NUMM   6     // for App number 7
 
 //#define CPU_SLEEP_ENABLE
 //#define DELAY_BEFORE_SLEEP 25000
@@ -1497,7 +1497,6 @@ void drawRect_custom( int x0, int y0, int x1, int y1, int x2, int y2, int x3, in
 }
 
 void drawIcon(bool draw, const unsigned char* data, int x, int y){
-
   /*
   ################################################
   #                                              #
@@ -1515,6 +1514,14 @@ void drawIcon(bool draw, const unsigned char* data, int x, int y){
   int image_wigth = readRawParam(data, readPosition);   // width
   int image_height = readRawParam(data, readPosition);  // height
 
+  if(!draw){
+    setDrawColor(getBackgroundColor_red(), getBackgroundColor_green(), getBackgroundColor_blue());
+    #ifdef USE_PRIMITIVE_HARDWARE_DRAW_ACCELERATION
+      drawRect(x, y, x+image_wigth, y+image_height, true);
+      return;
+    #endif
+  }
+
   int icon_x=0;
   int icon_y=0;
 
@@ -1531,12 +1538,6 @@ void drawIcon(bool draw, const unsigned char* data, int x, int y){
 
         if(draw){
           setDrawColor(red, green, blue);
-        }else{
-          setDrawColor(getBackgroundColor_red(), getBackgroundColor_green(), getBackgroundColor_blue());
-          #ifdef USE_PRIMITIVE_HARDWARE_DRAW_ACCELERATION
-            drawRect(x, y, x+image_wigth, y+image_height, true);
-            return;
-          #endif
         }
         //else setDrawColor(getBackgroundColor_red(), getBackgroundColor_green(), getBackgroundColor_blue());
         
@@ -1571,8 +1572,8 @@ void drawIcon(bool draw, const unsigned char* data, int x, int y){
 
                   if(pixelsInARow>1){
                     driver_display_drawFastHLine(x + icon_x, y + icon_y, pixelsInARow);
-                    d+=pixelsInARow-1;
-                    icon_x+=pixelsInARow-1;
+                    d+=pixelsInARow;
+                    icon_x+=pixelsInARow;
                   }else{
                     drawPixel(x + icon_x, y + icon_y);  
                   }
@@ -1607,6 +1608,10 @@ void drawIcon(bool draw, const unsigned char* data, int x, int y){
 
   }
 
+}
+
+void drawIcon(const unsigned char* data, int x, int y){
+  drawIcon(1, data, x, y);
 }
 
 bool getBitInByte(unsigned char currentbyte, unsigned char bitNum){
@@ -2200,81 +2205,257 @@ const unsigned char appNameClass::icon[] PROGMEM = {
     0x3F,0x80,0x00,0xFE,0x7F,0x00,0x00,0x3E,0x7C,0x00,0x00,0x0E,0x70,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,
 };
 
-#define appNameClass    SettingsApp          // App name without spaces
-#define appName         "Settings"              // App name with spaces 
+#define appNameClass    SettingsApp     // App name without spaces
+#define appName         "Settings"      // App name with spaces 
+
+#define SETTINGS_ELEMENTS
+
+#define PAGES_LIST_HEIGHT               20
+#define ACTIVE_SCREEN_WIDTH             SCREEN_WIDTH
+#define ACTIVE_SCREEN_HEIGHT            (SCREEN_HEIGHT - STYLE_STATUSBAR_HEIGHT - PAGES_LIST_HEIGHT)
+#define SINGLE_ELEMENT_MIN_WIDTH        200
+#define SINGLE_ELEMENT_MIN_HEIGHT       80
+
+#define SINGLE_ELEMENTS_IN_X            ((int)(ACTIVE_SCREEN_WIDTH/SINGLE_ELEMENT_MIN_WIDTH))
+#define SINGLE_ELEMENTS_IN_Y            ((int)(ACTIVE_SCREEN_HEIGHT/SINGLE_ELEMENT_MIN_HEIGHT))
+
+#define SINGLE_ELEMENT_REAL_WIDTH       ((int)(ACTIVE_SCREEN_WIDTH/SINGLE_ELEMENTS_IN_X))
+#define SINGLE_ELEMENT_REAL_HEIGHT      ((int)(ACTIVE_SCREEN_HEIGHT/SINGLE_ELEMENTS_IN_Y))
+
+#define PAGES_LIST_POSITION             (SCREEN_HEIGHT-PAGES_LIST_HEIGHT/2)
+#define APPS_ON_SINGLE_PAGE             (SINGLE_ELEMENTS_IN_X * SINGLE_ELEMENTS_IN_Y)
 
 
-#define ELEMENT_POSITION_OFFSET     55
-#define ELEMENT_HEIGHT      45
+// SUBMENUES
+#define APP_SETTINGS_SUBMENU_MAIN 0x01
+
+// SETTINGS PAGES
+#define APP_SETTINGS_PAGE_TOTAL_ELEMENTS_MAIN 3
+
+// # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # //
 
 class appNameClass: public Application{
     public:
         virtual void onLoop() override;
         virtual void onDestroy() override;
         virtual void onEvent(unsigned char event, int val1, int val2) override;
+
         void onCreate();
-        appNameClass(){ fillScreen(64, 64, 64); super_onCreate(); onCreate(); };
+        appNameClass(){ fillScreen(0, 0, 0); super_onCreate(); onCreate(); };
         static unsigned const char* getParams(const unsigned char type){
-            switch(type){ 
-              case PARAM_TYPE_NAME: return (unsigned char*)appName; 
-              case PARAM_TYPE_ICON: return icon;
-              default: return (unsigned char*)""; }
+          switch(type){ 
+            case PARAM_TYPE_NAME: return (unsigned char*)appName; 
+            case PARAM_TYPE_ICON: return icon;
+            default: return (unsigned char*)""; 
+          }
         };
         const static unsigned char icon[] PROGMEM;
-
-        const static unsigned char icon_sound[]      PROGMEM;
-        const static unsigned char icon_light[]      PROGMEM;
-        const static unsigned char icon_time[]       PROGMEM;
-        const static unsigned char icon_date[]       PROGMEM;
-        const static unsigned char icon_battery[]    PROGMEM;
-        const static unsigned char arrow[]           PROGMEM;
       
+    private:
+        const unsigned char* getApplicationTitle(unsigned char submenu, unsigned char num);
+        const unsigned char* getApplicationIcon(unsigned char submenu, unsigned char num);
+        void drawIcons(bool draw);
+        void updateActiveAppIndex(int newSelectedAppIndex);
+        void drawActiveAppFrame(bool draw);
+        unsigned char getTotalPagesInSubMenu(unsigned char submenuType);
+        unsigned char getTotalApplicationsInSubMenu(unsigned char subMenu);
+        char app_settings_selectedAppIndex = 0;
+        const static unsigned char def[]               PROGMEM;
+        const static unsigned char icon_sound[]        PROGMEM;
+        const static unsigned char icon_light[]        PROGMEM;
+        const static unsigned char icon_time[]         PROGMEM;
+        const static unsigned char icon_date[]         PROGMEM;
+        const static unsigned char icon_battery[]      PROGMEM;
+        const static unsigned char currentSubMenu = 0x01;
 };
 
-void appNameClass::onCreate(){ 
-    
-    drawMenuElement(true, 35, STYLE_STATUSBAR_HEIGHT + 15 + ELEMENT_POSITION_OFFSET*0, SCREEN_WIDTH-10-35, ELEMENT_HEIGHT, this->icon_sound,    "Notifications and sound", "Volume, vibration level");
-    drawMenuElement(true, 35, STYLE_STATUSBAR_HEIGHT + 15 + ELEMENT_POSITION_OFFSET*1, SCREEN_WIDTH-10-35, ELEMENT_HEIGHT, this->icon_light,    "Screen light", "100%");
-    drawMenuElement(true, 35, STYLE_STATUSBAR_HEIGHT + 15 + ELEMENT_POSITION_OFFSET*2, SCREEN_WIDTH-10-35, ELEMENT_HEIGHT, this->icon_time,     "Setting time", "10:28:01");
-    drawMenuElement(true, 35, STYLE_STATUSBAR_HEIGHT + 15 + ELEMENT_POSITION_OFFSET*3, SCREEN_WIDTH-10-35, ELEMENT_HEIGHT, this->icon_date,     "Date", "11.12.2020");
-    drawMenuElement(true, 35, STYLE_STATUSBAR_HEIGHT + 15 + ELEMENT_POSITION_OFFSET*3, SCREEN_WIDTH-10-35, ELEMENT_HEIGHT, this->icon_battery,  "Battery", "100%");
+unsigned char appNameClass::getTotalPagesInSubMenu(unsigned char submenuType){
+    return (getTotalApplicationsInSubMenu(submenuType)%APPS_ON_SINGLE_PAGE==0?((int)(getTotalApplicationsInSubMenu(submenuType)/APPS_ON_SINGLE_PAGE)):((int)(getTotalApplicationsInSubMenu(submenuType)/APPS_ON_SINGLE_PAGE) + 1));
+}
 
-    drawIcon(true, this->arrow, 12, STYLE_STATUSBAR_HEIGHT + 15 + ELEMENT_POSITION_OFFSET*0 + ELEMENT_HEIGHT/2 - 4);
-    /*
-        Write you code onCreate here
-    */
+unsigned char appNameClass::getTotalApplicationsInSubMenu(unsigned char submenuType){
+    switch (submenuType){
+    case APP_SETTINGS_SUBMENU_MAIN:
+        return APP_SETTINGS_PAGE_TOTAL_ELEMENTS_MAIN;
+    default:
+        return APP_SETTINGS_PAGE_TOTAL_ELEMENTS_MAIN;
+    }
+}
+
+
+void appNameClass::onCreate(){
+    
+    core_views_draw_pages_list_simple(true, PAGES_LIST_POSITION, getTotalPagesInSubMenu(APP_SETTINGS_SUBMENU_MAIN));
+
+    unsigned char currentPage = 0;
+    if(currentPage==0) core_views_draw_active_page(true, PAGES_LIST_POSITION, getTotalPagesInSubMenu(APP_SETTINGS_SUBMENU_MAIN), currentPage);
+    //else this->updateActiveAppIndex(app_settings_selectedAppIndex_presaved);  
+    this->updateActiveAppIndex(app_settings_selectedAppIndex);  
+
+    // Drawing icons
+    this->drawIcons(true);
+    this->drawActiveAppFrame(true);  
+    
+}
+
+void appNameClass::updateActiveAppIndex(int newSelectedAppIndex){
+
+  if(newSelectedAppIndex<0) newSelectedAppIndex = getTotalApplicationsInSubMenu(APP_SETTINGS_SUBMENU_MAIN) - 1;
+  if(newSelectedAppIndex>=getTotalApplicationsInSubMenu(APP_SETTINGS_SUBMENU_MAIN)) newSelectedAppIndex = 0;
+
+  if(app_settings_selectedAppIndex!=newSelectedAppIndex){
+    
+    this->drawActiveAppFrame(false);
+    if( (int)((app_settings_selectedAppIndex)/APPS_ON_SINGLE_PAGE) != (int)((newSelectedAppIndex)/APPS_ON_SINGLE_PAGE)){
+      // update page
+      this->drawIcons(false);
+      core_views_draw_active_page(false, PAGES_LIST_POSITION, getTotalPagesInSubMenu(APP_SETTINGS_SUBMENU_MAIN), (int)(app_settings_selectedAppIndex/APPS_ON_SINGLE_PAGE));
+      app_settings_selectedAppIndex = newSelectedAppIndex;
+      core_views_draw_active_page(true, PAGES_LIST_POSITION, getTotalPagesInSubMenu(APP_SETTINGS_SUBMENU_MAIN), (int)(app_settings_selectedAppIndex/APPS_ON_SINGLE_PAGE));
+      this->drawIcons(true);
+    }else{
+      app_settings_selectedAppIndex = newSelectedAppIndex;
+    }
+
+    // update selected app frame
+    this->drawActiveAppFrame(true);
+  }
+}
+
+void appNameClass::drawActiveAppFrame(bool draw){
+  unsigned char positionOnScreen     = app_settings_selectedAppIndex%APPS_ON_SINGLE_PAGE;
+  unsigned char positionOnScreen_x   = app_settings_selectedAppIndex%SINGLE_ELEMENTS_IN_X;
+  unsigned char positionOnScreen_y   = positionOnScreen/SINGLE_ELEMENTS_IN_X;
+
+  int x0 = positionOnScreen_x*SINGLE_ELEMENT_REAL_WIDTH;
+  int y0 = positionOnScreen_y*SINGLE_ELEMENT_REAL_HEIGHT + STYLE_STATUSBAR_HEIGHT+1;
+  int x1 = x0+SINGLE_ELEMENT_REAL_WIDTH;
+  int y1 = y0+SINGLE_ELEMENT_REAL_HEIGHT;
+
+  if(draw) setDrawColor(196, 196, 196);
+  else setDrawColor(getBackgroundColor_red(), getBackgroundColor_green(), getBackgroundColor_blue());
+
+  for(unsigned char i=0; i<4; i++){
+    unsigned char delta = 5+i;
+    drawRect(x0+delta, y0+delta, x1-delta, y1-delta);  
+  }
+  
+}
+
+void appNameClass::drawIcons(bool draw){
+  for (unsigned char y_position=0; y_position<SINGLE_ELEMENTS_IN_Y; y_position++){
+        for (unsigned char x_position=0; x_position<SINGLE_ELEMENTS_IN_X; x_position++){
+            int x0 = x_position*SINGLE_ELEMENT_REAL_WIDTH;
+            int y0 = y_position*SINGLE_ELEMENT_REAL_HEIGHT + STYLE_STATUSBAR_HEIGHT+1;
+            int x1 = x0+SINGLE_ELEMENT_REAL_WIDTH;
+            int y1 = y0+SINGLE_ELEMENT_REAL_HEIGHT;
+
+            int x_center = (x0+x1)/2;
+            int y_center = (y0+y1)/2;
+
+            int app_num = y_position*(SINGLE_ELEMENTS_IN_Y) + x_position + APPS_ON_SINGLE_PAGE*(int)(app_settings_selectedAppIndex/APPS_ON_SINGLE_PAGE);
+
+            if(app_num<getTotalApplicationsInSubMenu(APP_SETTINGS_SUBMENU_MAIN)){
+              #ifdef ESP8266
+                ESP.wdtDisable();
+              #endif
+
+              //debug(String(app_num), 1000);
+            
+              core_views_draw_app_icon(
+                draw, 
+                x_center, y_center, 
+                (const unsigned char*)this->getApplicationTitle(0, app_num), 
+                this->getApplicationIcon(0, app_num)
+              );
+            }
+        }
+    }
 }
 
 void appNameClass::onLoop(){
     /*
-        Write you code onLoop here
+    #ifdef serialDebug
+        Serial.println("Application on loop");
+    #endif
+    delay(100);
     */
 }
 
 void appNameClass::onDestroy(){
-    /*
-        Write you code onDestroy here
-    */
+    #ifdef serialDebug
+      Serial.println("Application on onDestroy");
+    #endif
 }
 
 void appNameClass::onEvent(unsigned char event, int val1, int val2){
     
     if(event==EVENT_BUTTON_PRESSED){
-        // Write you code on [val1] button pressed here
-        if(val1==BUTTON_BACK){
-            startApp(-1);
-        }
+      switch(val1){
+        case 0:
+          this->updateActiveAppIndex(app_settings_selectedAppIndex-1);
+          break;
+        case 3:
+          startApp(-1);
+          break;
+        case 2:
+          this->updateActiveAppIndex(app_settings_selectedAppIndex+1);
+          break;
+      }
     }else if(event==EVENT_BUTTON_RELEASED){
-        // Write you code on [val1] button released here
+
     }else if(event==EVENT_BUTTON_LONG_PRESS){
-        // Write you code on [val1] button long press here
+
     }else if(event==EVENT_ON_TIME_CHANGED){
-        // Write you code on system time changed
+
     }
-    
+
 }
 
-const unsigned char appNameClass::arrow[] PROGMEM = {
+const unsigned char* appNameClass::getApplicationTitle(unsigned char submenu, unsigned char num){
+    switch(APP_SETTINGS_SUBMENU_MAIN){
+        case APP_SETTINGS_SUBMENU_MAIN:
+            switch (num){
+                case 0:
+                    return (const unsigned char*)"Sleep timout";
+                case 1:
+                    return (const unsigned char*)"Time";
+                case 2:
+                    return (const unsigned char*)"Date";
+                
+                default:
+                    return (const unsigned char*)"-";
+                    break;
+            }
+            break;
+        default:
+            return (const unsigned char*)"-";
+    }
+}
+
+const unsigned char* appNameClass::getApplicationIcon(unsigned char submenu, unsigned char num){
+    switch(APP_SETTINGS_SUBMENU_MAIN){
+        case APP_SETTINGS_SUBMENU_MAIN:
+            switch (num){
+                case 0:
+                    return this->icon_battery;
+                case 1:
+                    return this->icon_time;
+                case 2:
+                    return this->icon_date;
+                
+                default:
+                    return this->def;
+                    break;
+            }
+            break;
+        default:
+            return this->def;
+    }
+}
+
+
+const unsigned char appNameClass::def[] PROGMEM = {
     0x02,0x01,0x02,0x08,0x02,0x08,0x04,0xff,0xff,0xff,0x80,0xE0,0xF8,0xFF,0xFF,0xF8,0xE0,0x80,
 };
 
@@ -2308,6 +2489,9 @@ const unsigned char appNameClass::icon_battery[] PROGMEM = {
     0x04,0xff,0xff,0xff,0x01,0x80,0x1F,0xF8,0x20,0x04,0x20,0x04,0x20,0x04,0x20,0x04,0x20,0x04,0x20,0x04,0x20,
     0x04,0x20,0x04,0x20,0x04,0x20,0x04,0x20,0x04,0x20,0x04,0x20,0x04,0x3F,0xFC,
 };
+
+
+
 
 const unsigned char appNameClass::icon[] PROGMEM = {
     
