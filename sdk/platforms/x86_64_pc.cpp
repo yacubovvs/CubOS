@@ -68,6 +68,8 @@ void core_time_loop();
 void driver_controls_setup();
 void driver_battery_setup();
 void core_time_setup();
+void do_cpu_sleep();
+unsigned long driver_control_get_last_user_avtivity();
 
 class Application;
 Application *getApp(unsigned char i);

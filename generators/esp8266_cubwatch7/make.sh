@@ -39,6 +39,7 @@ cp sdk/core/core_shared_functions.ino   outputs/esp8266_cubwatch7/cubos/
 cp sdk/core/core_views.ino              outputs/esp8266_cubwatch7/cubos/  
 cp sdk/core/core_display.ino            outputs/esp8266_cubwatch7/cubos/  
 cp sdk/core/core_time.ino               outputs/esp8266_cubwatch7/cubos/  
+cp sdk/core/core_cpu.ino               outputs/esp8266_cubwatch7/cubos/  
 
 cp sdk/libs/Arduino_ST7789.cpp          outputs/esp8266_cubwatch7/cubos/ 
 cp sdk/libs/Arduino_ST7789.h            outputs/esp8266_cubwatch7/cubos/

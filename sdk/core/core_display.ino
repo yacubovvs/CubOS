@@ -384,6 +384,9 @@ void clearString(char * dString, int x, int y, unsigned char fontSize){
     setStr(dString, x, y, fontSize);
   #endif
 }
+void clearString(char * dString, int x, int y){
+  clearString(dString, x, y, 1);
+}
 
 void clearString_centered(char * dString, int y){
   clearString(dString, (SCREEN_WIDTH - strlen(dString)*FONT_CHAR_WIDTH)/2, y, 1);  

@@ -25,6 +25,9 @@ echo "
 cat "sdk/drivers/driver_display_emulator.ino"       >> $OUTPUT_DIRECTORY/cubos/main.cpp
 echo "
 "   >> $OUTPUT_DIRECTORY/cubos/main.cpp
+cat "sdk/drivers/driver_cpu_emulator.ino"       >> $OUTPUT_DIRECTORY/cubos/main.cpp
+echo "
+"   >> $OUTPUT_DIRECTORY/cubos/main.cpp
 
 # Platform libs
 #cp sdk/platforms/core_esp8266_noniso.c  $OUTPUT_DIRECTORY/cubos/
@@ -65,6 +68,9 @@ echo "
 cat sdk/core/core_views.ino              >> $OUTPUT_DIRECTORY/cubos/main.cpp
 echo "
 "   >> $OUTPUT_DIRECTORY/cubos/main.cpp
+echo "
+"   >> $OUTPUT_DIRECTORY/cubos/main.cpp
+cat sdk/core/core_cpu.ino               >> $OUTPUT_DIRECTORY/cubos/main.cpp
 
 
 # Applications

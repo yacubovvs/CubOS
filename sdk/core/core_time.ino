@@ -1,11 +1,3 @@
-String core_time_getHourMinuteTime(){
-    #ifdef USE_RTC
-        return "10:28";
-    #else
-        return "10:28";
-    #endif
-}
-
 unsigned char core_time_getHours_byte(){
     #ifdef USE_RTC
         return driver_RTC_getHours();
@@ -57,6 +49,14 @@ String core_time_getHourMinuteSecondsTime(){
     #endif
     return core_time_getHours_String() + ":" + core_time_getMinutes_String() + ":" + core_time_getSeconds_String();
 }
+
+String core_time_getHourMinuteTime(){
+    #ifdef USE_RTC
+        driver_RTC_refresh();
+    #endif
+    return core_time_getHours_String() + ":" + core_time_getMinutes_String();
+}
+
 
 //#define EVENT_ON_TIME_CHANGED              0x03
 long lastTimeChange = millis()/ON_TIME_CHANGE_EVERY_MS;

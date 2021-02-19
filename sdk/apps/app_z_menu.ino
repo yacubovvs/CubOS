@@ -242,7 +242,7 @@ void appNameClass::drawIcons(bool draw){
             int x_center = (x0+x1)/2;
             int y_center = (y0+y1)/2;
 
-            int app_num = y_position*(SINGLE_ELEMENTS_IN_Y) + x_position + APPS_ON_SINGLE_PAGE*(int)(app_z_menu_selectedAppIndex/APPS_ON_SINGLE_PAGE);
+            int app_num = y_position*(SINGLE_ELEMENTS_IN_X) + x_position + APPS_ON_SINGLE_PAGE*(int)(app_z_menu_selectedAppIndex/APPS_ON_SINGLE_PAGE);
 
             if(app_num<APP_MENU_APPLICATIONS_QUANTITY){
               #ifdef ESP8266
