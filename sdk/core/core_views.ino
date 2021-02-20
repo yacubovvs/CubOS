@@ -296,7 +296,7 @@ void core_views_draw_app_icon(bool draw, int x, int y, const unsigned char* titl
 
 
 #define CORE_VIEWS_SETTINGS_IMAGE_WIDTH 24
-void core_views_draw_settings_item(bool draw, int x, int y, const unsigned char* title, const unsigned char* icon){
+void core_views_draw_settings_item(bool draw, int x, int y, const unsigned char* title, String subTitle, const unsigned char* icon){
     // image
     int left_x = x + CORE_VIEWS_SETTINGS_IMAGE_WIDTH;
     setDrawColor(getBackgroundColor_red(), getBackgroundColor_green(), getBackgroundColor_blue());
@@ -306,10 +306,10 @@ void core_views_draw_settings_item(bool draw, int x, int y, const unsigned char*
     if(draw){
         setDrawColor(255, 255, 255);
         drawString((char*)title, left_x, y-12);
-        drawString((char*)title, left_x, y+4);
+        drawString(subTitle, left_x, y+4);
     }else{    
         clearString((char*)title, left_x, y-12);
-        clearString((char*)title, left_x, y+4);
+        clearString(subTitle, left_x, y+4, 1);
     }
 
     

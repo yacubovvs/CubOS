@@ -171,7 +171,7 @@ void loop(){
 
   #ifdef CPU_SLEEP_ENABLE
 //driver_cpu_sleep();
-    if(millis() - driver_control_get_last_user_avtivity() > DELAY_BEFORE_SLEEP){
+    if(millis() - driver_control_get_last_user_avtivity() > CPU_SLEEP_TIME_DELAY){
         if(!isInSleep){
             isInSleep = true;
             currentApp->onEvent(EVENT_ON_GOING_TO_SLEEP, 0, 0);

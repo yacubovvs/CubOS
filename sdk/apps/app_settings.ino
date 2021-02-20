@@ -53,13 +53,14 @@ class appNameClass: public Application{
         unsigned char getTotalPagesInSubMenu(unsigned char submenuType);
         unsigned char getTotalApplicationsInSubMenu(unsigned char subMenu);
         char app_settings_selectedAppIndex = 0;
-        const static unsigned char def[]               PROGMEM;
-        const static unsigned char icon_battery[]        PROGMEM;
-        const static unsigned char icon_light[]        PROGMEM;
-        const static unsigned char icon_time[]         PROGMEM;
-        const static unsigned char icon_date[]         PROGMEM;
-        const static unsigned char icon_sleep[]      PROGMEM;
+        const static unsigned char def[]                PROGMEM;
+        const static unsigned char icon_battery[]       PROGMEM;
+        const static unsigned char icon_light[]         PROGMEM;
+        const static unsigned char icon_time[]          PROGMEM;
+        const static unsigned char icon_date[]          PROGMEM;
+        const static unsigned char icon_sleep[]         PROGMEM;
         const static unsigned char currentSubMenu = 0x01;
+        String getApplicationSubTitle(unsigned char submenu, unsigned char num);
 };
 
 unsigned char appNameClass::getTotalPagesInSubMenu(unsigned char submenuType){
@@ -159,6 +160,7 @@ void appNameClass::drawIcons(bool draw){
                 draw, 
                 x0+35, y_center, 
                 (const unsigned char*)this->getApplicationTitle(0, app_num), 
+                this->getApplicationSubTitle(0, app_num), 
                 this->getApplicationIcon(0, app_num)
               );
             }
@@ -209,14 +211,41 @@ const unsigned char* appNameClass::getApplicationTitle(unsigned char submenu, un
                     return (const unsigned char*)"Date";
                 case 3:
                     return (const unsigned char*)"Battery";
+                case 3:
+                    return (const unsigned char*)"Battery";
                 
                 default:
-                    return (const unsigned char*)"-";
+                    return (const unsigned char*)"Compass";
                     break;
             }
             break;
         default:
             return (const unsigned char*)"-";
+    }
+}
+
+String appNameClass::getApplicationSubTitle(unsigned char submenu, unsigned char num){
+    switch(APP_SETTINGS_SUBMENU_MAIN){
+        case APP_SETTINGS_SUBMENU_MAIN:
+            switch (num){
+                case 0:
+                    return String(core_cpu_getCpuSleepTimeDelay());
+                case 1:
+                    return "Time";
+                case 2:
+                    return "Date";
+                case 3:
+                    return "Battery";
+                case 4:
+                    return "Compass";
+                
+                default:
+                    return "Reset maximum";
+                    break;
+            }
+            break;
+        default:
+            return "-";
     }
 }
 
@@ -232,6 +261,9 @@ const unsigned char* appNameClass::getApplicationIcon(unsigned char submenu, uns
                     return this->icon_date;
                 case 3:
                     return this->icon_battery;
+                case 4:
+                    return this->icon_battery;
+
                 
                 default:
                     return this->def;

@@ -40,7 +40,7 @@
 #define STARTING_APP_NUMM   6     // for App number 7
 
 #define CPU_SLEEP_ENABLE
-#define DELAY_BEFORE_SLEEP 25000
+#define CPU_SLEEP_TIME_DELAY 25000
 
 #define BUTTON_UP       0
 #define BUTTON_SELECT   1
