@@ -2457,6 +2457,8 @@ const unsigned char* appNameClass::getApplicationTitle(unsigned char submenu, un
                     return (const unsigned char*)"Date";
                 case 3:
                     return (const unsigned char*)"Battery";
+                case 4:
+                    return (const unsigned char*)"Compass";
                 
                 default:
                     return (const unsigned char*)"-";
@@ -2480,9 +2482,11 @@ String appNameClass::getApplicationSubTitle(unsigned char submenu, unsigned char
                     return "Date";
                 case 3:
                     return "Battery";
+                case 4:
+                    return "Compass";
                 
                 default:
-                    return "-";
+                    return "Reset maximum";
                     break;
             }
             break;
@@ -2503,6 +2507,9 @@ const unsigned char* appNameClass::getApplicationIcon(unsigned char submenu, uns
                     return this->icon_date;
                 case 3:
                     return this->icon_battery;
+                case 4:
+                    return this->icon_battery;
+
                 
                 default:
                     return this->def;

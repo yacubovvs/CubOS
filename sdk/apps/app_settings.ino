@@ -211,11 +211,11 @@ const unsigned char* appNameClass::getApplicationTitle(unsigned char submenu, un
                     return (const unsigned char*)"Date";
                 case 3:
                     return (const unsigned char*)"Battery";
-                case 3:
-                    return (const unsigned char*)"Battery";
+                case 4:
+                    return (const unsigned char*)"Compass";
                 
                 default:
-                    return (const unsigned char*)"Compass";
+                    return (const unsigned char*)"-";
                     break;
             }
             break;
