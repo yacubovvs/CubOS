@@ -40,6 +40,11 @@ uint16_t get_uint16Color(unsigned char red, unsigned char green, unsigned char b
   return ( (red*31/255) <<11)|( (green*31/255) <<6)|( (blue*31/255) <<0);
 }
 
+#if defined(_WIN32) || defined(_WIN64) 
+#else
+  typedef int SOCKET;
+#endif
+
 SOCKET sock;
 
 void sendMessageToDisplay(String message){
@@ -51,13 +56,22 @@ void sendMessageToDisplay(String message){
 
 void setup_displayDriver(){
 
-  WSADATA wData;
+
+  #if defined(_WIN32) || defined(_WIN64)
+    WSADATA wData;
+  #endif
+  
 	struct sockaddr_in addr,serv_addr;
-	
-	if(WSAStartup(MAKEWORD(1,1),&wData)!=0)
-	{
-		std::cout<<"socket not initialized\n";
-	}
+	#if defined(_WIN32) || defined(_WIN64) 
+    if(WSAStartup(MAKEWORD(1,1),&wData)!=0)
+    {
+      std::cout<<"socket not initialized\n";
+    }
+  #else
+    int sockfd = 0, n = 0;
+    char recvBuff[1024];
+    memset(recvBuff, '0',sizeof(recvBuff));
+  #endif
 	std::cout<<"socket initialized\n";
 
 	sock=socket(AF_INET,SOCK_STREAM,0);
@@ -71,33 +85,48 @@ void setup_displayDriver(){
 	addr.sin_addr.s_addr=htonl(INADDR_LOOPBACK);
 	bind(sock,(struct sockaddr *)&addr,sizeof(addr));
 
-	char HostName[1024];
-	DWORD HostIP = 0;
-	LPHOSTENT lphost;	
-	gethostname(HostName, 1024);
-	lphost=gethostbyname(HostName);
-	serv_addr.sin_family=AF_INET;
-	memcpy((char*)&serv_addr.sin_addr,lphost->h_addr,lphost->h_length);
-	serv_addr.sin_port=htons(9100);
+	
+  
+  #if defined(_WIN32) || defined(_WIN64)
+  char HostName[1024];
+    DWORD HostIP = 0;
+    LPHOSTENT lphost;	  
+    gethostname(HostName, 1024);
+	  lphost=gethostbyname(HostName);
+    serv_addr.sin_family=AF_INET;
+	  memcpy((char*)&serv_addr.sin_addr,lphost->h_addr,lphost->h_length);
+    serv_addr.sin_port=htons(9100);
+  #else
+    memset(&serv_addr, '0', sizeof(serv_addr));
+    
+    serv_addr.sin_family=AF_INET;
+    serv_addr.sin_port=htons(9100);
+
+    if(inet_pton(AF_INET, "127.0.0.1", &serv_addr.sin_addr)<=0){
+        printf("\n inet_pton error occured\n");
+    }
+
+/*
+    if( connect(sockfd, (struct sockaddr *)&serv_addr, sizeof(serv_addr)) < 0){
+       printf("\n Error : Connect Failed \n");
+    }*/
+
+  #endif	
 
 	int error;
-	if(connect(sock,(struct sockaddr *)&serv_addr,sizeof(serv_addr))<0)
+	//if(connect(sock,(struct sockaddr *)&serv_addr,sizeof(serv_addr))<0)
+  if(connect(sock,(struct sockaddr *)&serv_addr,sizeof(serv_addr))<0)
 	{
 		std::cout<<"connect error\n";
-		error=WSAGetLastError();
-		std::cout<<error<<"\n";
+    #if defined(_WIN32) || defined(_WIN64) 
+      error=WSAGetLastError();
+      std::cout<<error<<"\n";
+    #endif
 		//_getch();
-	}
-	std::cout<<"connect success\n";
-
-
-  char message1[10];
-  char message2[10];
-  char message3[10];
-
-  char buff[15];
-  
-
+	}else{
+    std::cout<<"connect success\n";
+  }
+	
 }
 
 void sleep_displayDriver(){
