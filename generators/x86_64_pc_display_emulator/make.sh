@@ -25,7 +25,10 @@ echo "
 cat "sdk/drivers/driver_display_emulator.ino"       >> $OUTPUT_DIRECTORY/cubos/main.cpp
 echo "
 "   >> $OUTPUT_DIRECTORY/cubos/main.cpp
-cat "sdk/drivers/driver_cpu_emulator.ino"       >> $OUTPUT_DIRECTORY/cubos/main.cpp
+cat "sdk/drivers/driver_cpu_emulator.ino"           >> $OUTPUT_DIRECTORY/cubos/main.cpp
+echo "
+"   >> $OUTPUT_DIRECTORY/cubos/main.cpp
+cat "sdk/drivers/driver_battery_emulator.ino"       >> $OUTPUT_DIRECTORY/cubos/main.cpp
 echo "
 "   >> $OUTPUT_DIRECTORY/cubos/main.cpp
 
@@ -80,6 +83,9 @@ cat sdk/apps/app_alarm.ino           >> $OUTPUT_DIRECTORY/cubos/main.cpp
 echo "
 "   >> $OUTPUT_DIRECTORY/cubos/main.cpp
 cat sdk/apps/app_compass.ino         >> $OUTPUT_DIRECTORY/cubos/main.cpp
+echo "
+"   >> $OUTPUT_DIRECTORY/cubos/main.cpp
+cat sdk/apps/app_battery.ino         >> $OUTPUT_DIRECTORY/cubos/main.cpp
 echo "
 "   >> $OUTPUT_DIRECTORY/cubos/main.cpp
 cat sdk/apps/app_settings.ino        >> $OUTPUT_DIRECTORY/cubos/main.cpp

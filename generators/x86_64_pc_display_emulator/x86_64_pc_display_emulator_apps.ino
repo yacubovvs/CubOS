@@ -15,6 +15,8 @@
 #define APP_MENU_APPLICATIONS_6             SettingsApp
 #define APP_MENU_APPLICATIONS_7             SimpleGameApp
 #define APP_MENU_APPLICATIONS_8             TestApplicationApp
+#define APP_MENU_APPLICATIONS_9             BatteryApp
+
 
 /*
     # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
