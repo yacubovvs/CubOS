@@ -231,13 +231,13 @@ String appNameClass::getApplicationSubTitle(unsigned char submenu, unsigned char
                 case 0:
                     return String(core_cpu_getCpuSleepTimeDelay());
                 case 1:
-                    return "Time";
+                    return core_time_getHourMinuteSecondsTime();
                 case 2:
-                    return "Date";
+                    return core_time_getDateFull();
                 case 3:
-                    return "Battery";
+                    return String(core_batteryGetPercent()) + "%";
                 case 4:
-                    return "Compass";
+                    return "Calibrate";
                 
                 default:
                     return "Reset maximum";
