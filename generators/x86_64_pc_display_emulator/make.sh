@@ -68,6 +68,9 @@ echo "
 cat sdk/core/core_time.ino               >> $OUTPUT_DIRECTORY/cubos/main.cpp
 echo "
 "   >> $OUTPUT_DIRECTORY/cubos/main.cpp
+cat sdk/core/core_battery.ino               >> $OUTPUT_DIRECTORY/cubos/main.cpp
+echo "
+"   >> $OUTPUT_DIRECTORY/cubos/main.cpp
 cat sdk/core/core_views.ino              >> $OUTPUT_DIRECTORY/cubos/main.cpp
 echo "
 "   >> $OUTPUT_DIRECTORY/cubos/main.cpp
