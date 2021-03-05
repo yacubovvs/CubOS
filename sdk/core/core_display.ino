@@ -416,6 +416,11 @@ void drawString_centered(String dString, int x, int y){
   drawString(dString, x - dString.length()*FONT_CHAR_WIDTH/2, y);  
 }
 
+void drawString_centered(String dString, int x, int y, unsigned char fontSize){
+  drawString(dString, x - dString.length()*FONT_CHAR_WIDTH*fontSize/2, y, fontSize);  
+}
+
+
 void drawString_rightAlign(String dString, int x, int y){
   drawString(dString, x - dString.length()*FONT_CHAR_WIDTH, y);  
 }

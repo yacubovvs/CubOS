@@ -93,3 +93,11 @@ bool get_bit_fromBbyte(unsigned char b, unsigned char position){return (b&1<<pos
         }
     #endif
 #endif
+
+String core_basic_addLeadBullToInt2digits(unsigned char byteIn){
+    if(byteIn<10){
+        return "0" + String(byteIn);
+    }else{
+        return String(byteIn);
+    }
+}

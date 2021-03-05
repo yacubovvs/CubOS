@@ -47,7 +47,7 @@
 #define BUTTON_DOWN     2
 #define BUTTON_BACK     3
 
-//#define BATTERY_ENABLE
+#define BATTERY_ENABLE
 #define CLOCK_ENABLE
 #define USE_PRIMITIVE_HARDWARE_DRAW_ACCELERATION
 
@@ -420,6 +420,44 @@ void driver_cpu_wakeup(){}
 
 
 
+#define LION_EMULATOR_BATTERY_VOLTAGE_100 420 
+
+int getMaxBatteryAnalogValue(){
+    return 0;
+}
+
+void driver_battery_setup(){
+}
+
+void driver_battery_loop(){
+
+}
+
+int driver_battery_raw(){
+    return getMaxBatteryAnalogValue();
+}
+
+float driver_battery_getVoltage(){
+    return (float)LION_EMULATOR_BATTERY_VOLTAGE_100 / 100.0;
+}
+
+int driver_battery_getmVoltage(){
+    return LION_EMULATOR_BATTERY_VOLTAGE_100;
+}
+
+unsigned char driver_battery_getPercent(){
+    int mV = driver_battery_getmVoltage();
+    if(mV>=400){
+        return 100;
+    }else if(mV<=320){
+        return 0;
+    }else{
+        int dmV = mV - 320;
+        return dmV*100/80;
+    }
+    return 0;
+}
+
 
 
 
@@ -784,6 +822,8 @@ void driver_control_set_last_user_avtivity(unsigned long time){
 #define APP_MENU_APPLICATIONS_6             SettingsApp
 #define APP_MENU_APPLICATIONS_7             SimpleGameApp
 #define APP_MENU_APPLICATIONS_8             TestApplicationApp
+#define APP_MENU_APPLICATIONS_9             BatteryApp
+
 
 /*
     # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
@@ -923,6 +963,14 @@ bool get_bit_fromBbyte(unsigned char b, unsigned char position){return (b&1<<pos
         }
     #endif
 #endif
+
+String core_basic_addLeadBullToInt2digits(unsigned char byteIn){
+    if(byteIn<10){
+        return "0" + String(byteIn);
+    }else{
+        return String(byteIn);
+    }
+}
 
 String getHexNumberFromNumber(unsigned char b){
     switch(b){
@@ -1378,6 +1426,11 @@ void drawString_centered(String dString, int x, int y){
   drawString(dString, x - dString.length()*FONT_CHAR_WIDTH/2, y);  
 }
 
+void drawString_centered(String dString, int x, int y, unsigned char fontSize){
+  drawString(dString, x - dString.length()*FONT_CHAR_WIDTH*fontSize/2, y, fontSize);  
+}
+
+
 void drawString_rightAlign(String dString, int x, int y){
   drawString(dString, x - dString.length()*FONT_CHAR_WIDTH, y);  
 }
@@ -1699,24 +1752,16 @@ unsigned char core_time_getSeconds_byte(){
     #endif
 }
 
-String core_time_byteToTimeStringWithLeaderNull(unsigned char byteIn){
-    if(byteIn<10){
-        return "0" + String(byteIn);
-    }else{
-        return String(byteIn);
-    }
-}
-
 String core_time_getHours_String(){
-    return core_time_byteToTimeStringWithLeaderNull(core_time_getHours_byte());
+    return core_basic_addLeadBullToInt2digits(core_time_getHours_byte());
 }
 
 String core_time_getMinutes_String(){
-    return core_time_byteToTimeStringWithLeaderNull(core_time_getMinutes_byte());
+    return core_basic_addLeadBullToInt2digits(core_time_getMinutes_byte());
 }
 
 String core_time_getSeconds_String(){
-    return core_time_byteToTimeStringWithLeaderNull(core_time_getSeconds_byte());
+    return core_basic_addLeadBullToInt2digits(core_time_getSeconds_byte());
 }
 
 String core_time_getHourMinuteSecondsTime(){
@@ -1733,6 +1778,21 @@ String core_time_getHourMinuteTime(){
     return core_time_getHours_String() + ":" + core_time_getMinutes_String();
 }
 
+String core_time_getMonthDate(){
+    return "February";
+}
+
+String core_time_getDayDate(){
+    return "1";
+}
+
+String core_time_getYearDate(){
+    return "2021";
+}
+
+String core_time_getDateFull(){
+    return core_time_getDayDate() + " " + core_time_getMonthDate() + " " + core_time_getYearDate();
+}
 
 //#define EVENT_ON_TIME_CHANGED              0x03
 long lastTimeChange = millis()/ON_TIME_CHANGE_EVERY_MS;
@@ -1742,6 +1802,14 @@ void core_time_loop(){
         currentApp->onEvent(EVENT_ON_TIME_CHANGED, currentTime, 0);
         lastTimeChange = currentTime;
     }
+}
+
+unsigned char core_batteryGetPercent(){
+    #ifdef BATTERY_ENABLE
+        return driver_battery_getPercent();
+    #else
+        return 0;
+    #endif
 }
 
 /*
@@ -2273,6 +2341,91 @@ const unsigned char appNameClass::icon[] PROGMEM = {
     0x3F,0x80,0x00,0xFE,0x7F,0x00,0x00,0x3E,0x7C,0x00,0x00,0x0E,0x70,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,
 };
 
+#define appNameClass    BatteryApp              // App name without spaces
+#define appName         "Battery"              // App name with spaces 
+
+class appNameClass: public Application{
+    public:
+        virtual void onLoop() override;
+        virtual void onDestroy() override;
+        virtual void onEvent(unsigned char event, int val1, int val2) override;
+
+        void onCreate();
+        appNameClass(){ 
+            fillScreen(0, 0, 0);  // filling background
+            super_onCreate();           // Drawind statusbar and etc if needed
+            onCreate(); 
+        };
+
+        static unsigned const char* getParams(const unsigned char type){
+            switch(type){ 
+              case PARAM_TYPE_NAME: return (unsigned char*)appName; 
+              case PARAM_TYPE_ICON: return icon;
+              default: return (unsigned char*)""; }
+        };
+        const static unsigned char icon[] PROGMEM;
+      
+};
+
+void appNameClass::onCreate(){
+    /*
+        Write you code onCreate here
+    */
+
+    setDrawColor(255, 255, 255);
+    drawString("Max analog: " + String(getMaxBatteryAnalogValue()), 5, STYLE_STATUSBAR_HEIGHT + 0*20 + 10, 2);
+    drawString("Raw battery: " + String(driver_battery_raw()), 5, STYLE_STATUSBAR_HEIGHT + 1*20 + 10, 2);
+    drawString("Voltage: " + String(driver_battery_getmVoltage()) + "0 mV", 5, STYLE_STATUSBAR_HEIGHT + 2*20 + 10, 2);
+    //drawString("Voltage: " + String(driver_battery_getVoltage() + " V"), 5, STYLE_STATUSBAR_HEIGHT + 3*20 + 10, 2);
+    drawString("Percent: " + String(driver_battery_getPercent()), 5, STYLE_STATUSBAR_HEIGHT + 4*20 + 10, 2);
+    
+}
+
+void appNameClass::onLoop(){
+    /*
+        Write you code onLoop here
+    */
+}
+
+void appNameClass::onDestroy(){
+    /*
+        Write you code onDestroy here
+    */
+}
+
+void appNameClass::onEvent(unsigned char event, int val1, int val2){
+    
+    if(event==EVENT_BUTTON_PRESSED){
+        // Write you code on [val1] button pressed here
+        if(val1==BUTTON_BACK){
+            startApp(-1);
+        }
+    }else if(event==EVENT_BUTTON_RELEASED){
+        // Write you code on [val1] button released here
+    }else if(event==EVENT_BUTTON_LONG_PRESS){
+        // Write you code on [val1] button long press here
+    }else if(event==EVENT_ON_TIME_CHANGED){
+        // Write you code on system time changed
+    }
+    
+}
+
+const unsigned char appNameClass::icon[] PROGMEM = {
+    
+	/*            PUT YOUR ICON HERE            */
+    0x02,0x01,0x02,0x20,0x02,0x20,0x04,0x33,0xff,0x00,0x00,0x00,0x00,0x00,0x00,0x07,0xE0,0x00,0x00,0x07,0xE0,0x00,0x00,0x07,0xE0,
+    0x00,0x0F,0xFF,0xFF,0xF0,0x0F,0xFF,0xFF,0xF0,0x0F,0xFF,0xFF,0xF0,0x00,0x00,0x00,0x00,0x0F,0xFF,0xFF,0xF0,0x0F,0xFF,0xFF,0xF0,
+    0x0F,0xFF,0xFF,0xF0,0x0F,0xFF,0xFF,0xF0,0x0F,0xFF,0xFF,0xF0,0x00,0x00,0x00,0x00,0x0F,0xFF,0xFF,0xF0,0x0F,0xFF,0xFF,0xF0,0x0F,
+    0xFF,0xFF,0xF0,0x0F,0xFF,0xFF,0xF0,0x0F,0xFF,0xFF,0xF0,0x00,0x00,0x00,0x00,0x0F,0xFF,0xFF,0xF0,0x0F,0xFF,0xFF,0xF0,0x0F,0xFF,
+    0xFF,0xF0,0x0F,0xFF,0xFF,0xF0,0x0F,0xFF,0xFF,0xF0,0x00,0x00,0x00,0x00,0x0F,0xFF,0xFF,0xF0,0x0F,0xFF,0xFF,0xF0,0x0F,0xFF,0xFF,
+    0xF0,0x0F,0xFF,0xFF,0xF0,0x0F,0xFF,0xFF,0xF0,0x00,0x00,0x00,0x00,0x04,0xff,0xff,0xff,0x00,0x07,0xE0,0x00,0x00,0x08,0x10,0x00,
+    0x00,0x08,0x10,0x00,0x0F,0xF8,0x1F,0xF0,0x10,0x00,0x00,0x08,0x10,0x00,0x00,0x08,0x10,0x00,0x00,0x08,0x10,0x00,0x00,0x08,0x10,
+    0x00,0x00,0x08,0x10,0x00,0x00,0x08,0x10,0x00,0x00,0x08,0x10,0x00,0x00,0x08,0x10,0x00,0x00,0x08,0x10,0x00,0x00,0x08,0x10,0x00,
+    0x00,0x08,0x10,0x00,0x00,0x08,0x10,0x00,0x00,0x08,0x10,0x00,0x00,0x08,0x10,0x00,0x00,0x08,0x10,0x00,0x00,0x08,0x10,0x00,0x00,
+    0x08,0x10,0x00,0x00,0x08,0x10,0x00,0x00,0x08,0x10,0x00,0x00,0x08,0x10,0x00,0x00,0x08,0x10,0x00,0x00,0x08,0x10,0x00,0x00,0x08,
+    0x10,0x00,0x00,0x08,0x10,0x00,0x00,0x08,0x10,0x00,0x00,0x08,0x10,0x00,0x00,0x08,0x0F,0xFF,0xFF,0xF0,
+};
+
 #define appNameClass    SettingsApp     // App name without spaces
 #define appName         "Settings"      // App name with spaces 
 
@@ -2295,7 +2448,8 @@ const unsigned char appNameClass::icon[] PROGMEM = {
 
 
 // SUBMENUES
-#define APP_SETTINGS_SUBMENU_MAIN 0x01
+#define APP_SETTINGS_SUBMENU_MAIN 0x00
+#define APP_SETTINGS_SUBMENU_SET_TIME 0x01
 
 // SETTINGS PAGES
 #define APP_SETTINGS_PAGE_TOTAL_ELEMENTS_MAIN 4
@@ -2334,8 +2488,14 @@ class appNameClass: public Application{
         const static unsigned char icon_time[]          PROGMEM;
         const static unsigned char icon_date[]          PROGMEM;
         const static unsigned char icon_sleep[]         PROGMEM;
-        const static unsigned char currentSubMenu = 0x01;
+        unsigned char currentSubMenu       = APP_SETTINGS_SUBMENU_MAIN;
         String getApplicationSubTitle(unsigned char submenu, unsigned char num);
+        void drawSettingsPageFirstTime();
+        void clearWorkSpace();
+        void switchToSubMenu(unsigned char newSubMenu);
+        void drawSettingTimeArrows(bool draw);
+        void drawSettingTimeDigits(bool draw);
+        void drawSettingTimeDateDigits(bool draw, unsigned char position, int value);
 };
 
 unsigned char appNameClass::getTotalPagesInSubMenu(unsigned char submenuType){
@@ -2351,21 +2511,62 @@ unsigned char appNameClass::getTotalApplicationsInSubMenu(unsigned char submenuT
     }
 }
 
+void appNameClass::clearWorkSpace(){
+    setDrawColor(getBackgroundColor_red(), getBackgroundColor_green(), getBackgroundColor_blue());
+    drawRect(0, STYLE_STATUSBAR_HEIGHT, SCREEN_WIDTH, SCREEN_HEIGHT, true);
+}
 
-void appNameClass::onCreate(){
-    
-    core_views_draw_pages_list_simple(true, PAGES_LIST_POSITION, getTotalPagesInSubMenu(APP_SETTINGS_SUBMENU_MAIN));
+void appNameClass::drawSettingsPageFirstTime(){
+    if(currentSubMenu==APP_SETTINGS_SUBMENU_MAIN){
+        core_views_draw_pages_list_simple(true, PAGES_LIST_POSITION, getTotalPagesInSubMenu(APP_SETTINGS_SUBMENU_MAIN));
+        core_views_draw_active_page(true, PAGES_LIST_POSITION, getTotalPagesInSubMenu(APP_SETTINGS_SUBMENU_MAIN), 0);
+        this->updateActiveAppIndex(app_settings_selectedAppIndex);  
+        // Drawing icons
+        this->drawIcons(true);
+        this->drawActiveAppFrame(true);  
+    }if(currentSubMenu==APP_SETTINGS_SUBMENU_SET_TIME){
+        int y_position = (SCREEN_HEIGHT - STYLE_STATUSBAR_HEIGHT)/2;
+        //drawString("Setting up time", 80,80);
+        drawSettingTimeDigits(true);
 
-    unsigned char currentPage = 0;
-    if(currentPage==0) core_views_draw_active_page(true, PAGES_LIST_POSITION, getTotalPagesInSubMenu(APP_SETTINGS_SUBMENU_MAIN), currentPage);
-    //else this->updateActiveAppIndex(app_settings_selectedAppIndex_presaved);  
-    this->updateActiveAppIndex(app_settings_selectedAppIndex);  
+    }    
+}
 
-    // Drawing icons
-    this->drawIcons(true);
-    this->drawActiveAppFrame(true);  
+#define OFFSET_POSITION_ELEMENTS 60
+#define TIME_SET_POSITION_1 (SCREEN_WIDTH-OFFSET_POSITION_ELEMENTS)/6*1 + OFFSET_POSITION_ELEMENTS/2
+#define TIME_SET_POSITION_2 (SCREEN_WIDTH-OFFSET_POSITION_ELEMENTS)/6*3 + OFFSET_POSITION_ELEMENTS/2
+#define TIME_SET_POSITION_3 (SCREEN_WIDTH-OFFSET_POSITION_ELEMENTS)/6*5 + OFFSET_POSITION_ELEMENTS/2
+
+void appNameClass::drawSettingTimeArrows(bool draw){
     
 }
+
+void appNameClass::drawSettingTimeDigits(bool draw){
+    if(draw) setDrawColor(255, 255, 255);
+
+    drawSettingTimeDateDigits(true, TIME_SET_POSITION_1, core_time_getHours_byte());
+    drawSettingTimeDateDigits(true, TIME_SET_POSITION_2, core_time_getMinutes_byte());
+    drawSettingTimeDateDigits(true, TIME_SET_POSITION_3, core_time_getSeconds_byte());
+}
+
+void appNameClass::drawSettingTimeDateDigits(bool draw, unsigned char position, int value){
+    drawString_centered(core_basic_addLeadBullToInt2digits(value), position, SCREEN_HEIGHT/2, 3);
+}
+
+void appNameClass::switchToSubMenu(unsigned char newSubMenu){
+    app_settings_selectedAppIndex = 0;
+    currentSubMenu = newSubMenu;
+    clearWorkSpace();
+    drawSettingsPageFirstTime(); 
+}
+
+void appNameClass::onCreate(){
+    this->drawSettingsPageFirstTime();
+    this->currentSubMenu = APP_SETTINGS_SUBMENU_MAIN;
+    switchToSubMenu(APP_SETTINGS_SUBMENU_SET_TIME);
+}
+
+
 
 void appNameClass::updateActiveAppIndex(int newSelectedAppIndex){
 
@@ -2454,15 +2655,23 @@ void appNameClass::onEvent(unsigned char event, int val1, int val2){
     
     if(event==EVENT_BUTTON_PRESSED){
       switch(val1){
-        case 0:
-          this->updateActiveAppIndex(app_settings_selectedAppIndex-1);
-          break;
-        case 3:
-          startApp(-1);
-          break;
-        case 2:
-          this->updateActiveAppIndex(app_settings_selectedAppIndex+1);
-          break;
+        case BUTTON_UP:
+            if(currentSubMenu==APP_SETTINGS_SUBMENU_MAIN){
+                this->updateActiveAppIndex(app_settings_selectedAppIndex-1);
+            }
+            break;
+        case BUTTON_BACK:
+            if(currentSubMenu==APP_SETTINGS_SUBMENU_MAIN) startApp(-1);
+            if(currentSubMenu==APP_SETTINGS_SUBMENU_SET_TIME) switchToSubMenu(APP_SETTINGS_SUBMENU_MAIN);            
+            break;
+        case BUTTON_DOWN:
+            if(currentSubMenu==APP_SETTINGS_SUBMENU_MAIN){
+                this->updateActiveAppIndex(app_settings_selectedAppIndex+1);
+            }   
+            break;
+        case BUTTON_SELECT:
+            if(currentSubMenu==APP_SETTINGS_SUBMENU_MAIN && app_settings_selectedAppIndex==0) switchToSubMenu(APP_SETTINGS_SUBMENU_SET_TIME);
+            break;
       }
     }else if(event==EVENT_BUTTON_RELEASED){
 
@@ -2470,6 +2679,28 @@ void appNameClass::onEvent(unsigned char event, int val1, int val2){
 
     }else if(event==EVENT_ON_TIME_CHANGED){
 
+        if(currentSubMenu==APP_SETTINGS_SUBMENU_MAIN){
+            if((int)((app_settings_selectedAppIndex)/APPS_ON_SINGLE_PAGE)==0){
+                int x_position = 0;
+                int y_position = 0;
+                int x0 = x_position*SINGLE_ELEMENT_REAL_WIDTH;
+                int y0 = y_position*SINGLE_ELEMENT_REAL_HEIGHT + STYLE_STATUSBAR_HEIGHT+1;
+                int x1 = x0+SINGLE_ELEMENT_REAL_WIDTH;
+                int y1 = y0+SINGLE_ELEMENT_REAL_HEIGHT;
+
+                int x_center = (x0+x1)/2;
+                int y_center = (y0+y1)/2;
+                int y = y_center;
+
+                int x = x0+35;
+                int left_x = x + CORE_VIEWS_SETTINGS_IMAGE_WIDTH;
+                String currentTime = core_time_getHourMinuteSecondsTime();
+                setDrawColor(0, 0, 0);
+                clearString(currentTime, left_x, y+4, 1);
+                setDrawColor(255, 255, 255);
+                drawString(currentTime, left_x, y+4, 1);
+            }
+        }
     }
 
 }
@@ -2479,16 +2710,15 @@ const unsigned char* appNameClass::getApplicationTitle(unsigned char submenu, un
         case APP_SETTINGS_SUBMENU_MAIN:
             switch (num){
                 case 0:
-                    return (const unsigned char*)"Sleep timout";
-                case 1:
                     return (const unsigned char*)"Time";
-                case 2:
+                case 1:
                     return (const unsigned char*)"Date";
+                case 2:
+                    return (const unsigned char*)"Sleep timout";
                 case 3:
                     return (const unsigned char*)"Battery";
                 case 4:
-                    return (const unsigned char*)"Compass";
-                
+                    return (const unsigned char*)"Compass";                
                 default:
                     return (const unsigned char*)"-";
                     break;
@@ -2504,16 +2734,15 @@ String appNameClass::getApplicationSubTitle(unsigned char submenu, unsigned char
         case APP_SETTINGS_SUBMENU_MAIN:
             switch (num){
                 case 0:
-                    return String(core_cpu_getCpuSleepTimeDelay());
+                    return core_time_getHourMinuteSecondsTime();
                 case 1:
-                    return "Time";
+                    return core_time_getDateFull();
                 case 2:
-                    return "Date";
+                    return String(core_cpu_getCpuSleepTimeDelay());
                 case 3:
-                    return "Battery";
+                    return String(core_batteryGetPercent()) + "%";
                 case 4:
-                    return "Compass";
-                
+                    return "Calibrate";
                 default:
                     return "Reset maximum";
                     break;
@@ -2529,11 +2758,11 @@ const unsigned char* appNameClass::getApplicationIcon(unsigned char submenu, uns
         case APP_SETTINGS_SUBMENU_MAIN:
             switch (num){
                 case 0:
-                    return this->icon_sleep;
-                case 1:
                     return this->icon_time;
-                case 2:
+                case 1:
                     return this->icon_date;
+                case 2:
+                    return this->icon_sleep;
                 case 3:
                     return this->icon_battery;
                 case 4:

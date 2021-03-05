@@ -23,24 +23,16 @@ unsigned char core_time_getSeconds_byte(){
     #endif
 }
 
-String core_time_byteToTimeStringWithLeaderNull(unsigned char byteIn){
-    if(byteIn<10){
-        return "0" + String(byteIn);
-    }else{
-        return String(byteIn);
-    }
-}
-
 String core_time_getHours_String(){
-    return core_time_byteToTimeStringWithLeaderNull(core_time_getHours_byte());
+    return core_basic_addLeadBullToInt2digits(core_time_getHours_byte());
 }
 
 String core_time_getMinutes_String(){
-    return core_time_byteToTimeStringWithLeaderNull(core_time_getMinutes_byte());
+    return core_basic_addLeadBullToInt2digits(core_time_getMinutes_byte());
 }
 
 String core_time_getSeconds_String(){
-    return core_time_byteToTimeStringWithLeaderNull(core_time_getSeconds_byte());
+    return core_basic_addLeadBullToInt2digits(core_time_getSeconds_byte());
 }
 
 String core_time_getHourMinuteSecondsTime(){
