@@ -65,12 +65,14 @@ class appNameClass: public Application{
         void drawSettingsPageFirstTime();
         void clearWorkSpace();
         void switchToSubMenu(unsigned char newSubMenu);
-        void drawSettingTimeArrows(bool draw);
+        void drawSettingTimeArrows(bool draw, int position);
+        void drawSettingTimeSelect(bool draw, int position);
         void drawSettingTimeDigits(bool draw);
         void drawSettingTimeDateDigits(bool draw, unsigned char position, int value);
         unsigned char lastSeconds   = 0;
         unsigned char lastMinutes   = 0;
         unsigned char lastHours     = 0;
+        
 };
 
 unsigned char appNameClass::getTotalPagesInSubMenu(unsigned char submenuType){
@@ -91,6 +93,11 @@ void appNameClass::clearWorkSpace(){
     drawRect(0, STYLE_STATUSBAR_HEIGHT, SCREEN_WIDTH, SCREEN_HEIGHT, true);
 }
 
+#define OFFSET_POSITION_ELEMENTS 60
+#define TIME_SET_POSITION_1 (SCREEN_WIDTH-OFFSET_POSITION_ELEMENTS)/6*1 + OFFSET_POSITION_ELEMENTS/2
+#define TIME_SET_POSITION_2 (SCREEN_WIDTH-OFFSET_POSITION_ELEMENTS)/6*3 + OFFSET_POSITION_ELEMENTS/2
+#define TIME_SET_POSITION_3 (SCREEN_WIDTH-OFFSET_POSITION_ELEMENTS)/6*5 + OFFSET_POSITION_ELEMENTS/2
+
 void appNameClass::drawSettingsPageFirstTime(){
     if(currentSubMenu==APP_SETTINGS_SUBMENU_MAIN){
         core_views_draw_pages_list_simple(true, PAGES_LIST_POSITION, getTotalPagesInSubMenu(APP_SETTINGS_SUBMENU_MAIN));
@@ -103,17 +110,28 @@ void appNameClass::drawSettingsPageFirstTime(){
         int y_position = (SCREEN_HEIGHT - STYLE_STATUSBAR_HEIGHT)/2;
         //drawString("Setting up time", 80,80);
         drawSettingTimeDigits(true);
+        drawSettingTimeArrows(true, TIME_SET_POSITION_1);
+        drawSettingTimeArrows(true, TIME_SET_POSITION_2);
+        drawSettingTimeArrows(true, TIME_SET_POSITION_3);
 
+        drawSettingTimeSelect(true, TIME_SET_POSITION_1);
+        drawSettingTimeSelect(true, TIME_SET_POSITION_2);
+        drawSettingTimeSelect(true, TIME_SET_POSITION_3);
     }    
 }
 
-#define OFFSET_POSITION_ELEMENTS 60
-#define TIME_SET_POSITION_1 (SCREEN_WIDTH-OFFSET_POSITION_ELEMENTS)/6*1 + OFFSET_POSITION_ELEMENTS/2
-#define TIME_SET_POSITION_2 (SCREEN_WIDTH-OFFSET_POSITION_ELEMENTS)/6*3 + OFFSET_POSITION_ELEMENTS/2
-#define TIME_SET_POSITION_3 (SCREEN_WIDTH-OFFSET_POSITION_ELEMENTS)/6*5 + OFFSET_POSITION_ELEMENTS/2
+void appNameClass::drawSettingTimeArrows(bool draw, int position){
+    //drawRect(x0+delta, y0+delta, x1-delta, y1-delta);  
 
-void appNameClass::drawSettingTimeArrows(bool draw){
-    
+    drawIcon(draw, icon_arrow_top, position + 3 - 16, SCREEN_HEIGHT/2 - 19 );
+    drawIcon(draw, icon_arrow_bottom, position + 3 - 16, SCREEN_HEIGHT/2 + 20 );
+}
+
+void appNameClass::drawSettingTimeSelect(bool draw, int position){
+    //drawRect(x0+delta, y0+delta, x1-delta, y1-delta);  
+    if(draw) setDrawColor(255, 255, 255);
+    else setDrawColor(getBackgroundColor_red(), getBackgroundColor_green(), getBackgroundColor_blue());
+    drawRect(position - FONT_CHAR_WIDTH*3, SCREEN_HEIGHT/2 + 25, position + FONT_CHAR_WIDTH*3-3, SCREEN_HEIGHT/2 + 28, true);
 }
 
 void appNameClass::drawSettingTimeDigits(bool draw){
@@ -284,9 +302,9 @@ void appNameClass::onEvent(unsigned char event, int val1, int val2){
             unsigned char lastMinutes_new   = core_time_getMinutes_byte();
             unsigned char lastHours_new     = core_time_getHours_byte();
             
-            lastSeconds   = core_time_getSeconds_byte();
-            lastMinutes   = core_time_getMinutes_byte();
-            lastHours     = core_time_getHours_byte();
+            if(lastSeconds_new!=lastSeconds){}
+            if(lastMinutes_new!=lastMinutes){}
+            if(lastHours_new!=lastHours){}
             
         }
     }
