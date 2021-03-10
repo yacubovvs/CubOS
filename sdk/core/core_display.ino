@@ -404,6 +404,10 @@ void drawString_centered(char * dString, int x, int y){
   drawString(dString, x - strlen(dString)*FONT_CHAR_WIDTH/2, y);  
 }
 
+void clearString_centered(String dString, int x, int y, unsigned char fontSize){
+  clearString(dString, x - dString.length()*fontSize*FONT_CHAR_WIDTH/2, y, fontSize);  
+}
+
 void clearString_centered(char * dString, int x, int y){
   clearString(dString, x - strlen(dString)*FONT_CHAR_WIDTH/2, y, 1);    
 }
