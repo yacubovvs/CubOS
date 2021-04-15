@@ -28,7 +28,7 @@
 #include <unistd.h>
 
 unsigned long millis(){
-    return clock();
+    return clock()/100;
 }
 
 int max(int a, int b){

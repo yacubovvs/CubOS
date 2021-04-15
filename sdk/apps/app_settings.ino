@@ -182,7 +182,7 @@ void appNameClass::switchToSubMenu(unsigned char newSubMenu){
 void appNameClass::onCreate(){
     this->drawSettingsPageFirstTime();
     this->currentSubMenu = APP_SETTINGS_SUBMENU_MAIN;
-    switchToSubMenu(APP_SETTINGS_SUBMENU_SET_TIME);
+    //switchToSubMenu(APP_SETTINGS_SUBMENU_SET_TIME);
 }
 
 
