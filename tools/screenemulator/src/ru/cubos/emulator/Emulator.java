@@ -4,9 +4,10 @@ import ru.cubos.UserInterfaceListener;
 
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.KeyEvent;
-import java.awt.event.KeyListener;
+import java.awt.event.*;
 import java.awt.image.BufferedImage;
+import java.util.ArrayList;
+import java.util.List;
 
 public class Emulator extends JFrame {
     private ImagePanel imageWrapper;
@@ -14,6 +15,10 @@ public class Emulator extends JFrame {
 
     protected int width;
     protected int height;
+
+    boolean isTouched = false;
+    int presses[] = new int[10];
+    int moved[] = new int[10];
 
     public Emulator(int width, int height){
         imageWrapper = new EmulatorImagePanel(this);
@@ -28,6 +33,58 @@ public class Emulator extends JFrame {
         image = new BufferedImage(getScreenWidth(), getScreenHeight(), BufferedImage.TYPE_INT_RGB);
         updateImage();
         setVisible(true);
+
+        imageWrapper.addMouseMotionListener(new MouseMotionListener() {
+            @Override
+            public void mouseDragged(MouseEvent mouseEvent) {
+                moved[0] = mouseEvent.getX();
+                moved[1] = mouseEvent.getY();
+                System.out.println("Touch moved " + moved[0] + "; " + moved[1]);
+            }
+
+            @Override
+            public void mouseMoved(MouseEvent mouseEvent) {
+
+            }
+        });
+
+        imageWrapper.addMouseListener(new MouseListener() {
+            @Override
+            public void mouseClicked(MouseEvent mouseEvent) {
+
+            }
+
+            @Override
+            public void mousePressed(MouseEvent mouseEvent) {
+                System.out.println("Mouse press start");
+                presses[0] = mouseEvent.getX();
+                presses[1] = mouseEvent.getY();
+                isTouched = true;
+                /*
+                touches++;
+                if(touches<5){
+                    presses[touches*2] = mouseEvent.getX();
+                    presses[touches*2+1] = mouseEvent.getY();
+                    //System.out.println("Touch start " + presses[touches*2] + "; " + presses[touches*2+1]);
+                }*/
+            }
+
+            @Override
+            public void mouseReleased(MouseEvent mouseEvent) {
+                System.out.println("Mouse press released");
+                isTouched = false;
+            }
+
+            @Override
+            public void mouseEntered(MouseEvent mouseEvent) {
+
+            }
+
+            @Override
+            public void mouseExited(MouseEvent mouseEvent) {
+
+            }
+        });
     }
 
     public BufferedImage getImage(){

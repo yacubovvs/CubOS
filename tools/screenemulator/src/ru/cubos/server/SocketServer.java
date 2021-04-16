@@ -39,39 +39,9 @@ public class SocketServer extends Emulator {
 
     String keys[] = {"0", "0", "0", "0"};
 
-    int touches = 0;
-    List<Integer> touchList = new ArrayList<>();
-
     public SocketServer(int port, int width, int height){
         super(width, height);
         this.port = port;
-
-        addMouseListener(new MouseListener() {
-            @Override
-            public void mouseClicked(MouseEvent mouseEvent) {
-
-            }
-
-            @Override
-            public void mousePressed(MouseEvent mouseEvent) {
-
-            }
-
-            @Override
-            public void mouseReleased(MouseEvent mouseEvent) {
-
-            }
-
-            @Override
-            public void mouseEntered(MouseEvent mouseEvent) {
-
-            }
-
-            @Override
-            public void mouseExited(MouseEvent mouseEvent) {
-
-            }
-        });
 
         addKeyListener(new KeyListener() {
             @Override
