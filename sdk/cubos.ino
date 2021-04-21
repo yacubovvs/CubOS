@@ -137,7 +137,7 @@ void setup()
   
   setup_displayDriver();
 
-  #ifdef hasHardwareButtons
+  #ifdef HARDWARE_BUTTONS_ENABLED
     driver_controls_setup();
   #endif
   
@@ -149,7 +149,7 @@ bool isInSleep = false;
 void loop(){
   driver_display_loop();
 
-  #ifdef hasHardwareButtons
+  #ifdef HARDWARE_BUTTONS_ENABLED
     driver_controls_loop();
   #endif
 

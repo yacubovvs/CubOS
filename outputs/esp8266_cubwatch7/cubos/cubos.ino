@@ -44,7 +44,7 @@
 
 #define ON_TIME_CHANGE_EVERY_MS 1000
 
-#define hasHardwareButtons              // Conf of controls with hardware btns    
+#define HARDWARE_BUTTONS_ENABLED              // Conf of controls with hardware btns    
 //#define isTouchScreen                 // Conf of controls
 
 #define colorScreen                     // Screen is colored
@@ -221,7 +221,7 @@ void setup()
   
   setup_displayDriver();
 
-  #ifdef hasHardwareButtons
+  #ifdef HARDWARE_BUTTONS_ENABLED
     driver_controls_setup();
   #endif
   
@@ -233,7 +233,7 @@ bool isInSleep = false;
 void loop(){
   driver_display_loop();
 
-  #ifdef hasHardwareButtons
+  #ifdef HARDWARE_BUTTONS_ENABLED
     driver_controls_loop();
   #endif
 
