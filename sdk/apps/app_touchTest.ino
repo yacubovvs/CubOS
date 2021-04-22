@@ -8,6 +8,7 @@ class appNameClass: public Application{
         virtual void onEvent(unsigned char event, int val1, int val2) override;
 
         void onCreate();
+        void clearLabels();
         appNameClass(){ 
             fillScreen(0, 0, 0);  // filling background
             super_onCreate();           // Drawind statusbar and etc if needed
@@ -58,6 +59,13 @@ void appNameClass::onDestroy(){
     */
 }
 
+void appNameClass::clearLabels(){
+    setDrawColor(0, 0, 0);
+    clearString("Not touched released", 5, STYLE_STATUSBAR_HEIGHT + 0*20 + 10, 2);
+    clearString("000000000000000", 5, STYLE_STATUSBAR_HEIGHT + 1*20 + 10, 2);
+    clearString("000000000000000", 5, STYLE_STATUSBAR_HEIGHT + 2*20 + 10, 2);
+}
+
 void appNameClass::onEvent(unsigned char event, int val1, int val2){
     
     if(event==EVENT_BUTTON_PRESSED){
@@ -72,27 +80,27 @@ void appNameClass::onEvent(unsigned char event, int val1, int val2){
     }else if(event==EVENT_ON_TIME_CHANGED){
         // Write you code on system time changed
     }else if(event==EVENT_ON_TOUCH_START){
-        setDrawColor(0, 0, 0);
-        clearString("Not touched released", 5, STYLE_STATUSBAR_HEIGHT + 0*20 + 10, 2);
-        clearString("000000000000000", 5, STYLE_STATUSBAR_HEIGHT + 1*20 + 10, 2);
-        clearString("000000000000000", 5, STYLE_STATUSBAR_HEIGHT + 2*20 + 10, 2);
+        this->clearLabels();
 
         setDrawColor(255, 255, 255);
         drawString("Touch start", 5, STYLE_STATUSBAR_HEIGHT + 0*20 + 10, 2);
         drawString(String(val1), 5, STYLE_STATUSBAR_HEIGHT + 1*20 + 10, 2);
         drawString(String(val2), 5, STYLE_STATUSBAR_HEIGHT + 2*20 + 10, 2);
     }else if(event==EVENT_ON_TOUCH_RELEASED){
-        setDrawColor(0, 0, 0);
-        clearString("Not touched released", 5, STYLE_STATUSBAR_HEIGHT + 0*20 + 10, 2);
-        clearString("000000000000000", 5, STYLE_STATUSBAR_HEIGHT + 1*20 + 10, 2);
-        clearString("000000000000000", 5, STYLE_STATUSBAR_HEIGHT + 2*20 + 10, 2);
+        this->clearLabels();
 
         setDrawColor(255, 255, 255);
         drawString("Touch released", 5, STYLE_STATUSBAR_HEIGHT + 0*20 + 10, 2);
         drawString(String(val1), 5, STYLE_STATUSBAR_HEIGHT + 1*20 + 10, 2);
         drawString(String(val2), 5, STYLE_STATUSBAR_HEIGHT + 2*20 + 10, 2);
+    }else if(event==EVENT_ON_TOUCH_DRAG){
+        this->clearLabels();
+
+        setDrawColor(255, 255, 255);
+        drawString("Touch drag", 5, STYLE_STATUSBAR_HEIGHT + 0*20 + 10, 2);
+        drawString(String(val1), 5, STYLE_STATUSBAR_HEIGHT + 1*20 + 10, 2);
+        drawString(String(val2), 5, STYLE_STATUSBAR_HEIGHT + 2*20 + 10, 2);
     }
-    
 }
 
 const unsigned char appNameClass::icon[] PROGMEM = {

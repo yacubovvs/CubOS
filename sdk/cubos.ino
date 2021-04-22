@@ -167,7 +167,8 @@ void loop(){
   #endif
 
   #ifdef TOUCH_SCREEN_ENABLE
-    loop_touchScreenDriver();
+    //loop_touchScreenDriver();
+    loop_touchScreenCore();
   #endif
 
   #ifdef BATTERY_ENABLE

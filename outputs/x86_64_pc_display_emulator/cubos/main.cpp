@@ -13,12 +13,18 @@
 #define EVENT_ON_GOING_TO_SLEEP         0x04
 #define EVENT_ON_WAKE_UP                0x05
 
-#define EVENT_ON_TOUCH_START            0x06
-#define EVENT_ON_TOUCH_RELEASED         0x07
-#define EVENT_ON_TOUCH_CLICK            0x08
-#define EVENT_ON_TOUCH_LONG_PRESS       0x09
-#define EVENT_ON_TOUCH_DRAG             0x0A
-#define EVENT_ON_TOUCH_DOUBLE_CLICK     0x0B
+#define EVENT_ON_TOUCH_START                0x06
+#define EVENT_ON_TOUCH_RELEASED             0x07
+#define EVENT_ON_TOUCH_CLICK                0x08
+#define EVENT_ON_TOUCH_LONG_PRESS           0x09
+#define EVENT_ON_TOUCH_DRAG                 0x0A
+#define EVENT_ON_TOUCH_DOUBLE_CLICK         0x0B
+#define EVENT_ON_TOUCH_SWIPE_FROM_LEFT      0x0C
+#define EVENT_ON_TOUCH_SWIPE_FROM_RIGHT     0x0D
+#define EVENT_ON_TOUCH_SWIPE_FROM_TOP       0x0E
+#define EVENT_ON_TOUCH_SWIPE_FROM_BOTTOM    0x0F
+
+#define EVENT_BUTTON_DOUBLE_PRESS       0x10
 
 #define I2C_ENABLE
 #define CPU_CONTROLL_ENABLE
@@ -163,6 +169,7 @@ void delay(int x){
 }
 
 // PREDEFINED
+void loop_touchScreenCore();
 const unsigned char *getAppParams(char i, unsigned char type);
 void startApp(char num);
 bool getBitInByte(unsigned char currentByte, unsigned char bitNum);
@@ -716,7 +723,8 @@ void loop(){
   #endif
 
   #ifdef TOUCH_SCREEN_ENABLE
-    loop_touchScreenDriver();
+    //loop_touchScreenDriver();
+    loop_touchScreenCore();
   #endif
 
   #ifdef BATTERY_ENABLE
@@ -910,52 +918,12 @@ void driver_control_set_last_user_avtivity(unsigned long time){
 
 
 #ifdef TOUCH_SCREEN_ENABLE
-    bool TOUCH_SCREEN_last_isTouching = false;
-
-    int TOUCH_SCREEN_last_x = 0;
-    int TOUCH_SCREEN_last_y = 0;
-
     void setup_touchScreenDriver(){
         
     }
 
     void loop_touchScreenDriver(){
         driver_display_updateTouchScreen();
-        
-        /*
-        #define EVENT_ON_TOUCH_START            0x06
-        #define EVENT_ON_TOUCH_RELEASED         0x07
-        #define EVENT_ON_TOUCH_CLICK            0x08
-        #define EVENT_ON_TOUCH_LONG_PRESS       0x09
-        #define EVENT_ON_TOUCH_DRAG             0x0A
-        #define EVENT_ON_TOUCH_DOUBLE_CLICK     0x0B
-        */
-
-        /*
-        if(getTOUCH_SCREEN_isTouching()){
-            currentApp->onEvent(EVENT_ON_TOUCH_START, getTOUCH_SCREEN_X(), getTOUCH_SCREEN_Y());
-        }
-        if(!getTOUCH_SCREEN_isTouching()){
-            currentApp->onEvent(EVENT_ON_TOUCH_RELEASED, getTOUCH_SCREEN_X(), getTOUCH_SCREEN_Y());
-        }
-        */
-
-        if(!TOUCH_SCREEN_last_isTouching && getTOUCH_SCREEN_isTouching()){
-            TOUCH_SCREEN_last_isTouching = true;
-            TOUCH_SCREEN_last_x = getTOUCH_SCREEN_X();
-            TOUCH_SCREEN_last_y = getTOUCH_SCREEN_Y();
-            currentApp->onEvent(EVENT_ON_TOUCH_START, TOUCH_SCREEN_last_x, TOUCH_SCREEN_last_y);
-        }else if(TOUCH_SCREEN_last_isTouching && !getTOUCH_SCREEN_isTouching()){
-            TOUCH_SCREEN_last_isTouching = false;
-            currentApp->onEvent(EVENT_ON_TOUCH_RELEASED, getTOUCH_SCREEN_X(), getTOUCH_SCREEN_Y());
-        }else if(TOUCH_SCREEN_last_isTouching && getTOUCH_SCREEN_isTouching()
-                && (TOUCH_SCREEN_last_x!=TOUCH_SCREEN_last_x || TOUCH_SCREEN_last_y!=TOUCH_SCREEN_last_y)){
-            
-            TOUCH_SCREEN_last_x = getTOUCH_SCREEN_X();
-            TOUCH_SCREEN_last_y = getTOUCH_SCREEN_Y();
-
-            currentApp->onEvent(EVENT_ON_TOUCH_DRAG, getTOUCH_SCREEN_X(), getTOUCH_SCREEN_Y());
-        } 
     }
 
 #endif
@@ -2350,6 +2318,45 @@ const byte* getIcon(int icon){
         return 25000;
     }
 #endif
+
+#ifdef TOUCH_SCREEN_ENABLE
+    bool TOUCH_SCREEN_last_isTouching = false;
+
+    int TOUCH_SCREEN_last_x = 0;
+    int TOUCH_SCREEN_last_y = 0;
+
+
+    void loop_touchScreenCore(){
+        loop_touchScreenDriver();
+        
+        /*
+        #define EVENT_ON_TOUCH_START            0x06
+        #define EVENT_ON_TOUCH_RELEASED         0x07
+        #define EVENT_ON_TOUCH_CLICK            0x08
+        #define EVENT_ON_TOUCH_LONG_PRESS       0x09
+        #define EVENT_ON_TOUCH_DRAG             0x0A
+        #define EVENT_ON_TOUCH_DOUBLE_CLICK     0x0B
+        */
+
+        if(!TOUCH_SCREEN_last_isTouching && getTOUCH_SCREEN_isTouching()){
+            TOUCH_SCREEN_last_isTouching = true;
+            TOUCH_SCREEN_last_x = getTOUCH_SCREEN_X();
+            TOUCH_SCREEN_last_y = getTOUCH_SCREEN_Y();
+            currentApp->onEvent(EVENT_ON_TOUCH_START, TOUCH_SCREEN_last_x, TOUCH_SCREEN_last_y);
+        }else if(TOUCH_SCREEN_last_isTouching && !getTOUCH_SCREEN_isTouching()){
+            TOUCH_SCREEN_last_isTouching = false;
+            currentApp->onEvent(EVENT_ON_TOUCH_RELEASED, getTOUCH_SCREEN_X(), getTOUCH_SCREEN_Y());
+        }else if(TOUCH_SCREEN_last_isTouching && getTOUCH_SCREEN_isTouching()
+                && (TOUCH_SCREEN_last_x!=getTOUCH_SCREEN_X() || TOUCH_SCREEN_last_y!=getTOUCH_SCREEN_Y())){
+            TOUCH_SCREEN_last_x = getTOUCH_SCREEN_X();
+            TOUCH_SCREEN_last_y = getTOUCH_SCREEN_Y();
+
+            currentApp->onEvent(EVENT_ON_TOUCH_DRAG, getTOUCH_SCREEN_X(), getTOUCH_SCREEN_Y());
+        } 
+    }
+
+#endif
+
 
 #define appNameClass    AlarmApp          // App name without spaces
 #define appName         "Alarm"              // App name with spaces 
@@ -4025,6 +4032,7 @@ class appNameClass: public Application{
         virtual void onEvent(unsigned char event, int val1, int val2) override;
 
         void onCreate();
+        void clearLabels();
         appNameClass(){ 
             fillScreen(0, 0, 0);  // filling background
             super_onCreate();           // Drawind statusbar and etc if needed
@@ -4075,6 +4083,13 @@ void appNameClass::onDestroy(){
     */
 }
 
+void appNameClass::clearLabels(){
+    setDrawColor(0, 0, 0);
+    clearString("Not touched released", 5, STYLE_STATUSBAR_HEIGHT + 0*20 + 10, 2);
+    clearString("000000000000000", 5, STYLE_STATUSBAR_HEIGHT + 1*20 + 10, 2);
+    clearString("000000000000000", 5, STYLE_STATUSBAR_HEIGHT + 2*20 + 10, 2);
+}
+
 void appNameClass::onEvent(unsigned char event, int val1, int val2){
     
     if(event==EVENT_BUTTON_PRESSED){
@@ -4089,27 +4104,27 @@ void appNameClass::onEvent(unsigned char event, int val1, int val2){
     }else if(event==EVENT_ON_TIME_CHANGED){
         // Write you code on system time changed
     }else if(event==EVENT_ON_TOUCH_START){
-        setDrawColor(0, 0, 0);
-        clearString("Not touched released", 5, STYLE_STATUSBAR_HEIGHT + 0*20 + 10, 2);
-        clearString("000000000000000", 5, STYLE_STATUSBAR_HEIGHT + 1*20 + 10, 2);
-        clearString("000000000000000", 5, STYLE_STATUSBAR_HEIGHT + 2*20 + 10, 2);
+        this->clearLabels();
 
         setDrawColor(255, 255, 255);
         drawString("Touch start", 5, STYLE_STATUSBAR_HEIGHT + 0*20 + 10, 2);
         drawString(String(val1), 5, STYLE_STATUSBAR_HEIGHT + 1*20 + 10, 2);
         drawString(String(val2), 5, STYLE_STATUSBAR_HEIGHT + 2*20 + 10, 2);
     }else if(event==EVENT_ON_TOUCH_RELEASED){
-        setDrawColor(0, 0, 0);
-        clearString("Not touched released", 5, STYLE_STATUSBAR_HEIGHT + 0*20 + 10, 2);
-        clearString("000000000000000", 5, STYLE_STATUSBAR_HEIGHT + 1*20 + 10, 2);
-        clearString("000000000000000", 5, STYLE_STATUSBAR_HEIGHT + 2*20 + 10, 2);
+        this->clearLabels();
 
         setDrawColor(255, 255, 255);
         drawString("Touch released", 5, STYLE_STATUSBAR_HEIGHT + 0*20 + 10, 2);
         drawString(String(val1), 5, STYLE_STATUSBAR_HEIGHT + 1*20 + 10, 2);
         drawString(String(val2), 5, STYLE_STATUSBAR_HEIGHT + 2*20 + 10, 2);
+    }else if(event==EVENT_ON_TOUCH_DRAG){
+        this->clearLabels();
+
+        setDrawColor(255, 255, 255);
+        drawString("Touch drag", 5, STYLE_STATUSBAR_HEIGHT + 0*20 + 10, 2);
+        drawString(String(val1), 5, STYLE_STATUSBAR_HEIGHT + 1*20 + 10, 2);
+        drawString(String(val2), 5, STYLE_STATUSBAR_HEIGHT + 2*20 + 10, 2);
     }
-    
 }
 
 const unsigned char appNameClass::icon[] PROGMEM = {

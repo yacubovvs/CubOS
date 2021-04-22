@@ -56,6 +56,7 @@ void delay(int x){
 }
 
 // PREDEFINED
+void loop_touchScreenCore();
 const unsigned char *getAppParams(char i, unsigned char type);
 void startApp(char num);
 bool getBitInByte(unsigned char currentByte, unsigned char bitNum);

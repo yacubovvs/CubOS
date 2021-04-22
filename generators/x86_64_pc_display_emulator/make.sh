@@ -81,6 +81,9 @@ echo "
 echo "
 "   >> $OUTPUT_DIRECTORY/cubos/main.cpp
 cat sdk/core/core_cpu.ino               >> $OUTPUT_DIRECTORY/cubos/main.cpp
+echo "
+"   >> $OUTPUT_DIRECTORY/cubos/main.cpp
+cat sdk/core/core_touchscreen.ino       >> $OUTPUT_DIRECTORY/cubos/main.cpp
 
 
 # Applications
