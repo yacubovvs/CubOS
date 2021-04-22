@@ -1,0 +1,45 @@
+int maxBatteryAnalogValue = 890;
+
+int getMaxBatteryAnalogValue(){
+    return maxBatteryAnalogValue;
+}
+
+void driver_battery_setup(){
+}
+
+void driver_battery_loop(){
+
+}
+
+int driver_battery_raw(){
+    //int analogValue = analogRead(A0);
+    //if(analogValue>getMaxBatteryAnalogValue()) maxBatteryAnalogValue=analogValue;
+    return 890;
+}
+
+float driver_battery_getVoltage(){
+    //int analogValue = driver_battery_raw();
+    //float voltage = 4.2/((float)getMaxBatteryAnalogValue())*((float)analogValue);
+    float voltage = 4.2;
+    return voltage;
+}
+
+int driver_battery_getmVoltage(){
+    //int analogValue = driver_battery_raw();
+    //int voltage = 420*((float)analogValue)/((float)getMaxBatteryAnalogValue());
+    int voltage = 420;
+    return voltage;
+}
+
+unsigned char driver_battery_getPercent(){
+    int mV = driver_battery_getmVoltage();
+    if(mV>=400){
+        return 100;
+    }else if(mV<=320){
+        return 0;
+    }else{
+        int dmV = mV - 320;
+        return dmV*100/80;
+    }
+    return 0;
+}

@@ -1,3 +1,4 @@
+
 /*
     ############################################################################################
     #                                                                                          #
@@ -28,11 +29,11 @@
 
 #define ON_TIME_CHANGE_EVERY_MS 1000
 
-#define HARDWARE_BUTTONS_ENABLED              // Conf of controls with hardware btns    
-//#define isTouchScreen                 // Conf of controls
+#define HARDWARE_BUTTONS_ENABLED        // Conf of controls with hardware btns    
+#define TOUCH_SCREEN_ENABLE
 
 #define colorScreen                     // Screen is colored
-//#define noAnimation                     // Caurse of framebuffer type
+//#define noAnimation                   // Caurse of framebuffer type
 
 //#define toDefaultApp_onLeftLongPress
 

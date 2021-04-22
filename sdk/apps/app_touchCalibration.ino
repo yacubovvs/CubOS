@@ -28,11 +28,27 @@ void appNameClass::onCreate(){
     /*
         Write you code on App create here
     */
+
+    setBackgroundColor(0, 0, 0);
+    setDrawColor(255, 255, 255);
+    drawString("Not touched", 5, STYLE_STATUSBAR_HEIGHT + 0*20 + 10, 2);
+    drawString("00000", 5, STYLE_STATUSBAR_HEIGHT + 1*20 + 10, 2);
+    drawString("00000", 5, STYLE_STATUSBAR_HEIGHT + 2*20 + 10, 2);
 }
 
 void appNameClass::onLoop(){
     /*
         Write you code onLoop here
+    */
+
+    /*
+    setBackgroundColor(0, 0, 0);
+    setDrawColor(0, 0, 0);
+    clearString("25500", 5, STYLE_STATUSBAR_HEIGHT + 3*20 + 10, 2);
+    
+    setDrawColor(255, 255, 255);
+    drawString(getDe(), 5, STYLE_STATUSBAR_HEIGHT + 3*20 + 10, 2);
+    //drawString(String((int) 2), 5, STYLE_STATUSBAR_HEIGHT + 3*20 + 10, 2);
     */
 }
 
@@ -55,6 +71,26 @@ void appNameClass::onEvent(unsigned char event, int val1, int val2){
         // Write you code on [val1] button long press here
     }else if(event==EVENT_ON_TIME_CHANGED){
         // Write you code on system time changed
+    }else if(event==EVENT_ON_TOUCH_START){
+        setDrawColor(0, 0, 0);
+        clearString("Not touched released", 5, STYLE_STATUSBAR_HEIGHT + 0*20 + 10, 2);
+        clearString("000000000000000", 5, STYLE_STATUSBAR_HEIGHT + 1*20 + 10, 2);
+        clearString("000000000000000", 5, STYLE_STATUSBAR_HEIGHT + 2*20 + 10, 2);
+
+        setDrawColor(255, 255, 255);
+        drawString("Touch start", 5, STYLE_STATUSBAR_HEIGHT + 0*20 + 10, 2);
+        drawString(String(val1), 5, STYLE_STATUSBAR_HEIGHT + 1*20 + 10, 2);
+        drawString(String(val2), 5, STYLE_STATUSBAR_HEIGHT + 2*20 + 10, 2);
+    }else if(event==EVENT_ON_TOUCH_RELEASED){
+        setDrawColor(0, 0, 0);
+        clearString("Not touched released", 5, STYLE_STATUSBAR_HEIGHT + 0*20 + 10, 2);
+        clearString("000000000000000", 5, STYLE_STATUSBAR_HEIGHT + 1*20 + 10, 2);
+        clearString("000000000000000", 5, STYLE_STATUSBAR_HEIGHT + 2*20 + 10, 2);
+
+        setDrawColor(255, 255, 255);
+        drawString("Touch released", 5, STYLE_STATUSBAR_HEIGHT + 0*20 + 10, 2);
+        drawString(String(val1), 5, STYLE_STATUSBAR_HEIGHT + 1*20 + 10, 2);
+        drawString(String(val2), 5, STYLE_STATUSBAR_HEIGHT + 2*20 + 10, 2);
     }
     
 }

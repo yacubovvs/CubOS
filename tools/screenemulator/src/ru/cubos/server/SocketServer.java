@@ -262,6 +262,9 @@ public class SocketServer extends Emulator {
                     this.drawLine(x,y,x,y+h, currentColor);
                 }catch (Exception e){}
                 break;
+            case "T":       // READ TOUCHES
+                addMessage(isTouched + touchX + touchY);
+                break;
             case "R":       // Rectangle
                 try{
                     x = Integer.parseInt(messages[1]);

@@ -17,7 +17,8 @@
 #define APP_MENU_APPLICATIONS_8             TestApplicationApp
 #define APP_MENU_APPLICATIONS_9             BatteryApp
 #define APP_MENU_APPLICATIONS_10            TouchCalibration
-#define APP_MENU_APPLICATIONS_11            KeyboardTest
+#define APP_MENU_APPLICATIONS_11            TouchTest
+#define APP_MENU_APPLICATIONS_12            KeyboardTest
 
 
 /*

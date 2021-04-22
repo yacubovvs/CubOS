@@ -26,12 +26,21 @@ void fillScreen(unsigned char red, unsigned char green, unsigned char blue);
     ############################################################################################
 */
 
+/*
 #define EVENT_BUTTON_PRESSED            0x00
 #define EVENT_BUTTON_RELEASED           0x01
 #define EVENT_BUTTON_LONG_PRESS         0x02
 #define EVENT_ON_TIME_CHANGED           0x03
 #define EVENT_ON_GOING_TO_SLEEP         0x04
 #define EVENT_ON_WAKE_UP                0x05
+
+#define EVENT_ON_TOUCH_START            0x06
+#define EVENT_ON_TOUCH_RELEASED         0x07
+#define EVENT_ON_TOUCH_CLICK            0x08
+#define EVENT_ON_TOUCH_LONG_PRESS       0x09
+#define EVENT_ON_TOUCH_DRAG             0x0A
+#define EVENT_ON_TOUCH_DOUBLE_CLICK     0x0B
+*/
 
 /*
     ############################################################################################
@@ -140,6 +149,10 @@ void setup()
   #ifdef HARDWARE_BUTTONS_ENABLED
     driver_controls_setup();
   #endif
+
+  #ifdef TOUCH_SCREEN_ENABLE
+    setup_touchScreenDriver();
+  #endif
   
   currentApp = getApp(STARTING_APP_NUMM);
   
@@ -151,6 +164,10 @@ void loop(){
 
   #ifdef HARDWARE_BUTTONS_ENABLED
     driver_controls_loop();
+  #endif
+
+  #ifdef TOUCH_SCREEN_ENABLE
+    loop_touchScreenDriver();
   #endif
 
   #ifdef BATTERY_ENABLE

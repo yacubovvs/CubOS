@@ -12,10 +12,10 @@ mkdir $OUTPUT_DIRECTORY/cubos
 cp $BUILDSCRIPT_DIRECTORY  $OUTPUT_DIRECTORY
 
 # Generating project
-cat "generators/default_settings.ino"   >> $OUTPUT_DIRECTORY/cubos/main.cpp
+cat "generators/default_settings.ino"   > $OUTPUT_DIRECTORY/cubos/main.cpp
 echo "
 "   >> $OUTPUT_DIRECTORY/cubos/main.cpp
-cat $SETTINGS_FILE                      > $OUTPUT_DIRECTORY/cubos/main.cpp
+cat $SETTINGS_FILE                      >> $OUTPUT_DIRECTORY/cubos/main.cpp
 echo "
 "   >> $OUTPUT_DIRECTORY/cubos/main.cpp
 # Drivers
@@ -48,6 +48,10 @@ cat sdk/cubos.ino                       >> $OUTPUT_DIRECTORY/cubos/main.cpp
 echo "
 "   >> $OUTPUT_DIRECTORY/cubos/main.cpp
 cat "sdk/drivers/driver_controls_emulator.ino"       >> $OUTPUT_DIRECTORY/cubos/main.cpp
+
+echo "
+"   >> $OUTPUT_DIRECTORY/cubos/main.cpp
+cat "sdk/drivers/driver_touchscreen_emulator.ino"   >> $OUTPUT_DIRECTORY/cubos/main.cpp
 
 echo "
 "   >> $OUTPUT_DIRECTORY/cubos/main.cpp
@@ -116,6 +120,9 @@ cat sdk/apps/app_keyBoardTest.ino      >> $OUTPUT_DIRECTORY/cubos/main.cpp
 echo "
 "   >> $OUTPUT_DIRECTORY/cubos/main.cpp
 cat sdk/apps/app_touchCalibration.ino      >> $OUTPUT_DIRECTORY/cubos/main.cpp
+echo "
+"   >> $OUTPUT_DIRECTORY/cubos/main.cpp
+cat sdk/apps/app_touchTest.ino      >> $OUTPUT_DIRECTORY/cubos/main.cpp
 echo "
 "   >> $OUTPUT_DIRECTORY/cubos/main.cpp
 cat sdk/apps/app_z_menu.ino          >> $OUTPUT_DIRECTORY/cubos/main.cpp

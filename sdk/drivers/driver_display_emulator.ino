@@ -34,6 +34,24 @@
 #define MSG_SIZE 1024
 #define REPLY_SIZE 65536
 
+#ifdef TOUCH_SCREEN_ENABLE
+  bool TOUCH_SCREEN_isTouching = false;
+  int TOUCH_SCREEN_X = 0;
+  int TOUCH_SCREEN_Y = 0;
+
+  bool getTOUCH_SCREEN_isTouching(){
+    return TOUCH_SCREEN_isTouching;
+  }
+
+  int getTOUCH_SCREEN_X(){
+    return TOUCH_SCREEN_X;
+  }
+
+  int getTOUCH_SCREEN_Y(){
+    return TOUCH_SCREEN_Y;
+  }
+#endif
+
 bool driver_display_needToUpdateScreen = false;
 
 uint16_t get_uint16Color(unsigned char red, unsigned char green, unsigned char blue){
@@ -182,6 +200,38 @@ bool digRead(unsigned char b){
   return button[b];
 }
 
+#ifdef TOUCH_SCREEN_ENABLE
+
+  void driver_display_updateTouchScreen(){
+    char buff[15];  
+    sendMessageToDisplay("T\n");
+    recv(sock,buff,sizeof(buff),0);
+
+    TOUCH_SCREEN_isTouching = (buff[0]=='1');
+
+    //char x[1];
+    //char y[1];
+
+    std::string x = "     ";
+    std::string y = "     ";
+    
+    x[0] = buff[1];
+    x[1] = buff[2];
+    x[2] = buff[3];
+    x[3] = buff[4];
+    x[4] = buff[5];
+
+    y[0] = buff[6];
+    y[1] = buff[7];
+    y[2] = buff[8];
+    y[3] = buff[9];
+    y[4] = buff[10];
+
+    TOUCH_SCREEN_X = stoi(x);
+    TOUCH_SCREEN_Y = stoi(y);
+  }
+#endif
+
 void driver_display_updateControls(){
   char buff[15];
   sendMessageToDisplay("K\n");
@@ -192,13 +242,13 @@ void driver_display_updateControls(){
   button[1] = (buff[1]=='1');
   button[2] = (buff[2]=='1');
   button[3] = (buff[3]=='1');
+  
   /*
   printf("%d-", (int)(buff[0]=='1'));
   printf("%d-", (int)(buff[1]=='1'));
   printf("%d-", (int)(buff[2]=='1'));
   printf("%d\n", (int)(buff[3]=='1'));
   */
-
 }
 
 

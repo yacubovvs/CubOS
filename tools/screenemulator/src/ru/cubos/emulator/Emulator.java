@@ -16,9 +16,9 @@ public class Emulator extends JFrame {
     protected int width;
     protected int height;
 
-    boolean isTouched = false;
-    int presses[] = new int[10];
-    int moved[] = new int[10];
+    protected String isTouched = "0";
+    protected String touchX = addLeaderZeroes(0);
+    protected String touchY = addLeaderZeroes(0);
 
     public Emulator(int width, int height){
         imageWrapper = new EmulatorImagePanel(this);
@@ -37,9 +37,8 @@ public class Emulator extends JFrame {
         imageWrapper.addMouseMotionListener(new MouseMotionListener() {
             @Override
             public void mouseDragged(MouseEvent mouseEvent) {
-                moved[0] = mouseEvent.getX();
-                moved[1] = mouseEvent.getY();
-                System.out.println("Touch moved " + moved[0] + "; " + moved[1]);
+                touchX = addLeaderZeroes(mouseEvent.getX());
+                touchY = addLeaderZeroes(mouseEvent.getY());
             }
 
             @Override
@@ -56,10 +55,11 @@ public class Emulator extends JFrame {
 
             @Override
             public void mousePressed(MouseEvent mouseEvent) {
-                System.out.println("Mouse press start");
-                presses[0] = mouseEvent.getX();
-                presses[1] = mouseEvent.getY();
-                isTouched = true;
+                //System.out.println("Mouse press start");
+
+                touchX = addLeaderZeroes(mouseEvent.getX());
+                touchY = addLeaderZeroes(mouseEvent.getY());
+                isTouched = "1";
                 /*
                 touches++;
                 if(touches<5){
@@ -71,8 +71,8 @@ public class Emulator extends JFrame {
 
             @Override
             public void mouseReleased(MouseEvent mouseEvent) {
-                System.out.println("Mouse press released");
-                isTouched = false;
+                //System.out.println("Mouse press released");
+                isTouched = "0";
             }
 
             @Override
@@ -85,6 +85,13 @@ public class Emulator extends JFrame {
 
             }
         });
+    }
+
+    public String addLeaderZeroes(int value){
+        String outString = ("00000" + value);
+        outString = outString.substring(outString.length()-5);
+        //System.out.println(outString);
+        return outString;
     }
 
     public BufferedImage getImage(){

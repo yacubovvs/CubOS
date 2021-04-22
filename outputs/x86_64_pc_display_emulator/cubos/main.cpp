@@ -1,6 +1,40 @@
 /*
     ############################################################################################
     #                                                                                          #
+    #                                    DEFAULT SETTINGS +                                    #
+    #                                                                                          #
+    ############################################################################################
+*/
+
+#define EVENT_BUTTON_PRESSED            0x00
+#define EVENT_BUTTON_RELEASED           0x01
+#define EVENT_BUTTON_LONG_PRESS         0x02
+#define EVENT_ON_TIME_CHANGED           0x03
+#define EVENT_ON_GOING_TO_SLEEP         0x04
+#define EVENT_ON_WAKE_UP                0x05
+
+#define EVENT_ON_TOUCH_START            0x06
+#define EVENT_ON_TOUCH_RELEASED         0x07
+#define EVENT_ON_TOUCH_CLICK            0x08
+#define EVENT_ON_TOUCH_LONG_PRESS       0x09
+#define EVENT_ON_TOUCH_DRAG             0x0A
+#define EVENT_ON_TOUCH_DOUBLE_CLICK     0x0B
+
+#define I2C_ENABLE
+#define CPU_CONTROLL_ENABLE
+
+/*
+    ############################################################################################
+    #                                                                                          #
+    #                                    DEFAULT SETTINGS +                                    #
+    #                                                                                          #
+    ############################################################################################
+*/
+
+
+/*
+    ############################################################################################
+    #                                                                                          #
     #                                    x86_64 SETTINGS +                                     #
     #                                                                                          #
     ############################################################################################
@@ -28,11 +62,11 @@
 
 #define ON_TIME_CHANGE_EVERY_MS 1000
 
-#define HARDWARE_BUTTONS_ENABLED              // Conf of controls with hardware btns    
-//#define isTouchScreen                 // Conf of controls
+#define HARDWARE_BUTTONS_ENABLED        // Conf of controls with hardware btns    
+#define TOUCH_SCREEN_ENABLE
 
 #define colorScreen                     // Screen is colored
-//#define noAnimation                     // Caurse of framebuffer type
+//#define noAnimation                   // Caurse of framebuffer type
 
 //#define toDefaultApp_onLeftLongPress
 
@@ -143,6 +177,9 @@ void driver_battery_setup();
 void core_time_setup();
 void do_cpu_sleep();
 unsigned long driver_control_get_last_user_avtivity();
+void setup_touchScreenDriver();
+void loop_touchScreenDriver();
+
 
 class Application;
 Application *getApp(unsigned char i);
@@ -199,6 +236,24 @@ int main()
 
 #define MSG_SIZE 1024
 #define REPLY_SIZE 65536
+
+#ifdef TOUCH_SCREEN_ENABLE
+  bool TOUCH_SCREEN_isTouching = false;
+  int TOUCH_SCREEN_X = 0;
+  int TOUCH_SCREEN_Y = 0;
+
+  bool getTOUCH_SCREEN_isTouching(){
+    return TOUCH_SCREEN_isTouching;
+  }
+
+  int getTOUCH_SCREEN_X(){
+    return TOUCH_SCREEN_X;
+  }
+
+  int getTOUCH_SCREEN_Y(){
+    return TOUCH_SCREEN_Y;
+  }
+#endif
 
 bool driver_display_needToUpdateScreen = false;
 
@@ -348,6 +403,38 @@ bool digRead(unsigned char b){
   return button[b];
 }
 
+#ifdef TOUCH_SCREEN_ENABLE
+
+  void driver_display_updateTouchScreen(){
+    char buff[15];  
+    sendMessageToDisplay("T\n");
+    recv(sock,buff,sizeof(buff),0);
+
+    TOUCH_SCREEN_isTouching = (buff[0]=='1');
+
+    //char x[1];
+    //char y[1];
+
+    std::string x = "     ";
+    std::string y = "     ";
+    
+    x[0] = buff[1];
+    x[1] = buff[2];
+    x[2] = buff[3];
+    x[3] = buff[4];
+    x[4] = buff[5];
+
+    y[0] = buff[6];
+    y[1] = buff[7];
+    y[2] = buff[8];
+    y[3] = buff[9];
+    y[4] = buff[10];
+
+    TOUCH_SCREEN_X = stoi(x);
+    TOUCH_SCREEN_Y = stoi(y);
+  }
+#endif
+
 void driver_display_updateControls(){
   char buff[15];
   sendMessageToDisplay("K\n");
@@ -358,13 +445,13 @@ void driver_display_updateControls(){
   button[1] = (buff[1]=='1');
   button[2] = (buff[2]=='1');
   button[3] = (buff[3]=='1');
+  
   /*
   printf("%d-", (int)(buff[0]=='1'));
   printf("%d-", (int)(buff[1]=='1'));
   printf("%d-", (int)(buff[2]=='1'));
   printf("%d\n", (int)(buff[3]=='1'));
   */
-
 }
 
 
@@ -488,12 +575,21 @@ void fillScreen(unsigned char red, unsigned char green, unsigned char blue);
     ############################################################################################
 */
 
+/*
 #define EVENT_BUTTON_PRESSED            0x00
 #define EVENT_BUTTON_RELEASED           0x01
 #define EVENT_BUTTON_LONG_PRESS         0x02
 #define EVENT_ON_TIME_CHANGED           0x03
 #define EVENT_ON_GOING_TO_SLEEP         0x04
 #define EVENT_ON_WAKE_UP                0x05
+
+#define EVENT_ON_TOUCH_START            0x06
+#define EVENT_ON_TOUCH_RELEASED         0x07
+#define EVENT_ON_TOUCH_CLICK            0x08
+#define EVENT_ON_TOUCH_LONG_PRESS       0x09
+#define EVENT_ON_TOUCH_DRAG             0x0A
+#define EVENT_ON_TOUCH_DOUBLE_CLICK     0x0B
+*/
 
 /*
     ############################################################################################
@@ -602,6 +698,10 @@ void setup()
   #ifdef HARDWARE_BUTTONS_ENABLED
     driver_controls_setup();
   #endif
+
+  #ifdef TOUCH_SCREEN_ENABLE
+    setup_touchScreenDriver();
+  #endif
   
   currentApp = getApp(STARTING_APP_NUMM);
   
@@ -613,6 +713,10 @@ void loop(){
 
   #ifdef HARDWARE_BUTTONS_ENABLED
     driver_controls_loop();
+  #endif
+
+  #ifdef TOUCH_SCREEN_ENABLE
+    loop_touchScreenDriver();
   #endif
 
   #ifdef BATTERY_ENABLE
@@ -805,6 +909,59 @@ void driver_control_set_last_user_avtivity(unsigned long time){
 }
 
 
+#ifdef TOUCH_SCREEN_ENABLE
+    bool TOUCH_SCREEN_last_isTouching = false;
+
+    int TOUCH_SCREEN_last_x = 0;
+    int TOUCH_SCREEN_last_y = 0;
+
+    void setup_touchScreenDriver(){
+        
+    }
+
+    void loop_touchScreenDriver(){
+        driver_display_updateTouchScreen();
+        
+        /*
+        #define EVENT_ON_TOUCH_START            0x06
+        #define EVENT_ON_TOUCH_RELEASED         0x07
+        #define EVENT_ON_TOUCH_CLICK            0x08
+        #define EVENT_ON_TOUCH_LONG_PRESS       0x09
+        #define EVENT_ON_TOUCH_DRAG             0x0A
+        #define EVENT_ON_TOUCH_DOUBLE_CLICK     0x0B
+        */
+
+        /*
+        if(getTOUCH_SCREEN_isTouching()){
+            currentApp->onEvent(EVENT_ON_TOUCH_START, getTOUCH_SCREEN_X(), getTOUCH_SCREEN_Y());
+        }
+        if(!getTOUCH_SCREEN_isTouching()){
+            currentApp->onEvent(EVENT_ON_TOUCH_RELEASED, getTOUCH_SCREEN_X(), getTOUCH_SCREEN_Y());
+        }
+        */
+
+        if(!TOUCH_SCREEN_last_isTouching && getTOUCH_SCREEN_isTouching()){
+            TOUCH_SCREEN_last_isTouching = true;
+            TOUCH_SCREEN_last_x = getTOUCH_SCREEN_X();
+            TOUCH_SCREEN_last_y = getTOUCH_SCREEN_Y();
+            currentApp->onEvent(EVENT_ON_TOUCH_START, TOUCH_SCREEN_last_x, TOUCH_SCREEN_last_y);
+        }else if(TOUCH_SCREEN_last_isTouching && !getTOUCH_SCREEN_isTouching()){
+            TOUCH_SCREEN_last_isTouching = false;
+            currentApp->onEvent(EVENT_ON_TOUCH_RELEASED, getTOUCH_SCREEN_X(), getTOUCH_SCREEN_Y());
+        }else if(TOUCH_SCREEN_last_isTouching && getTOUCH_SCREEN_isTouching()
+                && (TOUCH_SCREEN_last_x!=TOUCH_SCREEN_last_x || TOUCH_SCREEN_last_y!=TOUCH_SCREEN_last_y)){
+            
+            TOUCH_SCREEN_last_x = getTOUCH_SCREEN_X();
+            TOUCH_SCREEN_last_y = getTOUCH_SCREEN_Y();
+
+            currentApp->onEvent(EVENT_ON_TOUCH_DRAG, getTOUCH_SCREEN_X(), getTOUCH_SCREEN_Y());
+        } 
+    }
+
+#endif
+
+
+
 /*
     ############################################################################################
     #                                                                                          #
@@ -824,7 +981,8 @@ void driver_control_set_last_user_avtivity(unsigned long time){
 #define APP_MENU_APPLICATIONS_8             TestApplicationApp
 #define APP_MENU_APPLICATIONS_9             BatteryApp
 #define APP_MENU_APPLICATIONS_10            TouchCalibration
-#define APP_MENU_APPLICATIONS_11            KeyboardTest
+#define APP_MENU_APPLICATIONS_11            TouchTest
+#define APP_MENU_APPLICATIONS_12            KeyboardTest
 
 
 /*
@@ -2162,6 +2320,29 @@ const unsigned char icon_arrow_bottom[] PROGMEM = {
     0x02,0x01,0x02,0x18,0x02,0x10,0x04,0xff,0xff,0xff,0xFF,0xFF,0xFF,0x7F,0xFF,0xFE,0x3F,0xFF,0xFC,0x1F,0xFF,0xF8,0x0F,0xFF,0xF0,0x07,0xFF,0xE0,0x03,0xFF,0xC0,0x01,0xFF,0x80,0x00,0xFF,0x00,0x00,0x7E,0x00,0x00,0x3C,0x00,0x00,0x18,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,
 };
 
+const byte* getIcon(int icon){
+
+    switch (icon){
+        #ifdef BATTERY_ENABLE
+            case ICON_BATTERY_100:        return battery100;  
+            case ICON_BATTERY_90:         return battery90;  
+            case ICON_BATTERY_80:         return battery80;  
+            case ICON_BATTERY_70:         return battery70;  
+            case ICON_BATTERY_60:         return battery60;  
+            case ICON_BATTERY_50:         return battery50;  
+            case ICON_BATTERY_40:         return battery40;  
+            case ICON_BATTERY_30:         return battery30;  
+            case ICON_BATTERY_20:         return battery20;  
+            case ICON_BATTERY_10:         return battery10;  
+            case ICON_BATTERY_0:          return battery0;
+        #endif
+        case ICON_ARROW_UP:             return icon_arrow_top;
+        case ICON_ARROW_DOWN:           return icon_arrow_bottom;
+        default: return {0};
+    }
+  
+}
+
 
 
 #ifdef CPU_SLEEP_ENABLE
@@ -2385,11 +2566,15 @@ void appNameClass::onCreate(){
     */
 
     setDrawColor(255, 255, 255);
-    drawString("Max analog: " + String(getMaxBatteryAnalogValue()), 5, STYLE_STATUSBAR_HEIGHT + 0*20 + 10, 2);
-    drawString("Raw battery: " + String(driver_battery_raw()), 5, STYLE_STATUSBAR_HEIGHT + 1*20 + 10, 2);
-    drawString("Voltage: " + String(driver_battery_getmVoltage()) + "0 mV", 5, STYLE_STATUSBAR_HEIGHT + 2*20 + 10, 2);
-    //drawString("Voltage: " + String(driver_battery_getVoltage() + " V"), 5, STYLE_STATUSBAR_HEIGHT + 3*20 + 10, 2);
-    drawString("Percent: " + String(driver_battery_getPercent()), 5, STYLE_STATUSBAR_HEIGHT + 4*20 + 10, 2);
+    #ifdef BATTERY_ENABLE
+        drawString("Max analog: " + String(getMaxBatteryAnalogValue()), 5, STYLE_STATUSBAR_HEIGHT + 0*20 + 10, 2);
+        drawString("Raw battery: " + String(driver_battery_raw()), 5, STYLE_STATUSBAR_HEIGHT + 1*20 + 10, 2);
+        drawString("Voltage: " + String(driver_battery_getmVoltage()) + "0 mV", 5, STYLE_STATUSBAR_HEIGHT + 2*20 + 10, 2);
+        //drawString("Voltage: " + String(driver_battery_getVoltage() + " V"), 5, STYLE_STATUSBAR_HEIGHT + 3*20 + 10, 2);
+        drawString("Percent: " + String(driver_battery_getPercent()), 5, STYLE_STATUSBAR_HEIGHT + 4*20 + 10, 2);
+    #else
+        drawString("Battery not supported", 5, STYLE_STATUSBAR_HEIGHT + 0*20 + 10, 2);
+    #endif
     
 }
 
@@ -2441,6 +2626,7 @@ const unsigned char appNameClass::icon[] PROGMEM = {
 #define appNameClass    SettingsApp     // App name without spaces
 #define appName         "Settings"      // App name with spaces 
 
+#define CORE_VIEWS_SETTINGS_IMAGE_WIDTH 24
 #define SETTINGS_ELEMENTS
 
 #define PAGES_LIST_HEIGHT               20
@@ -2578,8 +2764,11 @@ int appNameClass::getPositionBySelectedNumber(unsigned char selectedNumber){
 void appNameClass::drawSettingTimeArrows(bool draw, int position){
     //drawRect(x0+delta, y0+delta, x1-delta, y1-delta);  
 
-    drawIcon(draw, icon_arrow_top, position + 3 - 16, SCREEN_HEIGHT/2 - 19 - 15 );
-    drawIcon(draw, icon_arrow_bottom, position + 3 - 16, SCREEN_HEIGHT/2 + 20 + 15);
+    //drawIcon(draw, icon_arrow_top, position + 3 - 16, SCREEN_HEIGHT/2 - 19 - 15 );
+    //drawIcon(draw, icon_arrow_bottom, position + 3 - 16, SCREEN_HEIGHT/2 + 20 + 15);
+
+    drawIcon(draw, getIcon(ICON_ARROW_UP), position + 3 - 16, SCREEN_HEIGHT/2 - 19 - 15 );
+    drawIcon(draw, getIcon(ICON_ARROW_DOWN), position + 3 - 16, SCREEN_HEIGHT/2 + 20 + 15);
 }
 
 void appNameClass::drawSettingTimeSelect(bool draw, int position){
@@ -2850,7 +3039,11 @@ String appNameClass::getApplicationSubTitle(unsigned char submenu, unsigned char
                 case 1:
                     return core_time_getDateFull();
                 case 2:
-                    return String(core_cpu_getCpuSleepTimeDelay());
+                    #ifdef CPU_SLEEP_ENABLE
+                        return String(core_cpu_getCpuSleepTimeDelay());
+                    #else
+                        return "-";
+                    #endif
                 case 3:
                     return String(core_batteryGetPercent()) + "%";
                 case 4:
@@ -3743,11 +3936,27 @@ void appNameClass::onCreate(){
     /*
         Write you code on App create here
     */
+
+    setBackgroundColor(0, 0, 0);
+    setDrawColor(255, 255, 255);
+    drawString("Not touched", 5, STYLE_STATUSBAR_HEIGHT + 0*20 + 10, 2);
+    drawString("00000", 5, STYLE_STATUSBAR_HEIGHT + 1*20 + 10, 2);
+    drawString("00000", 5, STYLE_STATUSBAR_HEIGHT + 2*20 + 10, 2);
 }
 
 void appNameClass::onLoop(){
     /*
         Write you code onLoop here
+    */
+
+    /*
+    setBackgroundColor(0, 0, 0);
+    setDrawColor(0, 0, 0);
+    clearString("25500", 5, STYLE_STATUSBAR_HEIGHT + 3*20 + 10, 2);
+    
+    setDrawColor(255, 255, 255);
+    drawString(getDe(), 5, STYLE_STATUSBAR_HEIGHT + 3*20 + 10, 2);
+    //drawString(String((int) 2), 5, STYLE_STATUSBAR_HEIGHT + 3*20 + 10, 2);
     */
 }
 
@@ -3770,6 +3979,135 @@ void appNameClass::onEvent(unsigned char event, int val1, int val2){
         // Write you code on [val1] button long press here
     }else if(event==EVENT_ON_TIME_CHANGED){
         // Write you code on system time changed
+    }else if(event==EVENT_ON_TOUCH_START){
+        setDrawColor(0, 0, 0);
+        clearString("Not touched released", 5, STYLE_STATUSBAR_HEIGHT + 0*20 + 10, 2);
+        clearString("000000000000000", 5, STYLE_STATUSBAR_HEIGHT + 1*20 + 10, 2);
+        clearString("000000000000000", 5, STYLE_STATUSBAR_HEIGHT + 2*20 + 10, 2);
+
+        setDrawColor(255, 255, 255);
+        drawString("Touch start", 5, STYLE_STATUSBAR_HEIGHT + 0*20 + 10, 2);
+        drawString(String(val1), 5, STYLE_STATUSBAR_HEIGHT + 1*20 + 10, 2);
+        drawString(String(val2), 5, STYLE_STATUSBAR_HEIGHT + 2*20 + 10, 2);
+    }else if(event==EVENT_ON_TOUCH_RELEASED){
+        setDrawColor(0, 0, 0);
+        clearString("Not touched released", 5, STYLE_STATUSBAR_HEIGHT + 0*20 + 10, 2);
+        clearString("000000000000000", 5, STYLE_STATUSBAR_HEIGHT + 1*20 + 10, 2);
+        clearString("000000000000000", 5, STYLE_STATUSBAR_HEIGHT + 2*20 + 10, 2);
+
+        setDrawColor(255, 255, 255);
+        drawString("Touch released", 5, STYLE_STATUSBAR_HEIGHT + 0*20 + 10, 2);
+        drawString(String(val1), 5, STYLE_STATUSBAR_HEIGHT + 1*20 + 10, 2);
+        drawString(String(val2), 5, STYLE_STATUSBAR_HEIGHT + 2*20 + 10, 2);
+    }
+    
+}
+
+const unsigned char appNameClass::icon[] PROGMEM = {
+    
+	/*            PUT YOUR ICON HERE            */
+    0x02,0x01,0x02,0x20,0x02,0x20,0x04,0xff,0xff,0xff,0xFF,0x00,0x00,0xFF,0xFF,0x00,0x00,0xFF,0xC0,0x00,0x00,0x03,
+    0xC0,0x00,0x00,0x03,0xC0,0x00,0x00,0x03,0xC0,0x00,0x00,0x03,0xC0,0x00,0x00,0x03,0xC0,0x00,0x00,0x03,0x00,0x00,
+    0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x01,0x80,0x00,0x00,0x01,0x80,0x00,0x00,0x01,0x80,0x00,0x00,0x01,0x80,0x00,
+    0x00,0x01,0x80,0x00,0x00,0x3F,0xFC,0x00,0x00,0x3F,0xFC,0x00,0x00,0x01,0x80,0x00,0x00,0x01,0x80,0x00,0x00,0x01,
+    0x80,0x00,0x00,0x01,0x80,0x00,0x00,0x01,0x80,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0xC0,0x00,0x00,0x03,
+    0xC0,0x00,0x00,0x03,0xC0,0x00,0x00,0x03,0xC0,0x00,0x00,0x03,0xC0,0x00,0x00,0x03,0xC0,0x00,0x00,0x03,0xFF,0x00,
+    0x00,0xFF,0xFF,0x00,0x00,0xFF,
+};
+
+#define appNameClass    TouchTest         // App name without spaces
+#define appName         "Touch test"              // App name with spaces 
+
+class appNameClass: public Application{
+    public:
+        virtual void onLoop() override;
+        virtual void onDestroy() override;
+        virtual void onEvent(unsigned char event, int val1, int val2) override;
+
+        void onCreate();
+        appNameClass(){ 
+            fillScreen(0, 0, 0);  // filling background
+            super_onCreate();           // Drawind statusbar and etc if needed
+            onCreate(); 
+        };
+
+        static unsigned const char* getParams(const unsigned char type){
+            switch(type){ 
+              case PARAM_TYPE_NAME: return (unsigned char*)appName; 
+              case PARAM_TYPE_ICON: return icon;
+              default: return (unsigned char*)""; }
+        };
+        const static unsigned char icon[] PROGMEM;
+      
+};
+
+void appNameClass::onCreate(){
+    /*
+        Write you code on App create here
+    */
+
+    setBackgroundColor(0, 0, 0);
+    setDrawColor(255, 255, 255);
+    drawString("Not touched", 5, STYLE_STATUSBAR_HEIGHT + 0*20 + 10, 2);
+    drawString("00000", 5, STYLE_STATUSBAR_HEIGHT + 1*20 + 10, 2);
+    drawString("00000", 5, STYLE_STATUSBAR_HEIGHT + 2*20 + 10, 2);
+}
+
+void appNameClass::onLoop(){
+    /*
+        Write you code onLoop here
+    */
+
+    /*
+    setBackgroundColor(0, 0, 0);
+    setDrawColor(0, 0, 0);
+    clearString("25500", 5, STYLE_STATUSBAR_HEIGHT + 3*20 + 10, 2);
+    
+    setDrawColor(255, 255, 255);
+    drawString(getDe(), 5, STYLE_STATUSBAR_HEIGHT + 3*20 + 10, 2);
+    //drawString(String((int) 2), 5, STYLE_STATUSBAR_HEIGHT + 3*20 + 10, 2);
+    */
+}
+
+void appNameClass::onDestroy(){
+    /*
+        Write you code onDestroy here
+    */
+}
+
+void appNameClass::onEvent(unsigned char event, int val1, int val2){
+    
+    if(event==EVENT_BUTTON_PRESSED){
+        // Write you code on [val1] button pressed here
+        if(val1==BUTTON_BACK){
+            startApp(-1);
+        }
+    }else if(event==EVENT_BUTTON_RELEASED){
+        // Write you code on [val1] button released here
+    }else if(event==EVENT_BUTTON_LONG_PRESS){
+        // Write you code on [val1] button long press here
+    }else if(event==EVENT_ON_TIME_CHANGED){
+        // Write you code on system time changed
+    }else if(event==EVENT_ON_TOUCH_START){
+        setDrawColor(0, 0, 0);
+        clearString("Not touched released", 5, STYLE_STATUSBAR_HEIGHT + 0*20 + 10, 2);
+        clearString("000000000000000", 5, STYLE_STATUSBAR_HEIGHT + 1*20 + 10, 2);
+        clearString("000000000000000", 5, STYLE_STATUSBAR_HEIGHT + 2*20 + 10, 2);
+
+        setDrawColor(255, 255, 255);
+        drawString("Touch start", 5, STYLE_STATUSBAR_HEIGHT + 0*20 + 10, 2);
+        drawString(String(val1), 5, STYLE_STATUSBAR_HEIGHT + 1*20 + 10, 2);
+        drawString(String(val2), 5, STYLE_STATUSBAR_HEIGHT + 2*20 + 10, 2);
+    }else if(event==EVENT_ON_TOUCH_RELEASED){
+        setDrawColor(0, 0, 0);
+        clearString("Not touched released", 5, STYLE_STATUSBAR_HEIGHT + 0*20 + 10, 2);
+        clearString("000000000000000", 5, STYLE_STATUSBAR_HEIGHT + 1*20 + 10, 2);
+        clearString("000000000000000", 5, STYLE_STATUSBAR_HEIGHT + 2*20 + 10, 2);
+
+        setDrawColor(255, 255, 255);
+        drawString("Touch released", 5, STYLE_STATUSBAR_HEIGHT + 0*20 + 10, 2);
+        drawString(String(val1), 5, STYLE_STATUSBAR_HEIGHT + 1*20 + 10, 2);
+        drawString(String(val2), 5, STYLE_STATUSBAR_HEIGHT + 2*20 + 10, 2);
     }
     
 }
