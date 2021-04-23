@@ -29,9 +29,9 @@ cp sdk/apps/app_z_menu.ino          outputs/m5stick_c/cubos/
 # Drivers
 cp sdk/drivers/driver_battery_m5stickC.ino          outputs/m5stick_c/cubos/     
 cp sdk/drivers/driver_display_m5stickC_ST7735S.ino  outputs/m5stick_c/cubos/     
-cp sdk/drivers/driver_controls_watch7.ino           outputs/m5stick_c/cubos/     
+cp sdk/drivers/driver_controls_m5stickC.ino         outputs/m5stick_c/cubos/     
 #cp sdk/drivers/driver_RTC_DS3231.ino               outputs/m5stick_c/cubos/     
-cp sdk/drivers/driver_cpu_m5StickS.ino              outputs/m5stick_c/cubos/     
+cp sdk/drivers/driver_cpu_m5StickC.ino              outputs/m5stick_c/cubos/     
 
 # Core
 cp sdk/core/core_basic.ino              outputs/m5stick_c/cubos/  
