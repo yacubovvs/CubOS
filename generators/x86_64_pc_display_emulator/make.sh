@@ -72,7 +72,7 @@ echo "
 cat sdk/core/core_time.ino               >> $OUTPUT_DIRECTORY/cubos/main.cpp
 echo "
 "   >> $OUTPUT_DIRECTORY/cubos/main.cpp
-cat sdk/core/core_battery.ino               >> $OUTPUT_DIRECTORY/cubos/main.cpp
+cat sdk/core/core_battery.ino            >> $OUTPUT_DIRECTORY/cubos/main.cpp
 echo "
 "   >> $OUTPUT_DIRECTORY/cubos/main.cpp
 cat sdk/core/core_views.ino              >> $OUTPUT_DIRECTORY/cubos/main.cpp
@@ -119,16 +119,16 @@ echo "
 cat sdk/apps/app_simplegame.ino      >> $OUTPUT_DIRECTORY/cubos/main.cpp
 echo "
 "   >> $OUTPUT_DIRECTORY/cubos/main.cpp
-cat sdk/apps/app_keyBoardTest.ino      >> $OUTPUT_DIRECTORY/cubos/main.cpp
+cat sdk/apps/app_keyBoardTest.ino          >> $OUTPUT_DIRECTORY/cubos/main.cpp
 echo "
 "   >> $OUTPUT_DIRECTORY/cubos/main.cpp
 cat sdk/apps/app_touchCalibration.ino      >> $OUTPUT_DIRECTORY/cubos/main.cpp
 echo "
 "   >> $OUTPUT_DIRECTORY/cubos/main.cpp
-cat sdk/apps/app_touchTest.ino      >> $OUTPUT_DIRECTORY/cubos/main.cpp
+cat sdk/apps/app_touchTest.ino             >> $OUTPUT_DIRECTORY/cubos/main.cpp
 echo "
 "   >> $OUTPUT_DIRECTORY/cubos/main.cpp
-cat sdk/apps/app_z_menu.ino          >> $OUTPUT_DIRECTORY/cubos/main.cpp
+cat sdk/apps/app_z_menu_touch.ino          >> $OUTPUT_DIRECTORY/cubos/main.cpp
 echo "
 "   >> $OUTPUT_DIRECTORY/cubos/main.cpp
 

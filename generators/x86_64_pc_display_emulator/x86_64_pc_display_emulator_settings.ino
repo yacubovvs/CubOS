@@ -32,6 +32,9 @@
 #define HARDWARE_BUTTONS_ENABLED        // Conf of controls with hardware btns    
 #define TOUCH_SCREEN_ENABLE
 
+#define TOUCH_SCREEN_DELTA_MOVE_FOR_DRAG 7
+#define TOUCH_SCREEN_TIME_MS_FOT_LONG_TOUCH 300
+
 #define colorScreen                     // Screen is colored
 //#define noAnimation                   // Caurse of framebuffer type
 

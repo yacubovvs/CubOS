@@ -13,8 +13,8 @@
 //#define serialDebug
 #define screenDebug
 
-#define SCREEN_WIDTH            80     // Screen resolution width
-#define SCREEN_HEIGHT           160     // Screen resolution height
+#define SCREEN_WIDTH            140     // Screen resolution width
+#define SCREEN_HEIGHT           140     // Screen resolution height
 
 #define FONT_CHAR_WIDTH         6     // Font letter size width
 #define FONT_CHAR_HEIGHT        8     // Font letter size height

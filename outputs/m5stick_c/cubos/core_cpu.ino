@@ -1,7 +1,5 @@
-long core_cpu_getCpuSleepTimeDelay(){
-    #ifdef CPU_SLEEP_ENABLE
+#ifdef CPU_SLEEP_ENABLE
+    long core_cpu_getCpuSleepTimeDelay(){
         return 25000;
-    #else
-        return 0;
-    #endif
-}
+    }
+#endif

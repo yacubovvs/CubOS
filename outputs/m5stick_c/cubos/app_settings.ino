@@ -2,7 +2,6 @@
 #define appName         "Settings"      // App name with spaces 
 
 #define CORE_VIEWS_SETTINGS_IMAGE_WIDTH 24
-
 #define SETTINGS_ELEMENTS
 
 #define PAGES_LIST_HEIGHT               20
@@ -415,7 +414,11 @@ String appNameClass::getApplicationSubTitle(unsigned char submenu, unsigned char
                 case 1:
                     return core_time_getDateFull();
                 case 2:
-                    return String(core_cpu_getCpuSleepTimeDelay());
+                    #ifdef CPU_SLEEP_ENABLE
+                        return String(core_cpu_getCpuSleepTimeDelay());
+                    #else
+                        return "-";
+                    #endif
                 case 3:
                     return String(core_batteryGetPercent()) + "%";
                 case 4:

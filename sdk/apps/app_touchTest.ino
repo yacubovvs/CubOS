@@ -100,7 +100,16 @@ void appNameClass::onEvent(unsigned char event, int val1, int val2){
         drawString("Touch drag", 5, STYLE_STATUSBAR_HEIGHT + 0*20 + 10, 2);
         drawString(String(val1), 5, STYLE_STATUSBAR_HEIGHT + 1*20 + 10, 2);
         drawString(String(val2), 5, STYLE_STATUSBAR_HEIGHT + 2*20 + 10, 2);
+    }else if(event==EVENT_ON_TOUCH_LONG_PRESS){
+        this->clearLabels();
+
+        setDrawColor(255, 255, 255);
+        drawString("Long press", 5, STYLE_STATUSBAR_HEIGHT + 0*20 + 10, 2);
+        drawString(String(val1), 5, STYLE_STATUSBAR_HEIGHT + 1*20 + 10, 2);
+        drawString(String(val2), 5, STYLE_STATUSBAR_HEIGHT + 2*20 + 10, 2);
     }
+
+    
 }
 
 const unsigned char appNameClass::icon[] PROGMEM = {
