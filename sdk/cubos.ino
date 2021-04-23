@@ -131,7 +131,7 @@ void setup()
       driver_RTC_setup();
   #endif
 
-  #ifdef serialDebug
+  #ifdef DEBUG_SERIAL
       Serial.begin(115200);
       debug("Serial debug started");
   #endif
@@ -230,7 +230,7 @@ void debug(String string, int delaytime){
       printf("\n");
     #endif
 
-    #ifdef serialDebug
+    #ifdef DEBUG_SERIAL
       Serial.println(string);
     #endif
 

@@ -8,7 +8,9 @@
 
 #undef CPU_CONTROLL_ENABLE
 
-//#define serialDebug
+#define LILYGO_WATCH_2020_V3 
+
+//#define DEBUG_SERIAL
 #define screenDebug
 
 #define SCREEN_WIDTH            240     // Screen resolution width
@@ -32,7 +34,7 @@
 //#define toDefaultApp_onLeftLongPress
 
 #define STARTING_APP_NUMM   -1    // for Mainmenu (default app)
-//#define STARTING_APP_NUMM   7     // for App number 7
+//#define STARTING_APP_NUMM   11     // for App number 7
 
 //#define CPU_SLEEP_ENABLE
 //#define CPU_SLEEP_TIME_DELAY core_cpu_getCpuSleepTimeDelay()

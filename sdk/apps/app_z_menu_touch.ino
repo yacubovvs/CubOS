@@ -235,7 +235,7 @@ void appNameClass::onDestroy(){
 }
 
 void appNameClass::onEvent(unsigned char event, int val1, int val2){
-    
+
     if(event==EVENT_ON_TOUCH_START){
         
     }else if(event==EVENT_ON_TOUCH_RELEASED){

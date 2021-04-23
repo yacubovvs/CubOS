@@ -10,6 +10,19 @@
 #define SINGLE_ELEMENTS_IN_X            ((int)(ACTIVE_SCREEN_WIDTH/SINGLE_ELEMENT_MIN_WIDTH))
 #define SINGLE_ELEMENTS_IN_Y            ((int)(ACTIVE_SCREEN_HEIGHT/SINGLE_ELEMENT_MIN_HEIGHT))
 
+#if ((ACTIVE_SCREEN_WIDTH/SINGLE_ELEMENT_MIN_WIDTH)) < 1
+  #define SINGLE_ELEMENTS_IN_X 1
+#endif
+
+#if ((ACTIVE_SCREEN_HEIGHT/SINGLE_ELEMENT_MIN_HEIGHT)) < 1
+  #define SINGLE_ELEMENTS_IN_Y 1
+#endif
+
+/*
+#if ((ACTIVE_SCREEN_WIDTH/SINGLE_ELEMENT_MIN_WIDTH)) <= 1 && ((ACTIVE_SCREEN_HEIGHT/SINGLE_ELEMENT_MIN_HEIGHT)) <= 1
+#endif
+*/
+
 #define SINGLE_ELEMENT_REAL_WIDTH       ((int)(ACTIVE_SCREEN_WIDTH/SINGLE_ELEMENTS_IN_X))
 #define SINGLE_ELEMENT_REAL_HEIGHT      ((int)(ACTIVE_SCREEN_HEIGHT/SINGLE_ELEMENTS_IN_Y))
 
@@ -264,7 +277,7 @@ void appNameClass::drawIcons(bool draw){
 
 void appNameClass::onLoop(){
     /*
-    #ifdef serialDebug
+    #ifdef DEBUG_SERIAL
         Serial.println("Application on loop");
     #endif
     delay(100);
@@ -272,22 +285,48 @@ void appNameClass::onLoop(){
 }
 
 void appNameClass::onDestroy(){
-    #ifdef serialDebug
+    #ifdef DEBUG_SERIAL
       Serial.println("Application on onDestroy");
     #endif
 }
 
 void appNameClass::onEvent(unsigned char event, int val1, int val2){
     
+  /*
+  BUTTON_UP
+  BUTTON_SELECT
+  BUTTON_DOWN
+  BUTTON_BACK
+  BUTTON_POWER
+  */
+  debug("event in menu");
+
+  #if DRIVER_CONTROLS_TOTALBUTTONS == 2
+    if(event==EVENT_BUTTON_PRESSED){
+    }else if(event==EVENT_BUTTON_RELEASED){
+    }else if(event==EVENT_BUTTON_LONG_PRESS){
+      if(val1==BUTTON_SELECT){
+        startApp(app_z_menu_selectedAppIndex);
+      }
+    }else if(event==EVENT_ON_TIME_CHANGED){
+
+    }else if(event==EVENT_BUTTON_SHORT_PRESS){
+      if(val1==BUTTON_SELECT){
+        this->updateActiveAppIndex(app_z_menu_selectedAppIndex+1);
+      }else if(val1==BUTTON_BACK){
+        this->updateActiveAppIndex(app_z_menu_selectedAppIndex-1);
+      }
+    }
+  #else
     if(event==EVENT_BUTTON_PRESSED){
       switch(val1){
-        case 0:
+        case BUTTON_UP:
           this->updateActiveAppIndex(app_z_menu_selectedAppIndex-1);
           break;
-        case 1:
+        case BUTTON_SELECT:
           startApp(app_z_menu_selectedAppIndex);
           break;
-        case 2:
+        case BUTTON_DOWN:
           this->updateActiveAppIndex(app_z_menu_selectedAppIndex+1);
           break;
       }
@@ -297,7 +336,12 @@ void appNameClass::onEvent(unsigned char event, int val1, int val2){
 
     }else if(event==EVENT_ON_TIME_CHANGED){
 
+    }else if(event==EVENT_BUTTON_SHORT_PRESS){
+
     }
+
+    
+  #endif
 
 }
 

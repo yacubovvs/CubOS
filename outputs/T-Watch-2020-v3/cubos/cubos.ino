@@ -6,8 +6,51 @@
     ############################################################################################
 */
 
+// TOUCH
+
+
+#define TOUCH_SCREEN_DELTA_MOVE_FOR_DRAG 7
+#define TOUCH_SCREEN_TIME_MS_FOT_LONG_TOUCH 300
+
+// BUTTONS
+
+#define BUTTON_UP       0x01
+#define BUTTON_SELECT   0x02
+#define BUTTON_DOWN     0x03
+#define BUTTON_BACK     0x04
+#define BUTTON_POWER    0x05
+
+#define DRIVER_CONTROLS_TOTALBUTTONS 3
+#define DRIVER_CONTROLS_DELAY_BEFOR_LONG_PRESS 350
+
+// EVENTS
+
+#define EVENT_BUTTON_PRESSED            0x00
+#define EVENT_BUTTON_RELEASED           0x01
+#define EVENT_BUTTON_LONG_PRESS         0x02
+#define EVENT_BUTTON_SHORT_PRESS        0x03
+#define EVENT_ON_TIME_CHANGED           0x04
+#define EVENT_ON_GOING_TO_SLEEP         0x05
+#define EVENT_ON_WAKE_UP                0x06
+
+#define EVENT_ON_TOUCH_START                0x06
+#define EVENT_ON_TOUCH_RELEASED             0x07
+#define EVENT_ON_TOUCH_CLICK                0x08
+#define EVENT_ON_TOUCH_LONG_PRESS           0x09
+#define EVENT_ON_TOUCH_DRAG                 0x0A
+#define EVENT_ON_TOUCH_DOUBLE_CLICK         0x0B
+#define EVENT_ON_TOUCH_SWIPE_FROM_LEFT      0x0C
+#define EVENT_ON_TOUCH_SWIPE_FROM_RIGHT     0x0D
+#define EVENT_ON_TOUCH_SWIPE_FROM_TOP       0x0E
+#define EVENT_ON_TOUCH_SWIPE_FROM_BOTTOM    0x0F
+
+#define EVENT_BUTTON_DOUBLE_PRESS       0x10
+
 #define I2C_ENABLE
 #define CPU_CONTROLL_ENABLE
+
+#define FONT_SIZE_DEFAULT 2
+#define HARDWARE_BUTTONS_VALUE 3
 
 /*
     ############################################################################################
@@ -25,7 +68,9 @@
 
 #undef CPU_CONTROLL_ENABLE
 
-//#define serialDebug
+#define LILYGO_WATCH_2020_V3 
+
+//#define DEBUG_SERIAL
 #define screenDebug
 
 #define SCREEN_WIDTH            240     // Screen resolution width
@@ -49,7 +94,7 @@
 //#define toDefaultApp_onLeftLongPress
 
 #define STARTING_APP_NUMM   -1    // for Mainmenu (default app)
-//#define STARTING_APP_NUMM   7     // for App number 7
+//#define STARTING_APP_NUMM   11     // for App number 7
 
 //#define CPU_SLEEP_ENABLE
 //#define CPU_SLEEP_TIME_DELAY core_cpu_getCpuSleepTimeDelay()
@@ -110,12 +155,21 @@ void fillScreen(unsigned char red, unsigned char green, unsigned char blue);
     ############################################################################################
 */
 
+/*
 #define EVENT_BUTTON_PRESSED            0x00
 #define EVENT_BUTTON_RELEASED           0x01
 #define EVENT_BUTTON_LONG_PRESS         0x02
 #define EVENT_ON_TIME_CHANGED           0x03
 #define EVENT_ON_GOING_TO_SLEEP         0x04
 #define EVENT_ON_WAKE_UP                0x05
+
+#define EVENT_ON_TOUCH_START            0x06
+#define EVENT_ON_TOUCH_RELEASED         0x07
+#define EVENT_ON_TOUCH_CLICK            0x08
+#define EVENT_ON_TOUCH_LONG_PRESS       0x09
+#define EVENT_ON_TOUCH_DRAG             0x0A
+#define EVENT_ON_TOUCH_DOUBLE_CLICK     0x0B
+*/
 
 /*
     ############################################################################################
@@ -206,7 +260,7 @@ void setup()
       driver_RTC_setup();
   #endif
 
-  #ifdef serialDebug
+  #ifdef DEBUG_SERIAL
       Serial.begin(115200);
       debug("Serial debug started");
   #endif
@@ -224,6 +278,10 @@ void setup()
   #ifdef HARDWARE_BUTTONS_ENABLED
     driver_controls_setup();
   #endif
+
+  #ifdef TOUCH_SCREEN_ENABLE
+    setup_touchScreenDriver();
+  #endif
   
   currentApp = getApp(STARTING_APP_NUMM);
   
@@ -235,6 +293,11 @@ void loop(){
 
   #ifdef HARDWARE_BUTTONS_ENABLED
     driver_controls_loop();
+  #endif
+
+  #ifdef TOUCH_SCREEN_ENABLE
+    //loop_touchScreenDriver();
+    loop_touchScreenCore();
   #endif
 
   #ifdef BATTERY_ENABLE
@@ -296,7 +359,7 @@ void debug(String string, int delaytime){
       printf("\n");
     #endif
 
-    #ifdef serialDebug
+    #ifdef DEBUG_SERIAL
       Serial.println(string);
     #endif
 
@@ -382,6 +445,7 @@ void debug(const char* string){
 #define APP_MENU_APPLICATIONS_8             SimpleGameApp
 #define APP_MENU_APPLICATIONS_9             TestApplicationApp
 #define APP_MENU_APPLICATIONS_10            BatteryApp
+#define APP_MENU_APPLICATIONS_11            TouchTest
 
 /*
     # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #

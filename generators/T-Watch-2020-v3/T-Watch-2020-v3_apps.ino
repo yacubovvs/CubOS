@@ -17,6 +17,7 @@
 #define APP_MENU_APPLICATIONS_8             SimpleGameApp
 #define APP_MENU_APPLICATIONS_9             TestApplicationApp
 #define APP_MENU_APPLICATIONS_10            BatteryApp
+#define APP_MENU_APPLICATIONS_11            TouchTest
 
 /*
     # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #

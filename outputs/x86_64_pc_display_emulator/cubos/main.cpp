@@ -50,7 +50,7 @@
 //      FOR ESP8266 USE NONOSSDK 2.2.2 +
 // ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! !
 
-//#define serialDebug
+//#define DEBUG_SERIAL
 //#define screenDebug
 #define TERMINAL_DEBUG
 
@@ -690,7 +690,7 @@ void setup()
       driver_RTC_setup();
   #endif
 
-  #ifdef serialDebug
+  #ifdef DEBUG_SERIAL
       Serial.begin(115200);
       debug("Serial debug started");
   #endif
@@ -789,7 +789,7 @@ void debug(String string, int delaytime){
       printf("\n");
     #endif
 
-    #ifdef serialDebug
+    #ifdef DEBUG_SERIAL
       Serial.println(string);
     #endif
 

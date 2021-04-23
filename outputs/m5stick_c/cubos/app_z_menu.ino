@@ -264,7 +264,7 @@ void appNameClass::drawIcons(bool draw){
 
 void appNameClass::onLoop(){
     /*
-    #ifdef serialDebug
+    #ifdef DEBUG_SERIAL
         Serial.println("Application on loop");
     #endif
     delay(100);
@@ -272,7 +272,7 @@ void appNameClass::onLoop(){
 }
 
 void appNameClass::onDestroy(){
-    #ifdef serialDebug
+    #ifdef DEBUG_SERIAL
       Serial.println("Application on onDestroy");
     #endif
 }

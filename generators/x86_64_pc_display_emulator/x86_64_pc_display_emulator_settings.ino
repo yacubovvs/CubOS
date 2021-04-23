@@ -11,7 +11,7 @@
 //      FOR ESP8266 USE NONOSSDK 2.2.2 +
 // ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! !
 
-//#define serialDebug
+//#define DEBUG_SERIAL
 //#define screenDebug
 #define TERMINAL_DEBUG
 
