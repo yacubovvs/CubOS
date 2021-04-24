@@ -24,7 +24,7 @@ void setDrawColor(unsigned char red, unsigned char green, unsigned char blue){
 ////////////////////////////////////////////////////////
 
 
-void setup_displayDriver(){
+void driver_display_setup(){
   M5.begin();
   M5.Lcd.fillScreen(TFT_BLACK);
   M5.Lcd.setTextSize(1);

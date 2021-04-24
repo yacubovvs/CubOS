@@ -25,6 +25,7 @@ int readRawParam(const unsigned char* data, long &position){
     }else if(paramType==0x03){
       return (unsigned int)byte_to_value(readRawChar(data, position), readRawChar(data, position),0,0,0,0,0,0);
     }
+    return 0;
 }
 
 /*

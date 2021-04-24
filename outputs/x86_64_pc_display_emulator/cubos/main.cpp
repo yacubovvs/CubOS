@@ -6,12 +6,32 @@
     ############################################################################################
 */
 
+// TOUCH
+
+
+#define TOUCH_SCREEN_DELTA_MOVE_FOR_DRAG 7
+#define TOUCH_SCREEN_TIME_MS_FOT_LONG_TOUCH 300
+
+// BUTTONS
+
+#define BUTTON_UP       0x01
+#define BUTTON_SELECT   0x02
+#define BUTTON_DOWN     0x03
+#define BUTTON_BACK     0x04
+#define BUTTON_POWER    0x05
+
+#define DRIVER_CONTROLS_TOTALBUTTONS 3
+#define DRIVER_CONTROLS_DELAY_BEFOR_LONG_PRESS 350
+
+// EVENTS
+
 #define EVENT_BUTTON_PRESSED            0x00
 #define EVENT_BUTTON_RELEASED           0x01
 #define EVENT_BUTTON_LONG_PRESS         0x02
-#define EVENT_ON_TIME_CHANGED           0x03
-#define EVENT_ON_GOING_TO_SLEEP         0x04
-#define EVENT_ON_WAKE_UP                0x05
+#define EVENT_BUTTON_SHORT_PRESS        0x03
+#define EVENT_ON_TIME_CHANGED           0x04
+#define EVENT_ON_GOING_TO_SLEEP         0x05
+#define EVENT_ON_WAKE_UP                0x06
 
 #define EVENT_ON_TOUCH_START                0x06
 #define EVENT_ON_TOUCH_RELEASED             0x07
@@ -28,6 +48,9 @@
 
 #define I2C_ENABLE
 #define CPU_CONTROLL_ENABLE
+
+#define FONT_SIZE_DEFAULT 2
+#define HARDWARE_BUTTONS_VALUE 3
 
 /*
     ############################################################################################
@@ -285,7 +308,7 @@ void sendMessageToDisplay(String message){
   send(sock,char_array,sizeof(char_array),0);
 }
 
-void setup_displayDriver(){
+void driver_display_setup(){
 
 
   #if defined(_WIN32) || defined(_WIN64)
@@ -703,7 +726,8 @@ void setup()
     driver_cpu_setup();
   #endif
   
-  setup_displayDriver();
+  driver_display_setup();
+  core_display_setup();
 
   #ifdef HARDWARE_BUTTONS_ENABLED
     driver_controls_setup();
@@ -720,6 +744,7 @@ void setup()
 bool isInSleep = false;
 void loop(){
   driver_display_loop();
+  core_display_setup();
 
   #ifdef HARDWARE_BUTTONS_ENABLED
     driver_controls_loop();
@@ -1139,6 +1164,86 @@ String getHexStringFromByte(unsigned char b){
 
 /*
 * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * 
+                                  FRAMEBUFFER
+* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * 
+*/
+
+/*
+FRAMEBUFFER_ENABLE
+FRAMEBUFFER_TWIN_FULL
+FRAMEBUFFER_BYTE_PER_PIXEL
+*/
+
+#ifdef FRAMEBUFFER_ENABLE
+
+  #ifdef FRAMEBUFFER_TWIN_FULL
+
+    #define FRAMEBUFFER_SIZE SCREEN_WIDTH * SCREEN_HEIGHT
+
+    #if FRAMEBUFFER_BYTE_PER_PIXEL==2
+      #define FRAMEBUFFER_TYPE uint16_t
+    #endif
+
+    FRAMEBUFFER_TYPE FRAMEBUFFER_currentFrame[FRAMEBUFFER_SIZE]; 
+    FRAMEBUFFER_TYPE FRAMEBUFFER_newFrame[FRAMEBUFFER_SIZE];
+
+    void FRAMEBUFFER_reset(){
+      for(long i=0; i<FRAMEBUFFER_SIZE; i++){
+        FRAMEBUFFER_currentFrame[i] = 0; 
+        FRAMEBUFFER_newFrame[i] = 0;
+      }
+    }
+
+    void FRAMEBUFFER_new_setPixel(uint16_t x, uint16_t y, FRAMEBUFFER_TYPE color){
+      long position = y * SCREEN_WIDTH + x;
+      FRAMEBUFFER_newFrame[position] = color;
+    }
+
+    FRAMEBUFFER_TYPE FRAMEBUFFER_new_getPixel(uint16_t x, uint16_t y){
+      long position = y * SCREEN_WIDTH + x;
+      return FRAMEBUFFER_newFrame[position];
+    }
+
+    FRAMEBUFFER_TYPE FRAMEBUFFER_current_getPixel(uint16_t x, uint16_t y){
+      long position = y * SCREEN_WIDTH + x;
+      return FRAMEBUFFER_currentFrame[position];
+    }
+  #endif
+
+#endif
+
+/*
+* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * 
+                                  DRAW LIMITS
+* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * 
+*/
+
+bool DRAW_LIMITS_Enabled  = false;
+int DRAW_LIMITS_top       = 0;
+int DRAW_LIMITS_bottom    = SCREEN_HEIGHT;
+int DRAW_LIMITS_left      = 0;
+int DRAW_LIMITS_right     = SCREEN_WIDTH;
+ 
+void DRAW_LIMITS_setEnable(bool enabled){
+  DRAW_LIMITS_Enabled = enabled;
+}
+
+void DRAW_LIMIT_reset(){
+  DRAW_LIMITS_top       = 0;
+  DRAW_LIMITS_bottom    = SCREEN_HEIGHT;
+  DRAW_LIMITS_left      = 0;
+  DRAW_LIMITS_right     = SCREEN_WIDTH;
+}
+
+void DRAW_LIMITS_setEnable(int top, int bottom, int left, int right){
+  if(top!=-1)     DRAW_LIMITS_top       = top;
+  if(bottom!=-1)  DRAW_LIMITS_bottom    = bottom;
+  if(left!=-1)    DRAW_LIMITS_left      = left;
+  if(right!=-1)   DRAW_LIMITS_right     = right;
+}
+
+/*
+* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * 
                                   DISPLAY FUNCTIONS
 * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * 
 */
@@ -1427,7 +1532,13 @@ static const unsigned char font_cubos[] PROGMEM = {
 };
 
 void setStr(char * dString, int x, int y, unsigned char fontSize){
-        
+  
+  if(DRAW_LIMITS_Enabled){
+    //if out of screen
+    if(x>DRAW_LIMITS_right||y>DRAW_LIMITS_bottom) return;
+    if(y<DRAW_LIMITS_top - fontSize*FONT_CHAR_WIDTH-1) return;
+  }
+
   int string_length = strlen(dString);
   for (int i=0; i<string_length; i++){
 
@@ -1471,10 +1582,10 @@ void setStr(char * dString, int x, int y, unsigned char fontSize){
                 driver_display_drawFastVLine(x +  char_part + i*FONT_CHAR_WIDTH, y + bit, pixelsInLine);
                 bit+=pixelsInLine;
               }else{
-                setPixel(x + char_part + i*FONT_CHAR_WIDTH, y + bit);
+                drawPixel(x + char_part + i*FONT_CHAR_WIDTH, y + bit);
               }
             #else
-              setPixel(x + char_part + i*FONT_CHAR_WIDTH, y + bit);
+              drawPixel(x + char_part + i*FONT_CHAR_WIDTH, y + bit);
             #endif
           }
         }
@@ -1568,8 +1679,30 @@ void drawString_rightAlign(String dString, int x, int y){
   drawString(dString, x - dString.length()*FONT_CHAR_WIDTH, y);  
 }
 
+void core_display_setup(){
+  #ifdef FRAMEBUFFER_ENABLE
+    FRAMEBUFFER_reset();
+  #endif
+}
+
+void core_display_loop(){
+
+}
+
 void drawPixel(int x, int y){
-  setPixel(x, y);
+  if(DRAW_LIMITS_Enabled){
+    //if out of screen
+    if(x>DRAW_LIMITS_right+1 || x<DRAW_LIMITS_left || y<DRAW_LIMITS_top+1 || y>DRAW_LIMITS_bottom) return;
+  }
+    
+  #ifdef FRAMEBUFFER_ENABLE
+    #ifdef FRAMEBUFFER_TWIN_FULL
+      FRAMEBUFFER_new_setPixel(x, y, getDrawColor());
+    #endif
+  #else
+    setPixel(x, y);
+  #endif
+  
 }
 
 
@@ -1724,6 +1857,18 @@ void drawRect_custom( int x0, int y0, int x1, int y1, int x2, int y2, int x3, in
 }
 
 void drawIcon(bool draw, const unsigned char* data, int x, int y){
+    /*
+    DRAW_LIMITS_Enabled
+    DRAW_LIMITS_top
+    DRAW_LIMITS_bottom
+    DRAW_LIMITS_left
+    DRAW_LIMITS_right
+    */
+
+  if(DRAW_LIMITS_Enabled){
+    //if out of screen
+    if(x>DRAW_LIMITS_right||y>DRAW_LIMITS_bottom) return;
+  }
   /*
   ################################################
   #                                              #
@@ -1740,6 +1885,11 @@ void drawIcon(bool draw, const unsigned char* data, int x, int y){
   int image_type = readRawParam(data, readPosition);    // type of image
   int image_wigth = readRawParam(data, readPosition);   // width
   int image_height = readRawParam(data, readPosition);  // height
+
+  if(DRAW_LIMITS_Enabled){
+    //if out of screen
+    if(x+image_wigth<DRAW_LIMITS_left||y+image_height<DRAW_LIMITS_top) return;
+  }
 
   if(!draw){
     setDrawColor(getBackgroundColor_red(), getBackgroundColor_green(), getBackgroundColor_blue());
@@ -2373,11 +2523,19 @@ const byte* getIcon(int icon){
 
         }else if(TOUCH_SCREEN_last_isTouching && getTOUCH_SCREEN_isTouching()){
 
-            int dx = getTOUCH_SCREEN_X() - TOUCH_SCREEN_touch_start_x;
-            int dy = getTOUCH_SCREEN_Y() - TOUCH_SCREEN_touch_start_y;
+            int dx;
+            int dy;
+
+            if(!TOUCH_SCREEN_isDragging){
+                dx = getTOUCH_SCREEN_X() - TOUCH_SCREEN_touch_start_x;
+                dy = getTOUCH_SCREEN_Y() - TOUCH_SCREEN_touch_start_y;
+            }else{
+                dx = getTOUCH_SCREEN_X() - TOUCH_SCREEN_last_x;
+                dy = getTOUCH_SCREEN_Y() - TOUCH_SCREEN_last_y;
+            }
 
             //TOUCH_SCREEN_DELTA_MOVE_FOR_DRAG
-            if(TOUCH_SCREEN_isDragging || abs(dx)>TOUCH_SCREEN_DELTA_MOVE_FOR_DRAG || abs(dy)>TOUCH_SCREEN_DELTA_MOVE_FOR_DRAG){
+            if( (TOUCH_SCREEN_isDragging && (abs(dx)>0 || abs(dy)>0) ) || abs(dx)>TOUCH_SCREEN_DELTA_MOVE_FOR_DRAG || abs(dy)>TOUCH_SCREEN_DELTA_MOVE_FOR_DRAG){
                 TOUCH_SCREEN_isDragging = true;
                 TOUCH_SCREEN_last_x = getTOUCH_SCREEN_X();
                 TOUCH_SCREEN_last_y = getTOUCH_SCREEN_Y();
@@ -4121,9 +4279,13 @@ void appNameClass::onDestroy(){
 
 void appNameClass::clearLabels(){
     setDrawColor(0, 0, 0);
+    //drawRect(5, STYLE_STATUSBAR_HEIGHT + 0*20 + 10, 240, STYLE_STATUSBAR_HEIGHT + 3*20 + 10, true);
+    drawRect(0, STYLE_STATUSBAR_HEIGHT, 240, 240, true);
+    /*
     clearString("Not touched released", 5, STYLE_STATUSBAR_HEIGHT + 0*20 + 10, 2);
     clearString("000000000000000", 5, STYLE_STATUSBAR_HEIGHT + 1*20 + 10, 2);
     clearString("000000000000000", 5, STYLE_STATUSBAR_HEIGHT + 2*20 + 10, 2);
+    */
 }
 
 void appNameClass::onEvent(unsigned char event, int val1, int val2){
@@ -4361,6 +4523,12 @@ void appNameClass::onCreate(){
 
 void appNameClass::drawIcons(bool draw){
 
+  long drawMillis = millis();
+
+  DRAW_LIMITS_setEnable(true);
+  DRAW_LIMIT_reset();
+  DRAW_LIMITS_setEnable(STYLE_STATUSBAR_HEIGHT, SCREEN_HEIGHT - STYLE_STATUSBAR_HEIGHT, -1, -1);
+  
 	for(unsigned char app_num=0; app_num<APP_MENU_APPLICATIONS_QUANTITY; app_num++){
 
 		unsigned char x_position = app_num%SINGLE_ELEMENTS_IN_X;
@@ -4382,36 +4550,13 @@ void appNameClass::drawIcons(bool draw){
 		);
 	}
 
-	/*
-  	for (unsigned char y_position=0; y_position<SINGLE_ELEMENTS_IN_Y; y_position++){
-        for (unsigned char x_position=0; x_position<SINGLE_ELEMENTS_IN_X; x_position++){
-            int x0 = x_position*SINGLE_ELEMENT_REAL_WIDTH;
-            int y0 = y_position*SINGLE_ELEMENT_REAL_HEIGHT + STYLE_STATUSBAR_HEIGHT+1;
-            int x1 = x0+SINGLE_ELEMENT_REAL_WIDTH;
-            int y1 = y0+SINGLE_ELEMENT_REAL_HEIGHT;
+  DRAW_LIMITS_setEnable(false);
 
-            int x_center = (x0+x1)/2;
-            int y_center = (y0+y1)/2;
-
-            int app_num = y_position*(SINGLE_ELEMENTS_IN_X) + x_position + APPS_ON_SINGLE_PAGE*(int)(app_z_menu_selectedAppIndex/APPS_ON_SINGLE_PAGE);
-
-            if(app_num<APP_MENU_APPLICATIONS_QUANTITY){
-				#ifdef ESP8266
-					ESP.wdtDisable();
-				#endif
-
-				//debug(String(app_num), 1000);
-
-				core_views_draw_app_icon(
-					draw, 
-					x_center, y_center, 
-					(const unsigned char*)this->getApplicationTitle(app_num), 
-					this->getApplicationIcon(app_num)
-				);
-            }
-        }
-    }
-	*/
+  int timeToDraw = millis() - drawMillis;
+  setDrawColor(0,0,0);
+  drawRect(120, 0, 240, 20, true);
+  setDrawColor(255,255,255);
+  drawString(String(timeToDraw), 130, 4, 2);
 }
 
 void appNameClass::onLoop(){
@@ -4421,16 +4566,16 @@ void appNameClass::onDestroy(){
 }
 
 void appNameClass::onEvent(unsigned char event, int val1, int val2){
-    
+
     if(event==EVENT_ON_TOUCH_START){
         
     }else if(event==EVENT_ON_TOUCH_RELEASED){
         
     }else if(event==EVENT_ON_TOUCH_DRAG){
-        this->drawIcons(false);
-		this->scroll_x += val1;
-		this->scroll_y += val2;
-		this->drawIcons(true);
+      this->drawIcons(false);
+      this->scroll_x += val1;
+      this->scroll_y += val2;
+      this->drawIcons(true);
     }
 
 }

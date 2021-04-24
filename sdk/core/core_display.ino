@@ -14,29 +14,86 @@ FRAMEBUFFER_BYTE_PER_PIXEL
 
   #ifdef FRAMEBUFFER_TWIN_FULL
 
-    #define FRAMEBUFFER_SIZE SCREEN_WIDTH * SCREEN_HEIGHT * FRAMEBUFFER_BYTE_PER_PIXEL
+    #define FRAMEBUFFER_SIZE SCREEN_WIDTH * SCREEN_HEIGHT
 
-    uint16_t FRAMEBUFFER_currentFrame[FRAMEBUFFER_SIZE]; 
-    uint16_t FRAMEBUFFER_newFrame[FRAMEBUFFER_SIZE];
+    #if FRAMEBUFFER_BYTE_PER_PIXEL==2
+      #define FRAMEBUFFER_TYPE uint16_t
+    #endif
+
+    //FRAMEBUFFER_TYPE FRAMEBUFFER_currentFrame[FRAMEBUFFER_SIZE]; 
+    //FRAMEBUFFER_TYPE FRAMEBUFFER_newFrame[FRAMEBUFFER_SIZE];
+
+    //int FRAMEBUFFER_currentFrame[240*240]; 
+    //int FRAMEBUFFER_newFrame[240*240];
+
+    FRAMEBUFFER_TYPE FRAMEBUFFER_currentFrame1[SCREEN_WIDTH][SCREEN_HEIGHT/2];
+    FRAMEBUFFER_TYPE FRAMEBUFFER_currentFrame2[SCREEN_WIDTH][SCREEN_HEIGHT/2];
+    FRAMEBUFFER_TYPE FRAMEBUFFER_newFrame1[SCREEN_WIDTH][SCREEN_HEIGHT/2];
+    FRAMEBUFFER_TYPE FRAMEBUFFER_newFrame2[SCREEN_WIDTH][SCREEN_HEIGHT/2];
 
     void FRAMEBUFFER_reset(){
+      FRAMEBUFFER_newFrame1[0][0] = 0;
+      FRAMEBUFFER_newFrame2[0][0] = 0;
+      for(int x=0; x<SCREEN_WIDTH; x++){
+        for(int y=0; y<SCREEN_HEIGHT; y++){
+          //FRAMEBUFFER_new_setPixel(x, y, 0);
+          //FRAMEBUFFER_current_setPixel(x, y, 0);
+        }
+      }
+      //FRAMEBUFFER_newFrame[0][0] = 0;
+      //test = 2;
+      //FRAMEBUFFER_currentFrame[i]
+      /*
       for(long i=0; i<FRAMEBUFFER_SIZE; i++){
         FRAMEBUFFER_currentFrame[i] = 0; 
         FRAMEBUFFER_newFrame[i] = 0;
+      }*/
+      
+    }
+
+    void FRAMEBUFFER_new_setPixel(uint16_t x, uint16_t y, FRAMEBUFFER_TYPE color){
+      if(y>=SCREEN_HEIGHT/2){
+        FRAMEBUFFER_newFrame1[x][y] = color;
+      }else{
+        //FRAMEBUFFER_newFrame2[x][y-SCREEN_HEIGHT/2] = color;
       }
     }
 
-    void FRAMEBUFFER_new_setPixel(uint16_t x, uint16_t y, uint16_t color){
-
+    void FRAMEBUFFER_current_setPixel(uint16_t x, uint16_t y, FRAMEBUFFER_TYPE color){
+      if(y>=SCREEN_HEIGHT/2){
+        FRAMEBUFFER_currentFrame1[x][y] = color;
+      }else{
+        FRAMEBUFFER_currentFrame1[x][y-SCREEN_HEIGHT/2] = color;
+      }
     }
 
-    uint16_t FRAMEBUFFER_new_getPixel(uint16_t x, uint16_t y){
-      
+    FRAMEBUFFER_TYPE FRAMEBUFFER_new_setPixel(uint16_t x, uint16_t y){
+      if(y>=SCREEN_HEIGHT/2){
+        return FRAMEBUFFER_newFrame1[x][y];
+      }else{
+        return FRAMEBUFFER_newFrame2[x][y-SCREEN_HEIGHT/2];
+      }
     }
 
-    uint16_t FRAMEBUFFER_current_getPixel(uint16_t x, uint16_t y){
-      
+    FRAMEBUFFER_TYPE FRAMEBUFFER_current_setPixel(uint16_t x, uint16_t y){
+      if(y>=SCREEN_HEIGHT/2){
+        return FRAMEBUFFER_currentFrame1[x][y];
+      }else{
+        return  FRAMEBUFFER_currentFrame1[x][y-SCREEN_HEIGHT/2];
+      }
     }
+
+    /*
+    FRAMEBUFFER_TYPE FRAMEBUFFER_new_getPixel(uint16_t x, uint16_t y){
+      long position = y * SCREEN_WIDTH + x;
+      return FRAMEBUFFER_newFrame[position];
+    }
+
+    FRAMEBUFFER_TYPE FRAMEBUFFER_current_getPixel(uint16_t x, uint16_t y){
+      long position = y * SCREEN_WIDTH + x;
+      return FRAMEBUFFER_currentFrame[position];
+    }
+    */
   #endif
 
 #endif
@@ -508,13 +565,29 @@ void drawString_rightAlign(String dString, int x, int y){
   drawString(dString, x - dString.length()*FONT_CHAR_WIDTH, y);  
 }
 
+void core_display_setup(){
+  #ifdef FRAMEBUFFER_ENABLE
+    FRAMEBUFFER_reset();
+  #endif
+}
+
+void core_display_loop(){
+
+}
+
 void drawPixel(int x, int y){
   if(DRAW_LIMITS_Enabled){
     //if out of screen
     if(x>DRAW_LIMITS_right+1 || x<DRAW_LIMITS_left || y<DRAW_LIMITS_top+1 || y>DRAW_LIMITS_bottom) return;
   }
     
-  setPixel(x, y);
+  #ifdef FRAMEBUFFER_ENABLE
+    #ifdef FRAMEBUFFER_TWIN_FULL
+      //FRAMEBUFFER_new_setPixel(x, y, getDrawColor());
+    #endif
+  #else
+    setPixel(x, y);
+  #endif
   
 }
 

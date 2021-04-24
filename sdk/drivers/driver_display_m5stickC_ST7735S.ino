@@ -15,7 +15,7 @@ uint16_t get_uint16Color(unsigned char red, unsigned char green, unsigned char b
   return ( (red*31/255) <<11)|( (green*31/255) <<6)|( (blue*31/255) <<0);
 }
 
-void setup_displayDriver(){
+void driver_display_setup(){
   M5.begin();
   M5.IMU.Init();
 }

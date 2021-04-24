@@ -248,7 +248,7 @@ void setup()
     driver_cpu_setup();
   #endif
   
-  setup_displayDriver();
+  driver_display_setup();
 
   #ifdef HARDWARE_BUTTONS_ENABLED
     driver_controls_setup();

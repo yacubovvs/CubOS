@@ -72,7 +72,7 @@ void sendMessageToDisplay(String message){
   send(sock,char_array,sizeof(char_array),0);
 }
 
-void setup_displayDriver(){
+void driver_display_setup(){
 
 
   #if defined(_WIN32) || defined(_WIN64)

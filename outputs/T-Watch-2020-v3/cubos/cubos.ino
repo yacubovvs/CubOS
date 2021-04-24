@@ -254,8 +254,7 @@ Application* currentApp;
     ############################################################################################
 */
 
-void setup()
-{ 
+void setup(){ 
   #ifdef BATTERY_ENABLE
     driver_battery_setup();
   #endif
@@ -277,7 +276,8 @@ void setup()
     driver_cpu_setup();
   #endif
   
-  setup_displayDriver();
+  driver_display_setup();
+  core_display_setup();
 
   #ifdef HARDWARE_BUTTONS_ENABLED
     driver_controls_setup();
@@ -294,6 +294,7 @@ void setup()
 bool isInSleep = false;
 void loop(){
   driver_display_loop();
+  core_display_loop();
 
   #ifdef HARDWARE_BUTTONS_ENABLED
     driver_controls_loop();

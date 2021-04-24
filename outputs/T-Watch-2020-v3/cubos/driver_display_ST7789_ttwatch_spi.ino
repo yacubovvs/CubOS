@@ -13,7 +13,11 @@ void setDrawColor(unsigned char red, unsigned char green, unsigned char blue){
   current_drawColor = get_uint16Color(red, green, blue);
 }
 
-void setup_displayDriver(void){
+uint16_t getDrawColor(){
+  return current_drawColor;
+}
+
+void driver_display_setup(){
     ttgo = TTGOClass::getWatch();
     ttgo->begin();
     ttgo->openBL();
