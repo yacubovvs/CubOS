@@ -19,6 +19,10 @@
 #define FONT_CHAR_WIDTH         6     // Font letter size width
 #define FONT_CHAR_HEIGHT        8     // Font letter size height
 
+#define FRAMEBUFFER_ENABLE
+#define FRAMEBUFFER_TWIN_FULL
+#define FRAMEBUFFER_BYTE_PER_PIXEL 2
+
 #define platform_esp32
 #define device_has_bluetooth
 #define device_has_wifi

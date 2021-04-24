@@ -175,6 +175,12 @@ void appNameClass::onCreate(){
 
 void appNameClass::drawIcons(bool draw){
 
+  long drawMillis = millis();
+
+  DRAW_LIMITS_setEnable(true);
+  DRAW_LIMIT_reset();
+  DRAW_LIMITS_setEnable(STYLE_STATUSBAR_HEIGHT, SCREEN_HEIGHT - STYLE_STATUSBAR_HEIGHT, -1, -1);
+  
 	for(unsigned char app_num=0; app_num<APP_MENU_APPLICATIONS_QUANTITY; app_num++){
 
 		unsigned char x_position = app_num%SINGLE_ELEMENTS_IN_X;
@@ -196,36 +202,13 @@ void appNameClass::drawIcons(bool draw){
 		);
 	}
 
-	/*
-  	for (unsigned char y_position=0; y_position<SINGLE_ELEMENTS_IN_Y; y_position++){
-        for (unsigned char x_position=0; x_position<SINGLE_ELEMENTS_IN_X; x_position++){
-            int x0 = x_position*SINGLE_ELEMENT_REAL_WIDTH;
-            int y0 = y_position*SINGLE_ELEMENT_REAL_HEIGHT + STYLE_STATUSBAR_HEIGHT+1;
-            int x1 = x0+SINGLE_ELEMENT_REAL_WIDTH;
-            int y1 = y0+SINGLE_ELEMENT_REAL_HEIGHT;
+  DRAW_LIMITS_setEnable(false);
 
-            int x_center = (x0+x1)/2;
-            int y_center = (y0+y1)/2;
-
-            int app_num = y_position*(SINGLE_ELEMENTS_IN_X) + x_position + APPS_ON_SINGLE_PAGE*(int)(app_z_menu_selectedAppIndex/APPS_ON_SINGLE_PAGE);
-
-            if(app_num<APP_MENU_APPLICATIONS_QUANTITY){
-				#ifdef ESP8266
-					ESP.wdtDisable();
-				#endif
-
-				//debug(String(app_num), 1000);
-
-				core_views_draw_app_icon(
-					draw, 
-					x_center, y_center, 
-					(const unsigned char*)this->getApplicationTitle(app_num), 
-					this->getApplicationIcon(app_num)
-				);
-            }
-        }
-    }
-	*/
+  int timeToDraw = millis() - drawMillis;
+  setDrawColor(0,0,0);
+  drawRect(120, 0, 240, 20, true);
+  setDrawColor(255,255,255);
+  drawString(String(timeToDraw), 130, 4, 2);
 }
 
 void appNameClass::onLoop(){
@@ -241,10 +224,10 @@ void appNameClass::onEvent(unsigned char event, int val1, int val2){
     }else if(event==EVENT_ON_TOUCH_RELEASED){
         
     }else if(event==EVENT_ON_TOUCH_DRAG){
-        this->drawIcons(false);
-		this->scroll_x += val1;
-		this->scroll_y += val2;
-		this->drawIcons(true);
+      this->drawIcons(false);
+      this->scroll_x += val1;
+      this->scroll_y += val2;
+      this->drawIcons(true);
     }
 
 }

@@ -1,5 +1,78 @@
 /*
 * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * 
+                                  FRAMEBUFFER
+* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * 
+*/
+
+/*
+FRAMEBUFFER_ENABLE
+FRAMEBUFFER_TWIN_FULL
+FRAMEBUFFER_BYTE_PER_PIXEL
+*/
+
+#ifdef FRAMEBUFFER_ENABLE
+
+  #ifdef FRAMEBUFFER_TWIN_FULL
+
+    #define FRAMEBUFFER_SIZE SCREEN_WIDTH * SCREEN_HEIGHT * FRAMEBUFFER_BYTE_PER_PIXEL
+
+    uint16_t FRAMEBUFFER_currentFrame[FRAMEBUFFER_SIZE]; 
+    uint16_t FRAMEBUFFER_newFrame[FRAMEBUFFER_SIZE];
+
+    void FRAMEBUFFER_reset(){
+      for(long i=0; i<FRAMEBUFFER_SIZE; i++){
+        FRAMEBUFFER_currentFrame[i] = 0; 
+        FRAMEBUFFER_newFrame[i] = 0;
+      }
+    }
+
+    void FRAMEBUFFER_new_setPixel(uint16_t x, uint16_t y, uint16_t color){
+
+    }
+
+    uint16_t FRAMEBUFFER_new_getPixel(uint16_t x, uint16_t y){
+      
+    }
+
+    uint16_t FRAMEBUFFER_current_getPixel(uint16_t x, uint16_t y){
+      
+    }
+  #endif
+
+#endif
+
+/*
+* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * 
+                                  DRAW LIMITS
+* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * 
+*/
+
+bool DRAW_LIMITS_Enabled  = false;
+int DRAW_LIMITS_top       = 0;
+int DRAW_LIMITS_bottom    = SCREEN_HEIGHT;
+int DRAW_LIMITS_left      = 0;
+int DRAW_LIMITS_right     = SCREEN_WIDTH;
+ 
+void DRAW_LIMITS_setEnable(bool enabled){
+  DRAW_LIMITS_Enabled = enabled;
+}
+
+void DRAW_LIMIT_reset(){
+  DRAW_LIMITS_top       = 0;
+  DRAW_LIMITS_bottom    = SCREEN_HEIGHT;
+  DRAW_LIMITS_left      = 0;
+  DRAW_LIMITS_right     = SCREEN_WIDTH;
+}
+
+void DRAW_LIMITS_setEnable(int top, int bottom, int left, int right){
+  if(top!=-1)     DRAW_LIMITS_top       = top;
+  if(bottom!=-1)  DRAW_LIMITS_bottom    = bottom;
+  if(left!=-1)    DRAW_LIMITS_left      = left;
+  if(right!=-1)   DRAW_LIMITS_right     = right;
+}
+
+/*
+* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * 
                                   DISPLAY FUNCTIONS
 * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * 
 */
@@ -288,7 +361,13 @@ static const unsigned char font_cubos[] PROGMEM = {
 };
 
 void setStr(char * dString, int x, int y, unsigned char fontSize){
-        
+  
+  if(DRAW_LIMITS_Enabled){
+    //if out of screen
+    if(x>DRAW_LIMITS_right||y>DRAW_LIMITS_bottom) return;
+    if(y<DRAW_LIMITS_top - fontSize*FONT_CHAR_WIDTH-1) return;
+  }
+
   int string_length = strlen(dString);
   for (int i=0; i<string_length; i++){
 
@@ -332,10 +411,10 @@ void setStr(char * dString, int x, int y, unsigned char fontSize){
                 driver_display_drawFastVLine(x +  char_part + i*FONT_CHAR_WIDTH, y + bit, pixelsInLine);
                 bit+=pixelsInLine;
               }else{
-                setPixel(x + char_part + i*FONT_CHAR_WIDTH, y + bit);
+                drawPixel(x + char_part + i*FONT_CHAR_WIDTH, y + bit);
               }
             #else
-              setPixel(x + char_part + i*FONT_CHAR_WIDTH, y + bit);
+              drawPixel(x + char_part + i*FONT_CHAR_WIDTH, y + bit);
             #endif
           }
         }
@@ -430,7 +509,13 @@ void drawString_rightAlign(String dString, int x, int y){
 }
 
 void drawPixel(int x, int y){
+  if(DRAW_LIMITS_Enabled){
+    //if out of screen
+    if(x>DRAW_LIMITS_right+1 || x<DRAW_LIMITS_left || y<DRAW_LIMITS_top+1 || y>DRAW_LIMITS_bottom) return;
+  }
+    
   setPixel(x, y);
+  
 }
 
 
@@ -585,6 +670,18 @@ void drawRect_custom( int x0, int y0, int x1, int y1, int x2, int y2, int x3, in
 }
 
 void drawIcon(bool draw, const unsigned char* data, int x, int y){
+    /*
+    DRAW_LIMITS_Enabled
+    DRAW_LIMITS_top
+    DRAW_LIMITS_bottom
+    DRAW_LIMITS_left
+    DRAW_LIMITS_right
+    */
+
+  if(DRAW_LIMITS_Enabled){
+    //if out of screen
+    if(x>DRAW_LIMITS_right||y>DRAW_LIMITS_bottom) return;
+  }
   /*
   ################################################
   #                                              #
@@ -601,6 +698,11 @@ void drawIcon(bool draw, const unsigned char* data, int x, int y){
   int image_type = readRawParam(data, readPosition);    // type of image
   int image_wigth = readRawParam(data, readPosition);   // width
   int image_height = readRawParam(data, readPosition);  // height
+
+  if(DRAW_LIMITS_Enabled){
+    //if out of screen
+    if(x+image_wigth<DRAW_LIMITS_left||y+image_height<DRAW_LIMITS_top) return;
+  }
 
   if(!draw){
     setDrawColor(getBackgroundColor_red(), getBackgroundColor_green(), getBackgroundColor_blue());
