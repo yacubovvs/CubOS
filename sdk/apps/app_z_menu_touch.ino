@@ -194,7 +194,7 @@ void appNameClass::drawIcons(bool draw){
 
 		core_views_draw_app_icon(
 			draw, 
-			x_center, y_center + this->scroll_y, 
+			x_center, y_center - this->scroll_y, 
 			(const unsigned char*)this->getApplicationTitle(app_num), 
 			this->getApplicationIcon(app_num)
 		);
@@ -217,8 +217,32 @@ void appNameClass::onEvent(unsigned char event, int val1, int val2){
         
     }else if(event==EVENT_ON_TOUCH_DRAG){
       this->drawIcons(false);
-      this->scroll_x += val1;
-      this->scroll_y += val2;
+      /*
+      #define PAGES_LIST_HEIGHT               20
+#define ACTIVE_SCREEN_WIDTH             SCREEN_WIDTH
+#define ACTIVE_SCREEN_HEIGHT            (SCREEN_HEIGHT - STYLE_STATUSBAR_HEIGHT - PAGES_LIST_HEIGHT)
+#define SINGLE_ELEMENT_MIN_WIDTH        100
+#define SINGLE_ELEMENT_MIN_HEIGHT       80
+
+#define SINGLE_ELEMENTS_IN_X            ((int)(ACTIVE_SCREEN_WIDTH/SINGLE_ELEMENT_MIN_WIDTH))
+#define SINGLE_ELEMENTS_IN_Y            ((int)(ACTIVE_SCREEN_HEIGHT/SINGLE_ELEMENT_MIN_HEIGHT))
+
+#define SINGLE_ELEMENT_REAL_WIDTH       ((int)(ACTIVE_SCREEN_WIDTH/SINGLE_ELEMENTS_IN_X))
+#define SINGLE_ELEMENT_REAL_HEIGHT      ((int)(ACTIVE_SCREEN_HEIGHT/SINGLE_ELEMENTS_IN_Y))
+
+#define PAGES_LIST_POSITION             (SCREEN_HEIGHT-PAGES_LIST_HEIGHT/2)
+
+#define APPS_ON_SINGLE_PAGE             (SINGLE_ELEMENTS_IN_X * SINGLE_ELEMENTS_IN_Y)
+      */
+      this->scroll_y -= val2;
+      if(scroll_y<0) scroll_y = 0;
+      if(scroll_y>(SINGLE_ELEMENTS_IN_Y)*(SINGLE_ELEMENT_REAL_HEIGHT) - ACTIVE_SCREEN_HEIGHT){
+        //scroll_y = (SINGLE_ELEMENTS_IN_Y)*(SINGLE_ELEMENT_REAL_HEIGHT) - ACTIVE_SCREEN_HEIGHT;
+        
+      }
+      //log_d("Scroll %d  Limit %d", scroll_y, (SINGLE_ELEMENTS_IN_Y)*(SINGLE_ELEMENT_REAL_HEIGHT) - ACTIVE_SCREEN_HEIGHT);
+      //log_d("Scroll %d  Limit %d", scroll_y, SINGLE_ELEMENT_REAL_HEIGHT);
+
       this->drawIcons(true);
     }
 

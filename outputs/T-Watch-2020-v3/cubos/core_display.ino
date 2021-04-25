@@ -582,7 +582,7 @@ void core_display_setup(){
   #endif
 }
 
-int fs_ms_max = 0;
+//int fs_ms_max = 0;
 
 void core_display_loop(){
   
@@ -590,7 +590,7 @@ void core_display_loop(){
     #ifdef FRAMEBUFFER_TWIN_FULL
       if(getFRAMEBUFFER_isChanged()){
 
-        long drawMillis = millis();
+        //long drawMillis = millis();
 
         for(int y=0; y<SCREEN_HEIGHT; y++){
           for(int x=0; x<SCREEN_WIDTH; x++){
@@ -607,7 +607,7 @@ void core_display_loop(){
           }
         }
 
-        int timeToDraw = millis() - drawMillis;
+        //int timeToDraw = millis() - drawMillis;
         /*
         if(fs_ms_max==0) fs_ms_max=1;
         else if(fs_ms_max<timeToDraw){
@@ -615,7 +615,7 @@ void core_display_loop(){
           log_d("Framebuffer drawing %d", fs_ms_max);
         }*/
 
-        log_d("Framebuffer drawing %d", timeToDraw);
+        //log_d("Framebuffer drawing %d", timeToDraw);
         
       }
       setFRAMEBUFFER_isChanged(false);
