@@ -175,11 +175,9 @@ void appNameClass::onCreate(){
 
 void appNameClass::drawIcons(bool draw){
 
-  long drawMillis = millis();
-
   DRAW_LIMITS_setEnable(true);
   DRAW_LIMIT_reset();
-  DRAW_LIMITS_setEnable(STYLE_STATUSBAR_HEIGHT, SCREEN_HEIGHT - STYLE_STATUSBAR_HEIGHT, -1, -1);
+  DRAW_LIMITS_setEnable(STYLE_STATUSBAR_HEIGHT, -1, -1, -1);
   
 	for(unsigned char app_num=0; app_num<APP_MENU_APPLICATIONS_QUANTITY; app_num++){
 
@@ -203,12 +201,6 @@ void appNameClass::drawIcons(bool draw){
 	}
 
   DRAW_LIMITS_setEnable(false);
-
-  int timeToDraw = millis() - drawMillis;
-  setDrawColor(0,0,0);
-  drawRect(120, 0, 240, 20, true);
-  setDrawColor(255,255,255);
-  drawString(String(timeToDraw), 130, 4, 2);
 }
 
 void appNameClass::onLoop(){

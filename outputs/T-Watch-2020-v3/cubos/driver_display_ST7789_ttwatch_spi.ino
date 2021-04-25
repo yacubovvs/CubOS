@@ -13,6 +13,10 @@ void setDrawColor(unsigned char red, unsigned char green, unsigned char blue){
   current_drawColor = get_uint16Color(red, green, blue);
 }
 
+void setDrawColor(uint16_t color){
+  current_drawColor = color;
+}
+
 uint16_t getDrawColor(){
   return current_drawColor;
 }
@@ -43,6 +47,18 @@ void setPixel(int x, int y){
     ttgo->tft->drawPixel(SCREEN_WIDTH-x, SCREEN_HEIGHT-y, current_drawColor);
   #else
     ttgo->tft->drawPixel(x, y, current_drawColor);
+  #endif
+}
+
+void setPixel(int x, int y, uint16_t color){
+  #if defined(SCREEN_ROTATION_90)
+    ttgo->tft->drawPixel(SCREEN_WIDTH-x, SCREEN_HEIGHT-y, color);
+  #elif defined(SCREEN_ROTATION_180)
+    ttgo->tft->drawPixel(SCREEN_WIDTH-x, SCREEN_HEIGHT-y, color);
+  #elif defined(SCREEN_ROTATION_270)
+    ttgo->tft->drawPixel(SCREEN_WIDTH-x, SCREEN_HEIGHT-y, color);
+  #else
+    ttgo->tft->drawPixel(x, y, color);
   #endif
 }
 
