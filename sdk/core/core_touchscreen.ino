@@ -18,6 +18,10 @@
 
     long TOUCH_SCREEN_touch_start_ms = 0;
 
+    long getTOUCH_SCREEN_touch_start_ms(){
+        return TOUCH_SCREEN_touch_start_ms;
+    }
+
     void loop_touchScreenCore(){
         loop_touchScreenDriver();
         

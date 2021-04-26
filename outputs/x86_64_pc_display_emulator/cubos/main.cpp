@@ -666,35 +666,6 @@ class Application{
       if(this->showStatusBar) core_views_statusBar_draw();
     }
 
-    void loop_app(){
-      onLoop();
-      
-
-      #ifdef noAnimation
-        scroll_x = scroll_to_x;
-        scroll_y = scroll_to_y;
-      #else
-        int dy=0; int dx =0;
-  
-        if(scroll_x!=scroll_to_x){
-          dx = abs(scroll_x-scroll_to_x)/5 + 2;
-          if(scroll_x>scroll_to_x) dx *= -1;
-          scroll_x+=dx;
-  
-          if (abs(scroll_x-scroll_to_x)<abs(dx)) scroll_to_x=scroll_x;
-        }
-  
-        if(scroll_y!=scroll_to_y){
-          dy = abs(scroll_y-scroll_to_y)/5 + 2;
-          if(scroll_y>scroll_to_y) dy *= -1;
-          scroll_y+=dy;
-      
-          if (abs(scroll_y-scroll_to_y)<abs(dy)) scroll_y=scroll_to_y;
-        }
-
-        //Serial.println(scroll_to_y);
-      #endif
-    }
     Application(){};
 };
 
@@ -2599,6 +2570,10 @@ const byte* getIcon(int icon){
     }
 
     long TOUCH_SCREEN_touch_start_ms = 0;
+
+    long getTOUCH_SCREEN_touch_start_ms(){
+        return TOUCH_SCREEN_touch_start_ms;
+    }
 
     void loop_touchScreenCore(){
         loop_touchScreenDriver();
@@ -4669,12 +4644,43 @@ void appNameClass::onEvent(unsigned char event, int val1, int val2){
     if(event==EVENT_ON_TOUCH_START){
         
     }else if(event==EVENT_ON_TOUCH_RELEASED){
-        this->scroll_y = 0;
+
+      /*
+      getTOUCH_SCREEN_X()
+      getTOUCH_SCREEN_Y()
+      getTOUCH_SCREEN_touch_start_x()
+      getTOUCH_SCREEN_touch_start_y()
+      getTOUCH_SCREEN_touch_start_ms()
+      */
+
+      if(millis() - getTOUCH_SCREEN_touch_start_ms()<350){
+        // Fast scroll
+        if(abs(getTOUCH_SCREEN_touch_start_y()-val2)>20){
+          // Slow scroll
+          this->drawIcons(false);
+          float position = ((float)this->scroll_y)/((float)SINGLE_ELEMENT_REAL_HEIGHT);
+          this->scroll_y = round(position+2) * SINGLE_ELEMENT_REAL_HEIGHT;
+          int max_scroll = (APP_MENU_APPLICATIONS_QUANTITY-1)/SINGLE_ELEMENTS_IN_Y*SINGLE_ELEMENT_REAL_HEIGHT + STYLE_STATUSBAR_HEIGHT+1+SINGLE_ELEMENT_REAL_HEIGHT - SCREEN_HEIGHT;
+          if(scroll_y>max_scroll) {
+            scroll_y = max_scroll;
+          }
+          this->drawIcons(true);    
+        }
+      }else{
+        // Slow scroll
+        this->drawIcons(false);
+        float position = ((float)this->scroll_y)/((float)SINGLE_ELEMENT_REAL_HEIGHT);
+        this->scroll_y = round(position) * SINGLE_ELEMENT_REAL_HEIGHT;
+        this->drawIcons(true);
+      }
+      
+      
+      
+      
     }else if(event==EVENT_ON_TOUCH_DRAG){
 
       // SCREEN SCROLL
       this->drawIcons(false);
-  
       this->scroll_y -= val2;
       if(scroll_y<0) scroll_y = 0;
 

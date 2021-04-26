@@ -80,35 +80,6 @@ class Application{
       if(this->showStatusBar) core_views_statusBar_draw();
     }
 
-    void loop_app(){
-      onLoop();
-      
-
-      #ifdef noAnimation
-        scroll_x = scroll_to_x;
-        scroll_y = scroll_to_y;
-      #else
-        int dy=0; int dx =0;
-  
-        if(scroll_x!=scroll_to_x){
-          dx = abs(scroll_x-scroll_to_x)/5 + 2;
-          if(scroll_x>scroll_to_x) dx *= -1;
-          scroll_x+=dx;
-  
-          if (abs(scroll_x-scroll_to_x)<abs(dx)) scroll_to_x=scroll_x;
-        }
-  
-        if(scroll_y!=scroll_to_y){
-          dy = abs(scroll_y-scroll_to_y)/5 + 2;
-          if(scroll_y>scroll_to_y) dy *= -1;
-          scroll_y+=dy;
-      
-          if (abs(scroll_y-scroll_to_y)<abs(dy)) scroll_y=scroll_to_y;
-        }
-
-        //Serial.println(scroll_to_y);
-      #endif
-    }
     Application(){};
 };
 
