@@ -63,6 +63,10 @@ bool getBitInByte(unsigned char currentByte, unsigned char bitNum);
 void debug(String string);
 void debug(String string, int delaytime);
 
+void core_display_setup();
+void core_display_loop();
+void drawPixel(int x, int y);
+
 void driver_controls_loop();
 void driver_battery_loop();
 void core_time_loop();

@@ -118,6 +118,7 @@ public class SocketServer extends Emulator {
                 socketServer.setReceiveBufferSize(serverBufferSize_max);
                 socketServer.bind(new InetSocketAddress( (InetAddress) null, port));
                 System.out.println("Socket server started at port " + port);
+                this.setVisible(true);
 
                 clientSocket = socketServer.accept();
 

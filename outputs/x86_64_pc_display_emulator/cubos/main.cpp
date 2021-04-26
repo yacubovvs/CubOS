@@ -115,7 +115,7 @@
 
 #define BATTERY_ENABLE
 #define CLOCK_ENABLE
-#define USE_PRIMITIVE_HARDWARE_DRAW_ACCELERATION
+//#define USE_PRIMITIVE_HARDWARE_DRAW_ACCELERATION
 
 //#define USE_RTC
 
@@ -201,6 +201,10 @@ void startApp(char num);
 bool getBitInByte(unsigned char currentByte, unsigned char bitNum);
 void debug(String string);
 void debug(String string, int delaytime);
+
+void core_display_setup();
+void core_display_loop();
+void drawPixel(int x, int y);
 
 void driver_controls_loop();
 void driver_battery_loop();
@@ -703,8 +707,7 @@ Application* currentApp;
     ############################################################################################
 */
 
-void setup()
-{ 
+void setup(){ 
   #ifdef BATTERY_ENABLE
     driver_battery_setup();
   #endif
@@ -744,7 +747,7 @@ void setup()
 bool isInSleep = false;
 void loop(){
   driver_display_loop();
-  core_display_setup();
+  core_display_loop();
 
   #ifdef HARDWARE_BUTTONS_ENABLED
     driver_controls_loop();
@@ -1049,6 +1052,7 @@ int readRawParam(const unsigned char* data, long &position){
     }else if(paramType==0x03){
       return (unsigned int)byte_to_value(readRawChar(data, position), readRawChar(data, position),0,0,0,0,0,0);
     }
+    return 0;
 }
 
 /*
@@ -1178,25 +1182,77 @@ FRAMEBUFFER_BYTE_PER_PIXEL
 
   #ifdef FRAMEBUFFER_TWIN_FULL
 
-    #define FRAMEBUFFER_SIZE SCREEN_WIDTH * SCREEN_HEIGHT
+    #define FRAMEBUFFER_SIZE SCREEN_WIDTH * SCREEN_HEIGHT * FRAMEBUFFER_BYTE_PER_PIXEL
+    //#define FRAMEBUFFER_SIZE SCREEN_WIDTH * SCREEN_HEIGHT
 
     #if FRAMEBUFFER_BYTE_PER_PIXEL==2
       #define FRAMEBUFFER_TYPE uint16_t
     #endif
 
-    FRAMEBUFFER_TYPE FRAMEBUFFER_currentFrame[FRAMEBUFFER_SIZE]; 
-    FRAMEBUFFER_TYPE FRAMEBUFFER_newFrame[FRAMEBUFFER_SIZE];
+    bool FRAMEBUFFER_isChanged = false;
+
+    void setFRAMEBUFFER_isChanged(bool v){
+      FRAMEBUFFER_isChanged = v;
+    }
+
+    bool getFRAMEBUFFER_isChanged(){
+      return FRAMEBUFFER_isChanged;
+    }
+
+    FRAMEBUFFER_TYPE * FRAMEBUFFER_currentFrame;
+    FRAMEBUFFER_TYPE * FRAMEBUFFER_newFrame;
+    bool FRAMEBUFFER_pixelChangedchanged[SCREEN_WIDTH*SCREEN_HEIGHT + 1];
+
 
     void FRAMEBUFFER_reset(){
+
+      FRAMEBUFFER_currentFrame  = (FRAMEBUFFER_TYPE *)ps_malloc(FRAMEBUFFER_SIZE);
+      FRAMEBUFFER_newFrame      = (FRAMEBUFFER_TYPE *)ps_malloc(FRAMEBUFFER_SIZE);
+      
+
+      for(int x=0; x<SCREEN_WIDTH; x++){
+        for(int y=0; y<SCREEN_HEIGHT; y++){
+          long position = y * SCREEN_WIDTH + x;
+
+          FRAMEBUFFER_pixelChangedchanged[x + SCREEN_WIDTH*y] = false;
+          FRAMEBUFFER_new_setPixel(x, y, 0);
+          FRAMEBUFFER_current_setPixel(x, y, 0);
+        }
+      }
+
+      /*
+      for(int x=0; x<SCREEN_WIDTH; x++){
+        for(int y=0; y<SCREEN_HEIGHT; y++){
+          //FRAMEBUFFER_new_setPixel(x, y, 0);
+          //FRAMEBUFFER_current_setPixel(x, y, 0);
+        }
+      }
+      */
+
+      //FRAMEBUFFER_newFrame[0][0] = 0;
+      //test = 2;
+      //FRAMEBUFFER_currentFrame[i]
+      /*
       for(long i=0; i<FRAMEBUFFER_SIZE; i++){
         FRAMEBUFFER_currentFrame[i] = 0; 
         FRAMEBUFFER_newFrame[i] = 0;
-      }
+      }*/
+      
     }
+
 
     void FRAMEBUFFER_new_setPixel(uint16_t x, uint16_t y, FRAMEBUFFER_TYPE color){
       long position = y * SCREEN_WIDTH + x;
       FRAMEBUFFER_newFrame[position] = color;
+    }
+
+    void FRAMEBUFFER_current_setPixel(uint16_t x, uint16_t y, FRAMEBUFFER_TYPE color){
+      long position = y * SCREEN_WIDTH + x;
+      FRAMEBUFFER_currentFrame[position] = color;
+    }
+
+    void FRAMEBUFFER_current_setPixel(uint16_t position, FRAMEBUFFER_TYPE color){
+      FRAMEBUFFER_currentFrame[position] = color;
     }
 
     FRAMEBUFFER_TYPE FRAMEBUFFER_new_getPixel(uint16_t x, uint16_t y){
@@ -1204,10 +1260,19 @@ FRAMEBUFFER_BYTE_PER_PIXEL
       return FRAMEBUFFER_newFrame[position];
     }
 
+    FRAMEBUFFER_TYPE FRAMEBUFFER_new_getPixel(uint16_t position){
+      return FRAMEBUFFER_newFrame[position];
+    }
+
     FRAMEBUFFER_TYPE FRAMEBUFFER_current_getPixel(uint16_t x, uint16_t y){
       long position = y * SCREEN_WIDTH + x;
       return FRAMEBUFFER_currentFrame[position];
     }
+
+    FRAMEBUFFER_TYPE FRAMEBUFFER_current_getPixel(uint16_t position){
+      return FRAMEBUFFER_currentFrame[position];
+    }
+
   #endif
 
 #endif
@@ -1685,8 +1750,46 @@ void core_display_setup(){
   #endif
 }
 
-void core_display_loop(){
+//int fs_ms_max = 0;
 
+void core_display_loop(){
+  
+  #ifdef FRAMEBUFFER_ENABLE
+    #ifdef FRAMEBUFFER_TWIN_FULL
+      if(getFRAMEBUFFER_isChanged()){
+
+        //long drawMillis = millis();
+
+        for(int y=0; y<SCREEN_HEIGHT; y++){
+          for(int x=0; x<SCREEN_WIDTH; x++){
+            if(FRAMEBUFFER_pixelChangedchanged[x + SCREEN_WIDTH*y]==true){
+              uint16_t position = y * SCREEN_WIDTH + x;
+              uint16_t newColor = FRAMEBUFFER_new_getPixel(position);
+              if(FRAMEBUFFER_current_getPixel(position)!=newColor){
+                //if(getDrawColor()!=newColor) setDrawColor(newColor);
+                setPixel(x, y, newColor);
+                FRAMEBUFFER_current_setPixel(position, newColor);
+                FRAMEBUFFER_pixelChangedchanged[x + SCREEN_WIDTH*y] = false;
+              }
+            }
+          }
+        }
+
+        //int timeToDraw = millis() - drawMillis;
+        /*
+        if(fs_ms_max==0) fs_ms_max=1;
+        else if(fs_ms_max<timeToDraw){
+          fs_ms_max = timeToDraw;
+          log_d("Framebuffer drawing %d", fs_ms_max);
+        }*/
+
+        //log_d("Framebuffer drawing %d", timeToDraw);
+        
+      }
+      setFRAMEBUFFER_isChanged(false);
+    #endif
+  #endif
+  
 }
 
 void drawPixel(int x, int y){
@@ -1698,14 +1801,19 @@ void drawPixel(int x, int y){
   #ifdef FRAMEBUFFER_ENABLE
     #ifdef FRAMEBUFFER_TWIN_FULL
       FRAMEBUFFER_new_setPixel(x, y, getDrawColor());
+
+      uint16_t position = x + SCREEN_WIDTH*y;
+      if(position>=0 && position<=SCREEN_HEIGHT*SCREEN_WIDTH) FRAMEBUFFER_pixelChangedchanged[position] = true;
+
+      if(!getFRAMEBUFFER_isChanged()) setFRAMEBUFFER_isChanged(true);
+      
+      //setPixel(x, y);
     #endif
   #else
     setPixel(x, y);
   #endif
   
 }
-
-
 
 void drawLine(int x0, int y0, int x1, int y1){
 
@@ -4349,9 +4457,8 @@ const unsigned char appNameClass::icon[] PROGMEM = {
 #define appNameClass    MainMenuApp      // App name without spaces
 #define appName         "Main menu"      // App name with spaces 
 
-#define PAGES_LIST_HEIGHT               20
 #define ACTIVE_SCREEN_WIDTH             SCREEN_WIDTH
-#define ACTIVE_SCREEN_HEIGHT            (SCREEN_HEIGHT - STYLE_STATUSBAR_HEIGHT - PAGES_LIST_HEIGHT)
+#define ACTIVE_SCREEN_HEIGHT            (SCREEN_HEIGHT - STYLE_STATUSBAR_HEIGHT)
 #define SINGLE_ELEMENT_MIN_WIDTH        100
 #define SINGLE_ELEMENT_MIN_HEIGHT       80
 
@@ -4361,7 +4468,7 @@ const unsigned char appNameClass::icon[] PROGMEM = {
 #define SINGLE_ELEMENT_REAL_WIDTH       ((int)(ACTIVE_SCREEN_WIDTH/SINGLE_ELEMENTS_IN_X))
 #define SINGLE_ELEMENT_REAL_HEIGHT      ((int)(ACTIVE_SCREEN_HEIGHT/SINGLE_ELEMENTS_IN_Y))
 
-#define PAGES_LIST_POSITION             (SCREEN_HEIGHT-PAGES_LIST_HEIGHT/2)
+#define PAGES_LIST_POSITION             (SCREEN_HEIGHT)
 
 #define APPS_ON_SINGLE_PAGE             (SINGLE_ELEMENTS_IN_X * SINGLE_ELEMENTS_IN_Y)
 
@@ -4523,11 +4630,9 @@ void appNameClass::onCreate(){
 
 void appNameClass::drawIcons(bool draw){
 
-  long drawMillis = millis();
-
   DRAW_LIMITS_setEnable(true);
   DRAW_LIMIT_reset();
-  DRAW_LIMITS_setEnable(STYLE_STATUSBAR_HEIGHT, SCREEN_HEIGHT - STYLE_STATUSBAR_HEIGHT, -1, -1);
+  DRAW_LIMITS_setEnable(STYLE_STATUSBAR_HEIGHT, -1, -1, -1);
   
 	for(unsigned char app_num=0; app_num<APP_MENU_APPLICATIONS_QUANTITY; app_num++){
 
@@ -4544,19 +4649,13 @@ void appNameClass::drawIcons(bool draw){
 
 		core_views_draw_app_icon(
 			draw, 
-			x_center, y_center + this->scroll_y, 
+			x_center, y_center - this->scroll_y, 
 			(const unsigned char*)this->getApplicationTitle(app_num), 
 			this->getApplicationIcon(app_num)
 		);
 	}
 
   DRAW_LIMITS_setEnable(false);
-
-  int timeToDraw = millis() - drawMillis;
-  setDrawColor(0,0,0);
-  drawRect(120, 0, 240, 20, true);
-  setDrawColor(255,255,255);
-  drawString(String(timeToDraw), 130, 4, 2);
 }
 
 void appNameClass::onLoop(){
@@ -4570,11 +4669,20 @@ void appNameClass::onEvent(unsigned char event, int val1, int val2){
     if(event==EVENT_ON_TOUCH_START){
         
     }else if(event==EVENT_ON_TOUCH_RELEASED){
-        
+        this->scroll_y = 0;
     }else if(event==EVENT_ON_TOUCH_DRAG){
+
+      // SCREEN SCROLL
       this->drawIcons(false);
-      this->scroll_x += val1;
-      this->scroll_y += val2;
+  
+      this->scroll_y -= val2;
+      if(scroll_y<0) scroll_y = 0;
+
+      int max_scroll = (APP_MENU_APPLICATIONS_QUANTITY-1)/SINGLE_ELEMENTS_IN_Y*SINGLE_ELEMENT_REAL_HEIGHT + STYLE_STATUSBAR_HEIGHT+1+SINGLE_ELEMENT_REAL_HEIGHT - SCREEN_HEIGHT;
+      if(scroll_y>max_scroll) {
+        scroll_y = max_scroll;
+      }
+
       this->drawIcons(true);
     }
 
