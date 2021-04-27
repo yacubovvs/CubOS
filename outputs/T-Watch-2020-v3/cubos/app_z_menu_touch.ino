@@ -211,7 +211,27 @@ void appNameClass::onDestroy(){
 void appNameClass::onEvent(unsigned char event, int val1, int val2){
 
     if(event==EVENT_ON_TOUCH_START){
-        
+
+    }else if(event==EVENT_ON_TOUCH_CLICK){    
+
+      int position_x = (this->scroll_x + val1)/(SINGLE_ELEMENT_REAL_WIDTH);
+      int position_y = (this->scroll_y + val2 + STYLE_STATUSBAR_HEIGHT)/(SINGLE_ELEMENT_REAL_HEIGHT);
+      //if(position_y<0) position_y = 1;
+
+      position_y -= 1;
+      if(position_y<0) position_y = 0;
+      if(position_x>SINGLE_ELEMENTS_IN_X-1)position_x=SINGLE_ELEMENTS_IN_X-1;
+      if(position_x<0) position_x = 0;
+
+      //if(position_y>SINGLE_ELEMENTS_IN_Y-1)position_y=SINGLE_ELEMENTS_IN_Y-1;
+      
+      setDrawColor(0, 0, 0);
+      drawRect(0, 0, 50, 45, true);
+      setDrawColor(255, 255, 255);
+      drawString(String(position_x), 3, 3, 2);
+      drawString(String(position_y), 24, 3, 2);
+      
+
     }else if(event==EVENT_ON_TOUCH_RELEASED){
 
       /*
@@ -222,29 +242,39 @@ void appNameClass::onEvent(unsigned char event, int val1, int val2){
       getTOUCH_SCREEN_touch_start_ms()
       */
 
-      if(millis() - getTOUCH_SCREEN_touch_start_ms()<150){
-        // Fast scroll
-        if(abs(getTOUCH_SCREEN_touch_start_y()-val2)>20){
-          // Slow scroll
-          this->drawIcons(false);
-          float position = ((float)this->scroll_y)/((float)SINGLE_ELEMENT_REAL_HEIGHT);
-          this->scroll_y = round(position+2) * SINGLE_ELEMENT_REAL_HEIGHT;
-          int max_scroll = (APP_MENU_APPLICATIONS_QUANTITY-1)/SINGLE_ELEMENTS_IN_Y*SINGLE_ELEMENT_REAL_HEIGHT + STYLE_STATUSBAR_HEIGHT+1+SINGLE_ELEMENT_REAL_HEIGHT - SCREEN_HEIGHT;
-          if(scroll_y>max_scroll) {
-            scroll_y = max_scroll;
-          }
-          this->drawIcons(true);    
-        }
-      }else{
-        // Slow scroll
+      #ifdef PLATFORM_PC_emulator
         this->drawIcons(false);
         float position = ((float)this->scroll_y)/((float)SINGLE_ELEMENT_REAL_HEIGHT);
         this->scroll_y = round(position) * SINGLE_ELEMENT_REAL_HEIGHT;
         this->drawIcons(true);
-      }
-      
-      
-      
+      #else
+        if(millis() - getTOUCH_SCREEN_touch_start_ms()<150){
+          // Fast scroll
+          if(abs(getTOUCH_SCREEN_touch_start_y()-val2)>10){
+            // Slow scroll
+            this->drawIcons(false);
+            float position = ((float)this->scroll_y)/((float)SINGLE_ELEMENT_REAL_HEIGHT);
+
+            if(getTOUCH_SCREEN_touch_start_y()-val2>0) this->scroll_y = round(position+2) * SINGLE_ELEMENT_REAL_HEIGHT;
+            else this->scroll_y = round(position-2) * SINGLE_ELEMENT_REAL_HEIGHT;
+            
+            int max_scroll = (APP_MENU_APPLICATIONS_QUANTITY-1)/SINGLE_ELEMENTS_IN_Y*SINGLE_ELEMENT_REAL_HEIGHT + STYLE_STATUSBAR_HEIGHT+1+SINGLE_ELEMENT_REAL_HEIGHT - SCREEN_HEIGHT;
+            if(scroll_y>max_scroll) {
+              scroll_y = max_scroll;
+            }
+            if(scroll_y<0){
+              scroll_y=0;
+            }
+            this->drawIcons(true);    
+          }
+        }else{
+          // Slow scroll
+          this->drawIcons(false);
+          float position = ((float)this->scroll_y)/((float)SINGLE_ELEMENT_REAL_HEIGHT);
+          this->scroll_y = round(position) * SINGLE_ELEMENT_REAL_HEIGHT;
+          this->drawIcons(true);
+        }
+      #endif
       
     }else if(event==EVENT_ON_TOUCH_DRAG){
 

@@ -61,9 +61,7 @@
 //#define SCREEN_ROTATION_180
 //#define SCREEN_ROTATION_270
 
-#define STYLE_STATUSBAR_HEIGHT  40
-
-#define LILYGO_WATCH_2020_V3 
+#define STYLE_STATUSBAR_HEIGHT  40 
 
 /*
     ############################################################################################

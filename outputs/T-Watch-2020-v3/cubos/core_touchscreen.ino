@@ -51,6 +51,14 @@
             TOUCH_SCREEN_last_isTouching = false;
             currentApp->onEvent(EVENT_ON_TOUCH_RELEASED, getTOUCH_SCREEN_X(), getTOUCH_SCREEN_Y());
 
+            if(!TOUCH_SCREEN_isDragging && millis()-TOUCH_SCREEN_touch_start_ms<TOUCH_SCREEN_TIME_MS_FOT_LONG_TOUCH){
+                currentApp->onEvent(EVENT_ON_TOUCH_CLICK, getTOUCH_SCREEN_X(), getTOUCH_SCREEN_Y());
+            }else{
+                TOUCH_SCREEN_isDragging = false;
+                TOUCH_SCREEN_isLongPressed = false;
+            }
+            
+
         }else if(TOUCH_SCREEN_last_isTouching && getTOUCH_SCREEN_isTouching()){
 
             int dx;

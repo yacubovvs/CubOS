@@ -23,7 +23,7 @@
 
 //#define device_has_battery
 
-#define PLATFORM_PC_x32_64
+#define PLATFORM_PC_emulator
 #define device_has_bluetooth
 #define device_has_wifi
 
