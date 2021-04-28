@@ -227,7 +227,7 @@ void appNameClass::onEvent(unsigned char event, int val1, int val2){
       //if(appNum<0) appNum = 0;
       if(appNum<0 || appNum>APP_MENU_APPLICATIONS_QUANTITY-1) return; //appNum = APP_MENU_APPLICATIONS_QUANTITY-1;
       startApp(appNum);
-
+      
       /*
       setDrawColor(0, 0, 0);
       drawRect(0, 0, 50, 45, true);
