@@ -184,9 +184,9 @@ void loop(){
 }
 
 #ifdef CPU_SLEEP_ENABLE
-    void do_cpu_sleep(){
-        driver_cpu_sleep();
-    }
+  void do_cpu_sleep(){
+      driver_cpu_sleep();
+  }
 #endif
 
 void debug(String string){

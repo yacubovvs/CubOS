@@ -770,9 +770,9 @@ void loop(){
 }
 
 #ifdef CPU_SLEEP_ENABLE
-    void do_cpu_sleep(){
-        driver_cpu_sleep();
-    }
+  void do_cpu_sleep(){
+      driver_cpu_sleep();
+  }
 #endif
 
 void debug(String string){
@@ -4659,15 +4659,21 @@ void appNameClass::onEvent(unsigned char event, int val1, int val2){
 
       position_y -= 1;
       if(position_y<0) position_y = 0;
-
-      //if(position_x>SINGLE_ELEMENTS_IN_X-1)position_x=SINGLE_ELEMENTS_IN_X-1;
-      //if(position_y>SINGLE_ELEMENTS_IN_Y-1)position_y=SINGLE_ELEMENTS_IN_Y-1;
+      if(position_x>SINGLE_ELEMENTS_IN_X-1)position_x=SINGLE_ELEMENTS_IN_X-1;
+      if(position_x<0) position_x = 0;
       
+      int appNum = position_x + position_y*SINGLE_ELEMENTS_IN_X;
+      //if(appNum<0) appNum = 0;
+      if(appNum<0 || appNum>APP_MENU_APPLICATIONS_QUANTITY-1) return; //appNum = APP_MENU_APPLICATIONS_QUANTITY-1;
+      startApp(appNum);
+
+      /*
       setDrawColor(0, 0, 0);
       drawRect(0, 0, 50, 45, true);
       setDrawColor(255, 255, 255);
       drawString(String(position_x), 3, 3, 2);
       drawString(String(position_y), 24, 3, 2);
+      */
       
 
     }else if(event==EVENT_ON_TOUCH_RELEASED){
@@ -4688,14 +4694,20 @@ void appNameClass::onEvent(unsigned char event, int val1, int val2){
       #else
         if(millis() - getTOUCH_SCREEN_touch_start_ms()<150){
           // Fast scroll
-          if(abs(getTOUCH_SCREEN_touch_start_y()-val2)>20){
+          if(abs(getTOUCH_SCREEN_touch_start_y()-val2)>10){
             // Slow scroll
             this->drawIcons(false);
             float position = ((float)this->scroll_y)/((float)SINGLE_ELEMENT_REAL_HEIGHT);
-            this->scroll_y = round(position+2) * SINGLE_ELEMENT_REAL_HEIGHT;
+
+            if(getTOUCH_SCREEN_touch_start_y()-val2>0) this->scroll_y = round(position+2) * SINGLE_ELEMENT_REAL_HEIGHT;
+            else this->scroll_y = round(position-2) * SINGLE_ELEMENT_REAL_HEIGHT;
+
             int max_scroll = (APP_MENU_APPLICATIONS_QUANTITY-1)/SINGLE_ELEMENTS_IN_Y*SINGLE_ELEMENT_REAL_HEIGHT + STYLE_STATUSBAR_HEIGHT+1+SINGLE_ELEMENT_REAL_HEIGHT - SCREEN_HEIGHT;
             if(scroll_y>max_scroll) {
               scroll_y = max_scroll;
+            }
+            if(scroll_y<0){
+              scroll_y=0;
             }
             this->drawIcons(true);    
           }

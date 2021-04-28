@@ -222,14 +222,19 @@ void appNameClass::onEvent(unsigned char event, int val1, int val2){
       if(position_y<0) position_y = 0;
       if(position_x>SINGLE_ELEMENTS_IN_X-1)position_x=SINGLE_ELEMENTS_IN_X-1;
       if(position_x<0) position_x = 0;
-
-      //if(position_y>SINGLE_ELEMENTS_IN_Y-1)position_y=SINGLE_ELEMENTS_IN_Y-1;
       
+      int appNum = position_x + position_y*SINGLE_ELEMENTS_IN_X;
+      //if(appNum<0) appNum = 0;
+      if(appNum<0 || appNum>APP_MENU_APPLICATIONS_QUANTITY-1) return; //appNum = APP_MENU_APPLICATIONS_QUANTITY-1;
+      startApp(appNum);
+
+      /*
       setDrawColor(0, 0, 0);
       drawRect(0, 0, 50, 45, true);
       setDrawColor(255, 255, 255);
       drawString(String(position_x), 3, 3, 2);
       drawString(String(position_y), 24, 3, 2);
+      */
       
 
     }else if(event==EVENT_ON_TOUCH_RELEASED){
@@ -257,7 +262,7 @@ void appNameClass::onEvent(unsigned char event, int val1, int val2){
 
             if(getTOUCH_SCREEN_touch_start_y()-val2>0) this->scroll_y = round(position+2) * SINGLE_ELEMENT_REAL_HEIGHT;
             else this->scroll_y = round(position-2) * SINGLE_ELEMENT_REAL_HEIGHT;
-            
+
             int max_scroll = (APP_MENU_APPLICATIONS_QUANTITY-1)/SINGLE_ELEMENTS_IN_Y*SINGLE_ELEMENT_REAL_HEIGHT + STYLE_STATUSBAR_HEIGHT+1+SINGLE_ELEMENT_REAL_HEIGHT - SCREEN_HEIGHT;
             if(scroll_y>max_scroll) {
               scroll_y = max_scroll;
