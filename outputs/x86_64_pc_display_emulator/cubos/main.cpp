@@ -102,8 +102,8 @@
 
 //#define toDefaultApp_onLeftLongPress
 
-#define STARTING_APP_NUMM   -1    // for Mainmenu (default app)
-//#define STARTING_APP_NUMM   6     // for App number 7
+//#define STARTING_APP_NUMM   -1    // for Mainmenu (default app)
+#define STARTING_APP_NUMM   6     // for App number 7
 
 #define CPU_SLEEP_ENABLE
 #define CPU_SLEEP_TIME_DELAY 25000
@@ -3027,7 +3027,9 @@ void appNameClass::drawSettingsPageFirstTime(){
         this->updateActiveAppIndex(app_settings_selectedAppIndex);  
         // Drawing icons
         this->drawIcons(true);
-        this->drawActiveAppFrame(true);  
+        #ifndef TOUCH_SCREEN_ENABLE
+            this->drawActiveAppFrame(true);  
+        #endif
     }if(currentSubMenu==APP_SETTINGS_SUBMENU_SET_TIME){
         int y_position = (SCREEN_HEIGHT - STYLE_STATUSBAR_HEIGHT)/2;
         //drawString("Setting up time", 80,80);
@@ -3101,6 +3103,12 @@ void appNameClass::switchToSubMenu(unsigned char newSubMenu){
 }
 
 void appNameClass::onCreate(){
+    #ifndef TOUCH_SCREEN_ENABLE
+        DRAW_LIMITS_setEnable(true);
+        DRAW_LIMIT_reset();
+        DRAW_LIMITS_setEnable(STYLE_STATUSBAR_HEIGHT, -1, -1, -1);
+    #endif
+
     this->drawSettingsPageFirstTime();
     this->currentSubMenu = APP_SETTINGS_SUBMENU_MAIN;
     //switchToSubMenu(APP_SETTINGS_SUBMENU_SET_TIME);
@@ -3115,7 +3123,10 @@ void appNameClass::updateActiveAppIndex(int newSelectedAppIndex){
 
   if(app_settings_selectedAppIndex!=newSelectedAppIndex){
     
-    this->drawActiveAppFrame(false);
+    #ifndef TOUCH_SCREEN_ENABLE
+        this->drawActiveAppFrame(false);
+    #endif
+    
     if( (int)((app_settings_selectedAppIndex)/APPS_ON_SINGLE_PAGE) != (int)((newSelectedAppIndex)/APPS_ON_SINGLE_PAGE)){
       // update page
       this->drawIcons(false);
@@ -3128,7 +3139,10 @@ void appNameClass::updateActiveAppIndex(int newSelectedAppIndex){
     }
 
     // update selected app frame
-    this->drawActiveAppFrame(true);
+    #ifndef TOUCH_SCREEN_ENABLE
+        this->drawActiveAppFrame(true);
+    #endif
+    
   }
 }
 
@@ -3153,35 +3167,51 @@ void appNameClass::drawActiveAppFrame(bool draw){
 }
 
 void appNameClass::drawIcons(bool draw){
-  for (unsigned char y_position=0; y_position<SINGLE_ELEMENTS_IN_Y; y_position++){
-        for (unsigned char x_position=0; x_position<SINGLE_ELEMENTS_IN_X; x_position++){
-            int x0 = x_position*SINGLE_ELEMENT_REAL_WIDTH;
-            int y0 = y_position*SINGLE_ELEMENT_REAL_HEIGHT + STYLE_STATUSBAR_HEIGHT+1;
-            int x1 = x0+SINGLE_ELEMENT_REAL_WIDTH;
-            int y1 = y0+SINGLE_ELEMENT_REAL_HEIGHT;
+    #ifndef TOUCH_SCREEN_ENABLE
+        for(unsigned char currentDrawPage=0; currentDrawPage<getTotalPagesInSubMenu(APP_SETTINGS_SUBMENU_MAIN); currentDrawPage++){
+    #endif
+        
+        for (unsigned char y_position=0; y_position<SINGLE_ELEMENTS_IN_Y; y_position++){
+            for (unsigned char x_position=0; x_position<SINGLE_ELEMENTS_IN_X; x_position++){
+                int x0 = x_position*SINGLE_ELEMENT_REAL_WIDTH;
+                int y0 = y_position*SINGLE_ELEMENT_REAL_HEIGHT + STYLE_STATUSBAR_HEIGHT+1;
+                int x1 = x0+SINGLE_ELEMENT_REAL_WIDTH;
+                int y1 = y0+SINGLE_ELEMENT_REAL_HEIGHT;
 
-            int x_center = (x0+x1)/2;
-            int y_center = (y0+y1)/2;
+                int x_center = (x0+x1)/2;
+                int y_center = (y0+y1)/2;
 
-            int app_num = y_position*(SINGLE_ELEMENTS_IN_X) + x_position + APPS_ON_SINGLE_PAGE*(int)(app_settings_selectedAppIndex/APPS_ON_SINGLE_PAGE);
+                #ifndef TOUCH_SCREEN_ENABLE
+                    int app_num = y_position*(SINGLE_ELEMENTS_IN_X) + x_position + currentDrawPage*APPS_ON_SINGLE_PAGE;
+                #else
+                    int app_num = y_position*(SINGLE_ELEMENTS_IN_X) + x_position + APPS_ON_SINGLE_PAGE*(int)(app_settings_selectedAppIndex/APPS_ON_SINGLE_PAGE);
+                #endif
+                
+                if(app_num<getTotalApplicationsInSubMenu(APP_SETTINGS_SUBMENU_MAIN)){
+                    #ifdef ESP8266
+                        ESP.wdtDisable();
+                    #endif
 
-            
-            if(app_num<getTotalApplicationsInSubMenu(APP_SETTINGS_SUBMENU_MAIN)){
-              #ifdef ESP8266
-                ESP.wdtDisable();
-              #endif
-
-            
-              core_views_draw_settings_item(
-                draw, 
-                x0+35, y_center, 
-                (const unsigned char*)this->getApplicationTitle(0, app_num), 
-                this->getApplicationSubTitle(0, app_num), 
-                this->getApplicationIcon(0, app_num)
-              );
+                    
+                    core_views_draw_settings_item(
+                        draw, 
+                        #ifndef TOUCH_SCREEN_ENABLE
+                            currentDrawPage*SCREEN_WIDTH - this->scroll_x + x0+35, 
+                        #else
+                            -this->scroll_x + x0+35, 
+                        #endif
+                        y_center, 
+                        (const unsigned char*)this->getApplicationTitle(0, app_num), 
+                        this->getApplicationSubTitle(0, app_num), 
+                        this->getApplicationIcon(0, app_num)
+                    );
+                }
             }
         }
+
+    #ifndef TOUCH_SCREEN_ENABLE
     }
+    #endif
 }
 
 void appNameClass::onLoop(){
@@ -3192,64 +3222,84 @@ void appNameClass::onDestroy(){
 }
 
 void appNameClass::onEvent(unsigned char event, int val1, int val2){
-    if(event==EVENT_BUTTON_PRESSED){
-        if(currentSubMenu==APP_SETTINGS_SUBMENU_MAIN){
-            switch(val1){
-                case BUTTON_UP:
-                        this->updateActiveAppIndex(app_settings_selectedAppIndex-1);
-                    break;
-                case BUTTON_BACK:
-                    startApp(-1);
-                    break;
-                case BUTTON_DOWN:
-                    if(currentSubMenu==APP_SETTINGS_SUBMENU_MAIN){
-                        this->updateActiveAppIndex(app_settings_selectedAppIndex+1);
-                    }   
-                    break;
-                case BUTTON_SELECT:
-                    if(currentSubMenu==APP_SETTINGS_SUBMENU_MAIN && app_settings_selectedAppIndex==0) switchToSubMenu(APP_SETTINGS_SUBMENU_SET_TIME);
-                    break;
+    #ifdef TOUCH_SCREEN_ENABLE
+        if(event==EVENT_ON_TOUCH_DRAG){
+
+            // SCREEN SCROLL
+            this->drawIcons(false);
+            this->scroll_x -= val1;
+            if(this->scroll_x<0) scroll_x = 0;
+
+            int max_scroll = (this->getTotalApplicationsInSubMenu(APP_SETTINGS_SUBMENU_MAIN) - 1 ) * SCREEN_WIDTH;
+            if(this->scroll_x>max_scroll) {
+                this->scroll_x = max_scroll;
             }
-        }else if(currentSubMenu==APP_SETTINGS_SUBMENU_SET_TIME){
+
+            this->drawIcons(true);
+        }
+    #else
+        if(event==EVENT_BUTTON_PRESSED){
             
-            switch(val1){
-                case BUTTON_UP:
-                case BUTTON_DOWN:
-                    if(currentPositionIsSelected==false){
-                        drawSettingTimeSelect(false, getPositionBySelectedNumber(currentSelectedPosition));
-                        if(val1==BUTTON_DOWN)currentSelectedPosition++; else currentSelectedPosition--;
-                        if(currentSelectedPosition>=3)currentSelectedPosition=0;
-                        if(currentSelectedPosition<0)currentSelectedPosition=2;
-                        drawSettingTimeSelect(true, getPositionBySelectedNumber(currentSelectedPosition));
-                    }else{
-                        
-                        // time changing
-                    }
-                    break;
-                case BUTTON_BACK:
-                    switchToSubMenu(APP_SETTINGS_SUBMENU_MAIN);            
-                    break;
+            if(currentSubMenu==APP_SETTINGS_SUBMENU_MAIN){
+                switch(val1){
+                    case BUTTON_UP:
+                            this->updateActiveAppIndex(app_settings_selectedAppIndex-1);
+                        break;
+                    case BUTTON_BACK:
+                        startApp(-1);
+                        break;
+                    case BUTTON_DOWN:
+                        if(currentSubMenu==APP_SETTINGS_SUBMENU_MAIN){
+                            this->updateActiveAppIndex(app_settings_selectedAppIndex+1);
+                        }   
+                        break;
+                    case BUTTON_SELECT:
+                        if(currentSubMenu==APP_SETTINGS_SUBMENU_MAIN && app_settings_selectedAppIndex==0) switchToSubMenu(APP_SETTINGS_SUBMENU_SET_TIME);
+                        break;
+                }
+            }else if(currentSubMenu==APP_SETTINGS_SUBMENU_SET_TIME){
                 
-                case BUTTON_SELECT:
-                    currentPositionIsSelected = !currentPositionIsSelected;
-                    if(currentPositionIsSelected){
-                        drawSettingTimeSelect(false, getPositionBySelectedNumber(currentSelectedPosition));
-                        drawSettingTimeArrows(true, getPositionBySelectedNumber(currentSelectedPosition));
-                    }else{
-                        drawSettingTimeArrows(false, getPositionBySelectedNumber(currentSelectedPosition));
-                        drawSettingTimeSelect(true, getPositionBySelectedNumber(currentSelectedPosition));
-                    }
-                    break;
+                switch(val1){
+                    case BUTTON_UP:
+                    case BUTTON_DOWN:
+                        if(currentPositionIsSelected==false){
+                            drawSettingTimeSelect(false, getPositionBySelectedNumber(currentSelectedPosition));
+                            if(val1==BUTTON_DOWN)currentSelectedPosition++; else currentSelectedPosition--;
+                            if(currentSelectedPosition>=3)currentSelectedPosition=0;
+                            if(currentSelectedPosition<0)currentSelectedPosition=2;
+                            drawSettingTimeSelect(true, getPositionBySelectedNumber(currentSelectedPosition));
+                        }else{
+                            
+                            // time changing
+                        }
+                        break;
+                    case BUTTON_BACK:
+                        switchToSubMenu(APP_SETTINGS_SUBMENU_MAIN);            
+                        break;
+                    
+                    case BUTTON_SELECT:
+                        currentPositionIsSelected = !currentPositionIsSelected;
+                        if(currentPositionIsSelected){
+                            drawSettingTimeSelect(false, getPositionBySelectedNumber(currentSelectedPosition));
+                            drawSettingTimeArrows(true, getPositionBySelectedNumber(currentSelectedPosition));
+                        }else{
+                            drawSettingTimeArrows(false, getPositionBySelectedNumber(currentSelectedPosition));
+                            drawSettingTimeSelect(true, getPositionBySelectedNumber(currentSelectedPosition));
+                        }
+                        break;
+                }
+
             }
+        
+        }else if(event==EVENT_BUTTON_RELEASED){
+
+        }else if(event==EVENT_BUTTON_LONG_PRESS){
 
         }
+    
+    #endif
 
-      
-    }else if(event==EVENT_BUTTON_RELEASED){
-
-    }else if(event==EVENT_BUTTON_LONG_PRESS){
-
-    }else if(event==EVENT_ON_TIME_CHANGED){
+    else if(event==EVENT_ON_TIME_CHANGED){
 
         if(currentSubMenu==APP_SETTINGS_SUBMENU_MAIN){
             if((int)((app_settings_selectedAppIndex)/APPS_ON_SINGLE_PAGE)==0){
@@ -4667,24 +4717,7 @@ void appNameClass::onEvent(unsigned char event, int val1, int val2){
       if(appNum<0 || appNum>APP_MENU_APPLICATIONS_QUANTITY-1) return; //appNum = APP_MENU_APPLICATIONS_QUANTITY-1;
       startApp(appNum);
 
-      /*
-      setDrawColor(0, 0, 0);
-      drawRect(0, 0, 50, 45, true);
-      setDrawColor(255, 255, 255);
-      drawString(String(position_x), 3, 3, 2);
-      drawString(String(position_y), 24, 3, 2);
-      */
-      
-
     }else if(event==EVENT_ON_TOUCH_RELEASED){
-
-      /*
-      getTOUCH_SCREEN_X()
-      getTOUCH_SCREEN_Y()
-      getTOUCH_SCREEN_touch_start_x()
-      getTOUCH_SCREEN_touch_start_y()
-      getTOUCH_SCREEN_touch_start_ms()
-      */
 
       #ifdef PLATFORM_PC_emulator
         this->drawIcons(false);

@@ -227,25 +227,8 @@ void appNameClass::onEvent(unsigned char event, int val1, int val2){
       //if(appNum<0) appNum = 0;
       if(appNum<0 || appNum>APP_MENU_APPLICATIONS_QUANTITY-1) return; //appNum = APP_MENU_APPLICATIONS_QUANTITY-1;
       startApp(appNum);
-      
-      /*
-      setDrawColor(0, 0, 0);
-      drawRect(0, 0, 50, 45, true);
-      setDrawColor(255, 255, 255);
-      drawString(String(position_x), 3, 3, 2);
-      drawString(String(position_y), 24, 3, 2);
-      */
-      
 
     }else if(event==EVENT_ON_TOUCH_RELEASED){
-
-      /*
-      getTOUCH_SCREEN_X()
-      getTOUCH_SCREEN_Y()
-      getTOUCH_SCREEN_touch_start_x()
-      getTOUCH_SCREEN_touch_start_y()
-      getTOUCH_SCREEN_touch_start_ms()
-      */
 
       #ifdef PLATFORM_PC_emulator
         this->drawIcons(false);
