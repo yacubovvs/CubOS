@@ -22,6 +22,7 @@
 #define FRAMEBUFFER_ENABLE
 #define FRAMEBUFFER_TWIN_FULL
 #define FRAMEBUFFER_BYTE_PER_PIXEL 2
+#define FRAMEBUFFER_PSRAM
 
 #define platform_esp32
 #define device_has_bluetooth

@@ -10,14 +10,27 @@
 #define SINGLE_ELEMENTS_IN_X            ((int)(ACTIVE_SCREEN_WIDTH/SINGLE_ELEMENT_MIN_WIDTH))
 #define SINGLE_ELEMENTS_IN_Y            ((int)(ACTIVE_SCREEN_HEIGHT/SINGLE_ELEMENT_MIN_HEIGHT))
 
+#define SINGLE_ELEMENTS_IN_X_MACRO      ((ACTIVE_SCREEN_WIDTH/SINGLE_ELEMENT_MIN_WIDTH))
+#define SINGLE_ELEMENTS_IN_Y_MACRO      ((ACTIVE_SCREEN_HEIGHT/SINGLE_ELEMENT_MIN_HEIGHT))
+
+#if ((ACTIVE_SCREEN_WIDTH/SINGLE_ELEMENT_MIN_WIDTH)) < 1
+  #define SINGLE_ELEMENTS_IN_X 1
+  #define SINGLE_ELEMENTS_IN_X_MACRO 1
+#endif
+
+#if ((ACTIVE_SCREEN_HEIGHT/SINGLE_ELEMENT_MIN_HEIGHT)) < 1
+  #define SINGLE_ELEMENTS_IN_Y 1
+  #define SINGLE_ELEMENTS_IN_Y_MACRO 1
+#endif
+
+#if ( ((SINGLE_ELEMENTS_IN_X_MACRO)==1) && ((SINGLE_ELEMENTS_IN_Y_MACRO)==1))
+  #define SINGLE_ELEMENT_ON_SCREEN
+#endif
+
 #define SINGLE_ELEMENT_REAL_WIDTH       ((int)(ACTIVE_SCREEN_WIDTH/SINGLE_ELEMENTS_IN_X))
 #define SINGLE_ELEMENT_REAL_HEIGHT      ((int)(ACTIVE_SCREEN_HEIGHT/SINGLE_ELEMENTS_IN_Y))
-
 #define PAGES_LIST_POSITION             (SCREEN_HEIGHT-PAGES_LIST_HEIGHT/2)
-
 #define APPS_ON_SINGLE_PAGE             (SINGLE_ELEMENTS_IN_X * SINGLE_ELEMENTS_IN_Y)
-
-
 
 
 #ifdef  APP_MENU_APPLICATIONS_0
@@ -172,9 +185,14 @@ const unsigned char appNameClass::icon[] PROGMEM = {
 
 void appNameClass::onCreate(){
     
+    setBackgroundColor(0,0,0);
+    setContrastColor(255, 255, 255);
+
     unsigned char app_z_menu_selectedAppIndex_presaved = app_z_menu_selectedAppIndex;
     app_z_menu_selectedAppIndex=0;
-    core_views_draw_pages_list_simple(true, PAGES_LIST_POSITION, TOTAL_PAGES);
+    #ifndef SINGLE_ELEMENT_ON_SCREEN
+      core_views_draw_pages_list_simple(true, PAGES_LIST_POSITION, TOTAL_PAGES);
+    #endif
 
     unsigned char currentPage = app_z_menu_selectedAppIndex_presaved/APPS_ON_SINGLE_PAGE;
     if(currentPage==0) core_views_draw_active_page(true, PAGES_LIST_POSITION, TOTAL_PAGES, currentPage);
@@ -183,7 +201,9 @@ void appNameClass::onCreate(){
 
     // Drawing icons
     this->drawIcons(true);
-    this->drawActiveAppFrame(true);  
+    #ifndef SINGLE_ELEMENT_ON_SCREEN
+      this->drawActiveAppFrame(true);  
+    #endif
     
 }
 
@@ -193,8 +213,10 @@ void appNameClass::updateActiveAppIndex(int newSelectedAppIndex){
   if(newSelectedAppIndex>=APP_MENU_APPLICATIONS_QUANTITY) newSelectedAppIndex = 0;
 
   if(app_z_menu_selectedAppIndex!=newSelectedAppIndex){
-    
-    this->drawActiveAppFrame(false);
+    #ifndef SINGLE_ELEMENT_ON_SCREEN
+      this->drawActiveAppFrame(false);
+    #endif
+
     if( (int)((app_z_menu_selectedAppIndex)/APPS_ON_SINGLE_PAGE) != (int)((newSelectedAppIndex)/APPS_ON_SINGLE_PAGE)){
       // update page
       this->drawIcons(false);
@@ -207,11 +229,17 @@ void appNameClass::updateActiveAppIndex(int newSelectedAppIndex){
     }
 
     // update selected app frame
-    this->drawActiveAppFrame(true);
+    #ifndef SINGLE_ELEMENT_ON_SCREEN
+      this->drawActiveAppFrame(true);
+    #endif
   }
 }
 
 void appNameClass::drawActiveAppFrame(bool draw){
+  #ifdef SINGLE_ELEMENT_ON_SCREEN
+    return;
+  #endif
+
   unsigned char positionOnScreen     = app_z_menu_selectedAppIndex%APPS_ON_SINGLE_PAGE;
   unsigned char positionOnScreen_x   = app_z_menu_selectedAppIndex%SINGLE_ELEMENTS_IN_X;
   unsigned char positionOnScreen_y   = positionOnScreen/SINGLE_ELEMENTS_IN_X;
@@ -279,15 +307,56 @@ void appNameClass::onDestroy(){
 
 void appNameClass::onEvent(unsigned char event, int val1, int val2){
     
+  /*
+  BUTTON_UP
+  BUTTON_SELECT
+  BUTTON_DOWN
+  BUTTON_BACK
+  BUTTON_POWER
+  */
+
+  #if DRIVER_CONTROLS_TOTALBUTTONS == 2
+    if(event==EVENT_BUTTON_PRESSED){
+    }else if(event==EVENT_BUTTON_RELEASED){
+    }else if(event==EVENT_BUTTON_LONG_PRESS){
+      if(val1==BUTTON_SELECT){
+        startApp(app_z_menu_selectedAppIndex);
+      }
+    }else if(event==EVENT_ON_TIME_CHANGED){
+
+    }else if(event==EVENT_BUTTON_SHORT_PRESS){
+      if(val1==BUTTON_SELECT){
+        this->updateActiveAppIndex(app_z_menu_selectedAppIndex+1);
+      }else if(val1==BUTTON_BACK){
+        this->updateActiveAppIndex(app_z_menu_selectedAppIndex-1);
+      }
+    }
+  #elif DRIVER_CONTROLS_TOTALBUTTONS == 1
+    if(event==EVENT_BUTTON_PRESSED){
+    }else if(event==EVENT_BUTTON_RELEASED){
+    }else if(event==EVENT_BUTTON_LONG_PRESS){
+      if(val1==BUTTON_SELECT){
+        startApp(app_z_menu_selectedAppIndex);
+      }
+    }else if(event==EVENT_ON_TIME_CHANGED){
+
+    }else if(event==EVENT_BUTTON_SHORT_PRESS){
+      if(val1==BUTTON_SELECT){
+        this->updateActiveAppIndex(app_z_menu_selectedAppIndex+1);
+      }else if(val1==BUTTON_BACK){
+        this->updateActiveAppIndex(app_z_menu_selectedAppIndex-1);
+      }
+    }
+  #else
     if(event==EVENT_BUTTON_PRESSED){
       switch(val1){
-        case 0:
+        case BUTTON_UP:
           this->updateActiveAppIndex(app_z_menu_selectedAppIndex-1);
           break;
-        case 1:
+        case BUTTON_SELECT:
           startApp(app_z_menu_selectedAppIndex);
           break;
-        case 2:
+        case BUTTON_DOWN:
           this->updateActiveAppIndex(app_z_menu_selectedAppIndex+1);
           break;
       }
@@ -297,7 +366,12 @@ void appNameClass::onEvent(unsigned char event, int val1, int val2){
 
     }else if(event==EVENT_ON_TIME_CHANGED){
 
+    }else if(event==EVENT_BUTTON_SHORT_PRESS){
+
     }
+
+    
+  #endif
 
 }
 

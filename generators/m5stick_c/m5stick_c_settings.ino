@@ -1,7 +1,7 @@
 /*
     ############################################################################################
     #                                                                                          #
-    #                                    WATCH7 SETTINGS +                                     #
+    #                                   M5STICK SETTINGS +                                     #
     #                                                                                          #
     ############################################################################################
 */
@@ -26,16 +26,15 @@
 
 #define HARDWARE_BUTTONS_ENABLED              // Conf of controls with hardware btns    
 
-#define DRIVER_CONTROLS_TOTALBUTTONS 2
+#define DRIVER_CONTROLS_TOTALBUTTONS 1
 #define DRIVER_CONTROLS_DELAY_BEFOR_LONG_PRESS 350
 
 #define COLOR_SCREEN                     // Screen is colored
-#define DISPLAY_NO_ANIMATION                     // Caurse of framebuffer type
 
 //#define toDefaultApp_onLeftLongPress
 
-#define STARTING_APP_NUMM   -1    // for Mainmenu (default app)
-//#define STARTING_APP_NUMM   3     // for App number 7
+//#define STARTING_APP_NUMM   -1    // for Mainmenu (default app)
+#define STARTING_APP_NUMM   2
 
 #define FONT_SIZE_DEFAULT 1
 
@@ -44,7 +43,7 @@
 
 
 //#define BATTERY_ENABLE
-//#define CLOCK_ENABLE
+#define CLOCK_ENABLE
 //#define USE_PRIMITIVE_HARDWARE_DRAW_ACCELERATION
 
 //#define USE_RTC
@@ -56,10 +55,17 @@
 
 #define STYLE_STATUSBAR_HEIGHT  20
 
+#define MAIN_MENU_SMOOTH_ANIMATION
+#define NARROW_SCREEN
+
+#define FRAMEBUFFER_ENABLE
+#define FRAMEBUFFER_TWIN_FULL
+#define FRAMEBUFFER_BYTE_PER_PIXEL 2
+
 /*
     ############################################################################################
     #                                                                                          #
-    #                                    WATCH7 SETTINGS -                                     #
+    #                                   M5STICK SETTINGS -                                     #
     #                                                                                          #
     ############################################################################################
 */

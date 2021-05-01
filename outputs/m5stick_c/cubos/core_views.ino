@@ -247,13 +247,21 @@ void core_views_draw_active_page(
     unsigned char pages_quantity,
     unsigned char position
 ){
+    #ifdef NARROW_SCREEN
+        if(draw) setDrawColor(getContrastColor_red(), getContrastColor_green(), getContrastColor_blue());
+        else setDrawColor(getBackgroundColor_red(), getBackgroundColor_green(), getBackgroundColor_blue());
 
-    if(draw) setDrawColor(0, 255, 0);
-    else setDrawColor(getBackgroundColor_red(), getBackgroundColor_green(), getBackgroundColor_blue());
+        //drawString_centered(String(position) + "/" + String(pages_quantity), y0, 1);
+        String activePageString = String(position + 1) + "/" + String(pages_quantity);
+        drawString(activePageString, (SCREEN_WIDTH - activePageString.length()*FONT_CHAR_WIDTH*2)/2, y0 - FONT_CHAR_HEIGHT, 2);
+    #else
+        if(draw) setDrawColor(0, 255, 0);
+        else setDrawColor(getBackgroundColor_red(), getBackgroundColor_green(), getBackgroundColor_blue());
 
-    int element_x = SCREEN_WIDTH/2 + core_views_pages_list_get_element_position_x(pages_quantity, position);
-    int element_y = y0;
-    drawRect(element_x - (CORE_VIEWS_PAGES_LIST_ELEMENT_SIZE-1), element_y - (CORE_VIEWS_PAGES_LIST_ELEMENT_SIZE-1), element_x + (CORE_VIEWS_PAGES_LIST_ELEMENT_SIZE-1), element_y + (CORE_VIEWS_PAGES_LIST_ELEMENT_SIZE-1), true);
+        int element_x = SCREEN_WIDTH/2 + core_views_pages_list_get_element_position_x(pages_quantity, position);
+        int element_y = y0;
+        drawRect(element_x - (CORE_VIEWS_PAGES_LIST_ELEMENT_SIZE-1), element_y - (CORE_VIEWS_PAGES_LIST_ELEMENT_SIZE-1), element_x + (CORE_VIEWS_PAGES_LIST_ELEMENT_SIZE-1), element_y + (CORE_VIEWS_PAGES_LIST_ELEMENT_SIZE-1), true);
+    #endif
 
 }
 

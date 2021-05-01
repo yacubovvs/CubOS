@@ -36,7 +36,12 @@ FRAMEBUFFER_BYTE_PER_PIXEL
     bool FRAMEBUFFER_pixelChangedchanged[SCREEN_WIDTH*SCREEN_HEIGHT + 1];
 
 
-    void FRAMEBUFFER_fill(uint16_t fillColor){
+    void FRAMEBUFFER_reset(){
+
+      FRAMEBUFFER_currentFrame  = (FRAMEBUFFER_TYPE *)ps_malloc(FRAMEBUFFER_SIZE);
+      FRAMEBUFFER_newFrame      = (FRAMEBUFFER_TYPE *)ps_malloc(FRAMEBUFFER_SIZE);
+      
+
       for(int x=0; x<SCREEN_WIDTH; x++){
         for(int y=0; y<SCREEN_HEIGHT; y++){
           long position = y * SCREEN_WIDTH + x;
@@ -46,19 +51,27 @@ FRAMEBUFFER_BYTE_PER_PIXEL
           FRAMEBUFFER_current_setPixel(x, y, 0);
         }
       }
+
+      /*
+      for(int x=0; x<SCREEN_WIDTH; x++){
+        for(int y=0; y<SCREEN_HEIGHT; y++){
+          //FRAMEBUFFER_new_setPixel(x, y, 0);
+          //FRAMEBUFFER_current_setPixel(x, y, 0);
+        }
+      }
+      */
+
+      //FRAMEBUFFER_newFrame[0][0] = 0;
+      //test = 2;
+      //FRAMEBUFFER_currentFrame[i]
+      /*
+      for(long i=0; i<FRAMEBUFFER_SIZE; i++){
+        FRAMEBUFFER_currentFrame[i] = 0; 
+        FRAMEBUFFER_newFrame[i] = 0;
+      }*/
+      
     }
 
-    void FRAMEBUFFER_reset(){
-      #ifdef FRAMEBUFFER_PSRAM
-        FRAMEBUFFER_currentFrame  = (FRAMEBUFFER_TYPE *)ps_malloc(FRAMEBUFFER_SIZE);
-        FRAMEBUFFER_newFrame      = (FRAMEBUFFER_TYPE *)ps_malloc(FRAMEBUFFER_SIZE);
-      #else
-        FRAMEBUFFER_currentFrame  = (FRAMEBUFFER_TYPE *)malloc(FRAMEBUFFER_SIZE);
-        FRAMEBUFFER_newFrame      = (FRAMEBUFFER_TYPE *)malloc(FRAMEBUFFER_SIZE);
-      #endif
-      
-      FRAMEBUFFER_fill(0);
-    }
 
     void FRAMEBUFFER_new_setPixel(uint16_t x, uint16_t y, FRAMEBUFFER_TYPE color){
       long position = y * SCREEN_WIDTH + x;
@@ -135,38 +148,23 @@ unsigned char background_red = 0;
 unsigned char background_green = 0;
 unsigned char background_blue = 0;
 
-unsigned char contrast_red = 255;
-unsigned char contrast_green = 255;
-unsigned char contrast_blue = 255;
+unsigned char getBackgroundColor_red(){
+  return background_red;
+} 
 
-unsigned char getBackgroundColor_red(){ return background_red;} 
-unsigned char getContrastColor_red(){ return contrast_red;} 
+unsigned char getBackgroundColor_green(){
+  return background_green;
+} 
 
-unsigned char getBackgroundColor_green(){ return background_green;} 
-unsigned char getContrastColor_green(){ return contrast_green;} 
-
-unsigned char getBackgroundColor_blue(){ return background_blue;} 
-unsigned char getContrastColor_blue(){ return contrast_blue;} 
+unsigned char getBackgroundColor_blue(){
+  return background_blue;
+} 
 
 void setBackgroundColor(unsigned char r, unsigned char g, unsigned char b){
   background_red    = r;
   background_green  = g;
   background_blue   = b;
 } 
-
-void setContrastColor(unsigned char r, unsigned char g, unsigned char b){
-  contrast_red    = r;
-  contrast_green  = g;
-  contrast_blue   = b;
-} 
-
-void setDrawColor_BackGoundColor(){
-  setDrawColor(getBackgroundColor_red(), getBackgroundColor_green(), getBackgroundColor_blue());
-}
-
-void setDrawColor_ContrastColor(){
-  setDrawColor(getContrastColor_red(), getContrastColor_green(), getContrastColor_blue());
-}
 
 //////////////////////////////////////////////////
 // Function needed for CubOS
@@ -573,9 +571,6 @@ void drawString_centered(String dString, int x, int y, unsigned char fontSize){
   drawString(dString, x - dString.length()*FONT_CHAR_WIDTH*fontSize/2, y, fontSize);  
 }
 
-void drawString_centered_fontSize(String dString, uint16_t y, unsigned char fontSize){
-  drawString(dString, (SCREEN_WIDTH - dString.length()*(FONT_CHAR_WIDTH)*fontSize)/2 + (int)(fontSize/2), y, fontSize);
-}
 
 void drawString_rightAlign(String dString, int x, int y){
   drawString(dString, x - dString.length()*FONT_CHAR_WIDTH, y);  

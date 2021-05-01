@@ -23,15 +23,19 @@ class appNameClass: public Application{
         };
         const static unsigned char icon[] PROGMEM;
 
-        void draw_current_time();
+        void draw_current_time(bool draw);
+        String timeString;
       
 };
 
 void appNameClass::onCreate(){
-    /*
-        Write you code onCreate here
-    */
-    this->draw_current_time();
+    DRAW_LIMITS_setEnable(true);
+    DRAW_LIMIT_reset();
+    //DRAW_LIMITS_setEnable(STYLE_STATUSBAR_HEIGHT, -1, -1, -1);
+
+    setBackgroundColor(0,0,0);
+    setContrastColor(255, 255, 255);
+    this->draw_current_time(true);
 }
 
 void appNameClass::onLoop(){
@@ -50,34 +54,74 @@ void appNameClass::onEvent(unsigned char event, int val1, int val2){
     
     if(event==EVENT_BUTTON_PRESSED){
         // Write you code on [val1] button pressed here
-        if(val1==BUTTON_BACK){
-            startApp(-1);
-        }
+        #if DRIVER_CONTROLS_TOTALBUTTONS > 3
+            if(val1==BUTTON_BACK){
+                startApp(-1);
+            }
+        #endif
+        
     }else if(event==EVENT_BUTTON_RELEASED){
         // Write you code on [val1] button released here
     }else if(event==EVENT_BUTTON_LONG_PRESS){
         // Write you code on [val1] button long press here
+        if(val1==BUTTON_SELECT){
+
+            #if DRIVER_CONTROLS_TOTALBUTTONS == 1
+                startApp(-1);
+            #elif DRIVER_CONTROLS_TOTALBUTTONS == 2
+                startApp(-1);
+            #else
+            #endif
+        }
     }else if(event==EVENT_ON_TIME_CHANGED){
         // Write you code on system time changed
-        this->draw_current_time();
+        this->draw_current_time(false);
+        this->draw_current_time(true);
     }else if(event==EVENT_ON_GOING_TO_SLEEP){
-        String timeString = core_time_getHourMinuteSecondsTime();
-        setDrawColor(0, 0, 0);
-        clearString(timeString, 2, 90, 5);
+        this->draw_current_time(false);
     }else if(event==EVENT_ON_WAKE_UP){
-        this->draw_current_time();
+        this->draw_current_time(true);
     }
-
-     
     
 }
 
-void appNameClass::draw_current_time(){
-    String timeString = core_time_getHourMinuteSecondsTime();
+void appNameClass::draw_current_time(bool draw){
+    if(draw){
+        // Draw
+        setDrawColor_ContrastColor();
+        this->timeString = core_time_getHourMinuteSecondsTime();
+        #ifdef NARROW_SCREEN
+            #define GRAY_HOURS 128
+
+            setDrawColor(GRAY_HOURS, GRAY_HOURS, GRAY_HOURS);
+            drawString_centered_fontSize(this->timeString.substring(0,2), 23, 6);
+            setDrawColor(255, 255, 255);
+            drawString_centered_fontSize(this->timeString.substring(3,5), 75, 6);
+            setDrawColor(GRAY_HOURS, 0, 0);
+            drawString_centered_fontSize(this->timeString.substring(6,8), 125, 4);
+            
+        #else
+            drawString(this->timeString, 2, 90, 5);
+        #endif
+    }else{
+        // Clear
+        setDrawColor_BackGoundColor();
+        #ifdef NARROW_SCREEN
+            drawString_centered_fontSize(this->timeString.substring(0,2), 23, 6);
+            drawString_centered_fontSize(this->timeString.substring(3,5), 75, 6);
+            drawString_centered_fontSize(this->timeString.substring(6,8), 125, 4);
+        #else
+            clearString(this->timeString, 2, 90, 5);
+        #endif
+    }
+
+    /*
+    this->timeString = core_time_getHourMinuteSecondsTime();
     setDrawColor(0, 0, 0);
-    clearString(timeString, 2, 90, 5);
+    clearString(this->timeString, 2, 90, 5);
     setDrawColor(255, 255, 255);
-    drawString(timeString, 2, 90, 5);
+    drawString(this->timeString, 2, 90, 5);
+    */
 }
 
 const unsigned char appNameClass::icon[] PROGMEM = {

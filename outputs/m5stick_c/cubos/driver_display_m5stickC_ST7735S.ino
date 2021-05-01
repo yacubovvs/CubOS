@@ -34,6 +34,11 @@ void powerOn_displayDriver(){
 
 
 void fillScreen(unsigned char red, unsigned char green, unsigned char blue){
+  uint16_t fillColor = get_uint16Color(red, green, blue);
+  M5.Lcd.fillScreen(fillColor);
+  #ifdef FRAMEBUFFER_ENABLE
+    FRAMEBUFFER_fill(fillColor);
+  #endif
 }
 
 
@@ -52,12 +57,28 @@ void setPixel(int x, int y){
   #endif
 }
 
+void setPixel(int x, int y, uint16_t color){
+    #if defined(SCREEN_ROTATION_90)
+      M5.Lcd.drawPixel(SCREEN_WIDTH-x, SCREEN_HEIGHT-y, color);
+    #elif defined(SCREEN_ROTATION_180)
+      M5.Lcd.drawPixel(SCREEN_WIDTH-x, SCREEN_HEIGHT-y, color);
+    #elif defined(SCREEN_ROTATION_270)
+      M5.Lcd.drawPixel(SCREEN_WIDTH-x, SCREEN_HEIGHT-y, color);
+    #else
+      M5.Lcd.drawPixel(x, y, color);
+    #endif
+}
+
 void setDrawColor(unsigned char red_new, unsigned char green_new, unsigned char blue_new){
   red = red_new;
   green = green_new;
   blue = blue_new;
 
   current_drawColor = get_uint16Color(red, green, blue);
+}
+
+uint16_t getDrawColor(){
+  return current_drawColor;
 }
 
 #ifdef USE_PRIMITIVE_HARDWARE_DRAW_ACCELERATION

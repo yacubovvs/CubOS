@@ -35,9 +35,9 @@ void driver_controls_loop(){
         onButtonEvent(EVENT_BUTTON_PRESSED, i);
       }else{
         // was pressed
-        if(_millis()-driver_control_time_pressed[i]>DRIVER_CONTROLS_DELAY_BEFOR_LONG_PRESS){
+        if(driver_control_time_pressed[i]!=0 && _millis()-driver_control_time_pressed[i]>DRIVER_CONTROLS_DELAY_BEFOR_LONG_PRESS){
           // long press
-          driver_control_time_pressed[i]=-1;
+          driver_control_time_pressed[i]=0;
           onButtonEvent(EVENT_BUTTON_LONG_PRESS, i);
         }
       }

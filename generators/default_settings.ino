@@ -52,6 +52,8 @@
 #define FONT_SIZE_DEFAULT 2
 #define HARDWARE_BUTTONS_VALUE 3
 
+// #define MAIN_MENU_SMOOTH_ANIMATION
+// #define NARROW_SCREEN
 /*
     ############################################################################################
     #                                                                                          #

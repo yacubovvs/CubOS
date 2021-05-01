@@ -52,8 +52,6 @@
 #define FONT_SIZE_DEFAULT 2
 #define HARDWARE_BUTTONS_VALUE 3
 
-// #define MAIN_MENU_SMOOTH_ANIMATION
-// #define NARROW_SCREEN
 /*
     ############################################################################################
     #                                                                                          #
@@ -63,49 +61,57 @@
 *//*
     ############################################################################################
     #                                                                                          #
-    #                                   M5STICK SETTINGS +                                     #
+    #                                 LILYGO_WATCH_2020_V3 +                                   #
     #                                                                                          #
     ############################################################################################
 */
 
-// ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! !
-//      FOR ESP8266 USE NONOSSDK 2.2.2 +
-// ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! !
+#undef CPU_CONTROLL_ENABLE
 
-#define DEBUG_SERIAL
+#define LILYGO_WATCH_2020_V2 
 
-#define SCREEN_WIDTH            80     // Screen resolution width
-#define SCREEN_HEIGHT           160     // Screen resolution height
+//#define DEBUG_SERIAL
+#define screenDebug
+
+#define SCREEN_WIDTH            240     // Screen resolution width
+#define SCREEN_HEIGHT           240     // Screen resolution height
 
 #define FONT_CHAR_WIDTH         6     // Font letter size width
 #define FONT_CHAR_HEIGHT        8     // Font letter size height
 
-#define PLATFORM_ESP32
-#define BLUETOOTH_ENABLED
-#define WIFI_ENABLED
+#define FRAMEBUFFER_ENABLE
+#define FRAMEBUFFER_TWIN_FULL
+#define FRAMEBUFFER_BYTE_PER_PIXEL 2
+
+#define platform_esp32
+#define device_has_bluetooth
+#define device_has_wifi
 
 #define ON_TIME_CHANGE_EVERY_MS 1000
 
-#define HARDWARE_BUTTONS_ENABLED              // Conf of controls with hardware btns    
+//#define HARDWARE_BUTTONS_ENABLED              // Conf of controls with hardware btns    
+#define TOUCH_SCREEN_ENABLE
 
-#define DRIVER_CONTROLS_TOTALBUTTONS 1
-#define DRIVER_CONTROLS_DELAY_BEFOR_LONG_PRESS 350
-
-#define COLOR_SCREEN                     // Screen is colored
+#define colorScreen                     // Screen is colored
+#define noAnimation                     
 
 //#define toDefaultApp_onLeftLongPress
 
-//#define STARTING_APP_NUMM   -1    // for Mainmenu (default app)
-#define STARTING_APP_NUMM   2
-
-#define FONT_SIZE_DEFAULT 1
+#define STARTING_APP_NUMM   -1    // for Mainmenu (default app)
+//#define STARTING_APP_NUMM   11     // for App number 7
 
 //#define CPU_SLEEP_ENABLE
 //#define CPU_SLEEP_TIME_DELAY core_cpu_getCpuSleepTimeDelay()
 
 
+#define BUTTON_UP       0x01
+#define BUTTON_SELECT   0x02
+#define BUTTON_DOWN     0x03
+#define BUTTON_BACK     0x04
+
+
 //#define BATTERY_ENABLE
-#define CLOCK_ENABLE
+//#define CLOCK_ENABLE
 //#define USE_PRIMITIVE_HARDWARE_DRAW_ACCELERATION
 
 //#define USE_RTC
@@ -115,19 +121,13 @@
 //#define SCREEN_ROTATION_180
 //#define SCREEN_ROTATION_270
 
-#define STYLE_STATUSBAR_HEIGHT  20
+#define STYLE_STATUSBAR_HEIGHT  40
 
-#define MAIN_MENU_SMOOTH_ANIMATION
-#define NARROW_SCREEN
-
-#define FRAMEBUFFER_ENABLE
-#define FRAMEBUFFER_TWIN_FULL
-#define FRAMEBUFFER_BYTE_PER_PIXEL 2
 
 /*
     ############################################################################################
     #                                                                                          #
-    #                                   M5STICK SETTINGS -                                     #
+    #                                 LILYGO_WATCH_2020_V3 -                                   #
     #                                                                                          #
     ############################################################################################
 */
@@ -316,9 +316,9 @@ void loop(){
 }
 
 #ifdef CPU_SLEEP_ENABLE
-  void do_cpu_sleep(){
-      driver_cpu_sleep();
-  }
+    void do_cpu_sleep(){
+        driver_cpu_sleep();
+    }
 #endif
 
 void debug(String string){
@@ -420,6 +420,7 @@ void debug(const char* string){
 #define APP_MENU_APPLICATIONS_8             SimpleGameApp
 #define APP_MENU_APPLICATIONS_9             TestApplicationApp
 #define APP_MENU_APPLICATIONS_10            BatteryApp
+#define APP_MENU_APPLICATIONS_11            TouchTest
 
 /*
     # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #

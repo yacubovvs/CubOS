@@ -110,9 +110,7 @@ void appNameClass::drawSettingsPageFirstTime(){
         this->updateActiveAppIndex(app_settings_selectedAppIndex);  
         // Drawing icons
         this->drawIcons(true);
-        #ifndef TOUCH_SCREEN_ENABLE
-            this->drawActiveAppFrame(true);  
-        #endif
+        this->drawActiveAppFrame(true);  
     }if(currentSubMenu==APP_SETTINGS_SUBMENU_SET_TIME){
         int y_position = (SCREEN_HEIGHT - STYLE_STATUSBAR_HEIGHT)/2;
         //drawString("Setting up time", 80,80);
@@ -186,12 +184,6 @@ void appNameClass::switchToSubMenu(unsigned char newSubMenu){
 }
 
 void appNameClass::onCreate(){
-    #ifndef TOUCH_SCREEN_ENABLE
-        DRAW_LIMITS_setEnable(true);
-        DRAW_LIMIT_reset();
-        DRAW_LIMITS_setEnable(STYLE_STATUSBAR_HEIGHT, -1, -1, -1);
-    #endif
-
     this->drawSettingsPageFirstTime();
     this->currentSubMenu = APP_SETTINGS_SUBMENU_MAIN;
     //switchToSubMenu(APP_SETTINGS_SUBMENU_SET_TIME);
@@ -206,10 +198,7 @@ void appNameClass::updateActiveAppIndex(int newSelectedAppIndex){
 
   if(app_settings_selectedAppIndex!=newSelectedAppIndex){
     
-    #ifndef TOUCH_SCREEN_ENABLE
-        this->drawActiveAppFrame(false);
-    #endif
-    
+    this->drawActiveAppFrame(false);
     if( (int)((app_settings_selectedAppIndex)/APPS_ON_SINGLE_PAGE) != (int)((newSelectedAppIndex)/APPS_ON_SINGLE_PAGE)){
       // update page
       this->drawIcons(false);
@@ -222,10 +211,7 @@ void appNameClass::updateActiveAppIndex(int newSelectedAppIndex){
     }
 
     // update selected app frame
-    #ifndef TOUCH_SCREEN_ENABLE
-        this->drawActiveAppFrame(true);
-    #endif
-    
+    this->drawActiveAppFrame(true);
   }
 }
 
@@ -250,51 +236,35 @@ void appNameClass::drawActiveAppFrame(bool draw){
 }
 
 void appNameClass::drawIcons(bool draw){
-    #ifndef TOUCH_SCREEN_ENABLE
-        for(unsigned char currentDrawPage=0; currentDrawPage<getTotalPagesInSubMenu(APP_SETTINGS_SUBMENU_MAIN); currentDrawPage++){
-    #endif
-        
-        for (unsigned char y_position=0; y_position<SINGLE_ELEMENTS_IN_Y; y_position++){
-            for (unsigned char x_position=0; x_position<SINGLE_ELEMENTS_IN_X; x_position++){
-                int x0 = x_position*SINGLE_ELEMENT_REAL_WIDTH;
-                int y0 = y_position*SINGLE_ELEMENT_REAL_HEIGHT + STYLE_STATUSBAR_HEIGHT+1;
-                int x1 = x0+SINGLE_ELEMENT_REAL_WIDTH;
-                int y1 = y0+SINGLE_ELEMENT_REAL_HEIGHT;
+  for (unsigned char y_position=0; y_position<SINGLE_ELEMENTS_IN_Y; y_position++){
+        for (unsigned char x_position=0; x_position<SINGLE_ELEMENTS_IN_X; x_position++){
+            int x0 = x_position*SINGLE_ELEMENT_REAL_WIDTH;
+            int y0 = y_position*SINGLE_ELEMENT_REAL_HEIGHT + STYLE_STATUSBAR_HEIGHT+1;
+            int x1 = x0+SINGLE_ELEMENT_REAL_WIDTH;
+            int y1 = y0+SINGLE_ELEMENT_REAL_HEIGHT;
 
-                int x_center = (x0+x1)/2;
-                int y_center = (y0+y1)/2;
+            int x_center = (x0+x1)/2;
+            int y_center = (y0+y1)/2;
 
-                #ifndef TOUCH_SCREEN_ENABLE
-                    int app_num = y_position*(SINGLE_ELEMENTS_IN_X) + x_position + currentDrawPage*APPS_ON_SINGLE_PAGE;
-                #else
-                    int app_num = y_position*(SINGLE_ELEMENTS_IN_X) + x_position + APPS_ON_SINGLE_PAGE*(int)(app_settings_selectedAppIndex/APPS_ON_SINGLE_PAGE);
-                #endif
-                
-                if(app_num<getTotalApplicationsInSubMenu(APP_SETTINGS_SUBMENU_MAIN)){
-                    #ifdef ESP8266
-                        ESP.wdtDisable();
-                    #endif
+            int app_num = y_position*(SINGLE_ELEMENTS_IN_X) + x_position + APPS_ON_SINGLE_PAGE*(int)(app_settings_selectedAppIndex/APPS_ON_SINGLE_PAGE);
 
-                    
-                    core_views_draw_settings_item(
-                        draw, 
-                        #ifndef TOUCH_SCREEN_ENABLE
-                            currentDrawPage*SCREEN_WIDTH - this->scroll_x + x0+35, 
-                        #else
-                            -this->scroll_x + x0+35, 
-                        #endif
-                        y_center, 
-                        (const unsigned char*)this->getApplicationTitle(0, app_num), 
-                        this->getApplicationSubTitle(0, app_num), 
-                        this->getApplicationIcon(0, app_num)
-                    );
-                }
+            
+            if(app_num<getTotalApplicationsInSubMenu(APP_SETTINGS_SUBMENU_MAIN)){
+              #ifdef ESP8266
+                ESP.wdtDisable();
+              #endif
+
+            
+              core_views_draw_settings_item(
+                draw, 
+                x0+35, y_center, 
+                (const unsigned char*)this->getApplicationTitle(0, app_num), 
+                this->getApplicationSubTitle(0, app_num), 
+                this->getApplicationIcon(0, app_num)
+              );
             }
         }
-
-    #ifndef TOUCH_SCREEN_ENABLE
     }
-    #endif
 }
 
 void appNameClass::onLoop(){
@@ -305,84 +275,64 @@ void appNameClass::onDestroy(){
 }
 
 void appNameClass::onEvent(unsigned char event, int val1, int val2){
-    #ifdef TOUCH_SCREEN_ENABLE
-        if(event==EVENT_ON_TOUCH_DRAG){
-
-            // SCREEN SCROLL
-            this->drawIcons(false);
-            this->scroll_x -= val1;
-            if(this->scroll_x<0) scroll_x = 0;
-
-            int max_scroll = (this->getTotalApplicationsInSubMenu(APP_SETTINGS_SUBMENU_MAIN) - 1 ) * SCREEN_WIDTH;
-            if(this->scroll_x>max_scroll) {
-                this->scroll_x = max_scroll;
+    if(event==EVENT_BUTTON_PRESSED){
+        if(currentSubMenu==APP_SETTINGS_SUBMENU_MAIN){
+            switch(val1){
+                case BUTTON_UP:
+                        this->updateActiveAppIndex(app_settings_selectedAppIndex-1);
+                    break;
+                case BUTTON_BACK:
+                    startApp(-1);
+                    break;
+                case BUTTON_DOWN:
+                    if(currentSubMenu==APP_SETTINGS_SUBMENU_MAIN){
+                        this->updateActiveAppIndex(app_settings_selectedAppIndex+1);
+                    }   
+                    break;
+                case BUTTON_SELECT:
+                    if(currentSubMenu==APP_SETTINGS_SUBMENU_MAIN && app_settings_selectedAppIndex==0) switchToSubMenu(APP_SETTINGS_SUBMENU_SET_TIME);
+                    break;
             }
-
-            this->drawIcons(true);
-        }
-    #else
-        if(event==EVENT_BUTTON_PRESSED){
+        }else if(currentSubMenu==APP_SETTINGS_SUBMENU_SET_TIME){
             
-            if(currentSubMenu==APP_SETTINGS_SUBMENU_MAIN){
-                switch(val1){
-                    case BUTTON_UP:
-                            this->updateActiveAppIndex(app_settings_selectedAppIndex-1);
-                        break;
-                    case BUTTON_BACK:
-                        startApp(-1);
-                        break;
-                    case BUTTON_DOWN:
-                        if(currentSubMenu==APP_SETTINGS_SUBMENU_MAIN){
-                            this->updateActiveAppIndex(app_settings_selectedAppIndex+1);
-                        }   
-                        break;
-                    case BUTTON_SELECT:
-                        if(currentSubMenu==APP_SETTINGS_SUBMENU_MAIN && app_settings_selectedAppIndex==0) switchToSubMenu(APP_SETTINGS_SUBMENU_SET_TIME);
-                        break;
-                }
-            }else if(currentSubMenu==APP_SETTINGS_SUBMENU_SET_TIME){
+            switch(val1){
+                case BUTTON_UP:
+                case BUTTON_DOWN:
+                    if(currentPositionIsSelected==false){
+                        drawSettingTimeSelect(false, getPositionBySelectedNumber(currentSelectedPosition));
+                        if(val1==BUTTON_DOWN)currentSelectedPosition++; else currentSelectedPosition--;
+                        if(currentSelectedPosition>=3)currentSelectedPosition=0;
+                        if(currentSelectedPosition<0)currentSelectedPosition=2;
+                        drawSettingTimeSelect(true, getPositionBySelectedNumber(currentSelectedPosition));
+                    }else{
+                        
+                        // time changing
+                    }
+                    break;
+                case BUTTON_BACK:
+                    switchToSubMenu(APP_SETTINGS_SUBMENU_MAIN);            
+                    break;
                 
-                switch(val1){
-                    case BUTTON_UP:
-                    case BUTTON_DOWN:
-                        if(currentPositionIsSelected==false){
-                            drawSettingTimeSelect(false, getPositionBySelectedNumber(currentSelectedPosition));
-                            if(val1==BUTTON_DOWN)currentSelectedPosition++; else currentSelectedPosition--;
-                            if(currentSelectedPosition>=3)currentSelectedPosition=0;
-                            if(currentSelectedPosition<0)currentSelectedPosition=2;
-                            drawSettingTimeSelect(true, getPositionBySelectedNumber(currentSelectedPosition));
-                        }else{
-                            
-                            // time changing
-                        }
-                        break;
-                    case BUTTON_BACK:
-                        switchToSubMenu(APP_SETTINGS_SUBMENU_MAIN);            
-                        break;
-                    
-                    case BUTTON_SELECT:
-                        currentPositionIsSelected = !currentPositionIsSelected;
-                        if(currentPositionIsSelected){
-                            drawSettingTimeSelect(false, getPositionBySelectedNumber(currentSelectedPosition));
-                            drawSettingTimeArrows(true, getPositionBySelectedNumber(currentSelectedPosition));
-                        }else{
-                            drawSettingTimeArrows(false, getPositionBySelectedNumber(currentSelectedPosition));
-                            drawSettingTimeSelect(true, getPositionBySelectedNumber(currentSelectedPosition));
-                        }
-                        break;
-                }
-
+                case BUTTON_SELECT:
+                    currentPositionIsSelected = !currentPositionIsSelected;
+                    if(currentPositionIsSelected){
+                        drawSettingTimeSelect(false, getPositionBySelectedNumber(currentSelectedPosition));
+                        drawSettingTimeArrows(true, getPositionBySelectedNumber(currentSelectedPosition));
+                    }else{
+                        drawSettingTimeArrows(false, getPositionBySelectedNumber(currentSelectedPosition));
+                        drawSettingTimeSelect(true, getPositionBySelectedNumber(currentSelectedPosition));
+                    }
+                    break;
             }
-        
-        }else if(event==EVENT_BUTTON_RELEASED){
-
-        }else if(event==EVENT_BUTTON_LONG_PRESS){
 
         }
-    
-    #endif
 
-    else if(event==EVENT_ON_TIME_CHANGED){
+      
+    }else if(event==EVENT_BUTTON_RELEASED){
+
+    }else if(event==EVENT_BUTTON_LONG_PRESS){
+
+    }else if(event==EVENT_ON_TIME_CHANGED){
 
         if(currentSubMenu==APP_SETTINGS_SUBMENU_MAIN){
             if((int)((app_settings_selectedAppIndex)/APPS_ON_SINGLE_PAGE)==0){

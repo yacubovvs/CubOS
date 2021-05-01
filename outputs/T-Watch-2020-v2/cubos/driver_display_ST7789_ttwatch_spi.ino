@@ -35,11 +35,7 @@ void powerOn_displayDriver(){}
 void driver_display_loop(){}
 
 void fillScreen(unsigned char red, unsigned char green, unsigned char blue){
-  uint16_t fillColor = get_uint16Color(red, green, blue);
-  ttgo->tft->fillScreen(fillColor);
-  #ifdef FRAMEBUFFER_ENABLE
-    FRAMEBUFFER_fill(fillColor);
-  #endif
+  ttgo->tft->fillScreen(get_uint16Color(red, green, blue));
 }
 
 void setPixel(int x, int y){
