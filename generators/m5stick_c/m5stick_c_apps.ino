@@ -6,17 +6,14 @@
     ############################################################################################
 */
 
-#define APP_MENU_APPLICATIONS_0             AlarmApp
-#define APP_MENU_APPLICATIONS_1             BarometerApp
-#define APP_MENU_APPLICATIONS_2             ClockApp
-#define APP_MENU_APPLICATIONS_3             CompassApp
-#define APP_MENU_APPLICATIONS_4             FileManagerApp
-#define APP_MENU_APPLICATIONS_5             I2CScannerApp
-#define APP_MENU_APPLICATIONS_6             InternetApp
-#define APP_MENU_APPLICATIONS_7             SettingsApp
-#define APP_MENU_APPLICATIONS_8             SimpleGameApp
-#define APP_MENU_APPLICATIONS_9             TestApplicationApp
-#define APP_MENU_APPLICATIONS_10            BatteryApp
+#define APP_MENU_APPLICATIONS_0             ClockApp
+#define APP_MENU_APPLICATIONS_1             SettingsApp
+#define APP_MENU_APPLICATIONS_2             CompassApp
+#define APP_MENU_APPLICATIONS_3             I2CScannerApp
+#define APP_MENU_APPLICATIONS_4             AlarmApp
+#define APP_MENU_APPLICATIONS_5             SimpleGameApp
+#define APP_MENU_APPLICATIONS_6             TestApplicationApp
+#define APP_MENU_APPLICATIONS_7             BatteryApp
 
 /*
     # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #

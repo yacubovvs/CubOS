@@ -185,6 +185,10 @@ const unsigned char appNameClass::icon[] PROGMEM = {
 
 void appNameClass::onCreate(){
     
+    DRAW_LIMITS_setEnable(true);
+    DRAW_LIMIT_reset();
+    DRAW_LIMITS_setEnable(STYLE_STATUSBAR_HEIGHT, -1, -1, -1);
+
     setBackgroundColor(0,0,0);
     setContrastColor(255, 255, 255);
 
@@ -278,10 +282,36 @@ void appNameClass::drawIcons(bool draw){
               #endif
 
               //debug(String(app_num), 1000);
+              #ifdef MAIN_MENU_SMOOTH_ANIMATION
+                if(this->scroll_x!=0){
+                  if(this->scroll_x<0){
+                  }else if(this->scroll_x>0){
+                    // unsigned char lastIcon=this->scroll_x/SCREEN_WIDTH;
+                    //debug(String(lastIcon));
+                    
+                    char elementsToPreDraw = this->scroll_x/SCREEN_WIDTH + 1;
+                    elementsToPreDraw = elementsToPreDraw%APP_MENU_APPLICATIONS_QUANTITY;
+                    for(unsigned char elementDraw = 0; elementDraw<=elementsToPreDraw; elementDraw++){
+                      int appElementDraw = app_num - elementDraw;
+                      while(appElementDraw<0) appElementDraw+=APP_MENU_APPLICATIONS_QUANTITY;
+                      appElementDraw = appElementDraw%APP_MENU_APPLICATIONS_QUANTITY;
+
+                      core_views_draw_app_icon(
+                        draw, 
+                        this->scroll_x + x_center - elementDraw*SCREEN_WIDTH , y_center, 
+                        (const unsigned char*)this->getApplicationTitle(appElementDraw), 
+                        this->getApplicationIcon(appElementDraw)
+                      );
+                    }
+
+                  }
+                }
+                //delay(5);
+              #endif
 
               core_views_draw_app_icon(
                 draw, 
-                x_center, y_center, 
+                this->scroll_x + x_center, y_center, 
                 (const unsigned char*)this->getApplicationTitle(app_num), 
                 this->getApplicationIcon(app_num)
               );
@@ -291,12 +321,20 @@ void appNameClass::drawIcons(bool draw){
 }
 
 void appNameClass::onLoop(){
-    /*
-    #ifdef DEBUG_SERIAL
-        Serial.println("Application on loop");
-    #endif
-    delay(100);
-    */
+  #ifdef MAIN_MENU_SMOOTH_ANIMATION
+    if(this->scroll_x!=0){
+      this->drawIcons(false);
+      if(this->scroll_x!=0){
+        //this->scroll_x++;
+        int dx = abs(scroll_x)/5 + 1;
+        if(scroll_x>scroll_to_x) dx *= -1;
+        scroll_x+=dx;
+
+        if (abs(dx)<1) scroll_x=0;
+      }
+      this->drawIcons(true);
+    }
+  #endif
 }
 
 void appNameClass::onDestroy(){
@@ -339,9 +377,11 @@ void appNameClass::onEvent(unsigned char event, int val1, int val2){
 
     }else if(event==EVENT_BUTTON_SHORT_PRESS){
       if(val1==BUTTON_SELECT){
+        this->drawIcons(false);
+        #ifdef MAIN_MENU_SMOOTH_ANIMATION
+          this->scroll_x += SCREEN_WIDTH;
+        #endif
         this->updateActiveAppIndex(app_z_menu_selectedAppIndex+1);
-      }else if(val1==BUTTON_BACK){
-        this->updateActiveAppIndex(app_z_menu_selectedAppIndex-1);
       }
     }
   #else

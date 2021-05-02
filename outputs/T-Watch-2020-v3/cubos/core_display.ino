@@ -117,9 +117,9 @@ FRAMEBUFFER_BYTE_PER_PIXEL
 
 bool DRAW_LIMITS_Enabled  = false;
 int DRAW_LIMITS_top       = 0;
-int DRAW_LIMITS_bottom    = SCREEN_HEIGHT;
+int DRAW_LIMITS_bottom    = SCREEN_HEIGHT-1;
 int DRAW_LIMITS_left      = 0;
-int DRAW_LIMITS_right     = SCREEN_WIDTH;
+int DRAW_LIMITS_right     = SCREEN_WIDTH-1;
  
 void DRAW_LIMITS_setEnable(bool enabled){
   DRAW_LIMITS_Enabled = enabled;
@@ -127,9 +127,9 @@ void DRAW_LIMITS_setEnable(bool enabled){
 
 void DRAW_LIMIT_reset(){
   DRAW_LIMITS_top       = 0;
-  DRAW_LIMITS_bottom    = SCREEN_HEIGHT;
+  DRAW_LIMITS_bottom    = SCREEN_HEIGHT-1;
   DRAW_LIMITS_left      = 0;
-  DRAW_LIMITS_right     = SCREEN_WIDTH;
+  DRAW_LIMITS_right     = SCREEN_WIDTH-1;
 }
 
 void DRAW_LIMITS_setEnable(int top, int bottom, int left, int right){

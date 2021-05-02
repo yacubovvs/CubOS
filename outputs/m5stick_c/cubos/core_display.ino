@@ -61,12 +61,12 @@ FRAMEBUFFER_BYTE_PER_PIXEL
     }
 
     void FRAMEBUFFER_new_setPixel(uint16_t x, uint16_t y, FRAMEBUFFER_TYPE color){
-      long position = y * SCREEN_WIDTH + x;
+      long position = y * (SCREEN_WIDTH-1) + x;
       FRAMEBUFFER_newFrame[position] = color;
     }
 
     void FRAMEBUFFER_current_setPixel(uint16_t x, uint16_t y, FRAMEBUFFER_TYPE color){
-      long position = y * SCREEN_WIDTH + x;
+      long position = y * (SCREEN_WIDTH-1) + x;
       FRAMEBUFFER_currentFrame[position] = color;
     }
 
@@ -75,7 +75,7 @@ FRAMEBUFFER_BYTE_PER_PIXEL
     }
 
     FRAMEBUFFER_TYPE FRAMEBUFFER_new_getPixel(uint16_t x, uint16_t y){
-      long position = y * SCREEN_WIDTH + x;
+      long position = y * (SCREEN_WIDTH-1) + x;
       return FRAMEBUFFER_newFrame[position];
     }
 
@@ -84,7 +84,7 @@ FRAMEBUFFER_BYTE_PER_PIXEL
     }
 
     FRAMEBUFFER_TYPE FRAMEBUFFER_current_getPixel(uint16_t x, uint16_t y){
-      long position = y * SCREEN_WIDTH + x;
+      long position = y * (SCREEN_WIDTH-1) + x;
       return FRAMEBUFFER_currentFrame[position];
     }
 
@@ -599,14 +599,17 @@ void core_display_loop(){
 
         for(int y=0; y<SCREEN_HEIGHT; y++){
           for(int x=0; x<SCREEN_WIDTH; x++){
-            if(FRAMEBUFFER_pixelChangedchanged[x + SCREEN_WIDTH*y]==true){
-              uint16_t position = y * SCREEN_WIDTH + x;
+            if(FRAMEBUFFER_pixelChangedchanged[x + (SCREEN_WIDTH-1)*y]==true){
+              uint16_t position = y * (SCREEN_WIDTH-1) + x;
               uint16_t newColor = FRAMEBUFFER_new_getPixel(position);
               if(FRAMEBUFFER_current_getPixel(position)!=newColor){
                 //if(getDrawColor()!=newColor) setDrawColor(newColor);
                 setPixel(x, y, newColor);
+                //if(x>=SCREEN_WIDTH) debug("XMORE!");
+                //if(y>=SCREEN_HEIGHT) debug("YMORE!");
+
                 FRAMEBUFFER_current_setPixel(position, newColor);
-                FRAMEBUFFER_pixelChangedchanged[x + SCREEN_WIDTH*y] = false;
+                FRAMEBUFFER_pixelChangedchanged[x + (SCREEN_WIDTH-1)*y] = false;
               }
             }
           }
@@ -632,14 +635,15 @@ void core_display_loop(){
 void drawPixel(int x, int y){
   if(DRAW_LIMITS_Enabled){
     //if out of screen
-    if(x>DRAW_LIMITS_right+1 || x<DRAW_LIMITS_left || y<DRAW_LIMITS_top+1 || y>DRAW_LIMITS_bottom) return;
+    if(x>=DRAW_LIMITS_right || x<=DRAW_LIMITS_left || y<=DRAW_LIMITS_top+1 || y>DRAW_LIMITS_bottom) return;
   }
     
   #ifdef FRAMEBUFFER_ENABLE
+    if(x>=SCREEN_WIDTH) return;
     #ifdef FRAMEBUFFER_TWIN_FULL
       FRAMEBUFFER_new_setPixel(x, y, getDrawColor());
 
-      uint16_t position = x + SCREEN_WIDTH*y;
+      uint16_t position = x + (SCREEN_WIDTH-1)*y;
       if(position>=0 && position<=SCREEN_HEIGHT*SCREEN_WIDTH) FRAMEBUFFER_pixelChangedchanged[position] = true;
 
       if(!getFRAMEBUFFER_isChanged()) setFRAMEBUFFER_isChanged(true);

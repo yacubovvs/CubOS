@@ -33,8 +33,8 @@
 
 //#define toDefaultApp_onLeftLongPress
 
-//#define STARTING_APP_NUMM   -1    // for Mainmenu (default app)
-#define STARTING_APP_NUMM   2
+#define STARTING_APP_NUMM   -1    // for Mainmenu (default app)
+//#define STARTING_APP_NUMM   9
 
 #define FONT_SIZE_DEFAULT 1
 
@@ -42,7 +42,7 @@
 //#define CPU_SLEEP_TIME_DELAY core_cpu_getCpuSleepTimeDelay()
 
 
-//#define BATTERY_ENABLE
+#define BATTERY_ENABLE
 #define CLOCK_ENABLE
 //#define USE_PRIMITIVE_HARDWARE_DRAW_ACCELERATION
 

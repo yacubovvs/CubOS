@@ -70,6 +70,13 @@ long lastTimeChange = millis()/ON_TIME_CHANGE_EVERY_MS;
 void core_time_loop(){
     long currentTime = millis()/ON_TIME_CHANGE_EVERY_MS;
     if(currentTime!=lastTimeChange){
+        #ifdef CLOCK_ENABLE
+            if(currentApp->showStatusBar==true){
+                core_views_statusBar_draw_time(false);
+                core_views_statusBar_draw_time(true);
+            }
+        #endif
+
         currentApp->onEvent(EVENT_ON_TIME_CHANGED, currentTime, 0);
         lastTimeChange = currentTime;
     }
