@@ -13,6 +13,31 @@
 #define SINGLE_ELEMENTS_IN_X            ((int)(ACTIVE_SCREEN_WIDTH/SINGLE_ELEMENT_MIN_WIDTH))
 #define SINGLE_ELEMENTS_IN_Y            ((int)(ACTIVE_SCREEN_HEIGHT/SINGLE_ELEMENT_MIN_HEIGHT))
 
+#define SINGLE_ELEMENTS_IN_X_MACRO      ((ACTIVE_SCREEN_WIDTH/SINGLE_ELEMENT_MIN_WIDTH))
+#define SINGLE_ELEMENTS_IN_Y_MACRO      ((ACTIVE_SCREEN_HEIGHT/SINGLE_ELEMENT_MIN_HEIGHT))
+
+#if ((ACTIVE_SCREEN_WIDTH/SINGLE_ELEMENT_MIN_WIDTH)) < 1
+  #define SINGLE_ELEMENTS_IN_X 1
+  #define SINGLE_ELEMENTS_IN_X_MACRO 1
+#endif
+
+#if ((ACTIVE_SCREEN_HEIGHT/SINGLE_ELEMENT_MIN_HEIGHT)) < 1
+  #define SINGLE_ELEMENTS_IN_Y 1
+  #define SINGLE_ELEMENTS_IN_Y_MACRO 1
+#endif
+
+#if ( ((SINGLE_ELEMENTS_IN_X_MACRO)==1) && ((SINGLE_ELEMENTS_IN_Y_MACRO)==1))
+  #define SINGLE_ELEMENT_ON_SCREEN
+#endif
+
+#ifdef NARROW_SCREEN
+  #define SINGLE_ELEMENTS_IN_X 1
+  #define SINGLE_ELEMENTS_IN_X_MACRO 1
+  #define SINGLE_ELEMENTS_IN_Y 1
+  #define SINGLE_ELEMENTS_IN_Y_MACRO 1
+  #define SINGLE_ELEMENT_ON_SCREEN
+#endif
+
 #define SINGLE_ELEMENT_REAL_WIDTH       ((int)(ACTIVE_SCREEN_WIDTH/SINGLE_ELEMENTS_IN_X))
 #define SINGLE_ELEMENT_REAL_HEIGHT      ((int)(ACTIVE_SCREEN_HEIGHT/SINGLE_ELEMENTS_IN_Y))
 
@@ -73,6 +98,9 @@ class appNameClass: public Application{
         unsigned char lastSeconds   = 0;
         unsigned char lastMinutes   = 0;
         unsigned char lastHours     = 0;
+        void pressPrevious();
+        void pressNext();
+        void pressSelect();
 
         char currentSelectedPosition        = 0;
         bool currentPositionIsSelected      = false;
@@ -105,13 +133,17 @@ void appNameClass::clearWorkSpace(){
 
 void appNameClass::drawSettingsPageFirstTime(){
     if(currentSubMenu==APP_SETTINGS_SUBMENU_MAIN){
-        core_views_draw_pages_list_simple(true, PAGES_LIST_POSITION, getTotalPagesInSubMenu(APP_SETTINGS_SUBMENU_MAIN));
+        #ifndef SINGLE_ELEMENT_ON_SCREEN
+            core_views_draw_pages_list_simple(true, PAGES_LIST_POSITION, getTotalPagesInSubMenu(APP_SETTINGS_SUBMENU_MAIN));
+        #endif
         core_views_draw_active_page(true, PAGES_LIST_POSITION, getTotalPagesInSubMenu(APP_SETTINGS_SUBMENU_MAIN), 0);
         this->updateActiveAppIndex(app_settings_selectedAppIndex);  
         // Drawing icons
         this->drawIcons(true);
         #ifndef TOUCH_SCREEN_ENABLE
+        #ifndef SINGLE_ELEMENT_ON_SCREEN
             this->drawActiveAppFrame(true);  
+        #endif
         #endif
     }if(currentSubMenu==APP_SETTINGS_SUBMENU_SET_TIME){
         int y_position = (SCREEN_HEIGHT - STYLE_STATUSBAR_HEIGHT)/2;
@@ -207,7 +239,9 @@ void appNameClass::updateActiveAppIndex(int newSelectedAppIndex){
   if(app_settings_selectedAppIndex!=newSelectedAppIndex){
     
     #ifndef TOUCH_SCREEN_ENABLE
+    #ifndef SINGLE_ELEMENT_ON_SCREEN
         this->drawActiveAppFrame(false);
+    #endif
     #endif
     
     if( (int)((app_settings_selectedAppIndex)/APPS_ON_SINGLE_PAGE) != (int)((newSelectedAppIndex)/APPS_ON_SINGLE_PAGE)){
@@ -223,7 +257,9 @@ void appNameClass::updateActiveAppIndex(int newSelectedAppIndex){
 
     // update selected app frame
     #ifndef TOUCH_SCREEN_ENABLE
+    #ifndef SINGLE_ELEMENT_ON_SCREEN
         this->drawActiveAppFrame(true);
+    #endif
     #endif
     
   }
@@ -304,6 +340,22 @@ void appNameClass::onLoop(){
 void appNameClass::onDestroy(){
 }
 
+void appNameClass::pressPrevious(){
+    if(currentSubMenu==APP_SETTINGS_SUBMENU_MAIN){
+        this->updateActiveAppIndex(app_settings_selectedAppIndex-1);
+    } 
+}
+
+void appNameClass::pressNext(){
+    if(currentSubMenu==APP_SETTINGS_SUBMENU_MAIN){
+        this->updateActiveAppIndex(app_settings_selectedAppIndex+1);
+    } 
+}
+
+void appNameClass::pressSelect(){
+
+}
+
 void appNameClass::onEvent(unsigned char event, int val1, int val2){
     #ifdef TOUCH_SCREEN_ENABLE
         if(event==EVENT_ON_TOUCH_DRAG){
@@ -321,64 +373,99 @@ void appNameClass::onEvent(unsigned char event, int val1, int val2){
             this->drawIcons(true);
         }
     #else
-        if(event==EVENT_BUTTON_PRESSED){
-            
-            if(currentSubMenu==APP_SETTINGS_SUBMENU_MAIN){
-                switch(val1){
-                    case BUTTON_UP:
-                            this->updateActiveAppIndex(app_settings_selectedAppIndex-1);
-                        break;
-                    case BUTTON_BACK:
-                        startApp(-1);
-                        break;
-                    case BUTTON_DOWN:
-                        if(currentSubMenu==APP_SETTINGS_SUBMENU_MAIN){
-                            this->updateActiveAppIndex(app_settings_selectedAppIndex+1);
-                        }   
-                        break;
-                    case BUTTON_SELECT:
-                        if(currentSubMenu==APP_SETTINGS_SUBMENU_MAIN && app_settings_selectedAppIndex==0) switchToSubMenu(APP_SETTINGS_SUBMENU_SET_TIME);
-                        break;
+
+        /**/
+        #if DRIVER_CONTROLS_TOTALBUTTONS == 2
+            if(event==EVENT_BUTTON_PRESSED){
+                if(val1==BUTTON_SELECT){
+                    this->pressNext();
                 }
-            }else if(currentSubMenu==APP_SETTINGS_SUBMENU_SET_TIME){
+            }else if(event==EVENT_BUTTON_RELEASED){
+            }else if(event==EVENT_BUTTON_LONG_PRESS){
+                if(val1==BUTTON_SELECT){
+                }
+                if(val1==BUTTON_BACK){
+                    startApp(-1);
+                }
+            }else if(event==EVENT_ON_TIME_CHANGED){
+
+            }else if(event==EVENT_BUTTON_SHORT_PRESS){
+                if(val1==BUTTON_SELECT){
+                }else if(val1==BUTTON_BACK){
+                }
+            }
+        #elif DRIVER_CONTROLS_TOTALBUTTONS == 1
+            if(event==EVENT_BUTTON_PRESSED){
+                if(val1==BUTTON_SELECT){
+                     this->pressNext();
+                }
+            }else if(event==EVENT_BUTTON_RELEASED){
+            }else if(event==EVENT_BUTTON_LONG_PRESS){
+            }else if(event==EVENT_ON_TIME_CHANGED){
+
+            }else if(event==EVENT_BUTTON_SHORT_PRESS){
+                if(val1==BUTTON_SELECT){
+                }
+            }
+        #else
+        /**/
+            if(event==EVENT_BUTTON_PRESSED){
                 
-                switch(val1){
-                    case BUTTON_UP:
-                    case BUTTON_DOWN:
-                        if(currentPositionIsSelected==false){
-                            drawSettingTimeSelect(false, getPositionBySelectedNumber(currentSelectedPosition));
-                            if(val1==BUTTON_DOWN)currentSelectedPosition++; else currentSelectedPosition--;
-                            if(currentSelectedPosition>=3)currentSelectedPosition=0;
-                            if(currentSelectedPosition<0)currentSelectedPosition=2;
-                            drawSettingTimeSelect(true, getPositionBySelectedNumber(currentSelectedPosition));
-                        }else{
-                            
-                            // time changing
-                        }
-                        break;
-                    case BUTTON_BACK:
-                        switchToSubMenu(APP_SETTINGS_SUBMENU_MAIN);            
-                        break;
+                if(currentSubMenu==APP_SETTINGS_SUBMENU_MAIN){
+                    switch(val1){
+                        case BUTTON_UP:
+                            this->pressPrevious();
+                            break;
+                        case BUTTON_BACK:
+                            startApp(-1);
+                            break;
+                        case BUTTON_DOWN:
+                            this->pressNext();   
+                            break;
+                        case BUTTON_SELECT:
+                            if(currentSubMenu==APP_SETTINGS_SUBMENU_MAIN && app_settings_selectedAppIndex==0) switchToSubMenu(APP_SETTINGS_SUBMENU_SET_TIME);
+                            break;
+                    }
+                }else if(currentSubMenu==APP_SETTINGS_SUBMENU_SET_TIME){
                     
-                    case BUTTON_SELECT:
-                        currentPositionIsSelected = !currentPositionIsSelected;
-                        if(currentPositionIsSelected){
-                            drawSettingTimeSelect(false, getPositionBySelectedNumber(currentSelectedPosition));
-                            drawSettingTimeArrows(true, getPositionBySelectedNumber(currentSelectedPosition));
-                        }else{
-                            drawSettingTimeArrows(false, getPositionBySelectedNumber(currentSelectedPosition));
-                            drawSettingTimeSelect(true, getPositionBySelectedNumber(currentSelectedPosition));
-                        }
-                        break;
+                    switch(val1){
+                        case BUTTON_UP:
+                        case BUTTON_DOWN:
+                            if(currentPositionIsSelected==false){
+                                drawSettingTimeSelect(false, getPositionBySelectedNumber(currentSelectedPosition));
+                                if(val1==BUTTON_DOWN)currentSelectedPosition++; else currentSelectedPosition--;
+                                if(currentSelectedPosition>=3)currentSelectedPosition=0;
+                                if(currentSelectedPosition<0)currentSelectedPosition=2;
+                                drawSettingTimeSelect(true, getPositionBySelectedNumber(currentSelectedPosition));
+                            }else{
+                                
+                                // time changing
+                            }
+                            break;
+                        case BUTTON_BACK:
+                            switchToSubMenu(APP_SETTINGS_SUBMENU_MAIN);            
+                            break;
+                        
+                        case BUTTON_SELECT:
+                            currentPositionIsSelected = !currentPositionIsSelected;
+                            if(currentPositionIsSelected){
+                                drawSettingTimeSelect(false, getPositionBySelectedNumber(currentSelectedPosition));
+                                drawSettingTimeArrows(true, getPositionBySelectedNumber(currentSelectedPosition));
+                            }else{
+                                drawSettingTimeArrows(false, getPositionBySelectedNumber(currentSelectedPosition));
+                                drawSettingTimeSelect(true, getPositionBySelectedNumber(currentSelectedPosition));
+                            }
+                            break;
+                    }
+
                 }
+            
+            }else if(event==EVENT_BUTTON_RELEASED){
+
+            }else if(event==EVENT_BUTTON_LONG_PRESS){
 
             }
-        
-        }else if(event==EVENT_BUTTON_RELEASED){
-
-        }else if(event==EVENT_BUTTON_LONG_PRESS){
-
-        }
+        #endif
     
     #endif
 
