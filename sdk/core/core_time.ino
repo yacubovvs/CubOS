@@ -50,7 +50,8 @@ String core_time_getHourMinuteTime(){
 }
 
 String core_time_getMonthDate(){
-    return "February";
+    //return "February";
+    return "Feb";
 }
 
 String core_time_getDayDate(){

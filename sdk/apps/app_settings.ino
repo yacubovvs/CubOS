@@ -88,6 +88,7 @@ class appNameClass: public Application{
         const static unsigned char icon_sleep[]         PROGMEM;
         unsigned char currentSubMenu       = APP_SETTINGS_SUBMENU_MAIN;
         String getApplicationSubTitle(unsigned char submenu, unsigned char num);
+        String getApplicationSubTitle(unsigned char submenu, unsigned char num, boolean getLast);
         void drawSettingsPageFirstTime();
         void clearWorkSpace();
         void switchToSubMenu(unsigned char newSubMenu);
@@ -101,6 +102,10 @@ class appNameClass: public Application{
         void pressPrevious();
         void pressNext();
         void pressSelect();
+
+        String lastTimeString;
+        String lastDateString;
+        String lastBatteryString;
 
         char currentSelectedPosition        = 0;
         bool currentPositionIsSelected      = false;
@@ -286,52 +291,67 @@ void appNameClass::drawActiveAppFrame(bool draw){
 }
 
 void appNameClass::drawIcons(bool draw){
-    #ifndef TOUCH_SCREEN_ENABLE
-        for(unsigned char currentDrawPage=0; currentDrawPage<getTotalPagesInSubMenu(APP_SETTINGS_SUBMENU_MAIN); currentDrawPage++){
-    #endif
-        
-        for (unsigned char y_position=0; y_position<SINGLE_ELEMENTS_IN_Y; y_position++){
-            for (unsigned char x_position=0; x_position<SINGLE_ELEMENTS_IN_X; x_position++){
-                int x0 = x_position*SINGLE_ELEMENT_REAL_WIDTH;
-                int y0 = y_position*SINGLE_ELEMENT_REAL_HEIGHT + STYLE_STATUSBAR_HEIGHT+1;
-                int x1 = x0+SINGLE_ELEMENT_REAL_WIDTH;
-                int y1 = y0+SINGLE_ELEMENT_REAL_HEIGHT;
+    #ifdef NARROW_SCREEN
 
-                int x_center = (x0+x1)/2;
-                int y_center = (y0+y1)/2;
+        int app_num = app_settings_selectedAppIndex;
+        //debug(String(app_num));
 
-                #ifndef TOUCH_SCREEN_ENABLE
-                    int app_num = y_position*(SINGLE_ELEMENTS_IN_X) + x_position + currentDrawPage*APPS_ON_SINGLE_PAGE;
-                #else
-                    int app_num = y_position*(SINGLE_ELEMENTS_IN_X) + x_position + APPS_ON_SINGLE_PAGE*(int)(app_settings_selectedAppIndex/APPS_ON_SINGLE_PAGE);
-                #endif
+        core_views_draw_settings_item(
+            draw, 
+            SCREEN_WIDTH/2,
+            SCREEN_HEIGHT/2, 
+            (const unsigned char*)this->getApplicationTitle(0, app_num), 
+            this->getApplicationSubTitle(0, app_num, !draw), 
+            this->getApplicationIcon(0, app_num)
+        );
 
-                debug(String(app_num));
-                
-                if(app_num<getTotalApplicationsInSubMenu(APP_SETTINGS_SUBMENU_MAIN)){
-                    #ifdef ESP8266
-                        ESP.wdtDisable();
+
+    #else
+        #ifndef TOUCH_SCREEN_ENABLE
+            for(unsigned char currentDrawPage=0; currentDrawPage<getTotalPagesInSubMenu(APP_SETTINGS_SUBMENU_MAIN); currentDrawPage++){
+        #endif
+            
+            for (unsigned char y_position=0; y_position<SINGLE_ELEMENTS_IN_Y; y_position++){
+                for (unsigned char x_position=0; x_position<SINGLE_ELEMENTS_IN_X; x_position++){
+                    int x0 = x_position*SINGLE_ELEMENT_REAL_WIDTH;
+                    int y0 = y_position*SINGLE_ELEMENT_REAL_HEIGHT + STYLE_STATUSBAR_HEIGHT+1;
+                    int x1 = x0+SINGLE_ELEMENT_REAL_WIDTH;
+                    int y1 = y0+SINGLE_ELEMENT_REAL_HEIGHT;
+
+                    int x_center = (x0+x1)/2;
+                    int y_center = (y0+y1)/2;
+
+                    #ifndef TOUCH_SCREEN_ENABLE
+                        int app_num = y_position*(SINGLE_ELEMENTS_IN_X) + x_position + currentDrawPage*APPS_ON_SINGLE_PAGE;
+                    #else
+                        int app_num = y_position*(SINGLE_ELEMENTS_IN_X) + x_position + APPS_ON_SINGLE_PAGE*(int)(app_settings_selectedAppIndex/APPS_ON_SINGLE_PAGE);
                     #endif
-
                     
-                    core_views_draw_settings_item(
-                        draw, 
-                        #ifndef TOUCH_SCREEN_ENABLE
-                            currentDrawPage*SCREEN_WIDTH - this->scroll_x + x0+35, 
-                        #else
-                            -this->scroll_x + x0+35, 
+                    if(app_num<getTotalApplicationsInSubMenu(APP_SETTINGS_SUBMENU_MAIN)){
+                        #ifdef ESP8266
+                            ESP.wdtDisable();
                         #endif
-                        y_center, 
-                        (const unsigned char*)this->getApplicationTitle(0, app_num), 
-                        this->getApplicationSubTitle(0, app_num), 
-                        this->getApplicationIcon(0, app_num)
-                    );
+
+                        
+                        core_views_draw_settings_item(
+                            draw, 
+                            #ifndef TOUCH_SCREEN_ENABLE
+                                currentDrawPage*SCREEN_WIDTH - this->scroll_x + x0+35, 
+                            #else
+                                -this->scroll_x + x0+35, 
+                            #endif
+                            y_center, 
+                            (const unsigned char*)this->getApplicationTitle(0, app_num), 
+                            this->getApplicationSubTitle(0, app_num), 
+                            this->getApplicationIcon(0, app_num)
+                        );
+                    }
                 }
             }
-        }
 
-    #ifndef TOUCH_SCREEN_ENABLE
-    }
+        #ifndef TOUCH_SCREEN_ENABLE
+        }
+        #endif
     #endif
 }
 
@@ -377,7 +397,7 @@ void appNameClass::onEvent(unsigned char event, int val1, int val2){
     #else
 
         /**/
-        #if DRIVER_CONTROLS_TOTALBUTTONS == 2
+        #if (DRIVER_CONTROLS_TOTALBUTTONS == 2 || DRIVER_CONTROLS_TOTALBUTTONS == 1)
             if(event==EVENT_BUTTON_PRESSED){
                 if(val1==BUTTON_SELECT){
                     this->pressNext();
@@ -389,26 +409,12 @@ void appNameClass::onEvent(unsigned char event, int val1, int val2){
                 if(val1==BUTTON_BACK){
                     startApp(-1);
                 }
-            }else if(event==EVENT_ON_TIME_CHANGED){
-
             }else if(event==EVENT_BUTTON_SHORT_PRESS){
                 if(val1==BUTTON_SELECT){
                 }else if(val1==BUTTON_BACK){
                 }
             }
-        #elif DRIVER_CONTROLS_TOTALBUTTONS == 1
-            if(event==EVENT_BUTTON_PRESSED){
-                if(val1==BUTTON_SELECT){
-                     this->pressNext();
-                }
-            }else if(event==EVENT_BUTTON_RELEASED){
-            }else if(event==EVENT_BUTTON_LONG_PRESS){
-            }else if(event==EVENT_ON_TIME_CHANGED){
-
-            }else if(event==EVENT_BUTTON_SHORT_PRESS){
-                if(val1==BUTTON_SELECT){
-                }
-            }
+    
         #else
         /**/
             if(event==EVENT_BUTTON_PRESSED){
@@ -473,6 +479,20 @@ void appNameClass::onEvent(unsigned char event, int val1, int val2){
 
     else if(event==EVENT_ON_TIME_CHANGED){
 
+        #ifdef SINGLE_ELEMENT_ON_SCREEN
+            /*
+            String lastTimeString;
+            String lastDateString;
+            String lastBatteryString;
+            */
+    
+            debug("On time change");
+            if(app_settings_selectedAppIndex==0){
+                //Setting time
+                this->drawIcons(false);
+                this->drawIcons(true);
+            }
+        #else
         if(currentSubMenu==APP_SETTINGS_SUBMENU_MAIN){
             if((int)((app_settings_selectedAppIndex)/APPS_ON_SINGLE_PAGE)==0){
                 int x_position = 0;
@@ -516,6 +536,7 @@ void appNameClass::onEvent(unsigned char event, int val1, int val2){
             }
             
         }
+        #endif
     }
 
 }
@@ -545,13 +566,26 @@ const unsigned char* appNameClass::getApplicationTitle(unsigned char submenu, un
 }
 
 String appNameClass::getApplicationSubTitle(unsigned char submenu, unsigned char num){
+    return this->getApplicationSubTitle(submenu, num, false);
+}
+
+String appNameClass::getApplicationSubTitle(unsigned char submenu, unsigned char num, bool getLast){    
+
     switch(APP_SETTINGS_SUBMENU_MAIN){
         case APP_SETTINGS_SUBMENU_MAIN:
             switch (num){
                 case 0:
-                    return core_time_getHourMinuteSecondsTime();
+                    if(getLast) return this->lastTimeString;
+                    else{
+                        this->lastTimeString = core_time_getHourMinuteSecondsTime();
+                        return this->lastTimeString;
+                    }
                 case 1:
-                    return core_time_getDateFull();
+                    if(getLast) return this->lastDateString;
+                    else{
+                        this->lastDateString = core_time_getDateFull();
+                        return this->lastDateString;
+                    }
                 case 2:
                     #ifdef CPU_SLEEP_ENABLE
                         return String(core_cpu_getCpuSleepTimeDelay());
@@ -559,7 +593,11 @@ String appNameClass::getApplicationSubTitle(unsigned char submenu, unsigned char
                         return "-";
                     #endif
                 case 3:
-                    return String(core_batteryGetPercent()) + "%";
+                    if(getLast) return this->lastBatteryString;
+                    else{
+                        this->lastBatteryString = String(core_batteryGetPercent()) + "%";
+                        return this->lastBatteryString;
+                    }
                 case 4:
                     return "Calibrate";
                 default:

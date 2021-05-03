@@ -252,21 +252,41 @@ void core_views_draw_app_icon(bool draw, int x, int y, const unsigned char* titl
 
 #define CORE_VIEWS_SETTINGS_IMAGE_WIDTH 24
 void core_views_draw_settings_item(bool draw, int x, int y, const unsigned char* title, String subTitle, const unsigned char* icon){
-    // image
-    int left_x = x + CORE_VIEWS_SETTINGS_IMAGE_WIDTH;
-    setDrawColor(getBackgroundColor_red(), getBackgroundColor_green(), getBackgroundColor_blue());
-    drawIcon(draw, icon, x-CORE_VIEWS_SETTINGS_IMAGE_WIDTH/2, y-CORE_VIEWS_SETTINGS_IMAGE_WIDTH/2);
 
-    // title
-    if(draw){
-        setDrawColor(255, 255, 255);
-        drawString((char*)title, left_x, y-12);
-        drawString(subTitle, left_x, y+4);
-    }else{    
-        clearString((char*)title, left_x, y-12);
-        clearString(subTitle, left_x, y+4, 1);
-    }
+    #ifdef NARROW_SCREEN
+        drawIcon(draw, icon, x-CORE_VIEWS_SETTINGS_IMAGE_WIDTH/2, y-30);
+        uint16_t titleShift = strlen((const char*)title)*FONT_CHAR_WIDTH/2;
+        uint16_t subTitleShift = subTitle.length()*FONT_CHAR_WIDTH/2;
 
+        #define TITLE_Y_POSITION y+10
+        #define SUBTITLE_Y_POSITION y+30
+        x+=2;
+        
+        if(draw){
+            setDrawColor_ContrastColor();
+            drawString((char*)title, x - titleShift,    TITLE_Y_POSITION, 1);
+            drawString(subTitle, x - subTitleShift,     SUBTITLE_Y_POSITION, 1);
+        }else{
+            setDrawColor_BackGoundColor();
+            clearString((char*)title, x - titleShift,   TITLE_Y_POSITION, 1);
+            clearString(subTitle, x - subTitleShift,    SUBTITLE_Y_POSITION, 1);
+        }
+    #else
+        // image
+        int left_x = x + CORE_VIEWS_SETTINGS_IMAGE_WIDTH;
+        setDrawColor(getBackgroundColor_red(), getBackgroundColor_green(), getBackgroundColor_blue());
+        drawIcon(draw, icon, x-CORE_VIEWS_SETTINGS_IMAGE_WIDTH/2, y-CORE_VIEWS_SETTINGS_IMAGE_WIDTH/2);
+
+        // title
+        if(draw){
+            setDrawColor(255, 255, 255);
+            drawString((char*)title, left_x, y-12);
+            drawString(subTitle, left_x, y+4);
+        }else{    
+            clearString((char*)title, left_x, y-12);
+            clearString(subTitle, left_x, y+4, 1);
+        }
+    #endif
     
 }
 
