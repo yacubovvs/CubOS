@@ -386,7 +386,7 @@ void appNameClass::onEvent(unsigned char event, int val1, int val2){
     }else if(event==EVENT_BUTTON_SHORT_PRESS){
       if(val1==BUTTON_SELECT){
         this->drawIcons(false);
-        #ifdef MAIN_MENU_SMOOTH_ANIMATION
+          #ifdef MAIN_MENU_SMOOTH_ANIMATION
           this->scroll_x += SCREEN_WIDTH;
         #endif
         this->updateActiveAppIndex(app_z_menu_selectedAppIndex+1);

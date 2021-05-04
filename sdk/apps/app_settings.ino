@@ -292,18 +292,63 @@ void appNameClass::drawActiveAppFrame(bool draw){
 
 void appNameClass::drawIcons(bool draw){
     #ifdef NARROW_SCREEN
-
         int app_num = app_settings_selectedAppIndex;
-        //debug(String(app_num));
+        
+        #ifdef MAIN_MENU_SMOOTH_ANIMATION
+            if(this->scroll_x!=0){
+                if(this->scroll_x<0){
+                }else if(this->scroll_x>0){
 
-        core_views_draw_settings_item(
-            draw, 
-            SCREEN_WIDTH/2,
-            SCREEN_HEIGHT/2, 
-            (const unsigned char*)this->getApplicationTitle(0, app_num), 
-            this->getApplicationSubTitle(0, app_num, !draw), 
-            this->getApplicationIcon(0, app_num)
-        );
+                    char elementsToPreDraw = this->scroll_x/SCREEN_WIDTH + 1;
+                    elementsToPreDraw = elementsToPreDraw%getTotalPagesInSubMenu(currentSubMenu);
+                    for(unsigned char elementDraw = 0; elementDraw<=elementsToPreDraw; elementDraw++){
+                        int appElementDraw = app_num - elementDraw;
+                        while(appElementDraw<0) appElementDraw+=getTotalPagesInSubMenu(currentSubMenu);
+                        appElementDraw = appElementDraw%getTotalPagesInSubMenu(currentSubMenu);
+
+                        core_views_draw_settings_item(
+                            draw, 
+                            this->scroll_x + SCREEN_WIDTH/2 - elementDraw*SCREEN_WIDTH,
+                            SCREEN_HEIGHT/2, 
+                            (const unsigned char*)this->getApplicationTitle(0, appElementDraw), 
+                            this->getApplicationSubTitle(0, appElementDraw, !draw), 
+                            this->getApplicationIcon(0, appElementDraw)
+                        );
+                    }
+
+
+                    /*
+                    
+
+                        core_views_draw_app_icon(
+                        draw, 
+                        this->scroll_x + x_center - elementDraw*SCREEN_WIDTH , y_center, 
+                        (const unsigned char*)this->getApplicationTitle(appElementDraw), 
+                        this->getApplicationIcon(appElementDraw)
+                        );
+                    
+                    */
+                }
+            }
+
+            core_views_draw_settings_item(
+                draw, 
+                this->scroll_x + SCREEN_WIDTH/2,
+                SCREEN_HEIGHT/2, 
+                (const unsigned char*)this->getApplicationTitle(0, app_num), 
+                this->getApplicationSubTitle(0, app_num, !draw), 
+                this->getApplicationIcon(0, app_num)
+            );
+        #else
+            core_views_draw_settings_item(
+                draw, 
+                SCREEN_WIDTH/2,
+                SCREEN_HEIGHT/2, 
+                (const unsigned char*)this->getApplicationTitle(0, app_num), 
+                this->getApplicationSubTitle(0, app_num, !draw), 
+                this->getApplicationIcon(0, app_num)
+            );
+        #endif
 
 
     #else
@@ -356,7 +401,20 @@ void appNameClass::drawIcons(bool draw){
 }
 
 void appNameClass::onLoop(){
-    
+    #ifdef MAIN_MENU_SMOOTH_ANIMATION
+        if(this->scroll_x!=0){
+        this->drawIcons(false);
+        if(this->scroll_x!=0){
+            //this->scroll_x++;
+            int dx = abs(scroll_x)/5 + 1;
+            if(scroll_x>scroll_to_x) dx *= -1;
+            scroll_x+=dx;
+
+            if (abs(dx)<1) scroll_x=0;
+        }
+        this->drawIcons(true);
+        }
+    #endif
 }
 
 void appNameClass::onDestroy(){
@@ -365,11 +423,18 @@ void appNameClass::onDestroy(){
 void appNameClass::pressPrevious(){
     if(currentSubMenu==APP_SETTINGS_SUBMENU_MAIN){
         this->updateActiveAppIndex(app_settings_selectedAppIndex-1);
+        #ifdef MAIN_MENU_SMOOTH_ANIMATION
+          this->scroll_x -= SCREEN_WIDTH;
+        #endif
     } 
 }
 
 void appNameClass::pressNext(){
     if(currentSubMenu==APP_SETTINGS_SUBMENU_MAIN){
+        this->drawIcons(false);
+        #ifdef MAIN_MENU_SMOOTH_ANIMATION
+          this->scroll_x += SCREEN_WIDTH;
+        #endif
         this->updateActiveAppIndex(app_settings_selectedAppIndex+1);
     } 
 }
@@ -380,8 +445,8 @@ void appNameClass::pressSelect(){
 
 void appNameClass::onEvent(unsigned char event, int val1, int val2){
     #ifdef TOUCH_SCREEN_ENABLE
-        if(event==EVENT_ON_TOUCH_DRAG){
 
+        if(event==EVENT_ON_TOUCH_DRAG){
             // SCREEN SCROLL
             this->drawIcons(false);
             this->scroll_x -= val1;
@@ -394,27 +459,32 @@ void appNameClass::onEvent(unsigned char event, int val1, int val2){
 
             this->drawIcons(true);
         }
+
     #else
 
         /**/
         #if (DRIVER_CONTROLS_TOTALBUTTONS == 2 || DRIVER_CONTROLS_TOTALBUTTONS == 1)
             if(event==EVENT_BUTTON_PRESSED){
+                debug("EVENT_BUTTON_PRESSED");
                 if(val1==BUTTON_SELECT){
                     this->pressNext();
                 }
             }else if(event==EVENT_BUTTON_RELEASED){
+                debug("EVENT_BUTTON_RELEASED");
             }else if(event==EVENT_BUTTON_LONG_PRESS){
+                debug("EVENT_BUTTON_LONG_PRESS");
                 if(val1==BUTTON_SELECT){
                 }
                 if(val1==BUTTON_BACK){
                     startApp(-1);
                 }
             }else if(event==EVENT_BUTTON_SHORT_PRESS){
+                debug("EVENT_BUTTON_SHORT_PRESS");
                 if(val1==BUTTON_SELECT){
                 }else if(val1==BUTTON_BACK){
                 }
             }
-    
+            
         #else
         /**/
             if(event==EVENT_BUTTON_PRESSED){
@@ -486,7 +556,6 @@ void appNameClass::onEvent(unsigned char event, int val1, int val2){
             String lastBatteryString;
             */
     
-            debug("On time change");
             if(app_settings_selectedAppIndex==0){
                 //Setting time
                 this->drawIcons(false);
