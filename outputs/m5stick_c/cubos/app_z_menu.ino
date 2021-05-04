@@ -358,8 +358,9 @@ void appNameClass::onEvent(unsigned char event, int val1, int val2){
   BUTTON_POWER
   */
 
-  #if DRIVER_CONTROLS_TOTALBUTTONS == 2
+  #if (DRIVER_CONTROLS_TOTALBUTTONS == 1 || DRIVER_CONTROLS_TOTALBUTTONS == 2)
     if(event==EVENT_BUTTON_PRESSED){
+      
     }else if(event==EVENT_BUTTON_RELEASED){
     }else if(event==EVENT_BUTTON_LONG_PRESS){
       if(val1==BUTTON_SELECT){
@@ -368,25 +369,11 @@ void appNameClass::onEvent(unsigned char event, int val1, int val2){
     }else if(event==EVENT_ON_TIME_CHANGED){
 
     }else if(event==EVENT_BUTTON_SHORT_PRESS){
-      if(val1==BUTTON_SELECT){
-        this->updateActiveAppIndex(app_z_menu_selectedAppIndex+1);
-      }else if(val1==BUTTON_BACK){
+      if(val1==BUTTON_BACK){
         this->updateActiveAppIndex(app_z_menu_selectedAppIndex-1);
-      }
-    }
-  #elif DRIVER_CONTROLS_TOTALBUTTONS == 1
-    if(event==EVENT_BUTTON_PRESSED){
-    }else if(event==EVENT_BUTTON_RELEASED){
-    }else if(event==EVENT_BUTTON_LONG_PRESS){
-      if(val1==BUTTON_SELECT){
-        startApp(app_z_menu_selectedAppIndex);
-      }
-    }else if(event==EVENT_ON_TIME_CHANGED){
-
-    }else if(event==EVENT_BUTTON_SHORT_PRESS){
-      if(val1==BUTTON_SELECT){
+      }else if(val1==BUTTON_SELECT){
         this->drawIcons(false);
-          #ifdef MAIN_MENU_SMOOTH_ANIMATION
+        #ifdef MAIN_MENU_SMOOTH_ANIMATION
           this->scroll_x += SCREEN_WIDTH;
         #endif
         this->updateActiveAppIndex(app_z_menu_selectedAppIndex+1);
