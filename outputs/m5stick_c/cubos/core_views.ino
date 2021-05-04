@@ -133,14 +133,17 @@ void core_views_statusBar_draw(){
 
 String core_views_statusBar_draw_time_TimeString = "";
 void core_views_statusBar_draw_time(bool draw){
+    bool lastLimits = DRAW_LIMITS_getEnable();
+    DRAW_LIMITS_setEnable(false);
     if(draw){
         setDrawColor(STYLE_STATUSBAR_TEXT_RED, STYLE_STATUSBAR_TEXT_GREEN, STYLE_STATUSBAR_TEXT_BLUE);
         core_views_statusBar_draw_time_TimeString = core_time_getHourMinuteTime();
-        clearString(core_views_statusBar_draw_time_TimeString, 5, STYLE_STATUSBAR_HEIGHT/2 - FONT_CHAR_HEIGHT/2 + ( (STYLE_STATUSBAR_HEIGHT)%2 ) + ( (FONT_CHAR_HEIGHT)%2 ) + 1, FONT_SIZE_DEFAULT);
+        drawString(core_views_statusBar_draw_time_TimeString, 5, STYLE_STATUSBAR_HEIGHT/2 - FONT_CHAR_HEIGHT/2 + ( (STYLE_STATUSBAR_HEIGHT)%2 ) + ( (FONT_CHAR_HEIGHT)%2 ) + 1, FONT_SIZE_DEFAULT);
     }else{
         setDrawColor(STYLE_STATUSBAR_BACKGROUND_RED, STYLE_STATUSBAR_BACKGROUND_GREEN, STYLE_STATUSBAR_BACKGROUND_BLUE);
-        drawString(core_views_statusBar_draw_time_TimeString, 5, STYLE_STATUSBAR_HEIGHT/2 - FONT_CHAR_HEIGHT/2 + ( (STYLE_STATUSBAR_HEIGHT)%2 ) + ( (FONT_CHAR_HEIGHT)%2 ) + 1, FONT_SIZE_DEFAULT);
+        clearString(core_views_statusBar_draw_time_TimeString, 5, STYLE_STATUSBAR_HEIGHT/2 - FONT_CHAR_HEIGHT/2 + ( (STYLE_STATUSBAR_HEIGHT)%2 ) + ( (FONT_CHAR_HEIGHT)%2 ) + 1, FONT_SIZE_DEFAULT);
     }
+    DRAW_LIMITS_setEnable(lastLimits);
 }
 
 

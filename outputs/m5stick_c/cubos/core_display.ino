@@ -126,6 +126,10 @@ void DRAW_LIMITS_setEnable(int top, int bottom, int left, int right){
   if(right!=-1)   DRAW_LIMITS_right     = right;
 }
 
+bool DRAW_LIMITS_getEnable(){
+  return DRAW_LIMITS_Enabled;
+}
+
 /*
 * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * 
                                   DISPLAY FUNCTIONS

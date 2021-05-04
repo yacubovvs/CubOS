@@ -33,9 +33,10 @@ void driver_controls_loop(){
         driver_control_pressed[i]=true;
         driver_control_time_pressed[i] = _millis();
         onButtonEvent(EVENT_BUTTON_PRESSED, i);
-        if(_millis() - driver_control_DOUBLE_PRESS_lastPress[i]>CONTROLS_DELAY_TO_DOUBLE_CLICK_MS){
-          onButtonEvent(EVENT_BUTTON_LONG_PRESS, i, _millis() - driver_control_DOUBLE_PRESS_lastPress[i]);
+        if(driver_control_DOUBLE_PRESS_lastPress[i]!=0 && _millis() - driver_control_DOUBLE_PRESS_lastPress[i]>CONTROLS_DELAY_TO_DOUBLE_CLICK_MS){
+          //onButtonEvent(EVENT_BUTTON_LONG_PRESS, i, _millis() - driver_control_DOUBLE_PRESS_lastPress[i]);
           driver_control_DOUBLE_PRESS_lastPress[i] = 0;
+          debug("***driver_control_DOUBLE_PRESS_lastPress reset");
         }else{
           driver_control_DOUBLE_PRESS_lastPress[i] = millis();
         }
@@ -50,6 +51,11 @@ void driver_controls_loop(){
         }
       }
 
+      if(driver_control_DOUBLE_PRESS_lastPress[i]!=0 && _millis() - driver_control_DOUBLE_PRESS_lastPress[i]>CONTROLS_DELAY_TO_DOUBLE_CLICK_MS){
+        onButtonEvent(EVENT_BUTTON_SHORT_PRESS, i);
+        driver_control_DOUBLE_PRESS_lastPress[i]=0;
+      }
+
     }else{
       if(driver_control_pressed[i]==true){
         // released
@@ -62,10 +68,6 @@ void driver_controls_loop(){
       }
     }
 
-    if(driver_control_DOUBLE_PRESS_lastPress[i]!=0 && _millis() - driver_control_DOUBLE_PRESS_lastPress[i]>CONTROLS_DELAY_TO_DOUBLE_CLICK_MS){
-      onButtonEvent(EVENT_BUTTON_SHORT_PRESS, i);
-      driver_control_DOUBLE_PRESS_lastPress[i]==0;
-    }
   }
 
   
