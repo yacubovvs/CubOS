@@ -467,20 +467,22 @@ void appNameClass::onEvent(unsigned char event, int val1, int val2){
             if(event==EVENT_BUTTON_PRESSED){
             }else if(event==EVENT_BUTTON_RELEASED){
             }else if(event==EVENT_BUTTON_LONG_PRESS){
-                //debug("EVENT_BUTTON_LONG_PRESS");
+                debug("EVENT_BUTTON_LONG_PRESS");
                 if(val1==BUTTON_SELECT){
                 }else if(val1==BUTTON_BACK){
                     startApp(-1);
-                }
+                }    
             }else if(event==EVENT_BUTTON_SHORT_PRESS){
-                //debug("EVENT_BUTTON_SHORT_PRESS");
+                debug("EVENT_BUTTON_SHORT_PRESS");
+            }else if(event==EVENT_BUTTON_SHORT_SINGLE_PRESS){
+                debug("EVENT_BUTTON_SHORT_SINGLE_PRESS");
                 if(val1==BUTTON_SELECT){
                     this->pressNext();
                 }else if(val1==BUTTON_BACK){
                     startApp(-1);
                 }
             }else if(event==EVENT_ON_TOUCH_DOUBLE_PRESS){
-                //debug("EVENT_ON_TOUCH_DOUBLE_PRESS");
+                debug("EVENT_ON_TOUCH_DOUBLE_PRESS");
                 if(val1==BUTTON_SELECT){
                     startApp(-1);
                 }

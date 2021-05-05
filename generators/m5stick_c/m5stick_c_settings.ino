@@ -27,7 +27,7 @@
 #define HARDWARE_BUTTONS_ENABLED              // Conf of controls with hardware btns    
 
 #define DRIVER_CONTROLS_TOTALBUTTONS 1
-#define DRIVER_CONTROLS_DELAY_BEFOR_LONG_PRESS 350
+#define DRIVER_CONTROLS_DELAY_BEFORE_LONG_PRESS 350
 
 #define COLOR_SCREEN                     // Screen is colored
 

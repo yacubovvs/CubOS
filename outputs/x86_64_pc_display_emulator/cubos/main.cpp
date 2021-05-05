@@ -21,7 +21,7 @@
 #define BUTTON_POWER    0x05
 
 #define DRIVER_CONTROLS_TOTALBUTTONS 3
-#define DRIVER_CONTROLS_DELAY_BEFOR_LONG_PRESS 350
+#define DRIVER_CONTROLS_DELAY_BEFORE_LONG_PRESS 350
 
 // EVENTS
 
@@ -861,7 +861,7 @@ void debug(const char* string){
 
 #define DRIVER_CONTROLS_TOTALBUTTONS 4
 #define _millis() millis()
-#define DRIVER_CONTROLS_DELAY_BEFOR_LONG_PRESS 350
+#define DRIVER_CONTROLS_DELAY_BEFORE_LONG_PRESS 350
 
 unsigned long last_user_activity = _millis();
 
@@ -893,7 +893,7 @@ void driver_controls_loop(){
             onButtonEvent(EVENT_BUTTON_PRESSED, i);
         }else{
             // was pressed
-            if(_millis()-driver_control_time_pressed[i]>DRIVER_CONTROLS_DELAY_BEFOR_LONG_PRESS){
+            if(_millis()-driver_control_time_pressed[i]>DRIVER_CONTROLS_DELAY_BEFORE_LONG_PRESS){
             // long press
             driver_control_time_pressed[i]=-1;
             onButtonEvent(EVENT_BUTTON_LONG_PRESS, i);
