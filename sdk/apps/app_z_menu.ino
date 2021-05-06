@@ -334,7 +334,7 @@ void appNameClass::onLoop(){
       this->drawIcons(false);
       if(this->scroll_x!=0){
         //this->scroll_x++;
-        int dx = abs(scroll_x)/5 + 1;
+        int dx = abs(scroll_x)/NARROW_ANIMATION_COEFFICIENT + 1;
         if(scroll_x>scroll_to_x) dx *= -1;
         scroll_x+=dx;
 
@@ -362,16 +362,13 @@ void appNameClass::onEvent(unsigned char event, int val1, int val2){
     if(event==EVENT_BUTTON_PRESSED){
       
     }else if(event==EVENT_BUTTON_RELEASED){
-      debug("EVENT_BUTTON_RELEASED");
     }else if(event==EVENT_BUTTON_LONG_PRESS){
-      debug("EVENT_BUTTON_LONG_PRESS");
       if(val1==BUTTON_SELECT){
         startApp(app_z_menu_selectedAppIndex);
       }
     }else if(event==EVENT_ON_TIME_CHANGED){
     //}else if(event==EVENT_BUTTON_SHORT_SINGLE_PRESS){
     }else if(event==EVENT_BUTTON_SHORT_PRESS){
-      debug("EVENT_BUTTON_SHORT_PRESS");
       if(val1==BUTTON_BACK){
         this->updateActiveAppIndex(app_z_menu_selectedAppIndex-1);
       }else if(val1==BUTTON_SELECT){
@@ -382,7 +379,6 @@ void appNameClass::onEvent(unsigned char event, int val1, int val2){
         this->updateActiveAppIndex(app_z_menu_selectedAppIndex+1);
       }
     }else if(event==EVENT_ON_TOUCH_DOUBLE_PRESS){
-      debug("EVENT_ON_TOUCH_DOUBLE_PRESS");
       if(val1==BUTTON_SELECT){
         this->drawIcons(false);
         #ifdef MAIN_MENU_SMOOTH_ANIMATION

@@ -25,8 +25,6 @@
 #define device_has_bluetooth
 #define device_has_wifi
 
-#define ON_TIME_CHANGE_EVERY_MS 1000
-
 #define HARDWARE_BUTTONS_ENABLED              // Conf of controls with hardware btns    
 //#define isTouchScreen                 // Conf of controls
 

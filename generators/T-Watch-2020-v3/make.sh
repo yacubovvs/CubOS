@@ -32,7 +32,7 @@ cp sdk/apps/app_z_menu_touch.ino    outputs/T-Watch-2020-v3/cubos/
 cp sdk/drivers/driver_display_ST7789_ttwatch_spi.ino        outputs/T-Watch-2020-v3/cubos/
 cp sdk/drivers/driver_touchscreen_ttwatch.ino               outputs/T-Watch-2020-v3/cubos/     
 #cp sdk/drivers/driver_controls_watch7.ino                   outputs/T-Watch-2020-v3/cubos/     
-#cp sdk/drivers/driver_RTC_DS3231.ino                        outputs/T-Watch-2020-v3/cubos/     
+#cp sdk/drivers/driver_rtc_ds3231.ino                        outputs/T-Watch-2020-v3/cubos/     
 #cp sdk/drivers/driver_cpu_m5StickS.ino                      outputs/T-Watch-2020-v3/cubos/     
 
 # Core

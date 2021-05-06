@@ -73,6 +73,10 @@ void appNameClass::onEvent(unsigned char event, int val1, int val2){
 }
 
 void appNameClass::draw_current_time(){
+    #ifdef USE_RTC
+        driver_RTC_refresh(true);
+    #endif
+
     String timeString = core_time_getHourMinuteSecondsTime();
     setDrawColor(0, 0, 0);
     clearString(timeString, 2, 90, 5);

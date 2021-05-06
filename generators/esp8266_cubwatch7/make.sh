@@ -30,7 +30,7 @@ cp sdk/apps/app_z_menu.ino          outputs/esp8266_cubwatch7/cubos/
 cp sdk/drivers/driver_battery_esp8266.ino       outputs/esp8266_cubwatch7/cubos/     
 cp sdk/drivers/driver_display_ST7789_spi.ino    outputs/esp8266_cubwatch7/cubos/     
 cp sdk/drivers/driver_controls_watch7.ino       outputs/esp8266_cubwatch7/cubos/     
-cp sdk/drivers/driver_RTC_DS3231.ino            outputs/esp8266_cubwatch7/cubos/     
+cp sdk/drivers/driver_rtc_ds3231.ino            outputs/esp8266_cubwatch7/cubos/     
 cp sdk/drivers/driver_cpu_esp8266.ino           outputs/esp8266_cubwatch7/cubos/     
 
 # Core

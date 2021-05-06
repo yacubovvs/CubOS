@@ -23,7 +23,11 @@
 #define DRIVER_CONTROLS_TOTALBUTTONS 3
 #define DRIVER_CONTROLS_DELAY_BEFORE_LONG_PRESS 50
 
-// EVENTS
+/*
+############################################################################
+#                                 EVENTS +                                 #
+############################################################################
+*/
 
 #define EVENT_BUTTON_PRESSED                0x00
 #define EVENT_BUTTON_RELEASED               0x01
@@ -46,8 +50,15 @@
 #define EVENT_ON_TOUCH_SWIPE_FROM_TOP       0x11
 #define EVENT_ON_TOUCH_SWIPE_FROM_BOTTOM    0x12
 
+/*
+############################################################################
+#                                 EVENTS -                                 #
+############################################################################
+*/
 
+#define ON_TIME_CHANGE_EVERY_MS 1000
 
+#define UPDATE_RTC_EVERY 65
 #define I2C_ENABLE
 #define CPU_CONTROLL_ENABLE
 
@@ -55,6 +66,8 @@
 #define HARDWARE_BUTTONS_VALUE 3
 
 #define CONTROLS_DELAY_TO_DOUBLE_CLICK_MS DRIVER_CONTROLS_DELAY_BEFORE_LONG_PRESS
+
+#define NARROW_ANIMATION_COEFFICIENT        5
 // #define MAIN_MENU_SMOOTH_ANIMATION
 // #define NARROW_SCREEN
 /*

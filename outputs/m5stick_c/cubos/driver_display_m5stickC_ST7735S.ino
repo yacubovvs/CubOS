@@ -34,11 +34,23 @@ void powerOn_displayDriver(){
 
 
 void fillScreen(unsigned char red, unsigned char green, unsigned char blue){
-  uint16_t fillColor = get_uint16Color(red, green, blue);
-  M5.Lcd.fillScreen(fillColor);
+  bool lastLimits = DRAW_LIMITS_getEnable();
+  DRAW_LIMITS_setEnable(false);
+  setDrawColor(red, green, blue);
+  for(int x=0; x<SCREEN_WIDTH; x++){
+    for(int y=0; y<SCREEN_HEIGHT; y++){
+      drawPixel(x,y);
+    }
+  }
+  DRAW_LIMITS_setEnable(lastLimits);
+
+  
+  /*
+  //M5.Lcd.fillScreen(fillColor);
   #ifdef FRAMEBUFFER_ENABLE
     FRAMEBUFFER_fill(fillColor);
   #endif
+  */
 }
 
 

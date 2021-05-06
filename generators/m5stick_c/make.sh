@@ -30,7 +30,7 @@ cp sdk/apps/app_z_menu.ino          outputs/m5stick_c/cubos/
 cp sdk/drivers/driver_battery_m5stickC.ino          outputs/m5stick_c/cubos/     
 cp sdk/drivers/driver_display_m5stickC_ST7735S.ino  outputs/m5stick_c/cubos/     
 cp sdk/drivers/driver_controls_m5stickC.ino         outputs/m5stick_c/cubos/     
-#cp sdk/drivers/driver_RTC_DS3231.ino               outputs/m5stick_c/cubos/     
+cp sdk/drivers/driver_rtc_m5stack_bm8563.ino        outputs/m5stick_c/cubos/     
 cp sdk/drivers/driver_cpu_m5stickC.ino              outputs/m5stick_c/cubos/     
 
 # Core
