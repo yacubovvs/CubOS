@@ -327,25 +327,11 @@ void appNameClass::drawIcons(bool draw){
                                 this->getApplicationIcon(0, appElementDraw)
                             );
                         }else if(currentSubMenu==APP_SETTINGS_SUBMENU_SET_TIME){
-                            String stringTitle = "Minutes";
-                            if(draw){
-                                setDrawColor_ContrastColor();
-                                drawString(
-                                    stringTitle,                            // TEXT
-                                    this->scroll_x + SCREEN_WIDTH/2 - elementDraw*SCREEN_WIDTH - stringTitle.length()*FONT_CHAR_WIDTH/2,        // X
-                                    SCREEN_HEIGHT/2,   // Y
-                                    1                                       // FONT SIZE
-                                );
-                            }else{
-                                setDrawColor_BackGoundColor();
-                                clearString(
-                                    stringTitle,                            // TEXT
-                                    this->scroll_x + SCREEN_WIDTH/2 - elementDraw*SCREEN_WIDTH - stringTitle.length()*FONT_CHAR_WIDTH/2,        // X
-                                    SCREEN_HEIGHT/2,   // Y
-                                    1                                       // FONT SIZE
-                                );
-                            }
+                            String stringTitle = reinterpret_cast<const char*>(this->getApplicationTitle(APP_SETTINGS_SUBMENU_SET_TIME, appElementDraw));
+                            core_views_draw_settings_item_noicon(draw, this->scroll_x + SCREEN_WIDTH/2 - elementDraw*SCREEN_WIDTH, SCREEN_HEIGHT/2, stringTitle, stringTitle, 1, 2);
                         }
+
+                        //delay(50);
                         
                     }
                 }
@@ -360,27 +346,8 @@ void appNameClass::drawIcons(bool draw){
                         this->getApplicationIcon(0, app_num)
                     );
                 }else if(currentSubMenu==APP_SETTINGS_SUBMENU_SET_TIME){
-                    
-                    //String stringTitle = reinterpret_cast<const unsigned char*>(this->getApplicationTitle(APP_SETTINGS_SUBMENU_SET_TIME, app_num));
-                    String stringTitle = "Minutes";
-                    if(draw){
-                        setDrawColor_ContrastColor();
-                        drawString(
-                            stringTitle,                            // TEXT
-                            this->scroll_x + SCREEN_WIDTH/2 - stringTitle.length()*FONT_CHAR_WIDTH/2,        // X
-                            SCREEN_HEIGHT/2,   // Y
-                            1                                       // FONT SIZE
-                        );
-                    }else{
-                        setDrawColor_BackGoundColor();
-                        clearString(
-                            stringTitle,                            // TEXT
-                            this->scroll_x + SCREEN_WIDTH/2 - stringTitle.length()*FONT_CHAR_WIDTH/2,        // X
-                            SCREEN_HEIGHT/2,   // Y
-                            1                                       // FONT SIZE
-                        );
-                    }
-                    
+                    String stringTitle = reinterpret_cast<const char*>(this->getApplicationTitle(APP_SETTINGS_SUBMENU_SET_TIME, app_num));
+                    core_views_draw_settings_item_noicon(draw, this->scroll_x + SCREEN_WIDTH/2, SCREEN_HEIGHT/2, stringTitle, stringTitle, 1, 2);
                 }
             }
         #else

@@ -293,6 +293,41 @@ void core_views_draw_settings_item(bool draw, int x, int y, const unsigned char*
     
 }
 
+void core_views_draw_settings_item_noicon(bool draw, int x, int y, String title, String subTitle, unsigned char titleFontSize, unsigned char subTitleFontSize){
+    if(draw){
+        setDrawColor_ContrastColor();
+        drawString(
+            title,                                                              // TEXT
+            x - title.length()*FONT_CHAR_WIDTH/2*titleFontSize,                 // X
+            y - SCREEN_HEIGHT/4,                                                // Y
+            titleFontSize                                                       // FONT SIZE
+        );
+
+        drawString(
+            subTitle,                                                           // TEXT
+            x - title.length()*FONT_CHAR_WIDTH/2*titleFontSize,                 // X
+            y + SCREEN_HEIGHT/4,                                                // Y
+            titleFontSize                                                       // FONT SIZE
+        );
+    }else{
+        setDrawColor_BackGoundColor();
+        clearString(
+            title,                                                              // TEXT
+            x - title.length()*FONT_CHAR_WIDTH/2*titleFontSize,                 // X
+            y - SCREEN_HEIGHT/4,                                                // Y
+            titleFontSize                                                       // FONT SIZE
+        );
+
+        clearString(
+            subTitle,                                                           // TEXT
+            x - title.length()*FONT_CHAR_WIDTH/2*titleFontSize,                 // X
+            y + SCREEN_HEIGHT/4,                                                // Y
+            titleFontSize                                                       // FONT SIZE
+        );
+    }
+    
+}
+
 void drawMenuElement(bool draw, uint16_t x, uint16_t y, uint16_t width, uint16_t height, const unsigned char* icon, String string1, String string2){
     if(draw) setDrawColor(255, 255, 255);
     else setDrawColor(getBackgroundColor_red(), getBackgroundColor_green(), getBackgroundColor_blue());
