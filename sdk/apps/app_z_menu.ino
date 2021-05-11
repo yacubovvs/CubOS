@@ -334,7 +334,7 @@ void appNameClass::onLoop(){
       this->drawIcons(false);
       if(this->scroll_x!=0){
         //this->scroll_x++;
-        int dx = abs(scroll_x)/NARROW_ANIMATION_COEFFICIENT + 1;
+        int dx = abs(scroll_x)/SMOOTH_ANIMATION_COEFFICIENT + 1;
         if(scroll_x>scroll_to_x) dx *= -1;
         scroll_x+=dx;
 

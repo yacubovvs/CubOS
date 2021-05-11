@@ -14,8 +14,6 @@ void driver_RTC_refresh(bool hard){
 		M5.Rtc.GetTime(&RTC_TimeStruct);
 		M5.Rtc.GetData(&RTC_DateStruct);
 		driver_RTC_lastTimeRefresh = millis();
-
-		//debug("RTC updating");
 	}
 	
 }
@@ -28,12 +26,30 @@ unsigned char driver_RTC_getMinutes(){
 	return RTC_TimeStruct.Minutes;
 }
 
+void driver_RTC_setMinutes(unsigned char minutes){
+	minutes = minutes%60;
+	RTC_TimeStruct.Minutes = minutes;
+	M5.Rtc.SetTime(&RTC_TimeStruct);
+}
+
 unsigned char driver_RTC_getSeconds(){
 	return RTC_TimeStruct.Seconds;
 }
 
+void driver_RTC_setSeconds(unsigned char seconds){
+	seconds = seconds%60;
+	RTC_TimeStruct.Seconds = seconds;
+	M5.Rtc.SetTime(&RTC_TimeStruct);
+}
+
 unsigned char driver_RTC_getHours(){
 	return RTC_TimeStruct.Hours;
+}
+
+void driver_RTC_setHours(unsigned char hours){
+	hours = hours%24;
+	RTC_TimeStruct.Hours = hours;
+	M5.Rtc.SetTime(&RTC_TimeStruct);
 }
 
 unsigned char driver_RTC_getTemperature(){

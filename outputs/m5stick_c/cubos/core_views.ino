@@ -138,10 +138,10 @@ void core_views_statusBar_draw_time(bool draw){
     if(draw){
         setDrawColor(STYLE_STATUSBAR_TEXT_RED, STYLE_STATUSBAR_TEXT_GREEN, STYLE_STATUSBAR_TEXT_BLUE);
         core_views_statusBar_draw_time_TimeString = core_time_getHourMinuteTime();
-        drawString(core_views_statusBar_draw_time_TimeString, 5, STYLE_STATUSBAR_HEIGHT/2 - FONT_CHAR_HEIGHT/2 + ( (STYLE_STATUSBAR_HEIGHT)%2 ) + ( (FONT_CHAR_HEIGHT)%2 ) + 1, FONT_SIZE_DEFAULT);
+        drawString(core_views_statusBar_draw_time_TimeString, 5, STYLE_STATUSBAR_HEIGHT/2 - FONT_CHAR_HEIGHT/2 + ( (STYLE_STATUSBAR_HEIGHT)%2 ) + ( (FONT_CHAR_HEIGHT)%2 ) + 2, FONT_SIZE_DEFAULT);
     }else{
         setDrawColor(STYLE_STATUSBAR_BACKGROUND_RED, STYLE_STATUSBAR_BACKGROUND_GREEN, STYLE_STATUSBAR_BACKGROUND_BLUE);
-        clearString(core_views_statusBar_draw_time_TimeString, 5, STYLE_STATUSBAR_HEIGHT/2 - FONT_CHAR_HEIGHT/2 + ( (STYLE_STATUSBAR_HEIGHT)%2 ) + ( (FONT_CHAR_HEIGHT)%2 ) + 1, FONT_SIZE_DEFAULT);
+        clearString(core_views_statusBar_draw_time_TimeString, 5, STYLE_STATUSBAR_HEIGHT/2 - FONT_CHAR_HEIGHT/2 + ( (STYLE_STATUSBAR_HEIGHT)%2 ) + ( (FONT_CHAR_HEIGHT)%2 ) + 2, FONT_SIZE_DEFAULT);
     }
     DRAW_LIMITS_setEnable(lastLimits);
 }
@@ -294,35 +294,36 @@ void core_views_draw_settings_item(bool draw, int x, int y, const unsigned char*
 }
 
 void core_views_draw_settings_item_noicon(bool draw, int x, int y, String title, String subTitle, unsigned char titleFontSize, unsigned char subTitleFontSize){
+    
     if(draw){
         setDrawColor_ContrastColor();
         drawString(
-            title,                                                              // TEXT
-            x - title.length()*FONT_CHAR_WIDTH/2*titleFontSize,                 // X
-            y - SCREEN_HEIGHT/4,                                                // Y
-            titleFontSize                                                       // FONT SIZE
+            title,                                                                          // TEXT
+            x - title.length()*FONT_CHAR_WIDTH/2*titleFontSize,                             // X
+            y - COREVIEWS_NO_ICON_ELEMENT_HEIGHT/2,                                         // Y
+            titleFontSize                                                                   // FONT SIZE
         );
 
         drawString(
-            subTitle,                                                           // TEXT
-            x - title.length()*FONT_CHAR_WIDTH/2*titleFontSize,                 // X
-            y + SCREEN_HEIGHT/4,                                                // Y
-            titleFontSize                                                       // FONT SIZE
+            subTitle,                                                                       // TEXT
+            x - subTitle.length()*FONT_CHAR_WIDTH/2*subTitleFontSize,                       // X
+            y + COREVIEWS_NO_ICON_ELEMENT_HEIGHT/2 - subTitleFontSize * FONT_CHAR_HEIGHT,   // Y
+            subTitleFontSize                                                                // FONT SIZE
         );
     }else{
         setDrawColor_BackGoundColor();
         clearString(
-            title,                                                              // TEXT
-            x - title.length()*FONT_CHAR_WIDTH/2*titleFontSize,                 // X
-            y - SCREEN_HEIGHT/4,                                                // Y
-            titleFontSize                                                       // FONT SIZE
+            title,                                                                          // TEXT
+            x - title.length()*FONT_CHAR_WIDTH/2*titleFontSize,                             // X
+            y - COREVIEWS_NO_ICON_ELEMENT_HEIGHT/2,                                         // Y
+            titleFontSize                                                                   // FONT SIZE
         );
 
         clearString(
-            subTitle,                                                           // TEXT
-            x - title.length()*FONT_CHAR_WIDTH/2*titleFontSize,                 // X
-            y + SCREEN_HEIGHT/4,                                                // Y
-            titleFontSize                                                       // FONT SIZE
+            subTitle,                                                                       // TEXT
+            x - subTitle.length()*FONT_CHAR_WIDTH/2*subTitleFontSize,                       // X
+            y + COREVIEWS_NO_ICON_ELEMENT_HEIGHT/2 - subTitleFontSize * FONT_CHAR_HEIGHT,   // Y
+            subTitleFontSize                                                                // FONT SIZE
         );
     }
     

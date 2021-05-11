@@ -21,7 +21,8 @@
 #define BUTTON_POWER    0x05
 
 #define DRIVER_CONTROLS_TOTALBUTTONS 3
-#define DRIVER_CONTROLS_DELAY_BEFORE_LONG_PRESS 50
+#define DRIVER_CONTROLS_DELAY_BEFORE_LONG_PRESS     50
+#define DRIVER_CONTROLS_DELAY_BEFORE_MULRI_PRESS    400
 
 /*
 ############################################################################
@@ -56,6 +57,20 @@
 ############################################################################
 */
 
+/*
+############################################################################
+#                                 STYLES +                                 #
+############################################################################
+*/
+
+#define COREVIEWS_NO_ICON_ELEMENT_HEIGHT 40
+
+/*
+############################################################################
+#                                 STYLES -                                 #
+############################################################################
+*/
+
 #define ON_TIME_CHANGE_EVERY_MS 1000
 
 #define UPDATE_RTC_EVERY 65
@@ -67,9 +82,10 @@
 
 #define CONTROLS_DELAY_TO_DOUBLE_CLICK_MS DRIVER_CONTROLS_DELAY_BEFORE_LONG_PRESS
 
-#define NARROW_ANIMATION_COEFFICIENT        5
+#define SMOOTH_ANIMATION_COEFFICIENT        5
 // #define MAIN_MENU_SMOOTH_ANIMATION
 // #define NARROW_SCREEN
+
 /*
     ############################################################################################
     #                                                                                          #

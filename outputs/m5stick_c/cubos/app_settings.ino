@@ -104,9 +104,20 @@ class appNameClass: public Application{
         void pressNext();
         void pressSelect();
 
-        String lastTimeString;
-        String lastDateString;
-        String lastBatteryString;
+        String lastTimeString           = "";
+        String lastDateString           = "";
+        String lastBatteryString        = "";
+
+        String lastTimeString_hours     = "";
+        String lastTimeString_minutes   = "";
+        String lastTimeString_seconds   = "";
+        String lastDateString_year      = "";
+        String lastDateString_month     = "";
+        String lastDateString_date      = "";
+
+        #if (DRIVER_CONTROLS_TOTALBUTTONS == 2 || DRIVER_CONTROLS_TOTALBUTTONS == 1)
+            unsigned long stillPressingSelect_time = 0;
+        #endif
 
         char currentSelectedPosition        = 0;
         bool currentPositionIsSelected      = false;
@@ -151,7 +162,7 @@ void appNameClass::drawSettingsPageFirstTime(){
             this->drawActiveAppFrame(true);  
         #endif
         #endif
-    }if(currentSubMenu==APP_SETTINGS_SUBMENU_SET_TIME){
+    }else if(currentSubMenu==APP_SETTINGS_SUBMENU_SET_TIME){
 
         #ifdef NARROW_SCREEN
             this->drawIcons(true);
@@ -162,7 +173,17 @@ void appNameClass::drawSettingsPageFirstTime(){
             drawSettingTimeSelect(true, getPositionBySelectedNumber(currentSelectedPosition));
         #endif
 
-    }    
+    }else if(currentSubMenu==APP_SETTINGS_SUBMENU_SET_DATE){
+
+        #ifdef NARROW_SCREEN
+            this->drawIcons(true);
+        #else
+            /*
+            TODO
+            */
+        #endif
+
+    }      
 }
 
 int appNameClass::getPositionBySelectedNumber(unsigned char selectedNumber){
@@ -323,12 +344,21 @@ void appNameClass::drawIcons(bool draw){
                                 this->scroll_x + SCREEN_WIDTH/2 - elementDraw*SCREEN_WIDTH,
                                 SCREEN_HEIGHT/2, 
                                 (const unsigned char*)this->getApplicationTitle(APP_SETTINGS_SUBMENU_MAIN, appElementDraw), 
-                                this->getApplicationSubTitle(0, appElementDraw, !draw), 
-                                this->getApplicationIcon(0, appElementDraw)
+                                this->getApplicationSubTitle(currentSubMenu, appElementDraw, !draw), 
+                                this->getApplicationIcon(currentSubMenu, appElementDraw)
                             );
-                        }else if(currentSubMenu==APP_SETTINGS_SUBMENU_SET_TIME){
-                            String stringTitle = reinterpret_cast<const char*>(this->getApplicationTitle(APP_SETTINGS_SUBMENU_SET_TIME, appElementDraw));
-                            core_views_draw_settings_item_noicon(draw, this->scroll_x + SCREEN_WIDTH/2 - elementDraw*SCREEN_WIDTH, SCREEN_HEIGHT/2, stringTitle, stringTitle, 1, 2);
+                        }else if(currentSubMenu==APP_SETTINGS_SUBMENU_SET_TIME || currentSubMenu==APP_SETTINGS_SUBMENU_SET_DATE){
+                            String stringTitle = reinterpret_cast<const char*>(this->getApplicationTitle(currentSubMenu, appElementDraw));
+
+                            core_views_draw_settings_item_noicon(
+                                draw, 
+                                this->scroll_x + SCREEN_WIDTH/2 - elementDraw*SCREEN_WIDTH, 
+                                SCREEN_HEIGHT/2, 
+                                stringTitle, 
+                                this->getApplicationSubTitle(currentSubMenu, appElementDraw, !draw), 
+                                1, 
+                                2
+                            );
                         }
 
                         //delay(50);
@@ -342,12 +372,20 @@ void appNameClass::drawIcons(bool draw){
                         this->scroll_x + SCREEN_WIDTH/2,
                         SCREEN_HEIGHT/2, 
                         (const unsigned char*)this->getApplicationTitle(APP_SETTINGS_SUBMENU_MAIN, app_num), 
-                        this->getApplicationSubTitle(0, app_num, !draw), 
-                        this->getApplicationIcon(0, app_num)
+                        this->getApplicationSubTitle(currentSubMenu, app_num, !draw), 
+                        this->getApplicationIcon(currentSubMenu, app_num)
                     );
-                }else if(currentSubMenu==APP_SETTINGS_SUBMENU_SET_TIME){
-                    String stringTitle = reinterpret_cast<const char*>(this->getApplicationTitle(APP_SETTINGS_SUBMENU_SET_TIME, app_num));
-                    core_views_draw_settings_item_noicon(draw, this->scroll_x + SCREEN_WIDTH/2, SCREEN_HEIGHT/2, stringTitle, stringTitle, 1, 2);
+                }else if(currentSubMenu==APP_SETTINGS_SUBMENU_SET_TIME || currentSubMenu==APP_SETTINGS_SUBMENU_SET_DATE){
+                    String stringTitle = reinterpret_cast<const char*>(this->getApplicationTitle(currentSubMenu, app_num));
+                    core_views_draw_settings_item_noicon(
+                        draw, 
+                        this->scroll_x + SCREEN_WIDTH/2, 
+                        SCREEN_HEIGHT/2, 
+                        stringTitle, 
+                        this->getApplicationSubTitle(currentSubMenu, app_num, !draw), 
+                        1, 
+                        2
+                    );
                 }
             }
         #else
@@ -357,11 +395,13 @@ void appNameClass::drawIcons(bool draw){
                     SCREEN_WIDTH/2,
                     SCREEN_HEIGHT/2, 
                     (const unsigned char*)this->getApplicationTitle(APP_SETTINGS_SUBMENU_MAIN, app_num), 
-                    this->getApplicationSubTitle(0, app_num, !draw), 
-                    this->getApplicationIcon(0, app_num)
+                    this->getApplicationSubTitle(currentSubMenu, app_num, !draw), 
+                    this->getApplicationIcon(currentSubMenu, app_num)
                 );
             }else if(currentSubMenu==APP_SETTINGS_SUBMENU_SET_TIME){
-                
+                // TODO
+            }else if(currentSubMenu==APP_SETTINGS_SUBMENU_SET_DATE){
+                // TODO
             }
         #endif
 
@@ -418,18 +458,61 @@ void appNameClass::drawIcons(bool draw){
 void appNameClass::onLoop(){
     #ifdef MAIN_MENU_SMOOTH_ANIMATION
         if(this->scroll_x!=0){
-        this->drawIcons(false);
-        if(this->scroll_x!=0){
-            //this->scroll_x++;
-            int dx = abs(scroll_x)/NARROW_ANIMATION_COEFFICIENT + 1;
-            if(scroll_x>scroll_to_x) dx *= -1;
-            scroll_x+=dx;
+            this->drawIcons(false);
+            if(this->scroll_x!=0){
+                //this->scroll_x++;
+                int dx = abs(scroll_x)/SMOOTH_ANIMATION_COEFFICIENT + 1;
+                if(scroll_x>scroll_to_x) dx *= -1;
+                scroll_x+=dx;
 
-            if (abs(dx)<1) scroll_x=0;
-        }
-        this->drawIcons(true);
+                if (abs(dx)<1) scroll_x=0;
+            }
+            this->drawIcons(true);
         }
     #endif
+    if(currentSubMenu==APP_SETTINGS_SUBMENU_SET_TIME){
+        if(stillPressingSelect_time!=0 && millis()-this->stillPressingSelect_time>=DRIVER_CONTROLS_DELAY_BEFORE_MULRI_PRESS){
+            stillPressingSelect_time = millis();
+            switch(app_settings_selectedAppIndex){
+                case 0:
+                    // Add hours
+                    driver_RTC_setHours(driver_RTC_getHours() + 1);
+                    break;
+                case 1:
+                    // Add minutes
+                    driver_RTC_setMinutes(driver_RTC_getMinutes() + 1);
+                    break;
+                case 2:
+                    // Reset seconds
+                    driver_RTC_setSeconds(0);
+                    break;
+            } 
+            this->drawIcons(false);
+            this->drawIcons(true);
+        }
+    }else if(currentSubMenu==APP_SETTINGS_SUBMENU_SET_DATE){
+        if(stillPressingSelect_time!=0 && millis()-this->stillPressingSelect_time>=DRIVER_CONTROLS_DELAY_BEFORE_MULRI_PRESS){
+            stillPressingSelect_time = millis();
+            switch(app_settings_selectedAppIndex){
+                case 0:
+                    // Add year
+                    //driver_RTC_setHours(driver_RTC_getHours() + 1);
+                    break;
+                case 1:
+                    // Add month
+                    //driver_RTC_setMinutes(driver_RTC_getMinutes() + 1);
+                    break;
+                case 2:
+                    // Add dat
+                    //driver_RTC_setSeconds(0);
+                    break;
+            } 
+            this->drawIcons(false);
+            this->drawIcons(true);
+        }
+    }
+
+    
 }
 
 void appNameClass::onDestroy(){
@@ -485,12 +568,29 @@ void appNameClass::onEvent(unsigned char event, int val1, int val2){
 
         /**/
         #if (DRIVER_CONTROLS_TOTALBUTTONS == 2 || DRIVER_CONTROLS_TOTALBUTTONS == 1)
+            
             if(event==EVENT_BUTTON_PRESSED){
+                if(currentSubMenu==APP_SETTINGS_SUBMENU_SET_TIME){
+                    if(this->stillPressingSelect_time==0) this->stillPressingSelect_time = millis();
+                }  
             }else if(event==EVENT_BUTTON_RELEASED){
+                if(currentSubMenu==APP_SETTINGS_SUBMENU_SET_TIME){
+                    this->stillPressingSelect_time = 0;
+                }
             }else if(event==EVENT_BUTTON_LONG_PRESS){
                 //debug("EVENT_BUTTON_LONG_PRESS");
                 if(val1==BUTTON_SELECT){
-                    if(currentSubMenu==APP_SETTINGS_SUBMENU_MAIN && app_settings_selectedAppIndex==0) switchToSubMenu(APP_SETTINGS_SUBMENU_SET_TIME);
+                    if(currentSubMenu==APP_SETTINGS_SUBMENU_MAIN){
+                        switch(app_settings_selectedAppIndex){
+                            case 0:
+                                switchToSubMenu(APP_SETTINGS_SUBMENU_SET_TIME);
+                                break;
+                            case 1:
+                                switchToSubMenu(APP_SETTINGS_SUBMENU_SET_DATE);
+                                break;
+                        }
+                        
+                    }
                 }else if(val1==BUTTON_BACK){
                     startApp(-1);
                 }    
@@ -506,12 +606,13 @@ void appNameClass::onEvent(unsigned char event, int val1, int val2){
             }else if(event==EVENT_ON_TOUCH_DOUBLE_PRESS){
                 //debug("EVENT_ON_TOUCH_DOUBLE_PRESS");
                 if(val1==BUTTON_SELECT){
-                    startApp(-1);
+                    if(currentSubMenu==APP_SETTINGS_SUBMENU_SET_TIME || currentSubMenu==APP_SETTINGS_SUBMENU_SET_DATE){
+                        this->pressNext();
+                    } else startApp(-1);
                 }
             }
             
         #else
-        /**/
             if(event==EVENT_BUTTON_PRESSED){
                 
                 if(currentSubMenu==APP_SETTINGS_SUBMENU_MAIN){
@@ -526,7 +627,16 @@ void appNameClass::onEvent(unsigned char event, int val1, int val2){
                             this->pressNext();   
                             break;
                         case BUTTON_SELECT:
-                            if(currentSubMenu==APP_SETTINGS_SUBMENU_MAIN && app_settings_selectedAppIndex==0) switchToSubMenu(APP_SETTINGS_SUBMENU_SET_TIME);
+                            if(currentSubMenu==APP_SETTINGS_SUBMENU_MAIN){
+                                switch (app_settings_selectedAppIndex){
+                                case 0:
+                                    switchToSubMenu(APP_SETTINGS_SUBMENU_SET_TIME);    
+                                    break;
+                                case 1:
+                                    switchToSubMenu(APP_SETTINGS_SUBMENU_SET_DATE);    
+                                    break;
+                                }
+                            }
                             break;
                     }
                 }else if(currentSubMenu==APP_SETTINGS_SUBMENU_SET_TIME){
@@ -582,7 +692,9 @@ void appNameClass::onEvent(unsigned char event, int val1, int val2){
             */
     
             if(currentSubMenu==APP_SETTINGS_SUBMENU_MAIN && app_settings_selectedAppIndex==0 && app_settings_selectedAppIndex==0){
-                //Setting time
+                this->drawIcons(false);
+                this->drawIcons(true);
+            }else if(currentSubMenu==APP_SETTINGS_SUBMENU_SET_TIME || currentSubMenu==APP_SETTINGS_SUBMENU_SET_DATE){
                 this->drawIcons(false);
                 this->drawIcons(true);
             }
@@ -691,7 +803,7 @@ String appNameClass::getApplicationSubTitle(unsigned char submenu, unsigned char
 
 String appNameClass::getApplicationSubTitle(unsigned char submenu, unsigned char num, bool getLast){    
 
-    switch(APP_SETTINGS_SUBMENU_MAIN){
+    switch(submenu){
         case APP_SETTINGS_SUBMENU_MAIN:
             switch (num){
                 case 0:
@@ -722,6 +834,56 @@ String appNameClass::getApplicationSubTitle(unsigned char submenu, unsigned char
                     return "Calibrate";
                 default:
                     return "Reset maximum";
+                    break;
+            }
+            break;
+        case APP_SETTINGS_SUBMENU_SET_TIME:
+            switch (num){
+                case 0:
+                    if(getLast) return this->lastTimeString_hours;
+                    else{
+                        this->lastTimeString_hours = core_time_getHours_String();
+                        return this->lastTimeString_hours;
+                    }
+                case 1:
+                    if(getLast) return this->lastTimeString_minutes;
+                    else{
+                        this->lastTimeString_minutes = core_time_getMinutes_String();
+                        return this->lastTimeString_minutes;
+                    }
+                case 2:
+                    if(getLast) return this->lastTimeString_seconds;
+                    else{
+                        this->lastTimeString_seconds = core_time_getSeconds_String();
+                        return this->lastTimeString_seconds;
+                    }      
+                default:
+                    return "-";
+                    break;
+            }
+            break;
+        case APP_SETTINGS_SUBMENU_SET_DATE:
+            switch (num){
+                case 0:
+                    if(getLast) return this->lastDateString_year;
+                    else{
+                        this->lastDateString_year = core_time_getYearDate();
+                        return this->lastDateString_year;
+                    }   
+                case 1:
+                    if(getLast) return this->lastDateString_month;
+                    else{
+                        this->lastDateString_month = core_time_getMonthDate();
+                        return this->lastDateString_month;
+                    }   
+                case 2:
+                    if(getLast) return this->lastDateString_date;
+                    else{
+                        this->lastDateString_date = core_time_getDayDate();
+                        return this->lastDateString_date;
+                    }   
+                default:
+                    return "-";
                     break;
             }
             break;
