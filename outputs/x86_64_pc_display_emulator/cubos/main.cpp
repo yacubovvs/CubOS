@@ -2151,21 +2151,21 @@ String core_time_getHourMinuteTime(){
     return core_time_getHours_String() + ":" + core_time_getMinutes_String();
 }
 
-String core_time_getMonthDate(){
+String core_time_getMonth(){
     //return "February";
     return "Feb";
 }
 
-String core_time_getDayDate(){
+String core_time_getDate(){
     return "1";
 }
 
-String core_time_getYearDate(){
+String core_time_getYear(){
     return "2021";
 }
 
 String core_time_getDateFull(){
-    return core_time_getDayDate() + " " + core_time_getMonthDate() + " " + core_time_getYearDate();
+    return core_time_getDate() + " " + core_time_getMonth() + " " + core_time_getYear();
 }
 
 //#define EVENT_ON_TIME_CHANGED              0x03

@@ -6,6 +6,14 @@ unsigned char core_time_getHours_byte(){
     #endif
 }
 
+void core_time_setHours(unsigned char hours){
+    #ifdef USE_RTC
+        driver_RTC_setHours(hours);
+    #else
+        // TODO
+    #endif
+}
+
 unsigned char core_time_getMinutes_byte(){
     #ifdef USE_RTC
         return driver_RTC_getMinutes();
@@ -14,12 +22,27 @@ unsigned char core_time_getMinutes_byte(){
     #endif
 }
 
+void core_time_setMinutes(unsigned char minutes){
+    #ifdef USE_RTC
+        driver_RTC_setMinutes(minutes);
+    #else
+        // TODO
+    #endif
+}
 
 unsigned char core_time_getSeconds_byte(){
     #ifdef USE_RTC
         return driver_RTC_getSeconds();
     #else
         return millis()/(1000)%60;
+    #endif
+}
+
+void core_time_setSeconds(unsigned char seconds){
+    #ifdef USE_RTC
+        driver_RTC_setSeconds(seconds);
+    #else
+        // TODO
     #endif
 }
 
@@ -49,22 +72,179 @@ String core_time_getHourMinuteTime(){
     return core_time_getHours_String() + ":" + core_time_getMinutes_String();
 }
 
-String core_time_getMonthDate(){
+unsigned char core_time_getMonth(){
     //return "February";
-    return "Feb";
+    #ifdef USE_RTC
+        return driver_RTC_getMonth();
+    #else
+        return 1;
+    #endif
 }
 
-String core_time_getDayDate(){
-    return "1";
+String core_time_getMonth_string(){
+    switch(core_time_getMonth()){
+        case 1:
+            return "January";
+        case 2:
+            return "February";
+        case 3:
+            return "March";
+        case 4:
+            return "April";
+        case 5:
+            return "May";
+        case 6:
+            return "June";
+        case 7:
+            return "July";
+        case 8:
+            return "August";
+        case 9:
+            return "September";
+        case 10:
+            return "October";
+        case 11:
+            return "November";
+        case 12:
+            return "December";
+        default:
+            return "-";
+    }  
 }
 
-String core_time_getYearDate(){
-    return "2021";
+String core_time_getMonth_stringShort(){
+    switch(core_time_getMonth()){
+        case 1:
+            return "Jan";
+        case 2:
+            return "Feb";
+        case 3:
+            return "Mar";
+        case 4:
+            return "Apr";
+        case 5:
+            return "May";
+        case 6:
+            return "Jun";
+        case 7:
+            return "Jul";
+        case 8:
+            return "Aug";
+        case 9:
+            return "Sep";
+        case 10:
+            return "Oct";
+        case 11:
+            return "Nov";
+        case 12:
+            return "Dec";
+        default:
+            return "-";
+    }  
+}
+
+unsigned char core_time_getDate(){
+    #ifdef USE_RTC
+        return driver_RTC_getDate();
+    #else
+        return 1;
+    #endif
+}
+
+unsigned char core_time_getWeekDay(){
+    #ifdef USE_RTC
+        return driver_RTC_getWeekDay();
+    #else
+        return 0;
+    #endif
+}
+
+String core_time_getWeekDay_string(){
+	switch (core_time_getWeekDay()){
+		case 0:
+			return "Monday";
+		case 1:
+			return "Tuesday";
+		case 2:
+			return "Wednesday";
+		case 3:
+			return "Thursday";
+		case 4:
+			return "Friday";
+		case 5:
+			return "Saturday";
+		case 6:
+			return "Sunday";
+		default:
+			return "-";
+	}
+}
+
+String core_time_getWeekDay_stringShort(){
+	switch (core_time_getWeekDay()){
+		case 0:
+			return "Mon";
+		case 1:
+			return "Tue";
+		case 2:
+			return "Wed";
+		case 3:
+			return "Thu";
+		case 4:
+			return "Fri";
+		case 5:
+			return "Sat";
+		case 6:
+			return "Sun";
+		default:
+			return "-";
+	}
+}
+
+uint16_t core_time_getYear(){
+    #ifdef USE_RTC
+        return driver_RTC_getYear();
+    #else
+        return 2021;
+    #endif
 }
 
 String core_time_getDateFull(){
-    return core_time_getDayDate() + " " + core_time_getMonthDate() + " " + core_time_getYearDate();
+    return String(core_time_getDate()) + " " + String(core_time_getMonth()) + " " + String(core_time_getYear());
 }
+
+void core_time_setYear(uint16_t year){
+    #ifdef USE_RTC
+        return driver_RTC_setYear(year);
+    #else
+        // TODO
+    #endif
+}
+
+void core_time_setMonth(unsigned char month){
+    #ifdef USE_RTC
+        return driver_RTC_setMonth(month);
+    #else
+        // TODO
+    #endif
+}
+
+void core_time_setDate(unsigned char date){
+    #ifdef USE_RTC
+        return driver_RTC_setDate(date);
+    #else
+        // TODO
+    #endif
+}
+
+void core_time_setWeekDay(unsigned char weekDay){
+    #ifdef USE_RTC
+        return driver_RTC_setWeekDay(weekDay);
+    #else
+        // TODO
+    #endif
+}
+
 
 //#define EVENT_ON_TIME_CHANGED              0x03
 long lastTimeChange = millis()/ON_TIME_CHANGE_EVERY_MS;

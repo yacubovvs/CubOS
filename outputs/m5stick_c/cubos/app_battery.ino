@@ -1,3 +1,8 @@
+/* 
+*/
+#define BATTERY_ENABLE
+// */
+
 #define appNameClass    BatteryApp              // App name without spaces
 #define appName         "Battery"              // App name with spaces 
 
@@ -31,13 +36,13 @@ void appNameClass::onCreate(){
 
     setDrawColor(255, 255, 255);
     #ifdef BATTERY_ENABLE
-        drawString("Max analog: " + String(getMaxBatteryAnalogValue()), 5, STYLE_STATUSBAR_HEIGHT + 0*20 + 10, 2);
-        drawString("Raw battery: " + String(driver_battery_raw()), 5, STYLE_STATUSBAR_HEIGHT + 1*20 + 10, 2);
-        drawString("Voltage: " + String(driver_battery_getmVoltage()) + "0 mV", 5, STYLE_STATUSBAR_HEIGHT + 2*20 + 10, 2);
+        drawString("Max analog: " + String(getMaxBatteryAnalogValue()), 5, STYLE_STATUSBAR_HEIGHT + 0*20 + 10, FONT_SIZE_DEFAULT);
+        drawString("Raw battery: " + String(driver_battery_raw()), 5, STYLE_STATUSBAR_HEIGHT + 1*20 + 10, FONT_SIZE_DEFAULT);
+        drawString("Voltage: " + String(driver_battery_getmVoltage()) + "0 mV", 5, STYLE_STATUSBAR_HEIGHT + 2*20 + 10, FONT_SIZE_DEFAULT);
         //drawString("Voltage: " + String(driver_battery_getVoltage() + " V"), 5, STYLE_STATUSBAR_HEIGHT + 3*20 + 10, 2);
-        drawString("Percent: " + String(driver_battery_getPercent()), 5, STYLE_STATUSBAR_HEIGHT + 4*20 + 10, 2);
+        drawString("Percent: " + String(driver_battery_getPercent()), 5, STYLE_STATUSBAR_HEIGHT + 4*20 + 10, FONT_SIZE_DEFAULT);
     #else
-        drawString("Battery not supported", 5, STYLE_STATUSBAR_HEIGHT + 0*20 + 10, 2);
+        drawString("Battery not supported", 5, STYLE_STATUSBAR_HEIGHT + 0*20 + 10, FONT_SIZE_DEFAULT);
     #endif
     
 }

@@ -1,3 +1,10 @@
+/* 
+* /
+#define DRIVER_CONTROLS_TOTALBUTTONS 1
+#define MAIN_MENU_SMOOTH_ANIMATION
+#define NARROW_SCREEN
+// */
+
 #define appNameClass    SettingsApp     // App name without spaces
 #define appName         "Settings"      // App name with spaces 
 
@@ -51,7 +58,9 @@
 #define APP_SETTINGS_SUBMENU_SET_DATE       0x02
 
 // SETTINGS PAGES
-#define APP_SETTINGS_PAGE_TOTAL_ELEMENTS_MAIN 4
+#define APP_SETTINGS_PAGE_TOTAL_ELEMENTS_MAIN       4
+#define APP_SETTINGS_PAGE_TOTAL_ELEMENTS_SET_TIME   3
+#define APP_SETTINGS_PAGE_TOTAL_ELEMENTS_SET_DATE   4
 
 // # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # //
 
@@ -114,6 +123,7 @@ class appNameClass: public Application{
         String lastDateString_year      = "";
         String lastDateString_month     = "";
         String lastDateString_date      = "";
+        String lastDateString_weekDay   = "";
 
         #if (DRIVER_CONTROLS_TOTALBUTTONS == 2 || DRIVER_CONTROLS_TOTALBUTTONS == 1)
             unsigned long stillPressingSelect_time = 0;
@@ -131,10 +141,14 @@ unsigned char appNameClass::getTotalPagesInSubMenu(unsigned char submenuType){
 
 unsigned char appNameClass::getTotalApplicationsInSubMenu(unsigned char submenuType){
     switch (submenuType){
-    case APP_SETTINGS_SUBMENU_MAIN:
-        return APP_SETTINGS_PAGE_TOTAL_ELEMENTS_MAIN;
-    default:
-        return APP_SETTINGS_PAGE_TOTAL_ELEMENTS_MAIN;
+        case APP_SETTINGS_SUBMENU_MAIN:
+            return APP_SETTINGS_PAGE_TOTAL_ELEMENTS_MAIN;
+        case APP_SETTINGS_SUBMENU_SET_TIME:
+            return APP_SETTINGS_PAGE_TOTAL_ELEMENTS_SET_TIME;
+        case APP_SETTINGS_SUBMENU_SET_DATE:
+            return APP_SETTINGS_PAGE_TOTAL_ELEMENTS_SET_DATE;
+        default:
+            return APP_SETTINGS_PAGE_TOTAL_ELEMENTS_MAIN;
     }
 }
 
@@ -253,7 +267,6 @@ void appNameClass::onCreate(){
 
     this->drawSettingsPageFirstTime();
     this->currentSubMenu = APP_SETTINGS_SUBMENU_MAIN;
-    //switchToSubMenu(APP_SETTINGS_SUBMENU_SET_TIME);
 }
 
 
@@ -276,13 +289,13 @@ void appNameClass::updateActiveAppIndex(int newSelectedAppIndex){
     if( (int)((app_settings_selectedAppIndex)/APPS_ON_SINGLE_PAGE) != (int)((newSelectedAppIndex)/APPS_ON_SINGLE_PAGE)){
       // update page
       this->drawIcons(false);
-      if(currentSubMenu!=APP_SETTINGS_SUBMENU_SET_TIME){
+      if(currentSubMenu!=APP_SETTINGS_SUBMENU_SET_TIME && currentSubMenu!=APP_SETTINGS_SUBMENU_SET_DATE){
         core_views_draw_active_page(false, PAGES_LIST_POSITION, getTotalPagesInSubMenu(currentSubMenu), (int)(app_settings_selectedAppIndex/APPS_ON_SINGLE_PAGE));
       }
       
       app_settings_selectedAppIndex = newSelectedAppIndex;
 
-      if(currentSubMenu!=APP_SETTINGS_SUBMENU_SET_TIME){
+      if(currentSubMenu!=APP_SETTINGS_SUBMENU_SET_TIME && currentSubMenu!=APP_SETTINGS_SUBMENU_SET_DATE){
         core_views_draw_active_page(true, PAGES_LIST_POSITION, getTotalPagesInSubMenu(currentSubMenu), (int)(app_settings_selectedAppIndex/APPS_ON_SINGLE_PAGE));
       }
       this->drawIcons(true);
@@ -334,9 +347,6 @@ void appNameClass::drawIcons(bool draw){
                         int appElementDraw = app_num - elementDraw;
                         while(appElementDraw<0) appElementDraw+=getTotalPagesInSubMenu(currentSubMenu);
                         appElementDraw = appElementDraw%getTotalPagesInSubMenu(currentSubMenu);
-
-                        //APP_SETTINGS_SUBMENU_MAIN
-                        //APP_SETTINGS_SUBMENU_SET_TIME
 
                         if(currentSubMenu==APP_SETTINGS_SUBMENU_MAIN){
                             core_views_draw_settings_item(
@@ -476,15 +486,15 @@ void appNameClass::onLoop(){
             switch(app_settings_selectedAppIndex){
                 case 0:
                     // Add hours
-                    driver_RTC_setHours(driver_RTC_getHours() + 1);
+                    core_time_setHours(core_time_getHours_byte() + 1);
                     break;
                 case 1:
                     // Add minutes
-                    driver_RTC_setMinutes(driver_RTC_getMinutes() + 1);
+                    core_time_setMinutes(core_time_getMinutes_byte() + 1);
                     break;
                 case 2:
                     // Reset seconds
-                    driver_RTC_setSeconds(0);
+                    core_time_setSeconds(0);
                     break;
             } 
             this->drawIcons(false);
@@ -496,15 +506,19 @@ void appNameClass::onLoop(){
             switch(app_settings_selectedAppIndex){
                 case 0:
                     // Add year
-                    //driver_RTC_setHours(driver_RTC_getHours() + 1);
+                    core_time_setYear(core_time_getYear() + 1);
                     break;
                 case 1:
                     // Add month
-                    //driver_RTC_setMinutes(driver_RTC_getMinutes() + 1);
+                    core_time_setMonth(core_time_getMonth() + 1);
                     break;
                 case 2:
-                    // Add dat
-                    //driver_RTC_setSeconds(0);
+                    // Add date
+                    core_time_setDate(core_time_getDate() + 1);
+                    break;
+                case 3:
+                    // Set week day
+                    core_time_setWeekDay(core_time_getWeekDay() + 1);
                     break;
             } 
             this->drawIcons(false);
@@ -533,14 +547,16 @@ void appNameClass::pressNext(){
     #ifdef MAIN_MENU_SMOOTH_ANIMATION
         this->scroll_x += SCREEN_WIDTH;
     #endif
-    this->updateActiveAppIndex(app_settings_selectedAppIndex+1);
-
-    if(currentSubMenu==APP_SETTINGS_SUBMENU_SET_TIME){
-        if(app_settings_selectedAppIndex>=3){
+    
+    if(currentSubMenu==APP_SETTINGS_SUBMENU_SET_TIME || currentSubMenu==APP_SETTINGS_SUBMENU_SET_DATE){
+        if(app_settings_selectedAppIndex>=this->getTotalApplicationsInSubMenu(currentSubMenu)-1){
             this->scroll_x = 0;
             switchToSubMenu(APP_SETTINGS_SUBMENU_MAIN);
+            return;
         }
     }
+
+    this->updateActiveAppIndex(this->app_settings_selectedAppIndex+1);
 }
 
 void appNameClass::pressSelect(){
@@ -570,11 +586,11 @@ void appNameClass::onEvent(unsigned char event, int val1, int val2){
         #if (DRIVER_CONTROLS_TOTALBUTTONS == 2 || DRIVER_CONTROLS_TOTALBUTTONS == 1)
             
             if(event==EVENT_BUTTON_PRESSED){
-                if(currentSubMenu==APP_SETTINGS_SUBMENU_SET_TIME){
+                if(currentSubMenu==APP_SETTINGS_SUBMENU_SET_TIME || currentSubMenu==APP_SETTINGS_SUBMENU_SET_DATE){
                     if(this->stillPressingSelect_time==0) this->stillPressingSelect_time = millis();
                 }  
             }else if(event==EVENT_BUTTON_RELEASED){
-                if(currentSubMenu==APP_SETTINGS_SUBMENU_SET_TIME){
+                if(currentSubMenu==APP_SETTINGS_SUBMENU_SET_TIME || currentSubMenu==APP_SETTINGS_SUBMENU_SET_DATE){
                     this->stillPressingSelect_time = 0;
                 }
             }else if(event==EVENT_BUTTON_LONG_PRESS){
@@ -787,6 +803,8 @@ const unsigned char* appNameClass::getApplicationTitle(unsigned char submenu, un
                     return (const unsigned char*)"Month";
                 case 2:
                     return (const unsigned char*)"Day";          
+                case 3:
+                    return (const unsigned char*)"Day"; 
                 default:
                     return (const unsigned char*)"-";
                     break;
@@ -867,21 +885,28 @@ String appNameClass::getApplicationSubTitle(unsigned char submenu, unsigned char
                 case 0:
                     if(getLast) return this->lastDateString_year;
                     else{
-                        this->lastDateString_year = core_time_getYearDate();
+                        this->lastDateString_year = core_time_getYear();
                         return this->lastDateString_year;
                     }   
                 case 1:
                     if(getLast) return this->lastDateString_month;
                     else{
-                        this->lastDateString_month = core_time_getMonthDate();
+                        this->lastDateString_month = core_time_getMonth_stringShort();
                         return this->lastDateString_month;
                     }   
                 case 2:
                     if(getLast) return this->lastDateString_date;
                     else{
-                        this->lastDateString_date = core_time_getDayDate();
+                        this->lastDateString_date = core_time_getDate();
                         return this->lastDateString_date;
                     }   
+                case 3:
+                    if(getLast) return this->lastDateString_weekDay;
+                    else{
+                        this->lastDateString_weekDay = core_time_getWeekDay_stringShort();
+                        return this->lastDateString_weekDay;
+                    }   
+                    
                 default:
                     return "-";
                     break;

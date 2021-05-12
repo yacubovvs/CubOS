@@ -56,18 +56,52 @@ unsigned char driver_RTC_getTemperature(){
 	return 0;
 }
 
+unsigned char driver_RTC_getWeekDay(){
+	return RTC_DateStruct.WeekDay;
+}
+
+void driver_RTC_setWeekDay(unsigned char weekDay){
+	weekDay = weekDay%7;
+	RTC_DateStruct.WeekDay = weekDay;
+	M5.Rtc.SetData(&RTC_DateStruct);
+}
+
 unsigned char driver_RTC_getDate(){
-	return RTC_DateStruct.Month;
+	return RTC_DateStruct.Date;
+}
+
+void driver_RTC_setDate(unsigned char date){
+	date = date%31;
+	RTC_DateStruct.Date = date;
+	M5.Rtc.SetData(&RTC_DateStruct);
 }
 
 unsigned char driver_RTC_getMonth(){
 	return RTC_DateStruct.Month;
 }
 
-uint16_t driver_RTC_getYear(){
-	return RTC_DateStruct.Month;
+void driver_RTC_setMonth(unsigned char month){
+	month = month%12;
+	RTC_DateStruct.Month = month;
+	M5.Rtc.SetData(&RTC_DateStruct);
 }
 
-unsigned char driver_RTC_getWeekDay(){
-	return RTC_DateStruct.WeekDay;
+uint16_t driver_RTC_getYear(){
+	return RTC_DateStruct.Year;
+}
+
+
+void driver_RTC_setYear(int year){
+	#ifndef RTC_MIN_YEAR
+		#define RTC_MIN_YEAR 2020
+	#endif
+	#ifndef RTC_MAX_YEAR
+		#define RTC_MAX_YEAR 2070
+	#endif
+
+	if(year<RTC_MIN_YEAR) year = RTC_MAX_YEAR;
+	if(year>RTC_MAX_YEAR) year = RTC_MIN_YEAR;
+	
+	RTC_DateStruct.Year = year;
+	M5.Rtc.SetData(&RTC_DateStruct);
 }

@@ -193,6 +193,10 @@ void debug(String string){
   debug(string, 0);
 }
 
+void debug(int string){
+  debug(String(string), 0);
+}
+
 void debug(String string, int delaytime){
     #ifdef TERMINAL_DEBUG
       int str_len = string.length() + 1;

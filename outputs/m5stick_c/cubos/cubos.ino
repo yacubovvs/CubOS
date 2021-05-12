@@ -128,7 +128,7 @@
 //#define toDefaultApp_onLeftLongPress
 
 #define STARTING_APP_NUMM   -1    // for Mainmenu (default app)
-#define STARTING_APP_NUMM    1
+#define STARTING_APP_NUMM    7
 
 #define FONT_SIZE_DEFAULT   1
 
@@ -355,6 +355,10 @@ void loop(){
 
 void debug(String string){
   debug(string, 0);
+}
+
+void debug(int string){
+  debug(String(string), 0);
 }
 
 void debug(String string, int delaytime){
