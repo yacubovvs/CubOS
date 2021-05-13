@@ -19,12 +19,12 @@ float driver_battery_getVoltage(){
     return (float)LION_EMULATOR_BATTERY_VOLTAGE_100 / 100.0;
 }
 
-int driver_battery_getmVoltage(){
+int driver_battery_getVoltage_mV(){
     return LION_EMULATOR_BATTERY_VOLTAGE_100;
 }
 
 unsigned char driver_battery_getPercent(){
-    int mV = driver_battery_getmVoltage();
+    int mV = driver_battery_getVoltage_mV();
     if(mV>=400){
         return 100;
     }else if(mV<=320){

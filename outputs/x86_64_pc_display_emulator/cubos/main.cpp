@@ -567,12 +567,12 @@ float driver_battery_getVoltage(){
     return (float)LION_EMULATOR_BATTERY_VOLTAGE_100 / 100.0;
 }
 
-int driver_battery_getmVoltage(){
+int driver_battery_getVoltage_mV(){
     return LION_EMULATOR_BATTERY_VOLTAGE_100;
 }
 
 unsigned char driver_battery_getPercent(){
-    int mV = driver_battery_getmVoltage();
+    int mV = driver_battery_getVoltage_mV();
     if(mV>=400){
         return 100;
     }else if(mV<=320){
@@ -2185,7 +2185,7 @@ void core_time_loop(){
     }
 }
 
-unsigned char core_batteryGetPercent(){
+unsigned char core_battery_getPercent(){
     #ifdef BATTERY_ENABLE
         return driver_battery_getPercent();
     #else
@@ -2855,7 +2855,7 @@ void appNameClass::onCreate(){
     #ifdef BATTERY_ENABLE
         drawString("Max analog: " + String(getMaxBatteryAnalogValue()), 5, STYLE_STATUSBAR_HEIGHT + 0*20 + 10, 2);
         drawString("Raw battery: " + String(driver_battery_raw()), 5, STYLE_STATUSBAR_HEIGHT + 1*20 + 10, 2);
-        drawString("Voltage: " + String(driver_battery_getmVoltage()) + "0 mV", 5, STYLE_STATUSBAR_HEIGHT + 2*20 + 10, 2);
+        drawString("Voltage: " + String(driver_battery_getVoltage_mV()) + "0 mV", 5, STYLE_STATUSBAR_HEIGHT + 2*20 + 10, 2);
         //drawString("Voltage: " + String(driver_battery_getVoltage() + " V"), 5, STYLE_STATUSBAR_HEIGHT + 3*20 + 10, 2);
         drawString("Percent: " + String(driver_battery_getPercent()), 5, STYLE_STATUSBAR_HEIGHT + 4*20 + 10, 2);
     #else
@@ -3485,7 +3485,7 @@ String appNameClass::getApplicationSubTitle(unsigned char submenu, unsigned char
                         return "-";
                     #endif
                 case 3:
-                    return String(core_batteryGetPercent()) + "%";
+                    return String(core_battery_getPercent()) + "%";
                 case 4:
                     return "Calibrate";
                 default:

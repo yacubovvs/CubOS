@@ -845,7 +845,7 @@ String appNameClass::getApplicationSubTitle(unsigned char submenu, unsigned char
                 case 3:
                     if(getLast) return this->lastBatteryString;
                     else{
-                        this->lastBatteryString = String(core_batteryGetPercent()) + "%";
+                        this->lastBatteryString = String(core_battery_getPercent()) + "%";
                         return this->lastBatteryString;
                     }
                 case 4:

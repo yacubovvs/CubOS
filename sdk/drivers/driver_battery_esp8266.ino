@@ -24,14 +24,14 @@ float driver_battery_getVoltage(){
     return voltage;
 }
 
-int driver_battery_getmVoltage(){
+int driver_battery_getVoltage_mV(){
     int analogValue = driver_battery_raw();
     long voltage = 420*((float)analogValue)/((float)getMaxBatteryAnalogValue());
     return (int)voltage;
 }
 
 unsigned char driver_battery_getPercent(){
-    int mV = driver_battery_getmVoltage();
+    int mV = driver_battery_getVoltage_mV();
     if(mV>=400){
         return 100;
     }else if(mV<=320){

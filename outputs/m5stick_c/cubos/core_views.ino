@@ -124,11 +124,49 @@ void core_views_statusBar_draw(){
 
     // BATTERY
     #ifdef BATTERY_ENABLE
-        drawIcon(true, battery100,SCREEN_WIDTH-32-STYLE_STATUSBAR_HEIGHT/5, STYLE_STATUSBAR_HEIGHT/2 - 8 + 1);
-        if(DRAW_LIMITS_Enabled) debug("Draw limit enabled");
+        core_views_draw_statusbar_battery(true, driver_battery_getPercent());
+        //drawIcon(true, battery100,SCREEN_WIDTH-32-STYLE_STATUSBAR_HEIGHT/5, STYLE_STATUSBAR_HEIGHT/2 - 8 + 1);
+        //if(DRAW_LIMITS_Enabled) debug("Draw limit enabled");
     #endif
 
     DRAW_LIMITS_setEnable(DRAW_LIMITS_Enabled);
+}
+
+unsigned char batteryCharge_last = 0;
+void core_views_draw_statusbar_battery(bool draw, unsigned char batteryCharge){
+    TEMPORARILY_DISABLE_BACKGROUND();
+
+    setBackgroundColor(STYLE_STATUSBAR_BACKGROUND_RED, STYLE_STATUSBAR_BACKGROUND_GREEN, STYLE_STATUSBAR_BACKGROUND_BLUE);
+    if(draw) batteryCharge_last = batteryCharge;
+
+    const unsigned char *batteryIcon;
+    if(batteryCharge_last>=100){
+        batteryIcon = battery100;
+    }else if(batteryCharge_last>=90){
+        batteryIcon = battery90;
+    }else if(batteryCharge_last>=80){
+        batteryIcon = battery80;
+    }else if(batteryCharge_last>=70){
+        batteryIcon = battery70;
+    }else if(batteryCharge_last>=60){
+        batteryIcon = battery60;
+    }else if(batteryCharge_last>=50){
+        batteryIcon = battery50;
+    }else if(batteryCharge_last>=40){
+        batteryIcon = battery40;
+    }else if(batteryCharge_last>=30){
+        batteryIcon = battery30;
+    }else if(batteryCharge_last>=20){
+        batteryIcon = battery20;
+    }else if(batteryCharge_last>=10){
+        batteryIcon = battery10;
+    }else{
+        batteryIcon = battery0;
+    }
+
+    drawIcon(draw, batteryIcon, SCREEN_WIDTH-32-STYLE_STATUSBAR_HEIGHT/5, STYLE_STATUSBAR_HEIGHT/2 - 8 + 1);
+
+    TEMPORARILY_RESTORE_BACKGROUND();
 }
 
 String core_views_statusBar_draw_time_TimeString = "";

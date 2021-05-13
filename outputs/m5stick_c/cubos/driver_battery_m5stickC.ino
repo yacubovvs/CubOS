@@ -1,45 +1,69 @@
-int maxBatteryAnalogValue = 890;
-
-int getMaxBatteryAnalogValue(){
-    return maxBatteryAnalogValue;
-}
+#include <M5StickC.h>
+#include "AXP192.h"
 
 void driver_battery_setup(){
+    //M5.Axp.EnableCoulombcounter();
+    M5.Axp.SetChargeCurrent(CURRENT_100MA); // For M5StickC
 }
 
 void driver_battery_loop(){
-
-}
-
-int driver_battery_raw(){
-    //int analogValue = analogRead(A0);
-    //if(analogValue>getMaxBatteryAnalogValue()) maxBatteryAnalogValue=analogValue;
-    return 890;
 }
 
 float driver_battery_getVoltage(){
-    //int analogValue = driver_battery_raw();
-    //float voltage = 4.2/((float)getMaxBatteryAnalogValue())*((float)analogValue);
-    float voltage = 4.2;
-    return voltage;
+    return M5.Axp.GetBatVoltage();
 }
 
-int driver_battery_getmVoltage(){
-    //int analogValue = driver_battery_raw();
-    //int voltage = 420*((float)analogValue)/((float)getMaxBatteryAnalogValue());
-    int voltage = 420;
-    return voltage;
+int driver_battery_getVoltage_mV(){
+    float voltage = driver_battery_getVoltage();
+    return (int)(voltage*1000);
+}
+
+float driver_battery_getCurent_mA(){
+    return M5.Axp.GetBatCurrent();
+}
+
+float driver_battery_getUsbVoltage(){
+    return M5.Axp.GetVBusVoltage();
+}
+
+float driver_battery_getUsbCurent_mA(){
+    return M5.Axp.GetVBusCurrent();
+}
+
+float driver_battery_getVinVoltage(){
+    return M5.Axp.GetVinVoltage();
+}
+
+float driver_battery_getVinCurent_mA(){
+    return M5.Axp.GetVinCurrent();
+}
+
+float driver_battery_controller_Temp(){
+    M5.Axp.GetTempInAXP192();
+}
+
+float driver_battery_Temp(){
+    M5.Axp.GetTempInAXP192();
 }
 
 unsigned char driver_battery_getPercent(){
-    int mV = driver_battery_getmVoltage();
-    if(mV>=400){
+    int mV = driver_battery_getVoltage_mV();
+    if(mV>=4000){
         return 100;
-    }else if(mV<=320){
+    }else if(mV<=3200){
         return 0;
     }else{
-        int dmV = mV - 320;
-        return dmV*100/80;
+        int dmV = mV - 3200;
+        return dmV*10/80;
     }
     return 0;
 }
+
+bool driver_battery_isCharging(){
+    return true;
+}
+
+/* 
+Unused:  
+M5.Axp.GetBatPower() - (mW)
+*/

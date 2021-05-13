@@ -86,6 +86,8 @@
 // #define MAIN_MENU_SMOOTH_ANIMATION
 // #define NARROW_SCREEN
 
+#define UPDATE_BATTERY_EVERY_MS 10000
+
 /*
     ############################################################################################
     #                                                                                          #
@@ -308,7 +310,7 @@ void loop(){
   #endif
 
   #ifdef BATTERY_ENABLE
-    driver_battery_loop();
+    core_battery_loop();
   #endif
 
   #ifdef CLOCK_ENABLE
@@ -437,6 +439,12 @@ void debug(const char* string){
     ############################################################################################
 */
 
+// HELPERS
+#define TEMPORARILY_DISABLE_LIMITS() bool DRAW_LIMITS_wasEnable = DRAW_LIMITS_getEnable(); DRAW_LIMITS_setEnable(false);
+#define TEMPORARILY_RESTORE_LIMITS() DRAW_LIMITS_setEnable(DRAW_LIMITS_wasEnable);
+
+#define TEMPORARILY_DISABLE_BACKGROUND() unsigned char tdbg_r = getBackgroundColor_red(); unsigned char tdbg_g = getBackgroundColor_green(); unsigned char tdbg_b = getBackgroundColor_blue();
+#define TEMPORARILY_RESTORE_BACKGROUND() setBackgroundColor(tdbg_r, tdbg_g, tdbg_b);
 /*
     ############################################################################################
     #                                                                                          #
