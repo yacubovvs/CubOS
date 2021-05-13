@@ -86,7 +86,7 @@
 // #define MAIN_MENU_SMOOTH_ANIMATION
 // #define NARROW_SCREEN
 
-#define UPDATE_BATTERY_EVERY_MS 10000
+#define UPDATE_BATTERY_EVERY_MS 3000
 
 /*
     ############################################################################################

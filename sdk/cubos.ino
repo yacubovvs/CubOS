@@ -243,17 +243,18 @@ void debug(const char* string){
 #define ICON_ARROW_DOWN             0x04
 #define ICON_BATTERY_UNKNOWN        0x05
 
-#define ICON_BATTERY_100            0x06
-#define ICON_BATTERY_90             0x07
-#define ICON_BATTERY_80             0x08
-#define ICON_BATTERY_70             0x09
-#define ICON_BATTERY_60             0x0A
-#define ICON_BATTERY_50             0x0B
-#define ICON_BATTERY_40             0x0C
-#define ICON_BATTERY_30             0x0D
-#define ICON_BATTERY_20             0x0E
-#define ICON_BATTERY_10             0x0F
-#define ICON_BATTERY_0              0x10
+#define ICON_BATTERY_CHARGING       0x06
+#define ICON_BATTERY_100            0x07
+#define ICON_BATTERY_90             0x08
+#define ICON_BATTERY_80             0x09
+#define ICON_BATTERY_70             0x0A
+#define ICON_BATTERY_60             0x0B
+#define ICON_BATTERY_50             0x0C
+#define ICON_BATTERY_40             0x0D
+#define ICON_BATTERY_30             0x0E
+#define ICON_BATTERY_20             0x0F
+#define ICON_BATTERY_10             0x10
+#define ICON_BATTERY_0              0x11
 
 #define ICON_WIFI_CONNECTED         0x11
 #define ICON_WIFI_NOTCONNECTED      0x12

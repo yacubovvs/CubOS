@@ -210,7 +210,7 @@ uint16_t core_time_getYear(){
 }
 
 String core_time_getDateFull(){
-    return String(core_time_getDate()) + " " + String(core_time_getMonth()) + " " + String(core_time_getYear());
+    return core_basic_addLeadBullToInt2digits(core_time_getDate()) + "." + core_basic_addLeadBullToInt2digits(core_time_getMonth()) + "." + String(core_time_getYear());
 }
 
 void core_time_setYear(uint16_t year){

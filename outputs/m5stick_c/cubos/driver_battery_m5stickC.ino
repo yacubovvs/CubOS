@@ -60,7 +60,7 @@ unsigned char driver_battery_getPercent(){
 }
 
 bool driver_battery_isCharging(){
-    return true;
+    return driver_battery_getCurent_mA()>0;
 }
 
 /* 
