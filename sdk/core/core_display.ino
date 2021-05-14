@@ -132,6 +132,44 @@ bool DRAW_LIMITS_getEnable(){
 
 /*
 * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * 
+                                  POWER CONTROLL
+* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * 
+*/
+
+unsigned char core_display_brightness             = 100;
+unsigned char core_display_brightness_fade        = 50;
+unsigned char core_display_time_delay_to_fade     = 10;
+unsigned char core_display_time_delay_to_poweroff = 15;
+
+void set_core_display_brightness(unsigned char value){ 
+  if(value>100) value = 100;
+  core_display_brightness = value;
+  driver_display_setBrightness(core_display_brightness);
+}
+
+void set_core_display_brightness_fade(unsigned char value){ 
+  if(value>100) value = 100;
+  core_display_brightness_fade = value;
+}
+
+void set_core_display_time_delay_to_fade(unsigned char value){
+  if(value>240) value = 240;
+  core_display_time_delay_to_fade = value;
+}
+
+void set_core_display_time_delay_to_poweroff(unsigned char value){ 
+  if(value==0) value = 1;
+  if(value>240) value = 240;
+  core_display_time_delay_to_poweroff = value;
+}
+
+unsigned char get_core_display_brightness(){return core_display_brightness; }
+unsigned char get_core_display_brightness_fade(){return core_display_brightness_fade; }
+unsigned char get_core_display_time_delay_to_fade(){return core_display_time_delay_to_fade; }
+unsigned char get_core_display_time_delay_to_poweroff(){return core_display_time_delay_to_poweroff; }
+
+/*
+* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * 
                                   DISPLAY FUNCTIONS
 * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * 
 */

@@ -81,6 +81,10 @@ void appNameClass::onEvent(unsigned char event, int val1, int val2){
         this->draw_current_time(false);
     }else if(event==EVENT_ON_WAKE_UP){
         this->draw_current_time(true);
+    }else if(event==EVENT_ON_TOUCH_DOUBLE_PRESS){
+        if(val1==BUTTON_SELECT){
+            startApp(-1);
+        }
     }
     
 }

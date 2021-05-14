@@ -56,11 +56,15 @@
 #define APP_SETTINGS_SUBMENU_MAIN           0x00
 #define APP_SETTINGS_SUBMENU_SET_TIME       0x01
 #define APP_SETTINGS_SUBMENU_SET_DATE       0x02
+#define APP_SETTINGS_SUBMENU_SCREEN         0x03
+//#define APP_SETTINGS_SUBMENU_POWERSAVE      0x04
 
 // SETTINGS PAGES
-#define APP_SETTINGS_PAGE_TOTAL_ELEMENTS_MAIN       4
+#define APP_SETTINGS_PAGE_TOTAL_ELEMENTS_MAIN       3
 #define APP_SETTINGS_PAGE_TOTAL_ELEMENTS_SET_TIME   3
 #define APP_SETTINGS_PAGE_TOTAL_ELEMENTS_SET_DATE   4
+#define APP_SETTINGS_PAGE_TOTAL_ELEMENTS_SCREEN     4
+
 
 // # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # //
 
@@ -147,6 +151,8 @@ unsigned char appNameClass::getTotalApplicationsInSubMenu(unsigned char submenuT
             return APP_SETTINGS_PAGE_TOTAL_ELEMENTS_SET_TIME;
         case APP_SETTINGS_SUBMENU_SET_DATE:
             return APP_SETTINGS_PAGE_TOTAL_ELEMENTS_SET_DATE;
+        case APP_SETTINGS_SUBMENU_SCREEN:
+            return APP_SETTINGS_PAGE_TOTAL_ELEMENTS_SCREEN;
         default:
             return APP_SETTINGS_PAGE_TOTAL_ELEMENTS_MAIN;
     }
@@ -188,6 +194,16 @@ void appNameClass::drawSettingsPageFirstTime(){
         #endif
 
     }else if(currentSubMenu==APP_SETTINGS_SUBMENU_SET_DATE){
+
+        #ifdef NARROW_SCREEN
+            this->drawIcons(true);
+        #else
+            /*
+            TODO
+            */
+        #endif
+
+    }else if(currentSubMenu==APP_SETTINGS_SUBMENU_SCREEN){
 
         #ifdef NARROW_SCREEN
             this->drawIcons(true);
@@ -289,13 +305,21 @@ void appNameClass::updateActiveAppIndex(int newSelectedAppIndex){
     if( (int)((app_settings_selectedAppIndex)/APPS_ON_SINGLE_PAGE) != (int)((newSelectedAppIndex)/APPS_ON_SINGLE_PAGE)){
       // update page
       this->drawIcons(false);
-      if(currentSubMenu!=APP_SETTINGS_SUBMENU_SET_TIME && currentSubMenu!=APP_SETTINGS_SUBMENU_SET_DATE){
+      if(
+          currentSubMenu!=APP_SETTINGS_SUBMENU_SET_TIME 
+          && currentSubMenu!=APP_SETTINGS_SUBMENU_SET_DATE
+          && currentSubMenu!=APP_SETTINGS_SUBMENU_SCREEN
+          ){
         core_views_draw_active_page(false, PAGES_LIST_POSITION, getTotalPagesInSubMenu(currentSubMenu), (int)(app_settings_selectedAppIndex/APPS_ON_SINGLE_PAGE));
       }
       
       app_settings_selectedAppIndex = newSelectedAppIndex;
 
-      if(currentSubMenu!=APP_SETTINGS_SUBMENU_SET_TIME && currentSubMenu!=APP_SETTINGS_SUBMENU_SET_DATE){
+      if(
+          currentSubMenu!=APP_SETTINGS_SUBMENU_SET_TIME 
+          && currentSubMenu!=APP_SETTINGS_SUBMENU_SET_DATE
+          && currentSubMenu!=APP_SETTINGS_SUBMENU_SCREEN
+          ){
         core_views_draw_active_page(true, PAGES_LIST_POSITION, getTotalPagesInSubMenu(currentSubMenu), (int)(app_settings_selectedAppIndex/APPS_ON_SINGLE_PAGE));
       }
       this->drawIcons(true);
@@ -357,7 +381,12 @@ void appNameClass::drawIcons(bool draw){
                                 this->getApplicationSubTitle(currentSubMenu, appElementDraw, !draw), 
                                 this->getApplicationIcon(currentSubMenu, appElementDraw)
                             );
-                        }else if(currentSubMenu==APP_SETTINGS_SUBMENU_SET_TIME || currentSubMenu==APP_SETTINGS_SUBMENU_SET_DATE){
+                        }else if(
+                                    currentSubMenu==APP_SETTINGS_SUBMENU_SET_TIME 
+                                    || currentSubMenu==APP_SETTINGS_SUBMENU_SET_DATE 
+                                    || currentSubMenu==APP_SETTINGS_SUBMENU_SCREEN
+                                ){
+
                             String stringTitle = reinterpret_cast<const char*>(this->getApplicationTitle(currentSubMenu, appElementDraw));
 
                             core_views_draw_settings_item_noicon(
@@ -385,7 +414,11 @@ void appNameClass::drawIcons(bool draw){
                         this->getApplicationSubTitle(currentSubMenu, app_num, !draw), 
                         this->getApplicationIcon(currentSubMenu, app_num)
                     );
-                }else if(currentSubMenu==APP_SETTINGS_SUBMENU_SET_TIME || currentSubMenu==APP_SETTINGS_SUBMENU_SET_DATE){
+                }else if(
+                            currentSubMenu==APP_SETTINGS_SUBMENU_SET_TIME 
+                            || currentSubMenu==APP_SETTINGS_SUBMENU_SET_DATE
+                            || currentSubMenu==APP_SETTINGS_SUBMENU_SCREEN
+                        ){
                     String stringTitle = reinterpret_cast<const char*>(this->getApplicationTitle(currentSubMenu, app_num));
                     core_views_draw_settings_item_noicon(
                         draw, 
@@ -411,6 +444,8 @@ void appNameClass::drawIcons(bool draw){
             }else if(currentSubMenu==APP_SETTINGS_SUBMENU_SET_TIME){
                 // TODO
             }else if(currentSubMenu==APP_SETTINGS_SUBMENU_SET_DATE){
+                // TODO
+            }else if(currentSubMenu==APP_SETTINGS_SUBMENU_SCREEN){
                 // TODO
             }
         #endif
@@ -524,6 +559,56 @@ void appNameClass::onLoop(){
             this->drawIcons(false);
             this->drawIcons(true);
         }
+    }else if(currentSubMenu==APP_SETTINGS_SUBMENU_SCREEN){
+        if(stillPressingSelect_time!=0 && millis()-this->stillPressingSelect_time>=DRIVER_CONTROLS_DELAY_BEFORE_MULRI_PRESS){
+            stillPressingSelect_time = millis();
+            int value = 0;
+
+            this->drawIcons(false);
+            switch(app_settings_selectedAppIndex){
+                case 0:
+                    // Change display brightness
+                    value = get_core_display_brightness();
+                    if(value>=100) value = 0;
+                    else value+=10;
+                    set_core_display_brightness(value);
+                    break;
+                case 1:
+                    // Change display fade brightness
+                    value = get_core_display_brightness_fade();
+                    if(value>=100) value = 0;
+                    else value+=10;
+                    set_core_display_brightness_fade(value);
+                    break;
+                case 2:
+                    // Change time delay to fade
+                    value = get_core_display_time_delay_to_fade();
+                    if(value>=240) value = 0;
+                    else{
+                        if(value<4)         value+=1;
+                        else if(value<10)   value+=2;
+                        else if(value<30)   value+=5;
+                        else if(value<100)  value+=10;
+                        else value+=20;
+                    }
+                    set_core_display_time_delay_to_fade(value);
+                    break;
+                case 3:
+                    // Change time delay to poweroff
+                    value = get_core_display_time_delay_to_poweroff();
+                    if(value>=240) value = 1;
+                    else{
+                        if(value<4)         value+=1;
+                        else if(value<10)   value+=2;
+                        else if(value<30)   value+=5;
+                        else if(value<100)  value+=10;
+                        else value+=20;
+                    }
+                    set_core_display_time_delay_to_poweroff(value);
+                    break;
+            } 
+            this->drawIcons(true);
+        }
     }
 
     
@@ -548,7 +633,11 @@ void appNameClass::pressNext(){
         this->scroll_x += SCREEN_WIDTH;
     #endif
     
-    if(currentSubMenu==APP_SETTINGS_SUBMENU_SET_TIME || currentSubMenu==APP_SETTINGS_SUBMENU_SET_DATE){
+    if(
+            currentSubMenu==APP_SETTINGS_SUBMENU_SET_TIME || 
+            currentSubMenu==APP_SETTINGS_SUBMENU_SET_DATE || 
+            currentSubMenu==APP_SETTINGS_SUBMENU_SCREEN
+      ){
         if(app_settings_selectedAppIndex>=this->getTotalApplicationsInSubMenu(currentSubMenu)-1){
             this->scroll_x = 0;
             switchToSubMenu(APP_SETTINGS_SUBMENU_MAIN);
@@ -586,11 +675,19 @@ void appNameClass::onEvent(unsigned char event, int val1, int val2){
         #if (DRIVER_CONTROLS_TOTALBUTTONS == 2 || DRIVER_CONTROLS_TOTALBUTTONS == 1)
             
             if(event==EVENT_BUTTON_PRESSED){
-                if(currentSubMenu==APP_SETTINGS_SUBMENU_SET_TIME || currentSubMenu==APP_SETTINGS_SUBMENU_SET_DATE){
+                if(
+                    currentSubMenu==APP_SETTINGS_SUBMENU_SET_TIME 
+                    || currentSubMenu==APP_SETTINGS_SUBMENU_SET_DATE
+                    || currentSubMenu==APP_SETTINGS_SUBMENU_SCREEN
+                  ){
                     if(this->stillPressingSelect_time==0) this->stillPressingSelect_time = millis();
                 }  
             }else if(event==EVENT_BUTTON_RELEASED){
-                if(currentSubMenu==APP_SETTINGS_SUBMENU_SET_TIME || currentSubMenu==APP_SETTINGS_SUBMENU_SET_DATE){
+                if(
+                    currentSubMenu==APP_SETTINGS_SUBMENU_SET_TIME 
+                    || currentSubMenu==APP_SETTINGS_SUBMENU_SET_DATE
+                    || currentSubMenu==APP_SETTINGS_SUBMENU_SCREEN
+                    ){
                     this->stillPressingSelect_time = 0;
                 }
             }else if(event==EVENT_BUTTON_LONG_PRESS){
@@ -604,8 +701,10 @@ void appNameClass::onEvent(unsigned char event, int val1, int val2){
                             case 1:
                                 switchToSubMenu(APP_SETTINGS_SUBMENU_SET_DATE);
                                 break;
+                            case 2:
+                                switchToSubMenu(APP_SETTINGS_SUBMENU_SCREEN);
+                                break;
                         }
-                        
                     }
                 }else if(val1==BUTTON_BACK){
                     startApp(-1);
@@ -622,7 +721,11 @@ void appNameClass::onEvent(unsigned char event, int val1, int val2){
             }else if(event==EVENT_ON_TOUCH_DOUBLE_PRESS){
                 //debug("EVENT_ON_TOUCH_DOUBLE_PRESS");
                 if(val1==BUTTON_SELECT){
-                    if(currentSubMenu==APP_SETTINGS_SUBMENU_SET_TIME || currentSubMenu==APP_SETTINGS_SUBMENU_SET_DATE){
+                    if(
+                        currentSubMenu==APP_SETTINGS_SUBMENU_SET_TIME 
+                        || currentSubMenu==APP_SETTINGS_SUBMENU_SET_DATE
+                        || currentSubMenu==APP_SETTINGS_SUBMENU_SCREEN
+                      ){
                         this->pressNext();
                     } else startApp(-1);
                 }
@@ -650,6 +753,9 @@ void appNameClass::onEvent(unsigned char event, int val1, int val2){
                                     break;
                                 case 1:
                                     switchToSubMenu(APP_SETTINGS_SUBMENU_SET_DATE);    
+                                    break;
+                                case 2:
+                                    switchToSubMenu(APP_SETTINGS_SUBMENU_SCREEN);    
                                     break;
                                 }
                             }
@@ -687,6 +793,10 @@ void appNameClass::onEvent(unsigned char event, int val1, int val2){
                             break;
                     }
 
+                }else if(currentSubMenu==APP_SETTINGS_SUBMENU_SET_DATE){
+                    // TODO
+                }else if(currentSubMenu==APP_SETTINGS_SUBMENU_SCREEN){
+                    // TODO
                 }
             
             }else if(event==EVENT_BUTTON_RELEASED){
@@ -772,11 +882,9 @@ const unsigned char* appNameClass::getApplicationTitle(unsigned char submenu, un
                 case 1:
                     return (const unsigned char*)"Date";
                 case 2:
-                    return (const unsigned char*)"Sleep timout";
+                    return (const unsigned char*)"Screen";
                 case 3:
-                    return (const unsigned char*)"Battery";
-                case 4:
-                    return (const unsigned char*)"Compass";                
+                    return (const unsigned char*)"Power save";               
                 default:
                     return (const unsigned char*)"-";
                     break;
@@ -810,6 +918,21 @@ const unsigned char* appNameClass::getApplicationTitle(unsigned char submenu, un
                     break;
             }
             break;
+        case APP_SETTINGS_SUBMENU_SCREEN:
+            switch (num){
+                case 0:
+                    return (const unsigned char*)"Brightness";
+                case 1:
+                    return (const unsigned char*)"Fade bright.";
+                case 2:
+                    return (const unsigned char*)"Fade after";          
+                case 3:
+                    return (const unsigned char*)"Sleep after"; 
+                default:
+                    return (const unsigned char*)"-";
+                    break;
+            }
+            break;
         default:
             return (const unsigned char*)"-";
     }
@@ -837,11 +960,14 @@ String appNameClass::getApplicationSubTitle(unsigned char submenu, unsigned char
                         return this->lastDateString;
                     }
                 case 2:
+                    return String(get_core_display_brightness()) + "%";
+                    /*
                     #ifdef CPU_SLEEP_ENABLE
                         return String(core_cpu_getCpuSleepTimeDelay());
                     #else
                         return "-";
                     #endif
+                    */
                 case 3:
                     if(getLast) return this->lastBatteryString;
                     else{
@@ -910,6 +1036,20 @@ String appNameClass::getApplicationSubTitle(unsigned char submenu, unsigned char
                 default:
                     return "-";
                     break;
+            }
+            break;
+        case APP_SETTINGS_SUBMENU_SCREEN:
+            switch (num){
+                case 0:
+                    return String(get_core_display_brightness()) + " %";
+                case 1:
+                    return String(get_core_display_brightness_fade()) + " %"; 
+                case 2:
+                    return String(get_core_display_time_delay_to_fade()) + " s";  
+                case 3:
+                    return String(get_core_display_time_delay_to_poweroff()) + " s";  
+                default:
+                    return "-";
             }
             break;
         default:

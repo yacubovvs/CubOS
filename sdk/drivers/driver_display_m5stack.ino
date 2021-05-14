@@ -1,4 +1,3 @@
-/*
 #include <M5Stack.h>
 
 unsigned char red;
@@ -39,4 +38,10 @@ void fillScreen(unsigned char red, unsigned char green, unsigned char blue){
 void setPixel(int x, int y){
 	M5.Lcd.drawPixel(x, y, current_drawColor);
 }
-*/
+
+void driver_display_setBrightness(unsigned char brightness){
+  // brightness: 0..100%
+  brightness =  (unsigned char)((int)brightness*255/100);
+  M5.Lcd.setBrightness(brightness);
+}
+
