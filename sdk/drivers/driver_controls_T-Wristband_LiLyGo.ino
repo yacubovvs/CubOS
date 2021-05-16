@@ -36,6 +36,7 @@ void driver_controls_loop(){
         // press start
         driver_control_pressed[i]=true;
         driver_control_time_pressed[i] = _millis();
+        set_core_powersave_lastUserAction();
         onButtonEvent(EVENT_BUTTON_PRESSED, i);
         //debug("EVENT_BUTTON_PRESSED");
         if(driver_control_DOUBLE_PRESS_lastPress[i]!=0){
@@ -64,6 +65,7 @@ void driver_controls_loop(){
       if(driver_control_pressed[i]==true){
         // released
         driver_control_pressed[i]=false;
+        set_core_powersave_lastUserAction();
         onButtonEvent(EVENT_BUTTON_RELEASED, i);
         //debug("EVENT_BUTTON_RELEASED");
         

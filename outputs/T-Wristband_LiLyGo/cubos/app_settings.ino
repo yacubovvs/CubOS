@@ -961,13 +961,6 @@ String appNameClass::getApplicationSubTitle(unsigned char submenu, unsigned char
                     }
                 case 2:
                     return String(get_core_display_brightness()) + "%";
-                    /*
-                    #ifdef CPU_SLEEP_ENABLE
-                        return String(core_cpu_getCpuSleepTimeDelay());
-                    #else
-                        return "-";
-                    #endif
-                    */
                 case 3:
                     if(getLast) return this->lastBatteryString;
                     else{

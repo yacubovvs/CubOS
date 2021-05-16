@@ -42,5 +42,7 @@ cp sdk/core/core_display.ino            outputs/T-Wristband_LiLyGo/cubos/
 cp sdk/core/core_time.ino               outputs/T-Wristband_LiLyGo/cubos/  
 cp sdk/core/core_cpu.ino                outputs/T-Wristband_LiLyGo/cubos/  
 cp sdk/core/core_battery.ino            outputs/T-Wristband_LiLyGo/cubos/  
+cp sdk/core/core_powersave.ino          outputs/T-Wristband_LiLyGo/cubos/  
+
 
 echo Finished

@@ -151,9 +151,9 @@ bool DRAW_LIMITS_getEnable(){
 */
 
 unsigned char core_display_brightness             = 100;
-unsigned char core_display_brightness_fade        = 50;
-unsigned char core_display_time_delay_to_fade     = 10;
-unsigned char core_display_time_delay_to_poweroff = 15;
+unsigned char core_display_brightness_fade        = 5;
+unsigned char core_display_time_delay_to_fade     = 5;
+unsigned char core_display_time_delay_to_poweroff = 35;
 
 void set_core_display_brightness(unsigned char value){ 
   if(value>100) value = 100;

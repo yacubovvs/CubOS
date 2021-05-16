@@ -76,6 +76,7 @@
 #define UPDATE_RTC_EVERY 65
 #define I2C_ENABLE
 #define CPU_CONTROLL_ENABLE
+#define POWERSAVE_ENABLE
 
 #define FONT_SIZE_DEFAULT 2
 #define HARDWARE_BUTTONS_VALUE 3
@@ -130,14 +131,12 @@
 //#define toDefaultApp_onLeftLongPress
 
 #define STARTING_APP_NUMM   -1    // for Mainmenu (default app)
-#define STARTING_APP_NUMM    1 // Settings
+//#define STARTING_APP_NUMM    1 // Settings
 //#define STARTING_APP_NUMM    7 // Battery
 
 #define FONT_SIZE_DEFAULT   1
 
 //#define CPU_SLEEP_ENABLE
-//#define CPU_SLEEP_TIME_DELAY core_cpu_getCpuSleepTimeDelay()
-
 
 #define BATTERY_ENABLE
 #define CLOCK_ENABLE
@@ -295,6 +294,10 @@ void setup(){
   #ifdef TOUCH_SCREEN_ENABLE
     setup_touchScreenDriver();
   #endif
+
+  #ifdef POWERSAVE_ENABLE
+    core_powersave_setup();
+  #endif
   
   currentApp = getApp(STARTING_APP_NUMM);
   
@@ -320,6 +323,10 @@ void loop(){
 
   #ifdef CLOCK_ENABLE
     core_time_loop();
+  #endif
+
+  #ifdef POWERSAVE_ENABLE
+    core_powersave_loop();
   #endif
 
   currentApp->onLoop(); 

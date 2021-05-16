@@ -39,8 +39,7 @@
 
 #define FONT_SIZE_DEFAULT   1
 
-//#define CPU_SLEEP_ENABLE
-//#define CPU_SLEEP_TIME_DELAY core_cpu_getCpuSleepTimeDelay()
+//#define CPU_SLEEP_ENABLEЫ
 
 
 #define BATTERY_ENABLE

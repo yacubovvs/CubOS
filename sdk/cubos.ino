@@ -124,6 +124,10 @@ void setup(){
   #ifdef TOUCH_SCREEN_ENABLE
     setup_touchScreenDriver();
   #endif
+
+  #ifdef POWERSAVE_ENABLE
+    core_powersave_setup();
+  #endif
   
   currentApp = getApp(STARTING_APP_NUMM);
   
@@ -149,6 +153,10 @@ void loop(){
 
   #ifdef CLOCK_ENABLE
     core_time_loop();
+  #endif
+
+  #ifdef POWERSAVE_ENABLE
+    core_powersave_loop();
   #endif
 
   currentApp->onLoop(); 

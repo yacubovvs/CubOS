@@ -2540,9 +2540,7 @@ const byte* getIcon(int icon){
 
 
 #ifdef CPU_SLEEP_ENABLE
-    long core_cpu_getCpuSleepTimeDelay(){
-        return 25000;
-    }
+
 #endif
 
 #ifdef TOUCH_SCREEN_ENABLE

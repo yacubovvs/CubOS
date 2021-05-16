@@ -20,20 +20,21 @@ unsigned char green_bg   = 255;
 unsigned char blue_bg    = 255;
 
 uint16_t current_drawColor;
+unsigned char driver_display_screenBrightness = 0;
 
 void driver_display_setup(){
-  debug(String(TFT_SCLK));
   tft.init();
   //tft.setRotation(1);
   tft.setSwapBytes(true);
-  //tft.pushImage(0, 0,  160, 80, ttgo);
+  
+  //pinMode(TFT_BL, OUTPUT);
+  //digitalWrite(TFT_BL, 1);
 
-  debug(String(TFT_SCLK));
-  pinMode(TFT_BL, OUTPUT);
-  digitalWrite(TFT_BL, 1);
+  ledcSetup(0, 15000, 13);
+  ledcAttachPin(TFT_BL, 0);
 
   tft.fillScreen(TFT_BLACK);
-  
+  driver_display_setBrightness(get_core_display_brightness());
 }
 
 void sleep_displayDriver(){
@@ -70,12 +71,22 @@ void fillScreen(unsigned char red, unsigned char green, unsigned char blue){
   TEMPORARILY_RESTORE_LIMITS();
 }
 
-void driver_display_setBrightness(unsigned char brightness){
-  // brightness: 0..100%
-  brightness = 7 + (unsigned char)((int)brightness*8/100);
-  debug("Setting screen brightness to " + String(brightness));
-  // brightness 7..15
-  //M5.Axp.ScreenBreath(brightness);
+unsigned char driver_display_getBrightness(){
+  return driver_display_screenBrightness;
+}
+
+void driver_display_setBrightness(unsigned int brightness){
+  //if(brightness==0) brightness=1;
+  driver_display_screenBrightness = brightness;
+
+  brightness = (((long)brightness)*1024/100);
+  //debug("Setting screen brightness to " + String(brightness));
+  //analogWrite(TFT_BL, brightness);
+  
+  ledcWrite(0, brightness);
+
+  
+  
 }
 
 void driver_display_loop(){
