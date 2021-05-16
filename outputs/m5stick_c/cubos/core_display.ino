@@ -1,3 +1,7 @@
+uint16_t get_uint16Color(unsigned char red, unsigned char green, unsigned char blue){
+  return ( (red*31/255) <<11)|( (green*31/255) <<6)|( (blue*31/255) <<0);
+}
+
 /*
 * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * 
                                   FRAMEBUFFER

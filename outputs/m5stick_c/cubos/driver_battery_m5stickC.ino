@@ -39,11 +39,11 @@ float driver_battery_getVinCurent_mA(){
 }
 
 float driver_battery_controller_Temp(){
-    M5.Axp.GetTempInAXP192();
+    return M5.Axp.GetTempInAXP192();
 }
 
 float driver_battery_Temp(){
-    M5.Axp.GetTempInAXP192();
+    return M5.Axp.GetTempInAXP192();
 }
 
 unsigned char driver_battery_getPercent(){
