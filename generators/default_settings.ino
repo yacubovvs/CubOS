@@ -51,6 +51,20 @@
 #define EVENT_ON_TOUCH_SWIPE_FROM_TOP       0x11
 #define EVENT_ON_TOUCH_SWIPE_FROM_BOTTOM    0x12
 
+
+/*
+ ############################################################################
+                                 SLEEP TYPES -                               
+*/
+
+#define SLEEP_CPU       0x01
+#define SLEEP_DEEP      0x02
+#define SLEEP_LIGHT     0x03
+#define SLEEP_MODEM     0x04
+#define SLEEP_DISPLAY   0x05
+#define WAKE_MODEM      0x06
+#define WAKE_DISPLAY    0x07
+
 /*
 ############################################################################
 #                                 EVENTS -                                 #

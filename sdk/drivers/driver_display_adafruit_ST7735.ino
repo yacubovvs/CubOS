@@ -91,7 +91,7 @@ void fillScreen(unsigned char red, unsigned char green, unsigned char blue){
 void driver_display_setBrightness(unsigned char brightness){
   // brightness: 0..100%
   brightness = 7 + (unsigned char)((int)brightness*8/100);
-  debug("Setting screen brightness to " + String(brightness));
+  //debug("Setting screen brightness to " + String(brightness));
   // brightness 7..15
   //M5.Axp.ScreenBreath(brightness);
 }

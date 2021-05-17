@@ -570,14 +570,18 @@ void appNameClass::onLoop(){
                     // Change display brightness
                     value = get_core_display_brightness();
                     if(value>=100) value = 0;
-                    else value+=10;
+                    else value+=5;
+                    if(value==0) value = 1;
+                    if(value==6) value = 5;
                     set_core_display_brightness(value);
                     break;
                 case 1:
                     // Change display fade brightness
                     value = get_core_display_brightness_fade();
                     if(value>=100) value = 0;
-                    else value+=10;
+                    else value+=5;
+                    if(value==0) value = 1;
+                    if(value==6) value = 5;
                     set_core_display_brightness_fade(value);
                     break;
                 case 2:
@@ -961,13 +965,6 @@ String appNameClass::getApplicationSubTitle(unsigned char submenu, unsigned char
                     }
                 case 2:
                     return String(get_core_display_brightness()) + "%";
-                    /*
-                    #ifdef CPU_SLEEP_ENABLE
-                        return String(core_cpu_getCpuSleepTimeDelay());
-                    #else
-                        return "-";
-                    #endif
-                    */
                 case 3:
                     if(getLast) return this->lastBatteryString;
                     else{

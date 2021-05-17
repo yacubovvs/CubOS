@@ -34,12 +34,12 @@
 //#define toDefaultApp_onLeftLongPress
 
 #define STARTING_APP_NUMM   -1    // for Mainmenu (default app)
-#define STARTING_APP_NUMM    1 // Settings
-//#define STARTING_APP_NUMM    7 // Battery
+//#define STARTING_APP_NUMM    1 // Settings
+#define STARTING_APP_NUMM    7 // Battery
 
 #define FONT_SIZE_DEFAULT   1
 
-//#define CPU_SLEEP_ENABLEЫ
+#define CPU_SLEEP_ENABLE
 
 
 #define BATTERY_ENABLE

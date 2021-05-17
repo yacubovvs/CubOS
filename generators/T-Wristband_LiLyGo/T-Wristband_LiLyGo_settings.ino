@@ -39,7 +39,7 @@
 
 #define FONT_SIZE_DEFAULT   1
 
-//#define CPU_SLEEP_ENABLE
+#define CPU_SLEEP_ENABLE
 
 #define BATTERY_ENABLE
 #define CLOCK_ENABLE

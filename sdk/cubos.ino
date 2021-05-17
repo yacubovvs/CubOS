@@ -111,7 +111,7 @@ void setup(){
   #endif
 
   #ifdef CPU_CONTROLL_ENABLE
-    driver_cpu_setup();
+    core_cpu_setup();
   #endif
   
   driver_display_setup();
@@ -155,6 +155,10 @@ void loop(){
     core_time_loop();
   #endif
 
+  #ifdef CPU_CONTROLL_ENABLE
+    core_cpu_loop();
+  #endif
+
   #ifdef POWERSAVE_ENABLE
     core_powersave_loop();
   #endif
@@ -167,6 +171,7 @@ void loop(){
     ESP.wdtFeed();
   #endif
 
+/*
   #ifdef CPU_SLEEP_ENABLE
 //driver_cpu_sleep();
     if(millis() - driver_control_get_last_user_avtivity() > CPU_SLEEP_TIME_DELAY){
@@ -187,15 +192,17 @@ void loop(){
     }
     //driver_cpu_wakeup();
   #endif
-
+*/
 
 }
 
+/*
 #ifdef CPU_SLEEP_ENABLE
   void do_cpu_sleep(){
       driver_cpu_sleep();
   }
 #endif
+*/
 
 void debug(String string){
   debug(string, 0);

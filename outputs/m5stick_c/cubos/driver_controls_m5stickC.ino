@@ -38,6 +38,7 @@ void driver_controls_loop(){
         if(driver_control_DOUBLE_PRESS_lastPress[i]!=0){
           if(_millis() - driver_control_DOUBLE_PRESS_lastPress[i]<CONTROLS_DELAY_TO_DOUBLE_CLICK_MS){
             driver_control_DOUBLE_PRESS_doublePressed[i] = true;
+            set_core_powersave_lastUserAction();
             onButtonEvent(EVENT_ON_TOUCH_DOUBLE_PRESS, i, _millis() - driver_control_DOUBLE_PRESS_lastPress[i]);
           }
         }else{
@@ -61,6 +62,7 @@ void driver_controls_loop(){
       if(driver_control_pressed[i]==true){
         // released
         driver_control_pressed[i]=false;
+        set_core_powersave_lastUserAction();
         onButtonEvent(EVENT_BUTTON_RELEASED, i);
 
         

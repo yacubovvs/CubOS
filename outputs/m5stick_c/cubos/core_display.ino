@@ -1,5 +1,15 @@
 uint16_t get_uint16Color(unsigned char red, unsigned char green, unsigned char blue){
-  return ( (red*31/255) <<11)|( (green*31/255) <<6)|( (blue*31/255) <<0);
+  #ifdef SCREEN_INVERT_COLORS
+    red = 255 - red;
+    green = 255 - green;
+    blue = 255 - blue;
+  #endif
+  
+  #ifdef SCREEN_CHANGE_BLUE_RED
+    return ( (blue*31/255) <<11)|( (green*31/255) <<6)|( (red*31/255) <<0);
+  #else
+    return ( (red*31/255) <<11)|( (green*31/255) <<6)|( (blue*31/255) <<0);
+  #endif
 }
 
 /*
@@ -141,9 +151,9 @@ bool DRAW_LIMITS_getEnable(){
 */
 
 unsigned char core_display_brightness             = 100;
-unsigned char core_display_brightness_fade        = 50;
-unsigned char core_display_time_delay_to_fade     = 10;
-unsigned char core_display_time_delay_to_poweroff = 15;
+unsigned char core_display_brightness_fade        = 5;
+unsigned char core_display_time_delay_to_fade     = 5;
+unsigned char core_display_time_delay_to_poweroff = 35;
 
 void set_core_display_brightness(unsigned char value){ 
   if(value>100) value = 100;

@@ -51,6 +51,20 @@
 #define EVENT_ON_TOUCH_SWIPE_FROM_TOP       0x11
 #define EVENT_ON_TOUCH_SWIPE_FROM_BOTTOM    0x12
 
+
+/*
+ ############################################################################
+                                 SLEEP TYPES -                               
+*/
+
+#define SLEEP_CPU       0x01
+#define SLEEP_DEEP      0x02
+#define SLEEP_LIGHT     0x03
+#define SLEEP_MODEM     0x04
+#define SLEEP_DISPLAY   0x05
+#define WAKE_MODEM      0x06
+#define WAKE_DISPLAY    0x07
+
 /*
 ############################################################################
 #                                 EVENTS -                                 #
@@ -76,6 +90,7 @@
 #define UPDATE_RTC_EVERY 65
 #define I2C_ENABLE
 #define CPU_CONTROLL_ENABLE
+#define POWERSAVE_ENABLE
 
 #define FONT_SIZE_DEFAULT 2
 #define HARDWARE_BUTTONS_VALUE 3
@@ -130,13 +145,12 @@
 //#define toDefaultApp_onLeftLongPress
 
 #define STARTING_APP_NUMM   -1    // for Mainmenu (default app)
-#define STARTING_APP_NUMM    1 // Settings
-//#define STARTING_APP_NUMM    7 // Battery
+//#define STARTING_APP_NUMM    1 // Settings
+#define STARTING_APP_NUMM    7 // Battery
 
 #define FONT_SIZE_DEFAULT   1
 
-//#define CPU_SLEEP_ENABLE
-//#define CPU_SLEEP_TIME_DELAY core_cpu_getCpuSleepTimeDelay()
+#define CPU_SLEEP_ENABLE
 
 
 #define BATTERY_ENABLE
@@ -278,7 +292,7 @@ void setup(){
   #endif
 
   #ifdef CPU_CONTROLL_ENABLE
-    driver_cpu_setup();
+    core_cpu_setup();
   #endif
   
   driver_display_setup();
@@ -290,6 +304,10 @@ void setup(){
 
   #ifdef TOUCH_SCREEN_ENABLE
     setup_touchScreenDriver();
+  #endif
+
+  #ifdef POWERSAVE_ENABLE
+    core_powersave_setup();
   #endif
   
   currentApp = getApp(STARTING_APP_NUMM);
@@ -318,6 +336,14 @@ void loop(){
     core_time_loop();
   #endif
 
+  #ifdef CPU_CONTROLL_ENABLE
+    core_cpu_loop();
+  #endif
+
+  #ifdef POWERSAVE_ENABLE
+    core_powersave_loop();
+  #endif
+
   currentApp->onLoop(); 
   //currentApp->onLoop(); 
 
@@ -326,6 +352,7 @@ void loop(){
     ESP.wdtFeed();
   #endif
 
+/*
   #ifdef CPU_SLEEP_ENABLE
 //driver_cpu_sleep();
     if(millis() - driver_control_get_last_user_avtivity() > CPU_SLEEP_TIME_DELAY){
@@ -346,15 +373,17 @@ void loop(){
     }
     //driver_cpu_wakeup();
   #endif
-
+*/
 
 }
 
+/*
 #ifdef CPU_SLEEP_ENABLE
   void do_cpu_sleep(){
       driver_cpu_sleep();
   }
 #endif
+*/
 
 void debug(String string){
   debug(string, 0);

@@ -11,10 +11,6 @@ unsigned char blue_bg    = 255;
 
 uint16_t current_drawColor;
 
-uint16_t get_uint16Color(unsigned char red, unsigned char green, unsigned char blue){
-  return ( (red*31/255) <<11)|( (green*31/255) <<6)|( (blue*31/255) <<0);
-}
-
 void driver_display_setup(){
   M5.begin();
   M5.IMU.Init();
@@ -53,13 +49,20 @@ void fillScreen(unsigned char red, unsigned char green, unsigned char blue){
   */
 }
 
+unsigned char driver_display_currentBrightness=0;
 void driver_display_setBrightness(unsigned char brightness){
   // brightness: 0..100%
+  driver_display_currentBrightness = brightness;
   brightness = 7 + (unsigned char)((int)brightness*8/100);
-  debug("Setting screen brightness to " + String(brightness));
+  //debug("Setting screen brightness to " + String(brightness));
   // brightness 7..15
   M5.Axp.ScreenBreath(brightness);
 }
+
+unsigned char driver_display_getBrightness(){
+  return driver_display_currentBrightness;
+}
+
 
 void driver_display_loop(){
 }
