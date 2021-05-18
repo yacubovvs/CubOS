@@ -71,12 +71,14 @@ class Application{
     int scroll_to_y           = 0;
     bool isfullScreen         = true;
     bool showStatusBar        = true;
+    bool preventSleep         = false;
 
     virtual void onLoop()     = 0;
     virtual void onDestroy()  = 0;
     virtual void onEvent(unsigned char event, int val1, int val2) = 0;
 
     void super_onCreate(){
+      this->preventSleep = false;
       if(this->showStatusBar) core_views_statusBar_draw();
     }
 

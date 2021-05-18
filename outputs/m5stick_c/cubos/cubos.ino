@@ -57,14 +57,19 @@
                                  SLEEP TYPES -                               
 */
 
-#define SLEEP_CPU       0x01
-#define SLEEP_DEEP      0x02
-#define SLEEP_LIGHT     0x03
-#define SLEEP_MODEM     0x04
-#define SLEEP_DISPLAY   0x05
-#define WAKE_MODEM      0x06
-#define WAKE_DISPLAY    0x07
+#define SLEEP_CPU           0x01
+#define SLEEP_DEEP          0x02
+#define SLEEP_LIGHT         0x03
+#define SLEEP_MODEM         0x04
+#define SLEEP_DISPLAY       0x05
+#define SLEEP_HIBERNATE     0x03
+#define WAKE_MODEM          0x06
+#define WAKE_DISPLAY        0x07
+#define WAKE                0x08
 
+
+#define IN_APP_SLEEP_TYPE       SLEEP_LIGHT
+#define STAND_BY_SLEEP_TYPE     SLEEP_DEEP
 /*
 ############################################################################
 #                                 EVENTS -                                 #
@@ -102,6 +107,7 @@
 // #define NARROW_SCREEN
 
 #define UPDATE_BATTERY_EVERY_MS 3000
+#define SMOOTH_BACKLIGHT_CONTROL_DELAY 4
 
 /*
     ############################################################################################
@@ -252,12 +258,14 @@ class Application{
     int scroll_to_y           = 0;
     bool isfullScreen         = true;
     bool showStatusBar        = true;
+    bool preventSleep         = false;
 
     virtual void onLoop()     = 0;
     virtual void onDestroy()  = 0;
     virtual void onEvent(unsigned char event, int val1, int val2) = 0;
 
     void super_onCreate(){
+      this->preventSleep = false;
       if(this->showStatusBar) core_views_statusBar_draw();
     }
 

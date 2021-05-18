@@ -19,14 +19,8 @@ void driver_controls_setup(){
   last_user_activity = _millis();
 }
 
-/*
-#define EVENT_BUTTON_PRESSED            0x00
-#define EVENT_BUTTON_RELEASED           0x01
-#define EVENT_BUTTON_LONG_PRESS         0x02
-*/
 void driver_controls_loop(){
   for (unsigned char i=0; i<DRIVER_CONTROLS_TOTALBUTTONS; i++){
-    //if (digitalRead(driver_control_buttonsPins[i])){
     if ((driver_control_isPositive[i]==true) ? (!digitalRead(driver_control_buttonsPins[i])) : (digitalRead(driver_control_buttonsPins[i]))){
 
       last_user_activity = _millis();
