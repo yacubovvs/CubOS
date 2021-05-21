@@ -1,4 +1,6 @@
 #define _millis() millis()
+#define TP_PWR_PIN          25
+
 
 unsigned long last_user_activity = _millis();
 
@@ -13,8 +15,9 @@ unsigned long driver_control_DOUBLE_PRESS_doublePressed[]   = {false};
 unsigned long driver_control_IS_LONG_PRESS[]                = {false};
 
 void driver_controls_setup(){
-  pinMode(25, OUTPUT);
-  digitalWrite(25, 1);
+  pinMode(TP_PWR_PIN, PULLUP);
+  digitalWrite(TP_PWR_PIN, HIGH);
+  
   for (unsigned char i=0; i<DRIVER_CONTROLS_TOTALBUTTONS; i++){
     pinMode(driver_control_buttonsPins[i], INPUT);
   }

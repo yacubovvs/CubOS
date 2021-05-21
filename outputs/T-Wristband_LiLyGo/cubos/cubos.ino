@@ -51,6 +51,25 @@
 #define EVENT_ON_TOUCH_SWIPE_FROM_TOP       0x11
 #define EVENT_ON_TOUCH_SWIPE_FROM_BOTTOM    0x12
 
+
+/*
+ ############################################################################
+                                 SLEEP TYPES -                               
+*/
+
+#define SLEEP_CPU           0x01
+#define SLEEP_DEEP          0x02
+#define SLEEP_LIGHT         0x03
+#define SLEEP_MODEM         0x04
+#define SLEEP_DISPLAY       0x05
+#define SLEEP_HIBERNATE     0x03
+#define WAKE_MODEM          0x06
+#define WAKE_DISPLAY        0x07
+#define WAKE                0x08
+
+
+#define IN_APP_SLEEP_TYPE       SLEEP_LIGHT
+#define STAND_BY_SLEEP_TYPE     SLEEP_DEEP
 /*
 ############################################################################
 #                                 EVENTS -                                 #
@@ -88,6 +107,7 @@
 // #define NARROW_SCREEN
 
 #define UPDATE_BATTERY_EVERY_MS 3000
+#define SMOOTH_BACKLIGHT_CONTROL_DELAY 4
 
 /*
     ############################################################################################
@@ -136,7 +156,7 @@
 
 #define FONT_SIZE_DEFAULT   1
 
-//#define CPU_SLEEP_ENABLE
+#define CPU_SLEEP_ENABLE
 
 #define BATTERY_ENABLE
 #define CLOCK_ENABLE
@@ -162,6 +182,11 @@
 #define SCREEN_CHANGE_BLUE_RED
 
 #define DRIVER_RTC_INTERRUPT_PIN    34
+
+#define IN_APP_SLEEP_TYPE       SLEEP_LIGHT
+//#define STAND_BY_SLEEP_TYPE     SLEEP_LIGHT
+#define STAND_BY_SLEEP_TYPE     SLEEP_DEEP
+
 /*
     ############################################################################################
     #                                                                                          #
@@ -241,12 +266,14 @@ class Application{
     int scroll_to_y           = 0;
     bool isfullScreen         = true;
     bool showStatusBar        = true;
+    bool preventSleep         = false;
 
     virtual void onLoop()     = 0;
     virtual void onDestroy()  = 0;
     virtual void onEvent(unsigned char event, int val1, int val2) = 0;
 
     void super_onCreate(){
+      this->preventSleep = false;
       if(this->showStatusBar) core_views_statusBar_draw();
     }
 
@@ -281,7 +308,7 @@ void setup(){
   #endif
 
   #ifdef CPU_CONTROLL_ENABLE
-    driver_cpu_setup();
+    core_cpu_setup();
   #endif
   
   driver_display_setup();
@@ -325,6 +352,10 @@ void loop(){
     core_time_loop();
   #endif
 
+  #ifdef CPU_CONTROLL_ENABLE
+    core_cpu_loop();
+  #endif
+
   #ifdef POWERSAVE_ENABLE
     core_powersave_loop();
   #endif
@@ -337,6 +368,7 @@ void loop(){
     ESP.wdtFeed();
   #endif
 
+/*
   #ifdef CPU_SLEEP_ENABLE
 //driver_cpu_sleep();
     if(millis() - driver_control_get_last_user_avtivity() > CPU_SLEEP_TIME_DELAY){
@@ -357,15 +389,17 @@ void loop(){
     }
     //driver_cpu_wakeup();
   #endif
-
+*/
 
 }
 
+/*
 #ifdef CPU_SLEEP_ENABLE
   void do_cpu_sleep(){
       driver_cpu_sleep();
   }
 #endif
+*/
 
 void debug(String string){
   debug(string, 0);

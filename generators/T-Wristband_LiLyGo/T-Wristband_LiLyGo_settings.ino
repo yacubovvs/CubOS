@@ -65,6 +65,11 @@
 #define SCREEN_CHANGE_BLUE_RED
 
 #define DRIVER_RTC_INTERRUPT_PIN    34
+
+#define IN_APP_SLEEP_TYPE       SLEEP_LIGHT
+//#define STAND_BY_SLEEP_TYPE     SLEEP_LIGHT
+#define STAND_BY_SLEEP_TYPE     SLEEP_DEEP
+
 /*
     ############################################################################################
     #                                                                                          #

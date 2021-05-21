@@ -11,7 +11,6 @@ unsigned char core_battery_getPercent(){
     void core_battery_loop(){
         
         TEMPORARILY_DISABLE_LIMITS();
-
         driver_battery_loop();
 
         if(millis()-last_upodate_battery>UPDATE_BATTERY_EVERY_MS || millis()<last_upodate_battery){

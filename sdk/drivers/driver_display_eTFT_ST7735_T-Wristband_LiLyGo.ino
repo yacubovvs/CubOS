@@ -38,6 +38,9 @@ void driver_display_setup(){
 }
 
 void sleep_displayDriver(){
+  tft.setTextDatum(MC_DATUM);
+  tft.writecommand(ST7735_SLPIN);
+  tft.writecommand(ST7735_DISPOFF);
 }
 
 void wakeup_displayDriver(){

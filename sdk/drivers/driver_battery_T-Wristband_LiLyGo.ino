@@ -9,18 +9,26 @@
 #define LED_PIN             4
 #define CHARGE_PIN          32
 
+#define ANALOG_VALUE_ION_BATTERY 2440
+
 void driver_battery_setup(){
+    pinMode(BATT_ADC_PIN, INPUT);
+    pinMode(VBUS_PIN, INPUT);
 }
 
 void driver_battery_loop(){
+    //debug(String(analogRead(35)));
+    //delay(1000);
 }
 
 float driver_battery_getVoltage(){
-    return 4.2;
+    int analogValue = analogRead(BATT_ADC_PIN);
+    float voltage = 4.2/((float)ANALOG_VALUE_ION_BATTERY)*((float)analogValue);
+    return voltage;
 }
 
 int driver_battery_getVoltage_mV(){
-    return 4200;
+    return (int)(driver_battery_getVoltage()*1000);
 }
 
 float driver_battery_getCurent_mA(){
@@ -36,7 +44,9 @@ float driver_battery_getUsbCurent_mA(){
 }
 
 float driver_battery_getVinVoltage(){
-    return 0;
+    int analogValue = analogRead(VBUS_PIN);
+    float voltage = 4.2/((float)ANALOG_VALUE_ION_BATTERY)*((float)analogValue);
+    return voltage;
 }
 
 float driver_battery_getVinCurent_mA(){
@@ -65,5 +75,5 @@ unsigned char driver_battery_getPercent(){
 }
 
 bool driver_battery_isCharging(){
-    return driver_battery_getCurent_mA()>0;
+    return analogRead(VBUS_PIN)>ANALOG_VALUE_ION_BATTERY;
 }
