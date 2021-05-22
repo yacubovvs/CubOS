@@ -57,7 +57,7 @@
                                  SLEEP TYPES -                               
 */
 
-#define SLEEP_CPU           0x01
+#define SLEEP_IDLE_CPU           0x01
 #define SLEEP_DEEP          0x02
 #define SLEEP_LIGHT         0x03
 #define SLEEP_MODEM         0x04
@@ -102,12 +102,18 @@
 
 #define CONTROLS_DELAY_TO_DOUBLE_CLICK_MS DRIVER_CONTROLS_DELAY_BEFORE_LONG_PRESS
 
-#define SMOOTH_ANIMATION_COEFFICIENT        5
+#define SMOOTH_ANIMATION_COEFFICIENT    5
 // #define MAIN_MENU_SMOOTH_ANIMATION
 // #define NARROW_SCREEN
 
 #define UPDATE_BATTERY_EVERY_MS 3000
-#define SMOOTH_BACKLIGHT_CONTROL_DELAY 4
+#define SMOOTH_BACKLIGHT_CONTROL_DELAY  4
+
+// #define ACCELEROMETER_ENABLE
+#define DISPLAY_BACKLIGHT_CONTROL_ENABLE
+
+#define WAKEUP_FROM_LIGHT_SLEEP_EVERY_MS 1000
+#define WAKEUP_FROM_DEEP_SLEEP_EVERY_SECONDS 60*60*24
 
 /*
     ############################################################################################

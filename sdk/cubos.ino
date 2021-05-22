@@ -72,6 +72,7 @@ class Application{
     bool isfullScreen         = true;
     bool showStatusBar        = true;
     bool preventSleep         = false;
+    bool preventInAppSleep    = false;
 
     virtual void onLoop()     = 0;
     virtual void onDestroy()  = 0;
@@ -79,6 +80,7 @@ class Application{
 
     void super_onCreate(){
       this->preventSleep = false;
+      this->preventInAppSleep = false;
       if(this->showStatusBar) core_views_statusBar_draw();
     }
 
@@ -130,6 +132,10 @@ void setup(){
   #ifdef POWERSAVE_ENABLE
     core_powersave_setup();
   #endif
+
+  #ifdef ACCELEROMETER_ENABLE
+    driver_accelerometer_setup();
+  #endif
   
   currentApp = getApp(STARTING_APP_NUMM);
   
@@ -137,8 +143,9 @@ void setup(){
 
 bool isInSleep = false;
 void loop(){
-  driver_display_loop();
+  
   core_display_loop();
+  driver_display_loop();
 
   #ifdef HARDWARE_BUTTONS_ENABLED
     driver_controls_loop();
@@ -163,6 +170,10 @@ void loop(){
 
   #ifdef POWERSAVE_ENABLE
     core_powersave_loop();
+  #endif
+
+  #ifdef ACCELEROMETER_ENABLE
+    driver_accelerometer_loop();
   #endif
 
   currentApp->onLoop(); 

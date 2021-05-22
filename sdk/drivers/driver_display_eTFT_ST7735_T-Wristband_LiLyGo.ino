@@ -31,14 +31,17 @@ void driver_display_setup(){
   //digitalWrite(TFT_BL, 1);
 
   ledcSetup(0, 15000, 13);
-  ledcAttachPin(TFT_BL, 0);
+  
+  #ifdef DISPLAY_BACKLIGHT_CONTROL_ENABLE
+    ledcAttachPin(TFT_BL, 0);
+  #endif
 
   tft.fillScreen(TFT_BLACK);
   driver_display_setBrightness(get_core_display_brightness());
 }
 
 void sleep_displayDriver(){
-  tft.setTextDatum(MC_DATUM);
+  tft.writecommand(ST7735_SWRESET);
   tft.writecommand(ST7735_SLPIN);
   tft.writecommand(ST7735_DISPOFF);
 }
@@ -79,17 +82,14 @@ unsigned char driver_display_getBrightness(){
 }
 
 void driver_display_setBrightness(unsigned int brightness){
-  //if(brightness==0) brightness=1;
-  driver_display_screenBrightness = brightness;
-
-  brightness = (((long)brightness)*1024/100);
-  //debug("Setting screen brightness to " + String(brightness));
-  //analogWrite(TFT_BL, brightness);
-  
-  ledcWrite(0, brightness);
-
-  
-  
+  #ifdef DISPLAY_BACKLIGHT_CONTROL_ENABLE
+    if(brightness==0) ledcAttachPin(TFT_BL, 0);
+    else ledcAttachPin(TFT_BL, 1);
+  #else
+    driver_display_screenBrightness = brightness;
+    brightness = (((long)brightness)*1024/100);
+    ledcWrite(0, brightness);
+  #endif
 }
 
 void driver_display_loop(){

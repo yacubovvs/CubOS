@@ -314,7 +314,6 @@ void appNameClass::drawIcons(bool draw){
 
                   }
                 }
-                //delay(5);
               #endif
 
               core_views_draw_app_icon(

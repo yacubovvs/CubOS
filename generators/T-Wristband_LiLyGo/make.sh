@@ -45,5 +45,11 @@ cp sdk/core/core_cpu.ino                outputs/T-Wristband_LiLyGo/cubos/
 cp sdk/core/core_battery.ino            outputs/T-Wristband_LiLyGo/cubos/  
 cp sdk/core/core_powersave.ino          outputs/T-Wristband_LiLyGo/cubos/  
 
+#external libs
+cp external_libs/MPU9250_LiLyGO_T-Wristband/MPU9250.cpp                 outputs/T-Wristband_LiLyGo/cubos/ 
+cp external_libs/MPU9250_LiLyGO_T-Wristband/MPU9250.h                   outputs/T-Wristband_LiLyGo/cubos/ 
+cp external_libs/MPU9250_LiLyGO_T-Wristband/quaternionFilters.cpp       outputs/T-Wristband_LiLyGo/cubos/ 
+cp external_libs/MPU9250_LiLyGO_T-Wristband/quaternionFilters.h         outputs/T-Wristband_LiLyGo/cubos/ 
+cp external_libs/MPU9250_LiLyGO_T-Wristband/sensor.h                    outputs/T-Wristband_LiLyGo/cubos/ 
 
 echo Finished

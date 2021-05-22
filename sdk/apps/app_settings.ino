@@ -363,6 +363,7 @@ void appNameClass::drawIcons(bool draw){
         
         #ifdef MAIN_MENU_SMOOTH_ANIMATION
             if(this->scroll_x!=0){
+                this->preventInAppSleep=true;
                 if(this->scroll_x<0){
                 }else if(this->scroll_x>0){
                     char elementsToPreDraw = this->scroll_x/SCREEN_WIDTH + 1;
@@ -399,12 +400,11 @@ void appNameClass::drawIcons(bool draw){
                                 2
                             );
                         }
-
-                        //delay(50);
                         
                     }
                 }
             }else{
+                if(draw) this->preventInAppSleep=false;
                 if(currentSubMenu==APP_SETTINGS_SUBMENU_MAIN){
                     core_views_draw_settings_item(
                         draw, 

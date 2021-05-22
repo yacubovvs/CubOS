@@ -41,6 +41,8 @@
 
 #define CPU_SLEEP_ENABLE
 
+#define ACCELEROMETER_ENABLE
+
 #define BATTERY_ENABLE
 #define CLOCK_ENABLE
 //#define USE_PRIMITIVE_HARDWARE_DRAW_ACCELERATION
@@ -70,6 +72,10 @@
 //#define STAND_BY_SLEEP_TYPE     SLEEP_LIGHT
 #define STAND_BY_SLEEP_TYPE     SLEEP_DEEP
 
+#undef SMOOTH_BACKLIGHT_CONTROL_DELAY
+#undef DISPLAY_BACKLIGHT_CONTROL_ENABLE
+
+#define SMOOTH_ANIMATION_COEFFICIENT    4
 /*
     ############################################################################################
     #                                                                                          #

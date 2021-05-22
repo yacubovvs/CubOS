@@ -262,3 +262,7 @@ void core_time_loop(){
         lastTimeChange = currentTime;
     }
 }
+
+void core_time_setAlarmBySeconds(unsigned char seconds){
+    driver_RTC_setAlarmBySeconds(seconds);
+}

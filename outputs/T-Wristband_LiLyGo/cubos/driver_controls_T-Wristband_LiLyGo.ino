@@ -16,6 +16,7 @@ unsigned long driver_control_IS_LONG_PRESS[]                = {false};
 
 void driver_controls_setup(){
   pinMode(TP_PWR_PIN, PULLUP);
+  pinMode(RTC_INT_PIN, INPUT_PULLUP);
   digitalWrite(TP_PWR_PIN, HIGH);
   
   for (unsigned char i=0; i<DRIVER_CONTROLS_TOTALBUTTONS; i++){

@@ -1,6 +1,8 @@
 #include "WiFi.h"
+#include "esp_sleep.h"
 
 void driver_cpu_setup(){
+    esp_sleep_enable_ext0_wakeup(GPIO_NUM_33, HIGH);
 }
 
 void driver_cpu_wakeup(){
@@ -10,33 +12,47 @@ void driver_cpu_sleep(unsigned char sleepType, long timeout){
     
     switch (sleepType)
     {
-        case SLEEP_CPU:
+        case SLEEP_IDLE_CPU:
             break;
         case SLEEP_DEEP:
-            //esp_sleep_enable_ext0_wakeup(GPIO_NUM_37, LOW);
+            
             sleep_displayDriver();
-            esp_sleep_enable_ext0_wakeup(GPIO_NUM_33, HIGH);
+            #ifdef ACCELEROMETER_ENABLE
+                driver_accelerometer_sleep();
+            #endif
+
+            //esp_sleep_enable_ext0_wakeup(GPIO_NUM_33, HIGH);
             //esp_sleep_enable_ext1_wakeup(MULTIPLE_INT_BITMASK, ESP_EXT1_WAKEUP_ANY_HIGH);
+            //esp_sleep_enable_timer_wakeup(1000);
+            //esp_deep_sleep_disable_timer_wakeup();
+            //esp_sleep_disable_timer_wakeup();
+            esp_sleep_enable_timer_wakeup(1000000*WAKEUP_FROM_DEEP_SLEEP_EVERY_SECONDS);
+            //s_config.wakeup_triggers &= ~RTC_TIMER_TRIG_EN;
+            //s_config.sleep_duration = 0;
             esp_deep_sleep_start();
         
-            //if(timeout!=0) M5.Axp.DeepSleep(SLEEP_SEC(timeout));
-            //else M5.Axp.DeepSleep();
             break;
         case SLEEP_LIGHT:
             
-            //debug("Light sleep");
-            //digitalWrite(27,0);
+            //if(timeout!=0)esp_sleep_enable_timer_wakeup(timeout * 1000);
             //esp_sleep_enable_ext0_wakeup(GPIO_NUM_33, HIGH);
-            esp_sleep_enable_ext1_wakeup(GPIO_SEL_33, ESP_EXT1_WAKEUP_ANY_HIGH);
-            esp_light_sleep_start();
+            //esp_sleep_enable_ext1_wakeup(0x600000000, ESP_EXT1_WAKEUP_ANY_HIGH);
+            //core_time_setAlarmBySeconds(2);
+            //esp_sleep_enable_ext1_wakeup(0x200000000, ESP_EXT1_WAKEUP_ANY_HIGH);
+            //esp_sleep_enable_ext0_wakeup(GPIO_NUM_33, HIGH);
+
+            esp_sleep_enable_timer_wakeup(WAKEUP_FROM_LIGHT_SLEEP_EVERY_MS*1000);
+            //0000000200000000
             /*
-            if(timeout!=0){
-                M5.Axp.SetLDO2(false);
-                M5.Axp.LightSleep(SLEEP_SEC(timeout));
-            }else{
-                M5.Axp.SetLDO2(false);
-                M5.Axp.LightSleep();
-            }*/
+            rtc.disableAlarm();
+            rtc.setDateTime(2019, 4, 7, 9, 5, 57);
+            rtc.setAlarmByMinutes(6);
+            rtc.enableAlarm();
+            */
+
+            esp_light_sleep_start();
+
+            esp_sleep_enable_ext0_wakeup(GPIO_NUM_33, HIGH);
 
             break;
         case SLEEP_MODEM:

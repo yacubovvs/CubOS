@@ -57,7 +57,7 @@
                                  SLEEP TYPES -                               
 */
 
-#define SLEEP_CPU           0x01
+#define SLEEP_IDLE_CPU           0x01
 #define SLEEP_DEEP          0x02
 #define SLEEP_LIGHT         0x03
 #define SLEEP_MODEM         0x04
@@ -102,12 +102,18 @@
 
 #define CONTROLS_DELAY_TO_DOUBLE_CLICK_MS DRIVER_CONTROLS_DELAY_BEFORE_LONG_PRESS
 
-#define SMOOTH_ANIMATION_COEFFICIENT        5
+#define SMOOTH_ANIMATION_COEFFICIENT    5
 // #define MAIN_MENU_SMOOTH_ANIMATION
 // #define NARROW_SCREEN
 
 #define UPDATE_BATTERY_EVERY_MS 3000
-#define SMOOTH_BACKLIGHT_CONTROL_DELAY 4
+#define SMOOTH_BACKLIGHT_CONTROL_DELAY  4
+
+// #define ACCELEROMETER_ENABLE
+#define DISPLAY_BACKLIGHT_CONTROL_ENABLE
+
+#define WAKEUP_FROM_LIGHT_SLEEP_EVERY_MS 1000
+#define WAKEUP_FROM_DEEP_SLEEP_EVERY_SECONDS 60*60*24
 
 /*
     ############################################################################################
@@ -158,6 +164,8 @@
 
 #define CPU_SLEEP_ENABLE
 
+#define ACCELEROMETER_ENABLE
+
 #define BATTERY_ENABLE
 #define CLOCK_ENABLE
 //#define USE_PRIMITIVE_HARDWARE_DRAW_ACCELERATION
@@ -187,6 +195,10 @@
 //#define STAND_BY_SLEEP_TYPE     SLEEP_LIGHT
 #define STAND_BY_SLEEP_TYPE     SLEEP_DEEP
 
+#undef SMOOTH_BACKLIGHT_CONTROL_DELAY
+#undef DISPLAY_BACKLIGHT_CONTROL_ENABLE
+
+#define SMOOTH_ANIMATION_COEFFICIENT    4
 /*
     ############################################################################################
     #                                                                                          #
@@ -267,6 +279,7 @@ class Application{
     bool isfullScreen         = true;
     bool showStatusBar        = true;
     bool preventSleep         = false;
+    bool preventInAppSleep    = false;
 
     virtual void onLoop()     = 0;
     virtual void onDestroy()  = 0;
@@ -274,6 +287,7 @@ class Application{
 
     void super_onCreate(){
       this->preventSleep = false;
+      this->preventInAppSleep = false;
       if(this->showStatusBar) core_views_statusBar_draw();
     }
 
@@ -325,6 +339,10 @@ void setup(){
   #ifdef POWERSAVE_ENABLE
     core_powersave_setup();
   #endif
+
+  #ifdef ACCELEROMETER_ENABLE
+    driver_accelerometer_setup();
+  #endif
   
   currentApp = getApp(STARTING_APP_NUMM);
   
@@ -332,8 +350,9 @@ void setup(){
 
 bool isInSleep = false;
 void loop(){
-  driver_display_loop();
+  
   core_display_loop();
+  driver_display_loop();
 
   #ifdef HARDWARE_BUTTONS_ENABLED
     driver_controls_loop();
@@ -358,6 +377,10 @@ void loop(){
 
   #ifdef POWERSAVE_ENABLE
     core_powersave_loop();
+  #endif
+
+  #ifdef ACCELEROMETER_ENABLE
+    driver_accelerometer_loop();
   #endif
 
   currentApp->onLoop(); 

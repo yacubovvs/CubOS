@@ -13,7 +13,7 @@ void driver_cpu_sleep(unsigned char sleepType, long timeout){
     
     switch (sleepType)
     {
-        case SLEEP_CPU:
+        case SLEEP_IDLE_CPU:
             break;
         case SLEEP_DEEP:
             esp_sleep_enable_ext0_wakeup(GPIO_NUM_37, LOW);

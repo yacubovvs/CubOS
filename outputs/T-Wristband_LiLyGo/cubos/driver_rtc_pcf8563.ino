@@ -114,3 +114,11 @@ void driver_RTC_setYear(int year){
 	driver_rtc_dateTime.year = year;
 	rtc.setDateTime(driver_rtc_dateTime);
 }
+
+void driver_RTC_setAlarmBySeconds(unsigned char seconds){
+	/*
+	rtc.disableAlarm();
+    rtc.setAlarmBySeconds((driver_RTC_getSeconds()+seconds)%60);
+    rtc.enableAlarm();
+	*/
+}
