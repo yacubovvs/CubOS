@@ -62,6 +62,13 @@
 #define FRAMEBUFFER_TWIN_FULL
 #define FRAMEBUFFER_BYTE_PER_PIXEL 2
 
+#define IN_APP_SLEEP_TYPE       SLEEP_LIGHT
+//#define STAND_BY_SLEEP_TYPE     SLEEP_LIGHT
+#define STAND_BY_SLEEP_TYPE     SLEEP_DEEP
+
+#undef SMOOTH_BACKLIGHT_CONTROL_DELAY
+#undef DISPLAY_BACKLIGHT_CONTROL_ENABLE
+
 /*
     ############################################################################################
     #                                                                                          #

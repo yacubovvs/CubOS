@@ -363,6 +363,7 @@ void appNameClass::drawIcons(bool draw){
         
         #ifdef MAIN_MENU_SMOOTH_ANIMATION
             if(this->scroll_x!=0){
+                this->preventInAppSleep=true;
                 if(this->scroll_x<0){
                 }else if(this->scroll_x>0){
                     char elementsToPreDraw = this->scroll_x/SCREEN_WIDTH + 1;
@@ -399,12 +400,11 @@ void appNameClass::drawIcons(bool draw){
                                 2
                             );
                         }
-
-                        //delay(50);
                         
                     }
                 }
             }else{
+                if(draw) this->preventInAppSleep=false;
                 if(currentSubMenu==APP_SETTINGS_SUBMENU_MAIN){
                     core_views_draw_settings_item(
                         draw, 
@@ -516,7 +516,7 @@ void appNameClass::onLoop(){
         }
     #endif
     if(currentSubMenu==APP_SETTINGS_SUBMENU_SET_TIME){
-        if(stillPressingSelect_time!=0 && millis()-this->stillPressingSelect_time>=DRIVER_CONTROLS_DELAY_BEFORE_MULRI_PRESS){
+        if(stillPressingSelect_time!=0 && millis()-this->stillPressingSelect_time>=DRIVER_CONTROLS_DELAY_BEFORE_MULTY_PRESS){
             stillPressingSelect_time = millis();
             switch(app_settings_selectedAppIndex){
                 case 0:
@@ -536,7 +536,7 @@ void appNameClass::onLoop(){
             this->drawIcons(true);
         }
     }else if(currentSubMenu==APP_SETTINGS_SUBMENU_SET_DATE){
-        if(stillPressingSelect_time!=0 && millis()-this->stillPressingSelect_time>=DRIVER_CONTROLS_DELAY_BEFORE_MULRI_PRESS){
+        if(stillPressingSelect_time!=0 && millis()-this->stillPressingSelect_time>=DRIVER_CONTROLS_DELAY_BEFORE_MULTY_PRESS){
             stillPressingSelect_time = millis();
             switch(app_settings_selectedAppIndex){
                 case 0:
@@ -560,7 +560,7 @@ void appNameClass::onLoop(){
             this->drawIcons(true);
         }
     }else if(currentSubMenu==APP_SETTINGS_SUBMENU_SCREEN){
-        if(stillPressingSelect_time!=0 && millis()-this->stillPressingSelect_time>=DRIVER_CONTROLS_DELAY_BEFORE_MULRI_PRESS){
+        if(stillPressingSelect_time!=0 && millis()-this->stillPressingSelect_time>=DRIVER_CONTROLS_DELAY_BEFORE_MULTY_PRESS){
             stillPressingSelect_time = millis();
             int value = 0;
 
@@ -576,27 +576,31 @@ void appNameClass::onLoop(){
                     set_core_display_brightness(value);
                     break;
                 case 1:
-                    // Change display fade brightness
-                    value = get_core_display_brightness_fade();
-                    if(value>=100) value = 0;
-                    else value+=5;
-                    if(value==0) value = 1;
-                    if(value==6) value = 5;
-                    set_core_display_brightness_fade(value);
-                    break;
+                    #ifdef DISPLAY_BACKLIGHT_CONTROL_ENABLE
+                        // Change display fade brightness
+                        value = get_core_display_brightness_fade();
+                        if(value>=100) value = 0;
+                        else value+=5;
+                        if(value==0) value = 1;
+                        if(value==6) value = 5;
+                        set_core_display_brightness_fade(value);
+                        break;
+                    #endif
                 case 2:
-                    // Change time delay to fade
-                    value = get_core_display_time_delay_to_fade();
-                    if(value>=240) value = 0;
-                    else{
-                        if(value<4)         value+=1;
-                        else if(value<10)   value+=2;
-                        else if(value<30)   value+=5;
-                        else if(value<100)  value+=10;
-                        else value+=20;
-                    }
-                    set_core_display_time_delay_to_fade(value);
-                    break;
+                    #ifdef DISPLAY_BACKLIGHT_CONTROL_ENABLE
+                        // Change time delay to fade
+                        value = get_core_display_time_delay_to_fade();
+                        if(value>=240) value = 0;
+                        else{
+                            if(value<4)         value+=1;
+                            else if(value<10)   value+=2;
+                            else if(value<30)   value+=5;
+                            else if(value<100)  value+=10;
+                            else value+=20;
+                        }
+                        set_core_display_time_delay_to_fade(value);
+                        break;
+                    #endif
                 case 3:
                     // Change time delay to poweroff
                     value = get_core_display_time_delay_to_poweroff();
@@ -1040,9 +1044,17 @@ String appNameClass::getApplicationSubTitle(unsigned char submenu, unsigned char
                 case 0:
                     return String(get_core_display_brightness()) + " %";
                 case 1:
-                    return String(get_core_display_brightness_fade()) + " %"; 
+                    #ifdef DISPLAY_BACKLIGHT_CONTROL_ENABLE
+                        return String(get_core_display_brightness_fade()) + " %"; 
+                    #else
+                        return "-";
+                    #endif
                 case 2:
-                    return String(get_core_display_time_delay_to_fade()) + " s";  
+                    #ifdef DISPLAY_BACKLIGHT_CONTROL_ENABLE
+                        return String(get_core_display_time_delay_to_fade()) + " s";  
+                    #else
+                        return "-";
+                    #endif
                 case 3:
                     return String(get_core_display_time_delay_to_poweroff()) + " s";  
                 default:

@@ -22,17 +22,18 @@ void driver_controls_setup(){
 void driver_controls_loop(){
   for (unsigned char i=0; i<DRIVER_CONTROLS_TOTALBUTTONS; i++){
     if ((driver_control_isPositive[i]==true) ? (!digitalRead(driver_control_buttonsPins[i])) : (digitalRead(driver_control_buttonsPins[i]))){
-
+      set_core_powersave_lastUserAction();
+      
       last_user_activity = _millis();
       if(driver_control_pressed[i]==false){
         // press start
         driver_control_pressed[i]=true;
         driver_control_time_pressed[i] = _millis();
+        //1 set_core_powersave_lastUserAction();
         onButtonEvent(EVENT_BUTTON_PRESSED, i);
         if(driver_control_DOUBLE_PRESS_lastPress[i]!=0){
           if(_millis() - driver_control_DOUBLE_PRESS_lastPress[i]<CONTROLS_DELAY_TO_DOUBLE_CLICK_MS){
             driver_control_DOUBLE_PRESS_doublePressed[i] = true;
-            set_core_powersave_lastUserAction();
             onButtonEvent(EVENT_ON_TOUCH_DOUBLE_PRESS, i, _millis() - driver_control_DOUBLE_PRESS_lastPress[i]);
           }
         }else{
@@ -56,7 +57,7 @@ void driver_controls_loop(){
       if(driver_control_pressed[i]==true){
         // released
         driver_control_pressed[i]=false;
-        set_core_powersave_lastUserAction();
+        //1 set_core_powersave_lastUserAction();
         onButtonEvent(EVENT_BUTTON_RELEASED, i);
 
         

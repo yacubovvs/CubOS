@@ -22,7 +22,7 @@
 
 #define DRIVER_CONTROLS_TOTALBUTTONS 3
 #define DRIVER_CONTROLS_DELAY_BEFORE_LONG_PRESS     50
-#define DRIVER_CONTROLS_DELAY_BEFORE_MULRI_PRESS    400
+#define DRIVER_CONTROLS_DELAY_BEFORE_MULTY_PRESS    400
 
 /*
 ############################################################################

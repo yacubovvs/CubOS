@@ -1,4 +1,4 @@
-#ifdef CPU_SLEEP_ENABLE
+#ifdef CPU_CONTROLL_ENABLE
     void core_cpu_setup(){
         driver_cpu_setup();
         //core_cpu_modemSleep();

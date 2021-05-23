@@ -1,3 +1,5 @@
+//#define DEBUG_CORE_POWERSAVE
+
 #ifdef POWERSAVE_ENABLE
     long core_powersave_lastUserAction = 0;
     long core_powersave_lastUserAction_tick = 0;
@@ -23,6 +25,11 @@
         #endif
 
         set_core_powersave_lastUserAction();
+        #ifdef DEBUG_CORE_POWERSAVE
+            debug("Sleep modem");
+            delay(25);
+        #endif
+
         core_cpu_sleep(SLEEP_MODEM);
     }
 
@@ -34,7 +41,6 @@
             if(timeSincelastUserAction>=get_core_display_time_delay_to_fade()){
                 if(timeSincelastUserAction - get_core_display_time_delay_to_fade()>=get_core_display_time_delay_to_poweroff()){
                     // switch off screen
-
                     if(driver_display_getBrightness()!=0){
                         driver_display_setBrightness(0);
                     }
@@ -42,12 +48,19 @@
                     #ifdef CPU_SLEEP_ENABLE
                         // Going to sleep
                         if(currentApp->preventSleep==false){
+                            #ifdef DEBUG_CORE_POWERSAVE
+                                debug("Deep sleep");
+                                delay(25);
+                            #endif
                             core_cpu_sleep(STAND_BY_SLEEP_TYPE);
                         }
                     #endif
                 }else{
                     // fade screen
-                    
+                    #ifdef DEBUG_CORE_POWERSAVE
+                        debug("Fade screen");
+                        delay(25);
+                    #endif
                     if(driver_display_getBrightness()!=get_core_display_brightness_fade()){
                         #ifdef SMOOTH_BACKLIGHT_CONTROL_DELAY
                         if(get_core_display_brightness_fade()<driver_display_getBrightness()){
@@ -78,6 +91,10 @@
                 #ifdef CPU_SLEEP_ENABLE
                     // Going to sleep
                     if(currentApp->preventSleep==false){
+                        #ifdef DEBUG_CORE_POWERSAVE
+                            debug("Deep sleep");
+                            delay(25);
+                        #endif
                         core_cpu_sleep(STAND_BY_SLEEP_TYPE);
                     }
                 #endif
@@ -94,8 +111,10 @@
                     #else 
                         if(millis() - core_powersave_lastUserAction_tick>DRIVER_CONTROLS_DELAY_BEFORE_LONG_PRESS+1){
                     #endif
-                        gpio_hold_en((gpio_num_t) 26);
-                        gpio_deep_sleep_hold_en();
+                        #ifdef DEBUG_CORE_POWERSAVE
+                            debug("Light sleep");
+                            delay(25);
+                        #endif
                         core_cpu_sleep(SLEEP_LIGHT, 1);   
                     }
                 #endif

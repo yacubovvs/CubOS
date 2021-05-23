@@ -151,8 +151,10 @@ bool DRAW_LIMITS_getEnable(){
 */
 
 unsigned char core_display_brightness             = 100;
-unsigned char core_display_brightness_fade        = 20;
-unsigned char core_display_time_delay_to_fade     = 5;
+#ifdef DISPLAY_BACKLIGHT_CONTROL_ENABLE
+  unsigned char core_display_brightness_fade        = 20;
+  unsigned char core_display_time_delay_to_fade     = 5;
+#endif
 unsigned char core_display_time_delay_to_poweroff = 10;
 
 void set_core_display_brightness(unsigned char value){ 
@@ -161,15 +163,17 @@ void set_core_display_brightness(unsigned char value){
   driver_display_setBrightness(core_display_brightness);
 }
 
-void set_core_display_brightness_fade(unsigned char value){ 
-  if(value>100) value = 100;
-  core_display_brightness_fade = value;
-}
+#ifdef DISPLAY_BACKLIGHT_CONTROL_ENABLE
+  void set_core_display_brightness_fade(unsigned char value){ 
+    if(value>100) value = 100;
+    core_display_brightness_fade = value;
+  }
 
-void set_core_display_time_delay_to_fade(unsigned char value){
-  if(value>240) value = 240;
-  core_display_time_delay_to_fade = value;
-}
+  void set_core_display_time_delay_to_fade(unsigned char value){
+    if(value>240) value = 240;
+    core_display_time_delay_to_fade = value;
+  }
+#endif
 
 void set_core_display_time_delay_to_poweroff(unsigned char value){ 
   if(value==0) value = 1;
@@ -178,8 +182,10 @@ void set_core_display_time_delay_to_poweroff(unsigned char value){
 }
 
 unsigned char get_core_display_brightness(){return core_display_brightness; }
-unsigned char get_core_display_brightness_fade(){return core_display_brightness_fade; }
-unsigned char get_core_display_time_delay_to_fade(){return core_display_time_delay_to_fade; }
+#ifdef DISPLAY_BACKLIGHT_CONTROL_ENABLE
+  unsigned char get_core_display_brightness_fade(){return core_display_brightness_fade; }
+  unsigned char get_core_display_time_delay_to_fade(){return core_display_time_delay_to_fade; }
+#endif
 unsigned char get_core_display_time_delay_to_poweroff(){return core_display_time_delay_to_poweroff; }
 
 /*

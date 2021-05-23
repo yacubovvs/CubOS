@@ -105,3 +105,7 @@ void driver_RTC_setYear(int year){
 	RTC_DateStruct.Year = year;
 	M5.Rtc.SetData(&RTC_DateStruct);
 }
+
+void driver_RTC_setAlarmBySeconds(unsigned char seconds){
+
+}
