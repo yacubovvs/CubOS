@@ -101,7 +101,7 @@ void setup(){
     driver_battery_setup();
   #endif
 
-  #ifdef USE_RTC
+  #ifdef RTC_ENABLE
       driver_RTC_setup();
   #endif
 

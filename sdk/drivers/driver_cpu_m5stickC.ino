@@ -6,6 +6,9 @@ void driver_cpu_setup(){
     M5.begin();
     esp_sleep_enable_ext0_wakeup(GPIO_NUM_37, LOW);
     set_core_powersave_lastUserAction();
+
+    M5.Axp.ClearAllIRQ();
+    M5.Axp.DisableAllIRQ();
 }
 
 void driver_cpu_wakeup(){
@@ -22,9 +25,15 @@ void driver_cpu_sleep(unsigned char sleepType, long timeout){
             //esp_sleep_enable_ext0_wakeup(GPIO_NUM_37, LOW);
             //esp_sleep_enable_ext0_wakeup(GPIO_NUM_35, LOW);
 
+            //M5.Axp.DisableCoulombcounter();
+            //M5.Axp.ClearCoulombcounter();
+            //M5.Axp.StopCoulombcounter();
+
+            
             M5.Axp.SetLDO2(false);
             M5.Axp.SetLDO3(false);
-        
+
+    
             if(timeout!=0){
                 M5.Axp.DeepSleep(SLEEP_SEC(timeout));
             }else{

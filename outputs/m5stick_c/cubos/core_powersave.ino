@@ -10,7 +10,7 @@
     }
 
     long getCurrentSystemTime(){
-        #ifdef USE_RTC
+        #ifdef RTC_ENABLE
             long currentSystemTime =  ((long)core_time_getHours_byte())*60*60 + ((long)core_time_getMinutes_byte())*60 + ((long)core_time_getSeconds_byte());
             return currentSystemTime;
             //return millis()/1000;
@@ -20,7 +20,7 @@
     }
 
     void core_powersave_setup(){
-        #ifdef USE_RTC
+        #ifdef RTC_ENABLE
             driver_RTC_refresh();
         #endif
 

@@ -35,18 +35,18 @@
 
 #define STARTING_APP_NUMM   -1    // for Mainmenu (default app)
 //#define STARTING_APP_NUMM    1 // Settings
-#define STARTING_APP_NUMM    7 // Battery
+//#define STARTING_APP_NUMM    7 // Battery
 
 #define FONT_SIZE_DEFAULT   1
 
 #define CPU_SLEEP_ENABLE
-
+#define ACCELEROMETER_ENABLE
 
 #define BATTERY_ENABLE
 #define CLOCK_ENABLE
 //#define USE_PRIMITIVE_HARDWARE_DRAW_ACCELERATION
 
-#define USE_RTC
+#define RTC_ENABLE
 
 #define SCREEN_ROTATION_0
 //#define SCREEN_ROTATION_90
