@@ -153,9 +153,9 @@ unsigned char core_display_brightness             = 100;
 
 #ifdef DISPLAY_BACKLIGHT_FADE_CONTROL_ENABLE
   unsigned char core_display_brightness_fade        = 20;
-  unsigned char core_display_time_delay_to_fade     = 5;
+  unsigned char core_display_time_delay_to_fade     = 15;
 #endif
-unsigned char core_display_time_delay_to_poweroff = 10;
+unsigned char core_display_time_delay_to_poweroff = 30;
 
 #ifdef DISPLAY_BACKLIGHT_CONTROL_ENABLE
   void set_core_display_brightness(unsigned char value){ 
@@ -828,6 +828,43 @@ void drawRect(int x0, int y0, int x1, int y1, bool fill){
     drawLine(x0, y0, x0, y1);
     drawLine(x1, y0, x1, y1);
   }
+}
+
+void drawCircle(int x0, int y0, int radius, int width){
+  if(width==1) drawCircle(x0, y0, radius);
+  while(width>=0){
+    drawCircle(x0, y0, radius-width);
+    drawCircle(x0+1, y0+1, radius-width);
+    width--;
+  }
+}
+
+void drawCircle(int x0, int y0, int radius){
+	int x = 0;
+	int y = radius;
+	int delta = 1 - 2 * radius;
+	int error = 0;
+	while(y >= 0) {
+		setPixel(x0 + x, y0 + y);
+		setPixel(x0 + x, y0 - y);
+		setPixel(x0 - x, y0 + y);
+		setPixel(x0 - x, y0 - y);
+		error = 2 * (delta + y) - 1;
+		if(delta < 0 && error <= 0) {
+			++x;
+			delta += 2 * x + 1;
+			continue;
+		}
+		error = 2 * (delta - x) - 1;
+		if(delta > 0 && error > 0) {
+			--y;
+			delta += 1 - 2 * y;
+			continue;
+		}
+		++x;
+		delta += 2 * (x - y);
+		--y;
+	}
 }
 
 // System function

@@ -36,7 +36,7 @@
 #define STARTING_APP_NUMM   -1    // for Mainmenu (default app)
 //#define STARTING_APP_NUMM    1 // Settings
 //#define STARTING_APP_NUMM    7 // Battery
-//#define STARTING_APP_NUMM    0 // Clock
+#define STARTING_APP_NUMM    0 // Clock
 
 #define FONT_SIZE_DEFAULT   1
 

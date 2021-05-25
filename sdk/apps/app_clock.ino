@@ -89,24 +89,32 @@ void appNameClass::onEvent(unsigned char event, int val1, int val2){
     
 }
 
-
+/*
 #define NARROW_CLOCK_STRING1 18
 #define NARROW_CLOCK_STRING2 73
 #define NARROW_CLOCK_STRING3 125
+*/
+
 void appNameClass::draw_current_time(bool draw){
     if(draw){
         // Draw
         setDrawColor_ContrastColor();
         this->timeString = core_time_getHourMinuteSecondsTime();
         #ifdef NARROW_SCREEN
-            #define GRAY_HOURS 128
 
+            setDrawColor(51, 246, 31);
+            //drawRect(0,0,20,20,true);
+            drawCircle(SCREEN_WIDTH/2, SCREEN_HEIGHT/2, SCREEN_WIDTH/2-2, 6);
+            
+            /*
+            #define GRAY_HOURS 128
             setDrawColor(GRAY_HOURS, GRAY_HOURS, GRAY_HOURS);
             drawString_centered_fontSize(this->timeString.substring(0,2), NARROW_CLOCK_STRING1, 6);
             setDrawColor(255, 255, 255);
             drawString_centered_fontSize(this->timeString.substring(3,5), NARROW_CLOCK_STRING2, 6);
             setDrawColor(GRAY_HOURS, 0, 0);
             drawString_centered_fontSize(this->timeString.substring(6,8), NARROW_CLOCK_STRING3, 4);
+            */
             
         #else
             drawString(this->timeString, 2, 90, 5);
@@ -115,9 +123,13 @@ void appNameClass::draw_current_time(bool draw){
         // Clear
         setDrawColor_BackGoundColor();
         #ifdef NARROW_SCREEN
+
+            //drawRect(0,0,20,20,true);
+            /*
             drawString_centered_fontSize(this->timeString.substring(0,2), NARROW_CLOCK_STRING1, 6);
             drawString_centered_fontSize(this->timeString.substring(3,5), NARROW_CLOCK_STRING2, 6);
             drawString_centered_fontSize(this->timeString.substring(6,8), NARROW_CLOCK_STRING3, 4);
+            */
         #else
             clearString(this->timeString, 2, 90, 5);
         #endif
