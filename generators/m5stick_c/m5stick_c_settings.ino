@@ -36,7 +36,7 @@
 #define STARTING_APP_NUMM   -1    // for Mainmenu (default app)
 //#define STARTING_APP_NUMM    1 // Settings
 //#define STARTING_APP_NUMM    7 // Battery
-#define STARTING_APP_NUMM    0 // Clock
+//#define STARTING_APP_NUMM    0 // Clock
 
 #define FONT_SIZE_DEFAULT   1
 
@@ -67,8 +67,9 @@
 //#define STAND_BY_SLEEP_TYPE     SLEEP_LIGHT
 #define STAND_BY_SLEEP_TYPE     SLEEP_DEEP
 
-#undef SMOOTH_BACKLIGHT_CONTROL_DELAY
-#undef DISPLAY_BACKLIGHT_CONTROL_ENABLE
+#undef SMOOTH_BACKLIGHT_CONTROL_DELAY_CHANGE
+//#undef DISPLAY_BACKLIGHT_CONTROL_ENABLE
+//#undef DISPLAY_BACKLIGHT_FADE_CONTROL_ENABLE
 
 /*
     ############################################################################################

@@ -1946,7 +1946,7 @@ void drawRect_custom( int x0, int y0, int x1, int y1, int x2, int y2, int x3, in
   }
 }
 
-void drawIcon(bool draw, const unsigned char* data, int x, int y){
+void drawImage(bool draw, const unsigned char* data, int x, int y){
     /*
     DRAW_LIMITS_Enabled
     DRAW_LIMITS_top
@@ -2077,8 +2077,8 @@ void drawIcon(bool draw, const unsigned char* data, int x, int y){
 
 }
 
-void drawIcon(const unsigned char* data, int x, int y){
-  drawIcon(1, data, x, y);
+void drawImage(const unsigned char* data, int x, int y){
+  drawImage(1, data, x, y);
 }
 
 bool getBitInByte(unsigned char currentbyte, unsigned char bitNum){
@@ -2319,7 +2319,7 @@ void core_views_statusBar_draw(){
 
     // BATTERY
     #ifdef BATTERY_ENABLE
-        drawIcon(true, battery100,SCREEN_WIDTH-32-STYLE_STATUSBAR_HEIGHT/5, STYLE_STATUSBAR_HEIGHT/2 - 8 + 1);
+        drawImage(true, battery100,SCREEN_WIDTH-32-STYLE_STATUSBAR_HEIGHT/5, STYLE_STATUSBAR_HEIGHT/2 - 8 + 1);
         if(DRAW_LIMITS_Enabled) debug("Draw limit enabled");
     #endif
 
@@ -2430,7 +2430,7 @@ void core_views_draw_active_page(
 
 void core_views_draw_app_icon(bool draw, int x, int y, const unsigned char* title, const unsigned char* icon){
     // image
-    drawIcon(draw, icon, x-CORE_VIEWS_APPICON_IMAGE_WIDTH/2, y-CORE_VIEWS_APPICON_IMAGE_HEIGHT/2 + CORE_VIEWS_APPICON_IMAGE_Y_OFFSET);
+    drawImage(draw, icon, x-CORE_VIEWS_APPICON_IMAGE_WIDTH/2, y-CORE_VIEWS_APPICON_IMAGE_HEIGHT/2 + CORE_VIEWS_APPICON_IMAGE_Y_OFFSET);
 
     // title
     if(draw){
@@ -2449,7 +2449,7 @@ void core_views_draw_app_icon(bool draw, int x, int y, const unsigned char* titl
 void core_views_draw_settings_item(bool draw, int x, int y, const unsigned char* title, String subTitle, const unsigned char* icon){
 
     #ifdef NARROW_SCREEN
-        drawIcon(draw, icon, x-CORE_VIEWS_SETTINGS_IMAGE_WIDTH/2, y-30);
+        drawImage(draw, icon, x-CORE_VIEWS_SETTINGS_IMAGE_WIDTH/2, y-30);
         uint16_t titleShift = strlen((const char*)title)*FONT_CHAR_WIDTH/2;
         uint16_t subTitleShift = subTitle.length()*FONT_CHAR_WIDTH/2;
 
@@ -2470,7 +2470,7 @@ void core_views_draw_settings_item(bool draw, int x, int y, const unsigned char*
         // image
         int left_x = x + CORE_VIEWS_SETTINGS_IMAGE_WIDTH;
         setDrawColor(getBackgroundColor_red(), getBackgroundColor_green(), getBackgroundColor_blue());
-        drawIcon(draw, icon, x-CORE_VIEWS_SETTINGS_IMAGE_WIDTH/2, y-CORE_VIEWS_SETTINGS_IMAGE_WIDTH/2);
+        drawImage(draw, icon, x-CORE_VIEWS_SETTINGS_IMAGE_WIDTH/2, y-CORE_VIEWS_SETTINGS_IMAGE_WIDTH/2);
 
         // title
         if(draw){
@@ -2495,7 +2495,7 @@ void drawMenuElement(bool draw, uint16_t x, uint16_t y, uint16_t width, uint16_t
     //drawString_rightAlign(string2, x + width - 15, y + height*2/3 - FONT_CHAR_HEIGHT/2);
     drawString(string2, x + 36 + 10, y + height*2/3 - FONT_CHAR_HEIGHT/2);
 
-    drawIcon(draw, icon, x + 10, y + height/2 - 16/2);
+    drawImage(draw, icon, x + 10, y + height/2 - 16/2);
 }
 
 /*
@@ -3082,11 +3082,11 @@ int appNameClass::getPositionBySelectedNumber(unsigned char selectedNumber){
 void appNameClass::drawSettingTimeArrows(bool draw, int position){
     //drawRect(x0+delta, y0+delta, x1-delta, y1-delta);  
 
-    //drawIcon(draw, icon_arrow_top, position + 3 - 16, SCREEN_HEIGHT/2 - 19 - 15 );
-    //drawIcon(draw, icon_arrow_bottom, position + 3 - 16, SCREEN_HEIGHT/2 + 20 + 15);
+    //drawImage(draw, icon_arrow_top, position + 3 - 16, SCREEN_HEIGHT/2 - 19 - 15 );
+    //drawImage(draw, icon_arrow_bottom, position + 3 - 16, SCREEN_HEIGHT/2 + 20 + 15);
 
-    drawIcon(draw, getIcon(ICON_ARROW_UP), position + 3 - 16, SCREEN_HEIGHT/2 - 19 - 15 );
-    drawIcon(draw, getIcon(ICON_ARROW_DOWN), position + 3 - 16, SCREEN_HEIGHT/2 + 20 + 15);
+    drawImage(draw, getIcon(ICON_ARROW_UP), position + 3 - 16, SCREEN_HEIGHT/2 - 19 - 15 );
+    drawImage(draw, getIcon(ICON_ARROW_DOWN), position + 3 - 16, SCREEN_HEIGHT/2 + 20 + 15);
 }
 
 void appNameClass::drawSettingTimeSelect(bool draw, int position){
@@ -3633,7 +3633,7 @@ void appNameClass::onCreate(){
         0x30,0x03,0xFF,0xC0,
     };
 
-    drawIcon(true, testIcon, 70, 70); 
+    drawImage(true, testIcon, 70, 70); 
 
     /* * /
     fillScreen(0, 0, 0);
@@ -3676,8 +3676,8 @@ void appNameClass::onCreate(){
     drawString("Icon test", 5, STYLE_STATUSBAR_HEIGHT + 10 + 16*0, 2);
     
     for(unsigned char i=0; i<30; i++){
-        drawIcon(true, testIcon, 120, 120);      
-        drawIcon(false, testIcon, 120, 120);      
+        drawImage(true, testIcon, 120, 120);      
+        drawImage(false, testIcon, 120, 120);      
     }
 
     setDrawColor(255, 255, 255);

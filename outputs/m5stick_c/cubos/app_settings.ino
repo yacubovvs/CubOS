@@ -228,11 +228,11 @@ int appNameClass::getPositionBySelectedNumber(unsigned char selectedNumber){
 void appNameClass::drawSettingTimeArrows(bool draw, int position){
     //drawRect(x0+delta, y0+delta, x1-delta, y1-delta);  
 
-    //drawIcon(draw, icon_arrow_top, position + 3 - 16, SCREEN_HEIGHT/2 - 19 - 15 );
-    //drawIcon(draw, icon_arrow_bottom, position + 3 - 16, SCREEN_HEIGHT/2 + 20 + 15);
+    //drawImage(draw, icon_arrow_top, position + 3 - 16, SCREEN_HEIGHT/2 - 19 - 15 );
+    //drawImage(draw, icon_arrow_bottom, position + 3 - 16, SCREEN_HEIGHT/2 + 20 + 15);
 
-    drawIcon(draw, getIcon(ICON_ARROW_UP), position + 3 - 16, SCREEN_HEIGHT/2 - 19 - 15 );
-    drawIcon(draw, getIcon(ICON_ARROW_DOWN), position + 3 - 16, SCREEN_HEIGHT/2 + 20 + 15);
+    drawImage(draw, getIcon(ICON_ARROW_UP), position + 3 - 16, SCREEN_HEIGHT/2 - 19 - 15 );
+    drawImage(draw, getIcon(ICON_ARROW_DOWN), position + 3 - 16, SCREEN_HEIGHT/2 + 20 + 15);
 }
 
 void appNameClass::drawSettingTimeSelect(bool draw, int position){
@@ -567,16 +567,18 @@ void appNameClass::onLoop(){
             this->drawIcons(false);
             switch(app_settings_selectedAppIndex){
                 case 0:
-                    // Change display brightness
-                    value = get_core_display_brightness();
-                    if(value>=100) value = 0;
-                    else value+=5;
-                    if(value==0) value = 1;
-                    if(value==6) value = 5;
-                    set_core_display_brightness(value);
+                    #ifdef DISPLAY_BACKLIGHT_CONTROL_ENABLE
+                        // Change display brightness
+                        value = get_core_display_brightness();
+                        if(value>=100) value = 0;
+                        else value+=5;
+                        if(value==0) value = 1;
+                        if(value==6) value = 5;
+                        set_core_display_brightness(value);
+                    #endif
                     break;
                 case 1:
-                    #ifdef DISPLAY_BACKLIGHT_CONTROL_ENABLE
+                    #ifdef DISPLAY_BACKLIGHT_FADE_CONTROL_ENABLE
                         // Change display fade brightness
                         value = get_core_display_brightness_fade();
                         if(value>=100) value = 0;
@@ -584,10 +586,10 @@ void appNameClass::onLoop(){
                         if(value==0) value = 1;
                         if(value==6) value = 5;
                         set_core_display_brightness_fade(value);
-                        break;
                     #endif
+                    break;
                 case 2:
-                    #ifdef DISPLAY_BACKLIGHT_CONTROL_ENABLE
+                    #ifdef DISPLAY_BACKLIGHT_FADE_CONTROL_ENABLE
                         // Change time delay to fade
                         value = get_core_display_time_delay_to_fade();
                         if(value>=240) value = 0;
@@ -1042,15 +1044,19 @@ String appNameClass::getApplicationSubTitle(unsigned char submenu, unsigned char
         case APP_SETTINGS_SUBMENU_SCREEN:
             switch (num){
                 case 0:
-                    return String(get_core_display_brightness()) + " %";
+                    #ifdef DISPLAY_BACKLIGHT_CONTROL_ENABLE 
+                        return String(get_core_display_brightness()) + " %";
+                    #else
+                        return "-";
+                    #endif
                 case 1:
-                    #ifdef DISPLAY_BACKLIGHT_CONTROL_ENABLE
+                    #ifdef DISPLAY_BACKLIGHT_FADE_CONTROL_ENABLE
                         return String(get_core_display_brightness_fade()) + " %"; 
                     #else
                         return "-";
                     #endif
                 case 2:
-                    #ifdef DISPLAY_BACKLIGHT_CONTROL_ENABLE
+                    #ifdef DISPLAY_BACKLIGHT_FADE_CONTROL_ENABLE
                         return String(get_core_display_time_delay_to_fade()) + " s";  
                     #else
                         return "-";

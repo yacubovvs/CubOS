@@ -37,7 +37,7 @@
         if(core_powersave_lastUserAction>getCurrentSystemTime()) core_powersave_lastUserAction = 0;
         long timeSincelastUserAction = getCurrentSystemTime() - core_powersave_lastUserAction;
         
-        #ifdef DISPLAY_BACKLIGHT_CONTROL_ENABLE
+        #ifdef DISPLAY_BACKLIGHT_FADE_CONTROL_ENABLE
             if(timeSincelastUserAction>=get_core_display_time_delay_to_fade()){
                 if(timeSincelastUserAction - get_core_display_time_delay_to_fade()>=get_core_display_time_delay_to_poweroff()){
                     // switch off screen
@@ -62,10 +62,10 @@
                         delay(25);
                     #endif
                     if(driver_display_getBrightness()!=get_core_display_brightness_fade()){
-                        #ifdef SMOOTH_BACKLIGHT_CONTROL_DELAY
+                        #ifdef SMOOTH_BACKLIGHT_CONTROL_DELAY_CHANGE
                         if(get_core_display_brightness_fade()<driver_display_getBrightness()){
                             driver_display_setBrightness(driver_display_getBrightness()-1);
-                            delay(SMOOTH_BACKLIGHT_CONTROL_DELAY);
+                            delay(SMOOTH_BACKLIGHT_CONTROL_DELAY_CHANGE);
                         }else{
                             driver_display_setBrightness(get_core_display_brightness_fade());
                         }

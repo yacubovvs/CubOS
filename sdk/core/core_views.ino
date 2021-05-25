@@ -143,9 +143,9 @@ void core_views_statusBar_draw(){
         }
 
         if(batteryCharge_last_wasCharging){
-            drawIcon(draw, battery_charging, SCREEN_WIDTH-32-STYLE_STATUSBAR_HEIGHT/5, STYLE_STATUSBAR_HEIGHT/2 - 8 + 1);
+            drawImage(draw, battery_charging, SCREEN_WIDTH-32-STYLE_STATUSBAR_HEIGHT/5, STYLE_STATUSBAR_HEIGHT/2 - 8 + 1);
         }else{
-            drawIcon(draw, batteryIcon, SCREEN_WIDTH-32-STYLE_STATUSBAR_HEIGHT/5, STYLE_STATUSBAR_HEIGHT/2 - 8 + 1);
+            drawImage(draw, batteryIcon, SCREEN_WIDTH-32-STYLE_STATUSBAR_HEIGHT/5, STYLE_STATUSBAR_HEIGHT/2 - 8 + 1);
         }
 
         TEMPORARILY_RESTORE_BACKGROUND();
@@ -259,7 +259,7 @@ void core_views_draw_active_page(
 
 void core_views_draw_app_icon(bool draw, int x, int y, const unsigned char* title, const unsigned char* icon){
     // image
-    drawIcon(draw, icon, x-CORE_VIEWS_APPICON_IMAGE_WIDTH/2, y-CORE_VIEWS_APPICON_IMAGE_HEIGHT/2 + CORE_VIEWS_APPICON_IMAGE_Y_OFFSET);
+    drawImage(draw, icon, x-CORE_VIEWS_APPICON_IMAGE_WIDTH/2, y-CORE_VIEWS_APPICON_IMAGE_HEIGHT/2 + CORE_VIEWS_APPICON_IMAGE_Y_OFFSET);
 
     // title
     if(draw){
@@ -278,7 +278,7 @@ void core_views_draw_app_icon(bool draw, int x, int y, const unsigned char* titl
 void core_views_draw_settings_item(bool draw, int x, int y, const unsigned char* title, String subTitle, const unsigned char* icon){
 
     #ifdef NARROW_SCREEN
-        drawIcon(draw, icon, x-CORE_VIEWS_SETTINGS_IMAGE_WIDTH/2, y-30);
+        drawImage(draw, icon, x-CORE_VIEWS_SETTINGS_IMAGE_WIDTH/2, y-30);
         uint16_t titleShift = strlen((const char*)title)*FONT_CHAR_WIDTH/2;
         uint16_t subTitleShift = subTitle.length()*FONT_CHAR_WIDTH/2;
 
@@ -299,7 +299,7 @@ void core_views_draw_settings_item(bool draw, int x, int y, const unsigned char*
         // image
         int left_x = x + CORE_VIEWS_SETTINGS_IMAGE_WIDTH;
         setDrawColor(getBackgroundColor_red(), getBackgroundColor_green(), getBackgroundColor_blue());
-        drawIcon(draw, icon, x-CORE_VIEWS_SETTINGS_IMAGE_WIDTH/2, y-CORE_VIEWS_SETTINGS_IMAGE_WIDTH/2);
+        drawImage(draw, icon, x-CORE_VIEWS_SETTINGS_IMAGE_WIDTH/2, y-CORE_VIEWS_SETTINGS_IMAGE_WIDTH/2);
 
         // title
         if(draw){
@@ -360,7 +360,7 @@ void drawMenuElement(bool draw, uint16_t x, uint16_t y, uint16_t width, uint16_t
     //drawString_rightAlign(string2, x + width - 15, y + height*2/3 - FONT_CHAR_HEIGHT/2);
     drawString(string2, x + 36 + 10, y + height*2/3 - FONT_CHAR_HEIGHT/2);
 
-    drawIcon(draw, icon, x + 10, y + height/2 - 16/2);
+    drawImage(draw, icon, x + 10, y + height/2 - 16/2);
 }
 
 /*

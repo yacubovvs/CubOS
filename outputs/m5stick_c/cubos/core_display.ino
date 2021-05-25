@@ -149,21 +149,23 @@ bool DRAW_LIMITS_getEnable(){
                                   POWER CONTROLL
 * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * 
 */
-
 unsigned char core_display_brightness             = 100;
-#ifdef DISPLAY_BACKLIGHT_CONTROL_ENABLE
+
+#ifdef DISPLAY_BACKLIGHT_FADE_CONTROL_ENABLE
   unsigned char core_display_brightness_fade        = 20;
   unsigned char core_display_time_delay_to_fade     = 5;
 #endif
 unsigned char core_display_time_delay_to_poweroff = 10;
 
-void set_core_display_brightness(unsigned char value){ 
-  if(value>100) value = 100;
-  core_display_brightness = value;
-  driver_display_setBrightness(core_display_brightness);
-}
-
 #ifdef DISPLAY_BACKLIGHT_CONTROL_ENABLE
+  void set_core_display_brightness(unsigned char value){ 
+    if(value>100) value = 100;
+    core_display_brightness = value;
+    driver_display_setBrightness(core_display_brightness);
+  }
+#endif
+
+#ifdef DISPLAY_BACKLIGHT_FADE_CONTROL_ENABLE
   void set_core_display_brightness_fade(unsigned char value){ 
     if(value>100) value = 100;
     core_display_brightness_fade = value;
@@ -182,7 +184,7 @@ void set_core_display_time_delay_to_poweroff(unsigned char value){
 }
 
 unsigned char get_core_display_brightness(){return core_display_brightness; }
-#ifdef DISPLAY_BACKLIGHT_CONTROL_ENABLE
+#ifdef DISPLAY_BACKLIGHT_FADE_CONTROL_ENABLE
   unsigned char get_core_display_brightness_fade(){return core_display_brightness_fade; }
   unsigned char get_core_display_time_delay_to_fade(){return core_display_time_delay_to_fade; }
 #endif
@@ -867,7 +869,7 @@ void drawRect_custom( int x0, int y0, int x1, int y1, int x2, int y2, int x3, in
   }
 }
 
-void drawIcon(bool draw, const unsigned char* data, int x, int y){
+void drawImage(bool draw, const unsigned char* data, int x, int y){
     /*
     DRAW_LIMITS_Enabled
     DRAW_LIMITS_top
@@ -991,15 +993,45 @@ void drawIcon(bool draw, const unsigned char* data, int x, int y){
 
     }
       
+  #ifdef USE_TYPE2_OF_IMAGES
+    }else if(image_type==0x02){
+      // TYPE 2
+      //image_wigth
+      //image_height
+      if(draw){
+        uint16_t byte1;
+        unsigned char byte2;
+        for(icon_x=0; icon_x<image_wigth; icon_x++){
+          for(icon_y=0; icon_y<image_height; icon_y++){
+            byte1 = readRawChar(data, readPosition); 
+            byte2 = readRawChar(data, readPosition); 
+
+            uint16_t color = (byte1<<8) + byte2;
+          
+            //debug(String(byte1));
+            //debug(String(byte2));
+            //debug(String(color));
+            //return;
+
+            setDrawColor(color);
+            drawPixel(x + icon_x, y + icon_y);
+          }
+        }
+      }else{
+        drawRect(x, y, x+image_wigth, y+image_height, true);
+      }
+      
+  #endif
   }else{
     // Unknow type of image
+    
 
   }
 
 }
 
-void drawIcon(const unsigned char* data, int x, int y){
-  drawIcon(1, data, x, y);
+void drawImage(const unsigned char* data, int x, int y){
+  drawImage(1, data, x, y);
 }
 
 bool getBitInByte(unsigned char currentbyte, unsigned char bitNum){

@@ -11,22 +11,13 @@ unsigned char blue_bg    = 255;
 
 uint16_t current_drawColor;
 
-//#define vozmogniiPin 23
 void driver_display_setup(){
   driver_display_setBrightness(0);
-  //digitalWrite(vozmogniiPin, 0);
-  //M5.Axp.SetLDO2(false);
-  //digitalWrite(vozmogniiPin, 0);
   M5.begin();
-  //digitalWrite(vozmogniiPin, 0);
   M5.IMU.Init();
-  //digitalWrite(vozmogniiPin, 0);
   M5.Lcd.fillScreen(TFT_BLACK);
-  //digitalWrite(vozmogniiPin, 0);
   debug("Initing display");
-  //M5.Axp.SetLDO2(true);
   driver_display_setBrightness(get_core_display_brightness());
-  //digitalWrite(vozmogniiPin, 1);
 }
 
 void sleep_displayDriver(){
@@ -110,6 +101,10 @@ void setDrawColor(unsigned char red_new, unsigned char green_new, unsigned char 
   blue = blue_new;
 
   current_drawColor = get_uint16Color(red, green, blue);
+}
+
+void setDrawColor(uint16_t color){
+  current_drawColor = color;
 }
 
 uint16_t getDrawColor(){

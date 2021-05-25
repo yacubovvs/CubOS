@@ -167,7 +167,7 @@
             #                                                          #
             ############################################################
             */
-            .result{
+            .result, .result2{
                 border-radius: 3px;
                 border: solid black 1px;
                 padding: 10px 10px;
@@ -223,6 +223,10 @@
                 <div class="paintelements-line"></div>
             </div>
         </div>
+        <hr style="margin-top:25px;">
+        <input type="file" id="imgLoader" style="margin-top:10px; margin-bottom:10px;">
+        <hr>
+        <p id="result_title">Result type 1 (0 bytes):</p>
         <div class="result" contenteditable> 
         </div>
 
@@ -230,7 +234,66 @@
             Load from HEX data
         </div>
 
+        <hr>
+
+        <canvas style="display: none" id="canvas"></canvas>
+        
         <script>
+        document.getElementById('imgLoader').onchange = function handleImage(e) {
+            var reader = new FileReader();
+            reader.onload = function (event) {
+                var imgObj = new Image();
+                imgObj.src = event.target.result;
+                imgObj.onload = function () {
+                    // start fabricJS stuff
+
+                    //image.scale(getRandomNum(0.1, 0.25)).setCoords();
+                    //canvas.add(image);
+                    //console.log(imgObj);
+
+                    ctx = $('#canvas')[0].getContext("2d");
+                    ctx.drawImage(imgObj, 0, 0,image_width,image_height);
+                    
+                    var imageData = ctx.getImageData(0, 0, image_width, image_height);
+                    var px = imageData.data;      
+                    var len = px.length;
+
+                    let position = 0;
+                    for (var i = 0; i < len; i+=4) {
+                        
+                        var redPx = px[i];
+                        var greenPx = px[i+1];
+                        var bluePx = px[i+2];
+                        var alphaPx = px[i+3];
+
+                        //console.log( "" + (position%image_width) + " " + (Math.floor(position/image_width)) + "\n");
+
+                        image_map[position%image_width][Math.floor(position/image_width)] = "" + convert_to_HEX(redPx, 1) + convert_to_HEX(greenPx, 1) + convert_to_HEX(bluePx, 1);
+                        //if (redPx!=0 || greenPx!=0 ||bluePx!=0 || alphaPx!=0){
+                        //console.log(redPx,greenPx,bluePx,alphaPx);
+                        position++;
+                    }   
+
+                    generate_result();    
+                    loadImageFromHex();                
+                }
+
+            }
+            reader.readAsDataURL(e.target.files[0]);
+        }
+        </script>
+
+        <p id="result2_title" style="padding-top: 20px;">Result type 2 (0 bytes):</p>
+        <div class="result2" contenteditable> 
+        </div>
+
+
+
+        <script>
+
+            function get_uint16Color(red, green, blue){
+                return ( (red*31/255) <<11)|( (green*31/255) <<6)|( (blue*31/255) <<0);
+            }
 
             function width_plus(){
                 image_width += 8;
@@ -307,7 +370,7 @@
 
             function get_color_style(color){
                 var style = "";
-                //console.log("!" + color)
+
                 if (color=="transparent" || color==undefined){
                     style = "background: url(img/transparent.png); background-size:  100% 100%;";
                 }else{
@@ -326,7 +389,7 @@
 
             function set_currentColor(color){
                 current_color = color;
-                //console.log("Setting current color " + color);
+
                 $('.palette-element-active').removeClass('palette-element-active');
                 $('#color-pallete' + color).addClass('palette-element-active');
             }
@@ -351,7 +414,6 @@
                         if (image_map[x][y]==undefined) image_map[x][y] = "transparent";
 
                         var style = get_color_style(palette_arr[image_map[x][y]]);
-                        //console.log(style);
 
                         outer += "<div class=\"paintelement\" style=\"" + style + "\" id='paintelement" + x + "-" + y + "' onclick='paint_pixel(" + x + "," + y + ")' onmousemove='paint_pixel_mouse(" + x + "," + y + ")'></div>";
                     }
@@ -421,19 +483,57 @@
             }
 
             function getAllCollors(){
-                return palette_arr;
+                var map_palette_arr = [];
+
+                for(var y=0; y<image_height; y++){
+                    for(var x=0; x<image_width; x++){
+                        if ( map_palette_arr.find(function(el){return el==image_map[x][y]}) == undefined){
+                            map_palette_arr.push(image_map[x][y]);
+                        }        
+                    }
+                }
+                
+                return map_palette_arr;
             }
 
             function generate_result(){
                 var result = "";
+                var result2 = "";
 
-                result += "0x" + convert_to_HEX(2,1) + ",0x" + convert_to_HEX(1,1) + ",";               // Icon format 1
-                result += "0x" + convert_to_HEX(2,1) + ",0x" + convert_to_HEX(image_width,1) + ",";     // Icon width
-                result += "0x" + convert_to_HEX(2,1) + ",0x" + convert_to_HEX(image_height,1) + ",";    // Icon height
-                result += "";
+                result  += "0x" + convert_to_HEX(2,1) + ",0x" + convert_to_HEX(1,1) + ",";               // Icon format 1
+                result2 += "0x" + convert_to_HEX(2,1) + ",0x" + convert_to_HEX(2,1) + ",";               // Icon format 2
+                result  += "0x" + convert_to_HEX(2,1) + ",0x" + convert_to_HEX(image_width,1) + ",";     // Icon width
+                result2  += "0x" + convert_to_HEX(2,1) + ",0x" + convert_to_HEX(image_width,1) + ",";     // Icon width
+                result  += "0x" + convert_to_HEX(2,1) + ",0x" + convert_to_HEX(image_height,1) + ",";    // Icon height
+                result2  += "0x" + convert_to_HEX(2,1) + ",0x" + convert_to_HEX(image_height,1) + ",";    // Icon height
+                result  += "";
 
+                // FOR RESULT 2
+                for(let x=0; x<image_width; x++){
+                    for(let y=0; y<image_height; y++){
+                        let r = image_map[x][y].substr(0,2);
+                        let g = image_map[x][y].substr(2,2);
+                        let b = image_map[x][y].substr(4,2);
+
+                        let color_2byte = "" + get_uint16Color(parseInt("0x" + r), parseInt("0x" + g), parseInt("0x" + b));
+                        color_2byte = convert_to_HEX(color_2byte,2);
+
+                        let byte1 = "0x" + color_2byte.substr(0,2);
+                        let byte2 = "0x" + color_2byte.substr(2,2);
+
+                        result2 += byte1 + ",";
+                        result2 += byte2 + ",";
+
+                        //return;
+                        //image_map[x][y] = "transparent";
+                        //$('#paintelement' + x + '-' + y).attr('style', get_color_style(image_map[x][y]));
+                    }
+                }
+
+                // FOR RESULT 1
+                var pallete_new = getAllCollors();
                 for(color_i in getAllCollors()){
-                    var color = palette_arr[color_i];
+                    var color = pallete_new[color_i];
                     if (color=="transparent") continue;
                     
                     var outer = ""; //convert_to_HEX(4,1) + color + " ";
@@ -442,6 +542,7 @@
                     for(var y=0; y<image_height; y++){
                         for(var x=0; x<image_width; x++){
                             if(image_map[x][y]==color){
+                                
                                 outer += "1";
                                 colorEnabled = true;
                             }else outer += "0"
@@ -449,7 +550,7 @@
                     }
 
                     if (colorEnabled){
-
+                        
                         //result += convert_to_HEX(4,1) + color_to_hex(color) + " ";
                         result += "0x04," + color_to_hex(color) + "";
                         //outer = (outer + "00000000").substr(0, Math.floor(outer.length/8 + 1)*8);
@@ -477,8 +578,19 @@
                 }
 
                 //result += convert_to_HEX(2,1);
+                /*
+                    <p id="result_title">Result type 1 (0 bytes):</p>
+                    <div class="result" contenteditable> 
+                    </div>
+
+                    <p id="result2_title" style="padding-top: 20px;">Result type 2 (0 bytes):</p>
+                */
+
+                $('#result_title').text('Result type 1 (' + (result.split(',').length-1) + ' bytes):');
+                $('#result2_title').text('Result type 2 (' + (result2.split(',').length-1) + ' bytes):');
 
                 $(".result").html(result);
+                $(".result2").html(result2);
             }
 
             function color_to_hex(color){
@@ -494,20 +606,13 @@
                     text_arr[i]  = parseInt(text_arr_hex[i], 16);
                 }
 
-                //console.log(text_arr);
-
                 image_width     = text_arr[3];
                 image_height    = text_arr[5];
                 update_image_size();
 
                 let layer_byte_length = image_width*image_height/8;
-                //console.log("Layer length " + layer_byte_length + " bytes");
 
                 let current_position = 7;
-
-                //console.log("image_width " + image_width);
-                //console.log("image_height " + image_height);
-
                 for(let x=0; x<image_width; x++){
                     for(let y=0; y<image_height; y++){
                         image_map[x][y] = "transparent";
@@ -520,8 +625,6 @@
                     let g = text_arr_hex[current_position]; current_position++;
                     let b = text_arr_hex[current_position]; current_position++;
 
-                    //console.log("New layer");
-                    //console.log("" + r + ", " + g + ", " + b);
 
                     let x = 0;
                     let y = 0;
@@ -532,7 +635,6 @@
                                 
                                 image_map[x][y] = "" + r.substr(-2) + g.substr(-2) + b.substr(-2);
 
-                                //console.log("# " +x + ", " + y);
                                 //$('#paintelement' + x + '-' + y).attr('style', "background: unset; background-color: #" + image_map[x][y] + ";");
                                 $('#paintelement' + x + '-' + y).attr('style', get_color_style(image_map[x][y]));
                             }
@@ -545,11 +647,11 @@
                             }
                         }
                     }
-                    //console.log("*** " + current_position);
                     current_position++;
                 }
 
                 $('.result').text(text);
+                generate_result();
             }
 
             update_image_size();
