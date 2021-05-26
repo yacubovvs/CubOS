@@ -12,6 +12,53 @@ uint16_t get_uint16Color(unsigned char red, unsigned char green, unsigned char b
   #endif
 }
 
+void setGradientColor(
+    unsigned char r1, 
+    unsigned char g1, 
+    unsigned char b1, 
+    unsigned char r2, 
+    unsigned char g2, 
+    unsigned char b2, 
+    unsigned int steps, 
+    unsigned int current_steps
+    ){
+
+  unsigned char r;
+  unsigned char g;
+  unsigned char b;
+
+  unsigned char r_min = min(r1,r2);
+  unsigned char g_min = min(g1,g2);
+  unsigned char b_min = min(b1,b2);
+
+  unsigned char r_max = max(r1,r2);
+  unsigned char g_max = max(g1,g2);
+  unsigned char b_max = max(b1,b2);
+
+  float k = (float)current_steps/(float)steps;
+
+  if(r1==r2) r = r1;
+  else{
+    if(r1>r2) r = r_min + ((float)(r_max - r_min))*k;
+    else r = r_max - ((float)(r_max - r_min))*k; 
+  }
+  
+
+  if(g1==g2) g = g1;
+  else{
+    if(g1>g2) g = g_min + ((float)(g_max - g_min))*k;
+    else g = g_max - ((float)(g_max - g_min))*k; 
+  }
+
+  if(b1==b2) b = b1;
+  else{
+    if(b1>b2) b = b_min + ((float)(b_max - b_min))*k;
+    else b = b_max - ((float)(b_max - b_min))*k; 
+  }
+
+  setDrawColor(r, g, b);
+}
+
 /*
 * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * 
                                   FRAMEBUFFER

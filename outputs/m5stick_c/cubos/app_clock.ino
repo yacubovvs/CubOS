@@ -25,17 +25,26 @@ class appNameClass: public Application{
 
         void draw_current_time(bool draw);
         String timeString;
+
+        unsigned char last_seconds = 0;
+        unsigned char last_hours = 0;
+        unsigned char last_minutes = 0;
+
+        void drawSecondsCircle(bool draw, unsigned char second);
       
 };
 
 void appNameClass::onCreate(){
     DRAW_LIMITS_setEnable(true);
     DRAW_LIMIT_reset();
-    //DRAW_LIMITS_setEnable(STYLE_STATUSBAR_HEIGHT, -1, -1, -1);
-
+    
     setBackgroundColor(0,0,0);
     setContrastColor(255, 255, 255);
+
+    this->last_seconds = core_time_getSeconds_byte();
+    for(unsigned char isecond=0; isecond<=this->last_seconds; isecond++) this->drawSecondsCircle(true, isecond);
     this->draw_current_time(true);
+
 }
 
 void appNameClass::onLoop(){
@@ -95,6 +104,15 @@ void appNameClass::onEvent(unsigned char event, int val1, int val2){
 #define NARROW_CLOCK_STRING3 125
 */
 
+void appNameClass::drawSecondsCircle(bool draw, unsigned char second){
+    if(draw)setGradientColor(255, 85, 0, 46, 255, 0, 60, second);
+    else setDrawColor_BackGoundColor();
+
+    int grad = 6*second;
+
+    drawArc(SCREEN_WIDTH/2, SCREEN_HEIGHT/2, SCREEN_WIDTH/2-2, -90 + grad, -90 + grad + 6, 5);
+}
+
 void appNameClass::draw_current_time(bool draw){
     this->preventSleep         = true;
     this->preventInAppSleep    = true;
@@ -104,24 +122,10 @@ void appNameClass::draw_current_time(bool draw){
         this->timeString = core_time_getHourMinuteSecondsTime();
         #ifdef NARROW_SCREEN
 
-            setDrawColor(51, 246, 31);
-            //drawRect(0,0,20,20,true);
-            //drawCircle(SCREEN_WIDTH/2, SCREEN_HEIGHT/2, SCREEN_WIDTH/2-2, true);
-            long timer = millis();
+            // SECONDS CIRCLE
+            this->last_seconds = core_time_getSeconds_byte();
+            this->drawSecondsCircle(draw, this->last_seconds);
             
-            drawArc(SCREEN_WIDTH/2, SCREEN_HEIGHT/2, SCREEN_WIDTH/2-2, 0, 315, 5);
-             
-            drawString(String(millis() - timer), 5, 10, 2);
-
-            /*
-            #define GRAY_HOURS 128
-            setDrawColor(GRAY_HOURS, GRAY_HOURS, GRAY_HOURS);
-            drawString_centered_fontSize(this->timeString.substring(0,2), NARROW_CLOCK_STRING1, 6);
-            setDrawColor(255, 255, 255);
-            drawString_centered_fontSize(this->timeString.substring(3,5), NARROW_CLOCK_STRING2, 6);
-            setDrawColor(GRAY_HOURS, 0, 0);
-            drawString_centered_fontSize(this->timeString.substring(6,8), NARROW_CLOCK_STRING3, 4);
-            */
             
         #else
             drawString(this->timeString, 2, 90, 5);
@@ -130,14 +134,16 @@ void appNameClass::draw_current_time(bool draw){
         // Clear
         setDrawColor_BackGoundColor();
         #ifdef NARROW_SCREEN
-            setDrawColor_BackGoundColor();
-            drawRect(0,0,SCREEN_WIDTH, SCREEN_HEIGHT, true);
-            //drawRect(0,0,20,20,true);
-            /*
-            drawString_centered_fontSize(this->timeString.substring(0,2), NARROW_CLOCK_STRING1, 6);
-            drawString_centered_fontSize(this->timeString.substring(3,5), NARROW_CLOCK_STRING2, 6);
-            drawString_centered_fontSize(this->timeString.substring(6,8), NARROW_CLOCK_STRING3, 4);
-            */
+            
+            // SECONDS CIRCLE
+            if(this->last_seconds>core_time_getSeconds_byte()){
+                setDrawColor_BackGoundColor();
+                //drawArc(SCREEN_WIDTH/2, SCREEN_HEIGHT/2, SCREEN_WIDTH/2-2, 0, 360, 5);
+                for(int isecond=0; isecond<60; isecond++) drawSecondsCircle(draw, isecond);
+
+            }
+            
+
         #else
             clearString(this->timeString, 2, 90, 5);
         #endif

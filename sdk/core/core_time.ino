@@ -257,7 +257,7 @@ void core_time_loop(){
                 core_views_statusBar_draw_time(true);
             }
         #endif
-
+        driver_RTC_refresh();
         currentApp->onEvent(EVENT_ON_TIME_CHANGED, currentTime, 0);
         lastTimeChange = currentTime;
     }
