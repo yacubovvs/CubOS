@@ -1,14 +1,6 @@
 // Download library from https://github.com/m5stack/M5StickC
 #include <M5StickC.h>
 
-unsigned char red;
-unsigned char green;
-unsigned char blue;
-
-unsigned char red_bg     = 255;
-unsigned char green_bg   = 255;
-unsigned char blue_bg    = 255;
-
 uint16_t current_drawColor;
 
 void driver_display_setup(){
@@ -95,15 +87,11 @@ void setPixel(int x, int y, uint16_t color){
     #endif
 }
 
-void setDrawColor(unsigned char red_new, unsigned char green_new, unsigned char blue_new){
-  red = red_new;
-  green = green_new;
-  blue = blue_new;
-
+void driver_display_setDrawColor(unsigned char red, unsigned char green, unsigned char blue){
   current_drawColor = get_uint16Color(red, green, blue);
 }
 
-void setDrawColor(uint16_t color){
+void driver_display_setDrawColor(uint16_t color){
   current_drawColor = color;
 }
 

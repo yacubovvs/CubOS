@@ -14,10 +14,6 @@ unsigned char red;
 unsigned char green;
 unsigned char blue;
 
-unsigned char red_bg     = 255;
-unsigned char green_bg   = 255;
-unsigned char blue_bg    = 255;
-
 uint16_t current_drawColor;
 
 uint16_t get_uint16Color(unsigned char red, unsigned char green, unsigned char blue){

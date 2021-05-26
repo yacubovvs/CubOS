@@ -26,13 +26,17 @@ class appNameClass: public Application{
         void draw_current_time(bool draw);
         String timeString;
 
-        unsigned char last_seconds = 0;
-        unsigned char last_hours = 0;
-        unsigned char last_minutes = 0;
+        unsigned char last_seconds  = 0;
+        String last_hours           = "";
+        String last_minutes         = "";
 
         void drawSecondsCircle(bool draw, unsigned char second);
       
 };
+
+#define SECONDS_CIRCLE_X        (SCREEN_WIDTH/2) 
+#define SECONDS_CIRCLE_Y        (SCREEN_HEIGHT/2)
+#define SECONDS_CIRCLE_RADIUS   (SCREEN_WIDTH/2-2)
 
 void appNameClass::onCreate(){
     DRAW_LIMITS_setEnable(true);
@@ -40,6 +44,9 @@ void appNameClass::onCreate(){
     
     setBackgroundColor(0,0,0);
     setContrastColor(255, 255, 255);
+
+    setDrawColor(48, 48, 48);
+    drawCircle(SECONDS_CIRCLE_X, SECONDS_CIRCLE_Y, SECONDS_CIRCLE_RADIUS-1, true);
 
     this->last_seconds = core_time_getSeconds_byte();
     for(unsigned char isecond=0; isecond<=this->last_seconds; isecond++) this->drawSecondsCircle(true, isecond);
@@ -109,8 +116,8 @@ void appNameClass::drawSecondsCircle(bool draw, unsigned char second){
     else setDrawColor_BackGoundColor();
 
     int grad = 6*second;
-
-    drawArc(SCREEN_WIDTH/2, SCREEN_HEIGHT/2, SCREEN_WIDTH/2-2, -90 + grad, -90 + grad + 6, 5);
+ 
+    drawArc(SECONDS_CIRCLE_X, SECONDS_CIRCLE_Y, SECONDS_CIRCLE_RADIUS, -90 + grad, -90 + grad + 6, 8, true);
 }
 
 void appNameClass::draw_current_time(bool draw){
@@ -123,9 +130,22 @@ void appNameClass::draw_current_time(bool draw){
         #ifdef NARROW_SCREEN
 
             // SECONDS CIRCLE
+            char seconds_draw = core_time_getSeconds_byte() - last_seconds;
+            if(seconds_draw<=0) seconds_draw = 1;
             this->last_seconds = core_time_getSeconds_byte();
-            this->drawSecondsCircle(draw, this->last_seconds);
+            for(char i_predrawSeconds=0; i_predrawSeconds<seconds_draw; i_predrawSeconds++) this->drawSecondsCircle(draw, this->last_seconds-i_predrawSeconds);
             
+            // HOURS AND MINUTES 
+            setDrawColor_ContrastColor();
+            #define CLOCK_FONT      2
+            #define CLOCK_MARGIN    3
+            #define STRINGS_OFFSET  2
+
+            this->last_hours    = core_time_getHours_String();
+            this->last_minutes  = core_time_getMinutes_String();
+
+            drawString_centered(core_time_getHours_String(), SCREEN_WIDTH/2, STRINGS_OFFSET + SCREEN_HEIGHT/2-CLOCK_FONT*FONT_CHAR_HEIGHT - CLOCK_MARGIN, CLOCK_FONT);
+            drawString_centered(core_time_getMinutes_String(), SCREEN_WIDTH/2, STRINGS_OFFSET + SCREEN_HEIGHT/2 + CLOCK_MARGIN, CLOCK_FONT);
             
         #else
             drawString(this->timeString, 2, 90, 5);
@@ -137,10 +157,18 @@ void appNameClass::draw_current_time(bool draw){
             
             // SECONDS CIRCLE
             if(this->last_seconds>core_time_getSeconds_byte()){
+                // if munutes changed
                 setDrawColor_BackGoundColor();
-                //drawArc(SCREEN_WIDTH/2, SCREEN_HEIGHT/2, SCREEN_WIDTH/2-2, 0, 360, 5);
-                for(int isecond=0; isecond<60; isecond++) drawSecondsCircle(draw, isecond);
+                
+                for(int isecond=0; isecond<60; isecond++){
+                    drawSecondsCircle(draw, isecond);
+                }
 
+                setDrawColor(48, 48, 48);
+                drawCircle(SECONDS_CIRCLE_X, SECONDS_CIRCLE_Y, SECONDS_CIRCLE_RADIUS-1, true);
+                
+                clearString_centered(last_hours, SCREEN_WIDTH/2, STRINGS_OFFSET + SCREEN_HEIGHT/2-CLOCK_FONT*FONT_CHAR_HEIGHT - CLOCK_MARGIN, CLOCK_FONT);
+                clearString_centered(last_minutes, SCREEN_WIDTH/2, STRINGS_OFFSET + SCREEN_HEIGHT/2 + CLOCK_MARGIN, CLOCK_FONT);
             }
             
 

@@ -71,6 +71,33 @@ FRAMEBUFFER_TWIN_FULL
 FRAMEBUFFER_BYTE_PER_PIXEL
 */
 
+unsigned char current_red;
+unsigned char current_green;
+unsigned char current_blue;
+
+unsigned char get_current_red(){
+  return current_red;
+}
+
+unsigned char get_current_green(){
+  return current_green;
+}
+
+unsigned char get_current_blue(){
+  return current_blue;
+}
+
+void setDrawColor(unsigned char red_new, unsigned char green_new, unsigned char blue_new){
+  current_red     = red_new;
+  current_green   = green_new;
+  current_blue    = blue_new;
+  driver_display_setDrawColor(red_new, green_new, blue_new);
+}
+
+void setDrawColor(uint16_t color){
+  driver_display_setDrawColor(color);
+}
+
 #ifdef FRAMEBUFFER_ENABLE
 
   #ifdef FRAMEBUFFER_TWIN_FULL
@@ -882,20 +909,81 @@ void drawCircle(int x0, int y0, int radius){
   drawCircle(x0, y0, radius, false);
 }
 
-void drawArc(int x0, int y0, int radius, int drawFromAngle, int drawToAngle, uint16_t width){
+/*
+void drawArc_fade(int x0, int y0, int radius, int drawFromAngle, int drawToAngle, uint16_t width, byte r, byte g, byte b, byte r_fade, byte g_fade, byte b_fade){
   float start_angle = DEG_TO_RAD*drawFromAngle;
   float end_angle = DEG_TO_RAD*drawToAngle;
   float r = radius;
-
 
   float step = 1.0/((float)radius*1.6); // 1.6 imperical value
   for(float i = start_angle; i < end_angle; i = i + step)
   {
     float t_cos = cos(i);
     float t_sin = sin(i);
-    for(float radius_i=r; radius_i>=r-width; radius_i-=0.8){ // 0.8 imperical value
+
+    setDrawColor(r_fade, g_fade, b_fade);
+    drawPixel(x0 + t_cos * (r-0.8), y0 + t_sin * (r-0.8));
+    drawPixel(x0 + t_cos * (r-width+0.8), y0 + t_sin * (r-width+0.8));
+
+    setDrawColor(r, g, b);
+    for(float radius_i=r-0.8; radius_i>=r-width+0.8; radius_i-=0.8){ // 0.8 imperical value
       drawPixel(x0 + t_cos * radius_i, y0 + t_sin * radius_i);
     }
+  }
+}
+*/
+
+void drawArc(int x0, int y0, int radius, int drawFromAngle, int drawToAngle, uint16_t width){
+  drawArc(x0, y0, radius, drawFromAngle, drawToAngle, width, false);
+}
+
+void drawArc(int x0, int y0, int radius, int drawFromAngle, int drawToAngle, uint16_t width, bool drawFading){
+  double start_angle = DEG_TO_RAD*drawFromAngle;
+  double end_angle = DEG_TO_RAD*drawToAngle;
+  double r = radius;
+
+  double step = 1.0/((double)radius*1.6); // 1.6 imperical value
+
+  unsigned char draw_red    = get_current_red();
+  unsigned char draw_green  = get_current_green();
+  unsigned char draw_blue   = get_current_blue();
+
+  for(double i = start_angle; i < end_angle; i = i + step){
+    double t_cos = cos(i);
+    double t_sin = sin(i);
+    if(!drawFading){
+      for(double radius_i=r; radius_i>=r-width; radius_i-=0.8){ // 0.8 imperical value
+        drawPixel(round(x0 + t_cos * radius_i), round(y0 + t_sin * radius_i));
+      }
+    }else{
+      
+      setDrawColor(draw_red, draw_green, draw_blue);
+
+      //for(double radius_i=r-0.4; radius_i>=r-width+0.4; radius_i-=0.8){ // 0.8 imperical value
+      for(double radius_i=r; radius_i>=r-width; radius_i-=0.8){ // 0.8 imperical value
+        drawPixel(round(x0 + t_cos * radius_i), round(y0 + t_sin * radius_i));
+      }
+
+      setDrawColor( 
+        (draw_red    + getBackgroundColor_red())/3, 
+        (draw_green  + getBackgroundColor_green())/3, 
+        (draw_blue   + getBackgroundColor_blue())/3
+      );
+
+      drawPixel(round(x0 + t_cos * (r)), round(y0 + t_sin * (r)));
+      drawPixel(round(x0 + t_cos * (r-width)), round(y0 + t_sin * (r-width)));
+
+      setDrawColor( 
+        (draw_red    + getBackgroundColor_red())/2, 
+        (draw_green  + getBackgroundColor_green())/2, 
+        (draw_blue   + getBackgroundColor_blue())/2
+      );
+
+      drawPixel(round(x0 + t_cos * (r-0.4)), round(y0 + t_sin * (r-0.4)));
+      drawPixel(round(x0 + t_cos * (r-width+0.8)), round(y0 + t_sin * (r-width+0.8)));
+
+    }
+    
   }
 }
 
