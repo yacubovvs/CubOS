@@ -830,25 +830,47 @@ void drawRect(int x0, int y0, int x1, int y1, bool fill){
   }
 }
 
-void drawCircle(int x0, int y0, int radius, int width){
-  if(width==1) drawCircle(x0, y0, radius);
-  while(width>=0){
-    drawCircle(x0, y0, radius-width);
-    drawCircle(x0+1, y0+1, radius-width);
-    width--;
+
+void drawCircle(int x0, int y0, int radius){
+  drawCircle(x0, y0, radius, false);
+}
+
+void drawArc(int x0, int y0, int radius, int drawFromAngle, int drawToAngle, uint16_t width){
+  float start_angle = DEG_TO_RAD*drawFromAngle;
+  float end_angle = DEG_TO_RAD*drawToAngle;
+  float r = radius;
+
+
+  float step = 1.0/((float)radius*1.6); // 1.6 imperical value
+  for(float i = start_angle; i < end_angle; i = i + step)
+  {
+    float t_cos = cos(i);
+    float t_sin = sin(i);
+    for(float radius_i=r; radius_i>=r-width; radius_i-=0.8){ // 0.8 imperical value
+      drawPixel(x0 + t_cos * radius_i, y0 + t_sin * radius_i);
+    }
   }
 }
 
-void drawCircle(int x0, int y0, int radius){
+// The Bresenham algorithm
+void drawCircle(int x0, int y0, int radius, bool fill){
 	int x = 0;
 	int y = radius;
 	int delta = 1 - 2 * radius;
 	int error = 0;
 	while(y >= 0) {
-		setPixel(x0 + x, y0 + y);
-		setPixel(x0 + x, y0 - y);
-		setPixel(x0 - x, y0 + y);
-		setPixel(x0 - x, y0 - y);
+    if(fill){
+      drawLine(x0 + x, y0 + y, x0 + x, y0);
+      drawLine(x0 + x, y0 - y, x0 + x, y0);
+      drawLine(x0 - x, y0 + y, x0 - x, y0);
+      drawLine(x0 - x, y0 - y, x0 - x, y0);
+    }else{
+      drawPixel(x0 + x, y0 + y);
+      drawPixel(x0 + x, y0 - y);
+      drawPixel(x0 - x, y0 + y);
+      drawPixel(x0 - x, y0 - y);
+    }
+
 		error = 2 * (delta + y) - 1;
 		if(delta < 0 && error <= 0) {
 			++x;

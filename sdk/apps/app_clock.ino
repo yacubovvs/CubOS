@@ -96,6 +96,8 @@ void appNameClass::onEvent(unsigned char event, int val1, int val2){
 */
 
 void appNameClass::draw_current_time(bool draw){
+    this->preventSleep         = true;
+    this->preventInAppSleep    = true;
     if(draw){
         // Draw
         setDrawColor_ContrastColor();
@@ -104,8 +106,13 @@ void appNameClass::draw_current_time(bool draw){
 
             setDrawColor(51, 246, 31);
             //drawRect(0,0,20,20,true);
-            drawCircle(SCREEN_WIDTH/2, SCREEN_HEIGHT/2, SCREEN_WIDTH/2-2, 6);
+            //drawCircle(SCREEN_WIDTH/2, SCREEN_HEIGHT/2, SCREEN_WIDTH/2-2, true);
+            long timer = millis();
             
+            drawArc(SCREEN_WIDTH/2, SCREEN_HEIGHT/2, SCREEN_WIDTH/2-2, 0, 315, 5);
+             
+            drawString(String(millis() - timer), 5, 10, 2);
+
             /*
             #define GRAY_HOURS 128
             setDrawColor(GRAY_HOURS, GRAY_HOURS, GRAY_HOURS);
@@ -123,7 +130,8 @@ void appNameClass::draw_current_time(bool draw){
         // Clear
         setDrawColor_BackGoundColor();
         #ifdef NARROW_SCREEN
-
+            setDrawColor_BackGoundColor();
+            drawRect(0,0,SCREEN_WIDTH, SCREEN_HEIGHT, true);
             //drawRect(0,0,20,20,true);
             /*
             drawString_centered_fontSize(this->timeString.substring(0,2), NARROW_CLOCK_STRING1, 6);
