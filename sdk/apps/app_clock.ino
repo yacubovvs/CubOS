@@ -130,8 +130,10 @@ void appNameClass::draw_current_time(bool draw){
         #ifdef NARROW_SCREEN
 
             // SECONDS CIRCLE
-            char seconds_draw = core_time_getSeconds_byte() - last_seconds;
-            if(seconds_draw<=0) seconds_draw = 1;
+            unsigned char seconds_draw;
+            if(core_time_getSeconds_byte()>this->last_seconds) seconds_draw = core_time_getSeconds_byte() - this->last_seconds;
+            else seconds_draw = 1;
+            
             this->last_seconds = core_time_getSeconds_byte();
             for(char i_predrawSeconds=0; i_predrawSeconds<seconds_draw; i_predrawSeconds++) this->drawSecondsCircle(draw, this->last_seconds-i_predrawSeconds);
             
