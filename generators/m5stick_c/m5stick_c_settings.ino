@@ -71,6 +71,7 @@
 //#undef DISPLAY_BACKLIGHT_CONTROL_ENABLE
 //#undef DISPLAY_BACKLIGHT_FADE_CONTROL_ENABLE
 
+#define PEDOMETER_ENABLE
 /*
     ############################################################################################
     #                                                                                          #

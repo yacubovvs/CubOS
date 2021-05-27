@@ -21,39 +21,103 @@
 #define BUTTON_POWER    0x05
 
 #define DRIVER_CONTROLS_TOTALBUTTONS 3
-#define DRIVER_CONTROLS_DELAY_BEFORE_LONG_PRESS 350
+#define DRIVER_CONTROLS_DELAY_BEFORE_LONG_PRESS     50
+#define DRIVER_CONTROLS_DELAY_BEFORE_MULTY_PRESS    400
 
-// EVENTS
+/*
+############################################################################
+#                                 EVENTS +                                 #
+############################################################################
+*/
 
-#define EVENT_BUTTON_PRESSED            0x00
-#define EVENT_BUTTON_RELEASED           0x01
-#define EVENT_BUTTON_LONG_PRESS         0x02
-#define EVENT_BUTTON_SHORT_PRESS        0x03
-#define EVENT_ON_TIME_CHANGED           0x04
-#define EVENT_ON_GOING_TO_SLEEP         0x05
-#define EVENT_ON_WAKE_UP                0x06
+#define EVENT_BUTTON_PRESSED                0x00
+#define EVENT_BUTTON_RELEASED               0x01
+#define EVENT_BUTTON_LONG_PRESS             0x02
+#define EVENT_BUTTON_SHORT_PRESS            0x03
+#define EVENT_BUTTON_SHORT_SINGLE_PRESS     0x04
+#define EVENT_BUTTON_DOUBLE_PRESS           0x05
+#define EVENT_ON_TIME_CHANGED               0x06
+#define EVENT_ON_GOING_TO_SLEEP             0x07
+#define EVENT_ON_WAKE_UP                    0x08
 
-#define EVENT_ON_TOUCH_START                0x06
-#define EVENT_ON_TOUCH_RELEASED             0x07
-#define EVENT_ON_TOUCH_CLICK                0x08
-#define EVENT_ON_TOUCH_LONG_PRESS           0x09
-#define EVENT_ON_TOUCH_DRAG                 0x0A
-#define EVENT_ON_TOUCH_DOUBLE_CLICK         0x0B
-#define EVENT_ON_TOUCH_SWIPE_FROM_LEFT      0x0C
-#define EVENT_ON_TOUCH_SWIPE_FROM_RIGHT     0x0D
-#define EVENT_ON_TOUCH_SWIPE_FROM_TOP       0x0E
-#define EVENT_ON_TOUCH_SWIPE_FROM_BOTTOM    0x0F
+#define EVENT_ON_TOUCH_START                0x09
+#define EVENT_ON_TOUCH_RELEASED             0x0A
+#define EVENT_ON_TOUCH_CLICK                0x0B
+#define EVENT_ON_TOUCH_LONG_PRESS           0x0C
+#define EVENT_ON_TOUCH_DRAG                 0x0D
+#define EVENT_ON_TOUCH_DOUBLE_PRESS         0x0E
+#define EVENT_ON_TOUCH_SWIPE_FROM_LEFT      0x0F
+#define EVENT_ON_TOUCH_SWIPE_FROM_RIGHT     0x10
+#define EVENT_ON_TOUCH_SWIPE_FROM_TOP       0x11
+#define EVENT_ON_TOUCH_SWIPE_FROM_BOTTOM    0x12
 
-#define EVENT_BUTTON_DOUBLE_PRESS       0x10
 
+/*
+ ############################################################################
+                                 SLEEP TYPES -                               
+*/
+
+#define SLEEP_IDLE_CPU           0x01
+#define SLEEP_DEEP          0x02
+#define SLEEP_LIGHT         0x03
+#define SLEEP_MODEM         0x04
+#define SLEEP_DISPLAY       0x05
+#define SLEEP_HIBERNATE     0x03
+#define WAKE_MODEM          0x06
+#define WAKE_DISPLAY        0x07
+#define WAKE                0x08
+
+
+#define IN_APP_SLEEP_TYPE       SLEEP_LIGHT
+#define STAND_BY_SLEEP_TYPE     SLEEP_DEEP
+/*
+############################################################################
+#                                 EVENTS -                                 #
+############################################################################
+*/
+
+/*
+############################################################################
+#                                 STYLES +                                 #
+############################################################################
+*/
+
+#define COREVIEWS_NO_ICON_ELEMENT_HEIGHT 40
+
+/*
+############################################################################
+#                                 STYLES -                                 #
+############################################################################
+*/
+
+#define ON_TIME_CHANGE_EVERY_MS 1000
+
+#define UPDATE_RTC_EVERY 65
 #define I2C_ENABLE
 #define CPU_CONTROLL_ENABLE
+#define POWERSAVE_ENABLE
 
 #define FONT_SIZE_DEFAULT 2
 #define HARDWARE_BUTTONS_VALUE 3
 
+#define CONTROLS_DELAY_TO_DOUBLE_CLICK_MS DRIVER_CONTROLS_DELAY_BEFORE_LONG_PRESS
+
+#define SMOOTH_ANIMATION_COEFFICIENT    5
 // #define MAIN_MENU_SMOOTH_ANIMATION
 // #define NARROW_SCREEN
+
+#define UPDATE_BATTERY_EVERY_MS 3000
+#define SMOOTH_BACKLIGHT_CONTROL_DELAY_CHANGE  4
+
+// #define ACCELEROMETER_ENABLE
+#define DISPLAY_BACKLIGHT_CONTROL_ENABLE
+#define DISPLAY_BACKLIGHT_FADE_CONTROL_ENABLE
+
+#define WAKEUP_FROM_LIGHT_SLEEP_EVERY_MS 1000
+#define WAKEUP_FROM_DEEP_SLEEP_EVERY_SECONDS 60*60*24
+
+#define USE_TYPE2_OF_IMAGES
+//#define PEDOMETER_ENABLE
 /*
     ############################################################################################
     #                                                                                          #
@@ -119,7 +183,7 @@
 #define CLOCK_ENABLE
 //#define USE_PRIMITIVE_HARDWARE_DRAW_ACCELERATION
 
-//#define USE_RTC
+//#define RTC_ENABLE
 
 #define SCREEN_ROTATION_0
 //#define SCREEN_ROTATION_90
@@ -659,12 +723,16 @@ class Application{
     int scroll_to_y           = 0;
     bool isfullScreen         = true;
     bool showStatusBar        = true;
+    bool preventSleep         = false;
+    bool preventInAppSleep    = false;
 
     virtual void onLoop()     = 0;
     virtual void onDestroy()  = 0;
     virtual void onEvent(unsigned char event, int val1, int val2) = 0;
 
     void super_onCreate(){
+      this->preventSleep = false;
+      this->preventInAppSleep = false;
       if(this->showStatusBar) core_views_statusBar_draw();
     }
 
@@ -685,7 +753,7 @@ void setup(){
     driver_battery_setup();
   #endif
 
-  #ifdef USE_RTC
+  #ifdef RTC_ENABLE
       driver_RTC_setup();
   #endif
 
@@ -699,7 +767,7 @@ void setup(){
   #endif
 
   #ifdef CPU_CONTROLL_ENABLE
-    driver_cpu_setup();
+    core_cpu_setup();
   #endif
   
   driver_display_setup();
@@ -712,6 +780,14 @@ void setup(){
   #ifdef TOUCH_SCREEN_ENABLE
     setup_touchScreenDriver();
   #endif
+
+  #ifdef POWERSAVE_ENABLE
+    core_powersave_setup();
+  #endif
+
+  #ifdef ACCELEROMETER_ENABLE
+    driver_accelerometer_setup();
+  #endif
   
   currentApp = getApp(STARTING_APP_NUMM);
   
@@ -719,8 +795,9 @@ void setup(){
 
 bool isInSleep = false;
 void loop(){
-  driver_display_loop();
+  
   core_display_loop();
+  driver_display_loop();
 
   #ifdef HARDWARE_BUTTONS_ENABLED
     driver_controls_loop();
@@ -732,11 +809,23 @@ void loop(){
   #endif
 
   #ifdef BATTERY_ENABLE
-    driver_battery_loop();
+    core_battery_loop();
   #endif
 
   #ifdef CLOCK_ENABLE
     core_time_loop();
+  #endif
+
+  #ifdef CPU_CONTROLL_ENABLE
+    core_cpu_loop();
+  #endif
+
+  #ifdef POWERSAVE_ENABLE
+    core_powersave_loop();
+  #endif
+
+  #ifdef ACCELEROMETER_ENABLE
+    driver_accelerometer_loop();
   #endif
 
   currentApp->onLoop(); 
@@ -747,6 +836,7 @@ void loop(){
     ESP.wdtFeed();
   #endif
 
+/*
   #ifdef CPU_SLEEP_ENABLE
 //driver_cpu_sleep();
     if(millis() - driver_control_get_last_user_avtivity() > CPU_SLEEP_TIME_DELAY){
@@ -767,18 +857,24 @@ void loop(){
     }
     //driver_cpu_wakeup();
   #endif
-
+*/
 
 }
 
+/*
 #ifdef CPU_SLEEP_ENABLE
   void do_cpu_sleep(){
       driver_cpu_sleep();
   }
 #endif
+*/
 
 void debug(String string){
   debug(string, 0);
+}
+
+void debug(int string){
+  debug(String(string), 0);
 }
 
 void debug(String string, int delaytime){
@@ -827,17 +923,18 @@ void debug(const char* string){
 #define ICON_ARROW_DOWN             0x04
 #define ICON_BATTERY_UNKNOWN        0x05
 
-#define ICON_BATTERY_100            0x06
-#define ICON_BATTERY_90             0x07
-#define ICON_BATTERY_80             0x08
-#define ICON_BATTERY_70             0x09
-#define ICON_BATTERY_60             0x0A
-#define ICON_BATTERY_50             0x0B
-#define ICON_BATTERY_40             0x0C
-#define ICON_BATTERY_30             0x0D
-#define ICON_BATTERY_20             0x0E
-#define ICON_BATTERY_10             0x0F
-#define ICON_BATTERY_0              0x10
+#define ICON_BATTERY_CHARGING       0x06
+#define ICON_BATTERY_100            0x07
+#define ICON_BATTERY_90             0x08
+#define ICON_BATTERY_80             0x09
+#define ICON_BATTERY_70             0x0A
+#define ICON_BATTERY_60             0x0B
+#define ICON_BATTERY_50             0x0C
+#define ICON_BATTERY_40             0x0D
+#define ICON_BATTERY_30             0x0E
+#define ICON_BATTERY_20             0x0F
+#define ICON_BATTERY_10             0x10
+#define ICON_BATTERY_0              0x11
 
 #define ICON_WIFI_CONNECTED         0x11
 #define ICON_WIFI_NOTCONNECTED      0x12
@@ -857,6 +954,12 @@ void debug(const char* string){
     ############################################################################################
 */
 
+// HELPERS
+#define TEMPORARILY_DISABLE_LIMITS() bool DRAW_LIMITS_wasEnable = DRAW_LIMITS_getEnable(); DRAW_LIMITS_setEnable(false);
+#define TEMPORARILY_RESTORE_LIMITS() DRAW_LIMITS_setEnable(DRAW_LIMITS_wasEnable);
+
+#define TEMPORARILY_DISABLE_BACKGROUND() unsigned char tdbg_r = getBackgroundColor_red(); unsigned char tdbg_g = getBackgroundColor_green(); unsigned char tdbg_b = getBackgroundColor_blue();
+#define TEMPORARILY_RESTORE_BACKGROUND() setBackgroundColor(tdbg_r, tdbg_g, tdbg_b);
 
 
 #define DRIVER_CONTROLS_TOTALBUTTONS 4
@@ -1139,6 +1242,67 @@ String getHexStringFromByte(unsigned char b){
 }
 
 
+uint16_t get_uint16Color(unsigned char red, unsigned char green, unsigned char blue){
+  #ifdef SCREEN_INVERT_COLORS
+    red = 255 - red;
+    green = 255 - green;
+    blue = 255 - blue;
+  #endif
+  
+  #ifdef SCREEN_CHANGE_BLUE_RED
+    return ( (blue*31/255) <<11)|( (green*31/255) <<6)|( (red*31/255) <<0);
+  #else
+    return ( (red*31/255) <<11)|( (green*31/255) <<6)|( (blue*31/255) <<0);
+  #endif
+}
+
+void setGradientColor(
+    unsigned char r1, 
+    unsigned char g1, 
+    unsigned char b1, 
+    unsigned char r2, 
+    unsigned char g2, 
+    unsigned char b2, 
+    unsigned int steps, 
+    unsigned int current_steps
+    ){
+
+  unsigned char r;
+  unsigned char g;
+  unsigned char b;
+
+  unsigned char r_min = min(r1,r2);
+  unsigned char g_min = min(g1,g2);
+  unsigned char b_min = min(b1,b2);
+
+  unsigned char r_max = max(r1,r2);
+  unsigned char g_max = max(g1,g2);
+  unsigned char b_max = max(b1,b2);
+
+  float k = (float)current_steps/(float)steps;
+
+  if(r1==r2) r = r1;
+  else{
+    if(r1>r2) r = r_min + ((float)(r_max - r_min))*k;
+    else r = r_max - ((float)(r_max - r_min))*k; 
+  }
+  
+
+  if(g1==g2) g = g1;
+  else{
+    if(g1>g2) g = g_min + ((float)(g_max - g_min))*k;
+    else g = g_max - ((float)(g_max - g_min))*k; 
+  }
+
+  if(b1==b2) b = b1;
+  else{
+    if(b1>b2) b = b_min + ((float)(b_max - b_min))*k;
+    else b = b_max - ((float)(b_max - b_min))*k; 
+  }
+
+  setDrawColor(r, g, b);
+}
+
 /*
 * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * 
                                   FRAMEBUFFER
@@ -1150,6 +1314,33 @@ FRAMEBUFFER_ENABLE
 FRAMEBUFFER_TWIN_FULL
 FRAMEBUFFER_BYTE_PER_PIXEL
 */
+
+unsigned char current_red;
+unsigned char current_green;
+unsigned char current_blue;
+
+unsigned char get_current_red(){
+  return current_red;
+}
+
+unsigned char get_current_green(){
+  return current_green;
+}
+
+unsigned char get_current_blue(){
+  return current_blue;
+}
+
+void setDrawColor(unsigned char red_new, unsigned char green_new, unsigned char blue_new){
+  current_red     = red_new;
+  current_green   = green_new;
+  current_blue    = blue_new;
+  driver_display_setDrawColor(red_new, green_new, blue_new);
+}
+
+void setDrawColor(uint16_t color){
+  driver_display_setDrawColor(color);
+}
 
 #ifdef FRAMEBUFFER_ENABLE
 
@@ -1266,6 +1457,56 @@ void DRAW_LIMITS_setEnable(int top, int bottom, int left, int right){
   if(left!=-1)    DRAW_LIMITS_left      = left;
   if(right!=-1)   DRAW_LIMITS_right     = right;
 }
+
+bool DRAW_LIMITS_getEnable(){
+  return DRAW_LIMITS_Enabled;
+}
+
+/*
+* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * 
+                                  POWER CONTROLL
+* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * 
+*/
+unsigned char core_display_brightness             = 100;
+
+#ifdef DISPLAY_BACKLIGHT_FADE_CONTROL_ENABLE
+  unsigned char core_display_brightness_fade        = 20;
+  unsigned char core_display_time_delay_to_fade     = 15;
+#endif
+unsigned char core_display_time_delay_to_poweroff = 30;
+
+#ifdef DISPLAY_BACKLIGHT_CONTROL_ENABLE
+  void set_core_display_brightness(unsigned char value){ 
+    if(value>100) value = 100;
+    core_display_brightness = value;
+    driver_display_setBrightness(core_display_brightness);
+  }
+#endif
+
+#ifdef DISPLAY_BACKLIGHT_FADE_CONTROL_ENABLE
+  void set_core_display_brightness_fade(unsigned char value){ 
+    if(value>100) value = 100;
+    core_display_brightness_fade = value;
+  }
+
+  void set_core_display_time_delay_to_fade(unsigned char value){
+    if(value>240) value = 240;
+    core_display_time_delay_to_fade = value;
+  }
+#endif
+
+void set_core_display_time_delay_to_poweroff(unsigned char value){ 
+  if(value==0) value = 1;
+  if(value>240) value = 240;
+  core_display_time_delay_to_poweroff = value;
+}
+
+unsigned char get_core_display_brightness(){return core_display_brightness; }
+#ifdef DISPLAY_BACKLIGHT_FADE_CONTROL_ENABLE
+  unsigned char get_core_display_brightness_fade(){return core_display_brightness_fade; }
+  unsigned char get_core_display_time_delay_to_fade(){return core_display_time_delay_to_fade; }
+#endif
+unsigned char get_core_display_time_delay_to_poweroff(){return core_display_time_delay_to_poweroff; }
 
 /*
 * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * 
@@ -1907,6 +2148,126 @@ void drawRect(int x0, int y0, int x1, int y1, bool fill){
   }
 }
 
+
+void drawCircle(int x0, int y0, int radius){
+  drawCircle(x0, y0, radius, false);
+}
+
+/*
+void drawArc_fade(int x0, int y0, int radius, int drawFromAngle, int drawToAngle, uint16_t width, byte r, byte g, byte b, byte r_fade, byte g_fade, byte b_fade){
+  float start_angle = DEG_TO_RAD*drawFromAngle;
+  float end_angle = DEG_TO_RAD*drawToAngle;
+  float r = radius;
+
+  float step = 1.0/((float)radius*1.6); // 1.6 imperical value
+  for(float i = start_angle; i < end_angle; i = i + step)
+  {
+    float t_cos = cos(i);
+    float t_sin = sin(i);
+
+    setDrawColor(r_fade, g_fade, b_fade);
+    drawPixel(x0 + t_cos * (r-0.8), y0 + t_sin * (r-0.8));
+    drawPixel(x0 + t_cos * (r-width+0.8), y0 + t_sin * (r-width+0.8));
+
+    setDrawColor(r, g, b);
+    for(float radius_i=r-0.8; radius_i>=r-width+0.8; radius_i-=0.8){ // 0.8 imperical value
+      drawPixel(x0 + t_cos * radius_i, y0 + t_sin * radius_i);
+    }
+  }
+}
+*/
+
+void drawArc(int x0, int y0, int radius, int drawFromAngle, int drawToAngle, uint16_t width){
+  drawArc(x0, y0, radius, drawFromAngle, drawToAngle, width, false);
+}
+
+void drawArc(int x0, int y0, int radius, int drawFromAngle, int drawToAngle, uint16_t width, bool drawFading){
+  double start_angle = DEG_TO_RAD*drawFromAngle;
+  double end_angle = DEG_TO_RAD*drawToAngle;
+  double r = radius;
+
+  double step = 1.0/((double)radius*1.6); // 1.6 imperical value
+
+  unsigned char draw_red    = get_current_red();
+  unsigned char draw_green  = get_current_green();
+  unsigned char draw_blue   = get_current_blue();
+
+  for(double i = start_angle; i < end_angle; i = i + step){
+    double t_cos = cos(i);
+    double t_sin = sin(i);
+    if(!drawFading){
+      for(double radius_i=r; radius_i>=r-width; radius_i-=0.8){ // 0.8 imperical value
+        drawPixel(round(x0 + t_cos * radius_i), round(y0 + t_sin * radius_i));
+      }
+    }else{
+      
+      setDrawColor(draw_red, draw_green, draw_blue);
+
+      //for(double radius_i=r-0.4; radius_i>=r-width+0.4; radius_i-=0.8){ // 0.8 imperical value
+      for(double radius_i=r; radius_i>=r-width; radius_i-=0.8){ // 0.8 imperical value
+        drawPixel(round(x0 + t_cos * radius_i), round(y0 + t_sin * radius_i));
+      }
+
+      setDrawColor( 
+        (draw_red    + getBackgroundColor_red())/3, 
+        (draw_green  + getBackgroundColor_green())/3, 
+        (draw_blue   + getBackgroundColor_blue())/3
+      );
+
+      drawPixel(round(x0 + t_cos * (r)), round(y0 + t_sin * (r)));
+      drawPixel(round(x0 + t_cos * (r-width)), round(y0 + t_sin * (r-width)));
+
+      setDrawColor( 
+        (draw_red    + getBackgroundColor_red())/2, 
+        (draw_green  + getBackgroundColor_green())/2, 
+        (draw_blue   + getBackgroundColor_blue())/2
+      );
+
+      drawPixel(round(x0 + t_cos * (r-0.4)), round(y0 + t_sin * (r-0.4)));
+      drawPixel(round(x0 + t_cos * (r-width+0.8)), round(y0 + t_sin * (r-width+0.8)));
+
+    }
+    
+  }
+}
+
+// The Bresenham algorithm
+void drawCircle(int x0, int y0, int radius, bool fill){
+	int x = 0;
+	int y = radius;
+	int delta = 1 - 2 * radius;
+	int error = 0;
+	while(y >= 0) {
+    if(fill){
+      drawLine(x0 + x, y0 + y, x0 + x, y0);
+      drawLine(x0 + x, y0 - y, x0 + x, y0);
+      drawLine(x0 - x, y0 + y, x0 - x, y0);
+      drawLine(x0 - x, y0 - y, x0 - x, y0);
+    }else{
+      drawPixel(x0 + x, y0 + y);
+      drawPixel(x0 + x, y0 - y);
+      drawPixel(x0 - x, y0 + y);
+      drawPixel(x0 - x, y0 - y);
+    }
+
+		error = 2 * (delta + y) - 1;
+		if(delta < 0 && error <= 0) {
+			++x;
+			delta += 2 * x + 1;
+			continue;
+		}
+		error = 2 * (delta - x) - 1;
+		if(delta > 0 && error > 0) {
+			--y;
+			delta += 1 - 2 * y;
+			continue;
+		}
+		++x;
+		delta += 2 * (x - y);
+		--y;
+	}
+}
+
 // System function
 int treangle_area(int x0, int y0, int x1, int y1, int x2, int y2){
    return abs((x0 - x2)*(y1 - y2) + (x1-x2)*(y2-y0));
@@ -2070,8 +2431,38 @@ void drawImage(bool draw, const unsigned char* data, int x, int y){
 
     }
       
+  #ifdef USE_TYPE2_OF_IMAGES
+    }else if(image_type==0x02){
+      // TYPE 2
+      //image_wigth
+      //image_height
+      if(draw){
+        uint16_t byte1;
+        unsigned char byte2;
+        for(icon_x=0; icon_x<image_wigth; icon_x++){
+          for(icon_y=0; icon_y<image_height; icon_y++){
+            byte1 = readRawChar(data, readPosition); 
+            byte2 = readRawChar(data, readPosition); 
+
+            uint16_t color = (byte1<<8) + byte2;
+          
+            //debug(String(byte1));
+            //debug(String(byte2));
+            //debug(String(color));
+            //return;
+
+            setDrawColor(color);
+            drawPixel(x + icon_x, y + icon_y);
+          }
+        }
+      }else{
+        drawRect(x, y, x+image_wigth, y+image_height, true);
+      }
+      
+  #endif
   }else{
     // Unknow type of image
+    
 
   }
 
@@ -2101,27 +2492,50 @@ void drawDebugString(int val, int y){
 
 
 unsigned char core_time_getHours_byte(){
-    #ifdef USE_RTC
+    #ifdef RTC_ENABLE
         return driver_RTC_getHours();
     #else
         return millis()/(1000*60*60)%24;
     #endif
 }
 
+void core_time_setHours(unsigned char hours){
+    #ifdef RTC_ENABLE
+        driver_RTC_setHours(hours);
+    #else
+        // TODO
+    #endif
+}
+
 unsigned char core_time_getMinutes_byte(){
-    #ifdef USE_RTC
+    #ifdef RTC_ENABLE
         return driver_RTC_getMinutes();
     #else
         return millis()/(1000*60)%60;
     #endif
 }
 
+void core_time_setMinutes(unsigned char minutes){
+    #ifdef RTC_ENABLE
+        driver_RTC_setMinutes(minutes);
+    #else
+        // TODO
+    #endif
+}
 
 unsigned char core_time_getSeconds_byte(){
-    #ifdef USE_RTC
+    #ifdef RTC_ENABLE
         return driver_RTC_getSeconds();
     #else
         return millis()/(1000)%60;
+    #endif
+}
+
+void core_time_setSeconds(unsigned char seconds){
+    #ifdef RTC_ENABLE
+        driver_RTC_setSeconds(seconds);
+    #else
+        // TODO
     #endif
 }
 
@@ -2138,35 +2552,192 @@ String core_time_getSeconds_String(){
 }
 
 String core_time_getHourMinuteSecondsTime(){
-    #ifdef USE_RTC
+    #ifdef RTC_ENABLE
         driver_RTC_refresh();
     #endif
     return core_time_getHours_String() + ":" + core_time_getMinutes_String() + ":" + core_time_getSeconds_String();
 }
 
 String core_time_getHourMinuteTime(){
-    #ifdef USE_RTC
+    #ifdef RTC_ENABLE
         driver_RTC_refresh();
     #endif
     return core_time_getHours_String() + ":" + core_time_getMinutes_String();
 }
 
-String core_time_getMonth(){
+unsigned char core_time_getMonth(){
     //return "February";
-    return "Feb";
+    #ifdef RTC_ENABLE
+        return driver_RTC_getMonth();
+    #else
+        return 1;
+    #endif
 }
 
-String core_time_getDate(){
-    return "1";
+String core_time_getMonth_string(){
+    switch(core_time_getMonth()){
+        case 1:
+            return "January";
+        case 2:
+            return "February";
+        case 3:
+            return "March";
+        case 4:
+            return "April";
+        case 5:
+            return "May";
+        case 6:
+            return "June";
+        case 7:
+            return "July";
+        case 8:
+            return "August";
+        case 9:
+            return "September";
+        case 10:
+            return "October";
+        case 11:
+            return "November";
+        case 12:
+            return "December";
+        default:
+            return "-";
+    }  
 }
 
-String core_time_getYear(){
-    return "2021";
+String core_time_getMonth_stringShort(){
+    switch(core_time_getMonth()){
+        case 1:
+            return "Jan";
+        case 2:
+            return "Feb";
+        case 3:
+            return "Mar";
+        case 4:
+            return "Apr";
+        case 5:
+            return "May";
+        case 6:
+            return "Jun";
+        case 7:
+            return "Jul";
+        case 8:
+            return "Aug";
+        case 9:
+            return "Sep";
+        case 10:
+            return "Oct";
+        case 11:
+            return "Nov";
+        case 12:
+            return "Dec";
+        default:
+            return "-";
+    }  
+}
+
+unsigned char core_time_getDate(){
+    #ifdef RTC_ENABLE
+        return driver_RTC_getDate();
+    #else
+        return 1;
+    #endif
+}
+
+unsigned char core_time_getWeekDay(){
+    #ifdef RTC_ENABLE
+        return driver_RTC_getWeekDay();
+    #else
+        return 0;
+    #endif
+}
+
+String core_time_getWeekDay_string(){
+	switch (core_time_getWeekDay()){
+		case 0:
+			return "Monday";
+		case 1:
+			return "Tuesday";
+		case 2:
+			return "Wednesday";
+		case 3:
+			return "Thursday";
+		case 4:
+			return "Friday";
+		case 5:
+			return "Saturday";
+		case 6:
+			return "Sunday";
+		default:
+			return "-";
+	}
+}
+
+String core_time_getWeekDay_stringShort(){
+	switch (core_time_getWeekDay()){
+		case 0:
+			return "Mon";
+		case 1:
+			return "Tue";
+		case 2:
+			return "Wed";
+		case 3:
+			return "Thu";
+		case 4:
+			return "Fri";
+		case 5:
+			return "Sat";
+		case 6:
+			return "Sun";
+		default:
+			return "-";
+	}
+}
+
+uint16_t core_time_getYear(){
+    #ifdef RTC_ENABLE
+        return driver_RTC_getYear();
+    #else
+        return 2021;
+    #endif
 }
 
 String core_time_getDateFull(){
-    return core_time_getDate() + " " + core_time_getMonth() + " " + core_time_getYear();
+    return core_basic_addLeadBullToInt2digits(core_time_getDate()) + "." + core_basic_addLeadBullToInt2digits(core_time_getMonth()) + "." + String(core_time_getYear());
 }
+
+void core_time_setYear(uint16_t year){
+    #ifdef RTC_ENABLE
+        return driver_RTC_setYear(year);
+    #else
+        // TODO
+    #endif
+}
+
+void core_time_setMonth(unsigned char month){
+    #ifdef RTC_ENABLE
+        return driver_RTC_setMonth(month);
+    #else
+        // TODO
+    #endif
+}
+
+void core_time_setDate(unsigned char date){
+    #ifdef RTC_ENABLE
+        return driver_RTC_setDate(date);
+    #else
+        // TODO
+    #endif
+}
+
+void core_time_setWeekDay(unsigned char weekDay){
+    #ifdef RTC_ENABLE
+        return driver_RTC_setWeekDay(weekDay);
+    #else
+        // TODO
+    #endif
+}
+
 
 //#define EVENT_ON_TIME_CHANGED              0x03
 long lastTimeChange = millis()/ON_TIME_CHANGE_EVERY_MS;
@@ -2179,10 +2750,14 @@ void core_time_loop(){
                 core_views_statusBar_draw_time(true);
             }
         #endif
-
+        driver_RTC_refresh();
         currentApp->onEvent(EVENT_ON_TIME_CHANGED, currentTime, 0);
         lastTimeChange = currentTime;
     }
+}
+
+void core_time_setAlarmBySeconds(unsigned char seconds){
+    driver_RTC_setAlarmBySeconds(seconds);
 }
 
 unsigned char core_battery_getPercent(){
@@ -2192,6 +2767,30 @@ unsigned char core_battery_getPercent(){
         return 0;
     #endif
 }
+
+#ifdef BATTERY_ENABLE
+    long last_upodate_battery = 0;
+    void core_battery_loop(){
+        
+        TEMPORARILY_DISABLE_LIMITS();
+        driver_battery_loop();
+
+        if(millis()-last_upodate_battery>UPDATE_BATTERY_EVERY_MS || millis()<last_upodate_battery){
+            last_upodate_battery = millis();
+            
+            if(currentApp->showStatusBar){
+                core_views_draw_statusbar_battery(false, driver_battery_getPercent());
+                core_views_draw_statusbar_battery(true, driver_battery_getPercent());
+            }
+            
+        }
+
+        //ICON_BATTERY_100
+        TEMPORARILY_RESTORE_LIMITS();
+    }
+#endif
+//
+
 
 /*
     ############################################################################################
@@ -2212,92 +2811,67 @@ unsigned char core_battery_getPercent(){
 #define STYLE_STATUSBAR_TEXT_BLUE     255
 
 #ifdef BATTERY_ENABLE
+
+    // BATTERY CHARGING ICON
+    const unsigned char battery_charging[] PROGMEM = {
+        //0x02,0x01,0x02,0x20,0x02,0x10,0x04,0x00,0xdd,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x3F,0xFF,0xFF,0xF0,0x40,0x00,0x00,0x08,0x80,0x00,0x00,0x04,0x80,0x00,0x00,0x04,0x80,0x00,0x00,0x07,0x80,0x00,0x00,0x07,0x80,0x00,0x00,0x07,0x80,0x00,0x00,0x07,0x80,0x00,0x00,0x04,0x80,0x00,0x00,0x04,0x40,0x00,0x00,0x08,0x3F,0xFF,0xFF,0xF0,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,
+        //0x02,0x01,0x02,0x20,0x02,0x10,0x04,0x00,0xaa,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x3F,0xFF,0xFF,0xF0,0x7F,0xFF,0xFF,0xF8,0xE0,0x00,0x00,0x1C,0xC0,0x00,0x00,0x0C,0xC0,0x00,0x00,0x0F,0xC0,0x00,0x00,0x0F,0xC0,0x00,0x00,0x0F,0xC0,0x00,0x00,0x0F,0xC0,0x00,0x00,0x0C,0xE0,0x00,0x00,0x1C,0x7F,0xFF,0xFF,0xF8,0x3F,0xFF,0xFF,0xF0,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,
+        0x02,0x01,0x02,0x20,0x02,0x10,0x04,0x00,0xcc,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x3F,0xFF,0xFF,0xF0,0x40,0x00,0x00,0x08,0x9F,0xFF,0xFF,0xE4,0xBF,0xFF,0xFF,0xF4,0xBF,0xFF,0xFF,0xF7,0xBF,0xFF,0xFF,0xF7,0xBF,0xFF,0xFF,0xF7,0xBF,0xFF,0xFF,0xF7,0xBF,0xFF,0xFF,0xF4,0x9F,0xFF,0xFF,0xE4,0x40,0x00,0x00,0x08,0x3F,0xFF,0xFF,0xF0,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,
+    };
+
     // BATTERY 100% ICON
     const unsigned char battery100[] PROGMEM = {
-        0x02,0x01,0x02,0x20,0x02,0x10,0x04,0xff,0xff,0xff,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x3F,0xFF,0xFF,
-        0xF0,0x40,0x00,0x00,0x08,0x9F,0xFF,0xFF,0xE4,0xBF,0xFF,0xFF,0xF4,0xBF,0xFF,0xFF,0xF7,0xBF,0xFF,0xFF,0xF7,
-        0xBF,0xFF,0xFF,0xF7,0xBF,0xFF,0xFF,0xF7,0xBF,0xFF,0xFF,0xF4,0x9F,0xFF,0xFF,0xE4,0x40,0x00,0x00,0x0C,0x3F,
-        0xFF,0xFF,0xF8,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,
+        0x02,0x01,0x02,0x20,0x02,0x10,0x04,0xff,0xff,0xff,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x3F,0xFF,0xFF,0xF0,0x40,0x00,0x00,0x08,0x9F,0xFF,0xFF,0xE4,0xBF,0xFF,0xFF,0xF4,0xBF,0xFF,0xFF,0xF7,0xBF,0xFF,0xFF,0xF7,0xBF,0xFF,0xFF,0xF7,0xBF,0xFF,0xFF,0xF7,0xBF,0xFF,0xFF,0xF4,0x9F,0xFF,0xFF,0xE4,0x40,0x00,0x00,0x08,0x3F,0xFF,0xFF,0xF0,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,
     };
 
     // BATTERY 90% ICON
     const unsigned char battery90[] PROGMEM = {
-        0x02,0x01,0x02,0x20,0x02,0x10,0x04,0xff,0xff,0xff,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x3F,0xFF,0xFF,
-        0xF0,0x40,0x00,0x00,0x08,0x9F,0xFF,0xFF,0x84,0xBF,0xFF,0xFF,0x84,0xBF,0xFF,0xFF,0x87,0xBF,0xFF,0xFF,0x87,
-        0xBF,0xFF,0xFF,0x87,0xBF,0xFF,0xFF,0x87,0xBF,0xFF,0xFF,0x84,0x9F,0xFF,0xFF,0x84,0x40,0x00,0x00,0x0C,0x3F,
-        0xFF,0xFF,0xF8,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,
+        0x02,0x01,0x02,0x20,0x02,0x10,0x04,0xff,0xff,0xff,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x3F,0xFF,0xFF,0xF0,0x40,0x00,0x00,0x08,0x9F,0xFF,0xFF,0x84,0xBF,0xFF,0xFF,0x84,0xBF,0xFF,0xFF,0x87,0xBF,0xFF,0xFF,0x87,0xBF,0xFF,0xFF,0x87,0xBF,0xFF,0xFF,0x87,0xBF,0xFF,0xFF,0x84,0x9F,0xFF,0xFF,0x84,0x40,0x00,0x00,0x08,0x3F,0xFF,0xFF,0xF0,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,
     };
 
     // BATTERY 80% ICON
     const unsigned char battery80[] PROGMEM = {
-        0x02,0x01,0x02,0x20,0x02,0x10,0x04,0xff,0xff,0xff,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x3F,0xFF,0xFF,
-        0xF0,0x40,0x00,0x00,0x08,0x9F,0xFF,0xFE,0x04,0xBF,0xFF,0xFE,0x04,0xBF,0xFF,0xFE,0x07,0xBF,0xFF,0xFE,0x07,
-        0xBF,0xFF,0xFE,0x07,0xBF,0xFF,0xFE,0x07,0xBF,0xFF,0xFE,0x04,0x9F,0xFF,0xFE,0x04,0x40,0x00,0x00,0x0C,0x3F,
-        0xFF,0xFF,0xF8,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,
+        0x02,0x01,0x02,0x20,0x02,0x10,0x04,0xff,0xff,0xff,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x3F,0xFF,0xFF,0xF0,0x40,0x00,0x00,0x08,0x9F,0xFF,0xFE,0x04,0xBF,0xFF,0xFE,0x04,0xBF,0xFF,0xFE,0x07,0xBF,0xFF,0xFE,0x07,0xBF,0xFF,0xFE,0x07,0xBF,0xFF,0xFE,0x07,0xBF,0xFF,0xFE,0x04,0x9F,0xFF,0xFE,0x04,0x40,0x00,0x00,0x08,0x3F,0xFF,0xFF,0xF0,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,
     };
 
     // BATTERY 70% ICON
     const unsigned char battery70[] PROGMEM = {
-        0x02,0x01,0x02,0x20,0x02,0x10,0x04,0xff,0xff,0xff,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x3F,0xFF,0xFF,
-        0xF0,0x40,0x00,0x00,0x08,0x9F,0xFF,0xF0,0x04,0xBF,0xFF,0xF0,0x04,0xBF,0xFF,0xF0,0x07,0xBF,0xFF,0xF0,0x07,
-        0xBF,0xFF,0xF0,0x07,0xBF,0xFF,0xF0,0x07,0xBF,0xFF,0xF0,0x04,0x9F,0xFF,0xF0,0x04,0x40,0x00,0x00,0x0C,0x3F,
-        0xFF,0xFF,0xF8,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,
+        0x02,0x01,0x02,0x20,0x02,0x10,0x04,0xff,0xff,0xff,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x3F,0xFF,0xFF,0xF0,0x40,0x00,0x00,0x08,0x9F,0xFF,0xF0,0x04,0xBF,0xFF,0xF0,0x04,0xBF,0xFF,0xF0,0x07,0xBF,0xFF,0xF0,0x07,0xBF,0xFF,0xF0,0x07,0xBF,0xFF,0xF0,0x07,0xBF,0xFF,0xF0,0x04,0x9F,0xFF,0xF0,0x04,0x40,0x00,0x00,0x08,0x3F,0xFF,0xFF,0xF0,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,
     };
 
     // BATTERY 60% ICON
     const unsigned char battery60[] PROGMEM = {
-        0x02,0x01,0x02,0x20,0x02,0x10,0x04,0xff,0xff,0xff,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x3F,0xFF,0xFF,
-        0xF0,0x40,0x00,0x00,0x08,0x9F,0xFF,0x80,0x04,0xBF,0xFF,0x80,0x04,0xBF,0xFF,0x80,0x07,0xBF,0xFF,0x80,0x07,
-        0xBF,0xFF,0x80,0x07,0xBF,0xFF,0x80,0x07,0xBF,0xFF,0x80,0x04,0x9F,0xFF,0x80,0x04,0x40,0x00,0x00,0x0C,0x3F,
-        0xFF,0xFF,0xF8,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,
+        0x02,0x01,0x02,0x20,0x02,0x10,0x04,0xff,0xff,0xff,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x3F,0xFF,0xFF,0xF0,0x40,0x00,0x00,0x08,0x9F,0xFF,0x80,0x04,0xBF,0xFF,0x80,0x04,0xBF,0xFF,0x80,0x07,0xBF,0xFF,0x80,0x07,0xBF,0xFF,0x80,0x07,0xBF,0xFF,0x80,0x07,0xBF,0xFF,0x80,0x04,0x9F,0xFF,0x80,0x04,0x40,0x00,0x00,0x08,0x3F,0xFF,0xFF,0xF0,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,
     };
 
     // BATTERY 50% ICON
     const unsigned char battery50[] PROGMEM = {
-        0x02,0x01,0x02,0x20,0x02,0x10,0x04,0xff,0xff,0xff,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x3F,0xFF,0xFF,
-        0xF0,0x40,0x00,0x00,0x08,0x9F,0xFC,0x00,0x04,0xBF,0xFC,0x00,0x04,0xBF,0xFC,0x00,0x07,0xBF,0xFC,0x00,0x07,
-        0xBF,0xFC,0x00,0x07,0xBF,0xFC,0x00,0x07,0xBF,0xFC,0x00,0x04,0x9F,0xFC,0x00,0x04,0x40,0x00,0x00,0x0C,0x3F,
-        0xFF,0xFF,0xF8,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,
+        0x02,0x01,0x02,0x20,0x02,0x10,0x04,0xff,0xff,0xff,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x3F,0xFF,0xFF,0xF0,0x40,0x00,0x00,0x08,0x9F,0xFC,0x00,0x04,0xBF,0xFC,0x00,0x04,0xBF,0xFC,0x00,0x07,0xBF,0xFC,0x00,0x07,0xBF,0xFC,0x00,0x07,0xBF,0xFC,0x00,0x07,0xBF,0xFC,0x00,0x04,0x9F,0xFC,0x00,0x04,0x40,0x00,0x00,0x08,0x3F,0xFF,0xFF,0xF0,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,
     };
 
     // BATTERY 40% ICON
     const unsigned char battery40[] PROGMEM = {
-        0x02,0x01,0x02,0x20,0x02,0x10,0x04,0xff,0xff,0xff,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x3F,0xFF,0xFF,
-        0xF0,0x40,0x00,0x00,0x08,0x9F,0xF0,0x00,0x04,0xBF,0xF0,0x00,0x04,0xBF,0xF0,0x00,0x07,0xBF,0xF0,0x00,0x07,
-        0xBF,0xF0,0x00,0x07,0xBF,0xF0,0x00,0x07,0xBF,0xF0,0x00,0x04,0x9F,0xF0,0x00,0x04,0x40,0x00,0x00,0x0C,0x3F,
-        0xFF,0xFF,0xF8,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,
+        0x02,0x01,0x02,0x20,0x02,0x10,0x04,0xff,0xff,0xff,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x3F,0xFF,0xFF,0xF0,0x40,0x00,0x00,0x08,0x9F,0xF0,0x00,0x04,0xBF,0xF0,0x00,0x04,0xBF,0xF0,0x00,0x07,0xBF,0xF0,0x00,0x07,0xBF,0xF0,0x00,0x07,0xBF,0xF0,0x00,0x07,0xBF,0xF0,0x00,0x04,0x9F,0xF0,0x00,0x04,0x40,0x00,0x00,0x08,0x3F,0xFF,0xFF,0xF0,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,
     };
 
     // BATTERY 30% ICON
     const unsigned char battery30[] PROGMEM = {
-        0x02,0x01,0x02,0x20,0x02,0x10,0x04,0xff,0xff,0xff,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x3F,0xFF,0xFF,
-        0xF0,0x40,0x00,0x00,0x08,0x9F,0x80,0x00,0x04,0xBF,0x80,0x00,0x04,0xBF,0x80,0x00,0x07,0xBF,0x80,0x00,0x07,
-        0xBF,0x80,0x00,0x07,0xBF,0x80,0x00,0x07,0xBF,0x80,0x00,0x04,0x9F,0x80,0x00,0x04,0x40,0x00,0x00,0x0C,0x3F,
-        0xFF,0xFF,0xF8,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,
+        0x02,0x01,0x02,0x20,0x02,0x10,0x04,0xff,0xff,0xff,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x3F,0xFF,0xFF,0xF0,0x40,0x00,0x00,0x08,0x9F,0x80,0x00,0x04,0xBF,0x80,0x00,0x04,0xBF,0x80,0x00,0x07,0xBF,0x80,0x00,0x07,0xBF,0x80,0x00,0x07,0xBF,0x80,0x00,0x07,0xBF,0x80,0x00,0x04,0x9F,0x80,0x00,0x04,0x40,0x00,0x00,0x08,0x3F,0xFF,0xFF,0xF0,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,
     };
 
     // BATTERY 20% ICON
     const unsigned char battery20[] PROGMEM = {
-        0x02,0x01,0x02,0x20,0x02,0x10,0x04,0xff,0xff,0xff,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x3F,0xFF,0xFF,
-        0xF0,0x40,0x00,0x00,0x08,0x9C,0x00,0x00,0x04,0xBC,0x00,0x00,0x04,0xBC,0x00,0x00,0x07,0xBC,0x00,0x00,0x07,
-        0xBC,0x00,0x00,0x07,0xBC,0x00,0x00,0x07,0xBC,0x00,0x00,0x04,0x9C,0x00,0x00,0x04,0x40,0x00,0x00,0x0C,0x3F,
-        0xFF,0xFF,0xF8,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,
+        0x02,0x01,0x02,0x20,0x02,0x10,0x04,0xff,0xff,0xff,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x3F,0xFF,0xFF,0xF0,0x40,0x00,0x00,0x08,0x9C,0x00,0x00,0x04,0xBC,0x00,0x00,0x04,0xBC,0x00,0x00,0x07,0xBC,0x00,0x00,0x07,0xBC,0x00,0x00,0x07,0xBC,0x00,0x00,0x07,0xBC,0x00,0x00,0x04,0x9C,0x00,0x00,0x04,0x40,0x00,0x00,0x08,0x3F,0xFF,0xFF,0xF0,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,
     };
 
     // BATTERY 10% ICON
     const unsigned char battery10[] PROGMEM = {
-        0x02,0x01,0x02,0x20,0x02,0x10,0x04,0xff,0xff,0xff,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x3F,0xFF,0xFF,
-        0xF0,0x40,0x00,0x00,0x08,0x90,0x00,0x00,0x04,0xB0,0x00,0x00,0x04,0xB0,0x00,0x00,0x07,0xB0,0x00,0x00,0x07,
-        0xB0,0x00,0x00,0x07,0xB0,0x00,0x00,0x07,0xB0,0x00,0x00,0x04,0x90,0x00,0x00,0x04,0x40,0x00,0x00,0x0C,0x3F,
-        0xFF,0xFF,0xF8,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,
+        0x02,0x01,0x02,0x20,0x02,0x10,0x04,0xff,0xff,0xff,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x3F,0xFF,0xFF,0xF0,0x40,0x00,0x00,0x08,0x90,0x00,0x00,0x04,0xB0,0x00,0x00,0x04,0xB0,0x00,0x00,0x07,0xB0,0x00,0x00,0x07,0xB0,0x00,0x00,0x07,0xB0,0x00,0x00,0x07,0xB0,0x00,0x00,0x04,0x90,0x00,0x00,0x04,0x40,0x00,0x00,0x08,0x3F,0xFF,0xFF,0xF0,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,
     };
 
     // BATTERY 0% ICON
     const unsigned char battery0[] PROGMEM = {
-        0x02,0x01,0x02,0x20,0x02,0x10,0x04,0xff,0xff,0xff,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x3F,0xFF,0xFF,
-        0xF0,0x40,0x00,0x00,0x08,0x80,0x00,0x00,0x04,0x80,0x00,0x00,0x04,0x80,0x00,0x00,0x07,0x80,0x00,0x00,0x07,
-        0x80,0x00,0x00,0x07,0x80,0x00,0x00,0x07,0x80,0x00,0x00,0x04,0x80,0x00,0x00,0x04,0x40,0x00,0x00,0x0C,0x3F,
-        0xFF,0xFF,0xF8,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,
+        0x02,0x01,0x02,0x20,0x02,0x10,0x04,0xff,0xff,0xff,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x3F,0xFF,0xFF,0xF0,0x40,0x00,0x00,0x08,0x80,0x00,0x00,0x04,0x80,0x00,0x00,0x04,0x80,0x00,0x00,0x07,0x80,0x00,0x00,0x07,0x80,0x00,0x00,0x07,0x80,0x00,0x00,0x07,0x80,0x00,0x00,0x04,0x80,0x00,0x00,0x04,0x40,0x00,0x00,0x08,0x3F,0xFF,0xFF,0xF0,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,
     };
 #endif
 
@@ -2319,23 +2893,72 @@ void core_views_statusBar_draw(){
 
     // BATTERY
     #ifdef BATTERY_ENABLE
-        drawImage(true, battery100,SCREEN_WIDTH-32-STYLE_STATUSBAR_HEIGHT/5, STYLE_STATUSBAR_HEIGHT/2 - 8 + 1);
-        if(DRAW_LIMITS_Enabled) debug("Draw limit enabled");
+        core_views_draw_statusbar_battery(true, driver_battery_getPercent());
     #endif
 
     DRAW_LIMITS_setEnable(DRAW_LIMITS_Enabled);
 }
 
+#ifdef BATTERY_ENABLE
+    unsigned char batteryCharge_last = 0;
+    bool batteryCharge_last_wasCharging = false;
+    void core_views_draw_statusbar_battery(bool draw, unsigned char batteryCharge){
+        TEMPORARILY_DISABLE_BACKGROUND();
+
+        setBackgroundColor(STYLE_STATUSBAR_BACKGROUND_RED, STYLE_STATUSBAR_BACKGROUND_GREEN, STYLE_STATUSBAR_BACKGROUND_BLUE);
+        if(draw){
+            batteryCharge_last = batteryCharge;
+            batteryCharge_last_wasCharging = driver_battery_isCharging();
+        }
+
+        const unsigned char *batteryIcon;
+        if(batteryCharge_last>=100){
+            batteryIcon = battery100;
+        }else if(batteryCharge_last>=90){
+            batteryIcon = battery90;
+        }else if(batteryCharge_last>=80){
+            batteryIcon = battery80;
+        }else if(batteryCharge_last>=70){
+            batteryIcon = battery70;
+        }else if(batteryCharge_last>=60){
+            batteryIcon = battery60;
+        }else if(batteryCharge_last>=50){
+            batteryIcon = battery50;
+        }else if(batteryCharge_last>=40){
+            batteryIcon = battery40;
+        }else if(batteryCharge_last>=30){
+            batteryIcon = battery30;
+        }else if(batteryCharge_last>=20){
+            batteryIcon = battery20;
+        }else if(batteryCharge_last>=10){
+            batteryIcon = battery10;
+        }else{
+            batteryIcon = battery0;
+        }
+
+        if(batteryCharge_last_wasCharging){
+            drawImage(draw, battery_charging, SCREEN_WIDTH-32-STYLE_STATUSBAR_HEIGHT/5, STYLE_STATUSBAR_HEIGHT/2 - 8 + 1);
+        }else{
+            drawImage(draw, batteryIcon, SCREEN_WIDTH-32-STYLE_STATUSBAR_HEIGHT/5, STYLE_STATUSBAR_HEIGHT/2 - 8 + 1);
+        }
+
+        TEMPORARILY_RESTORE_BACKGROUND();
+    }
+#endif
+
 String core_views_statusBar_draw_time_TimeString = "";
 void core_views_statusBar_draw_time(bool draw){
+    bool lastLimits = DRAW_LIMITS_getEnable();
+    DRAW_LIMITS_setEnable(false);
     if(draw){
         setDrawColor(STYLE_STATUSBAR_TEXT_RED, STYLE_STATUSBAR_TEXT_GREEN, STYLE_STATUSBAR_TEXT_BLUE);
         core_views_statusBar_draw_time_TimeString = core_time_getHourMinuteTime();
-        clearString(core_views_statusBar_draw_time_TimeString, 5, STYLE_STATUSBAR_HEIGHT/2 - FONT_CHAR_HEIGHT/2 + ( (STYLE_STATUSBAR_HEIGHT)%2 ) + ( (FONT_CHAR_HEIGHT)%2 ) + 1, FONT_SIZE_DEFAULT);
+        drawString(core_views_statusBar_draw_time_TimeString, 5, STYLE_STATUSBAR_HEIGHT/2 - FONT_CHAR_HEIGHT/2 + ( (STYLE_STATUSBAR_HEIGHT)%2 ) + ( (FONT_CHAR_HEIGHT)%2 ) + 2, FONT_SIZE_DEFAULT);
     }else{
         setDrawColor(STYLE_STATUSBAR_BACKGROUND_RED, STYLE_STATUSBAR_BACKGROUND_GREEN, STYLE_STATUSBAR_BACKGROUND_BLUE);
-        drawString(core_views_statusBar_draw_time_TimeString, 5, STYLE_STATUSBAR_HEIGHT/2 - FONT_CHAR_HEIGHT/2 + ( (STYLE_STATUSBAR_HEIGHT)%2 ) + ( (FONT_CHAR_HEIGHT)%2 ) + 1, FONT_SIZE_DEFAULT);
+        clearString(core_views_statusBar_draw_time_TimeString, 5, STYLE_STATUSBAR_HEIGHT/2 - FONT_CHAR_HEIGHT/2 + ( (STYLE_STATUSBAR_HEIGHT)%2 ) + ( (FONT_CHAR_HEIGHT)%2 ) + 2, FONT_SIZE_DEFAULT);
     }
+    DRAW_LIMITS_setEnable(lastLimits);
 }
 
 
@@ -2485,6 +3108,42 @@ void core_views_draw_settings_item(bool draw, int x, int y, const unsigned char*
     
 }
 
+void core_views_draw_settings_item_noicon(bool draw, int x, int y, String title, String subTitle, unsigned char titleFontSize, unsigned char subTitleFontSize){
+    
+    if(draw){
+        setDrawColor_ContrastColor();
+        drawString(
+            title,                                                                          // TEXT
+            x - title.length()*FONT_CHAR_WIDTH/2*titleFontSize,                             // X
+            y - COREVIEWS_NO_ICON_ELEMENT_HEIGHT/2,                                         // Y
+            titleFontSize                                                                   // FONT SIZE
+        );
+
+        drawString(
+            subTitle,                                                                       // TEXT
+            x - subTitle.length()*FONT_CHAR_WIDTH/2*subTitleFontSize,                       // X
+            y + COREVIEWS_NO_ICON_ELEMENT_HEIGHT/2 - subTitleFontSize * FONT_CHAR_HEIGHT,   // Y
+            subTitleFontSize                                                                // FONT SIZE
+        );
+    }else{
+        setDrawColor_BackGoundColor();
+        clearString(
+            title,                                                                          // TEXT
+            x - title.length()*FONT_CHAR_WIDTH/2*titleFontSize,                             // X
+            y - COREVIEWS_NO_ICON_ELEMENT_HEIGHT/2,                                         // Y
+            titleFontSize                                                                   // FONT SIZE
+        );
+
+        clearString(
+            subTitle,                                                                       // TEXT
+            x - subTitle.length()*FONT_CHAR_WIDTH/2*subTitleFontSize,                       // X
+            y + COREVIEWS_NO_ICON_ELEMENT_HEIGHT/2 - subTitleFontSize * FONT_CHAR_HEIGHT,   // Y
+            subTitleFontSize                                                                // FONT SIZE
+        );
+    }
+    
+}
+
 void drawMenuElement(bool draw, uint16_t x, uint16_t y, uint16_t width, uint16_t height, const unsigned char* icon, String string1, String string2){
     if(draw) setDrawColor(255, 255, 255);
     else setDrawColor(getBackgroundColor_red(), getBackgroundColor_green(), getBackgroundColor_blue());
@@ -2518,6 +3177,7 @@ const byte* getIcon(int icon){
 
     switch (icon){
         #ifdef BATTERY_ENABLE
+            case ICON_BATTERY_CHARGING:   return battery_charging;
             case ICON_BATTERY_100:        return battery100;  
             case ICON_BATTERY_90:         return battery90;  
             case ICON_BATTERY_80:         return battery80;  
@@ -2539,8 +3199,35 @@ const byte* getIcon(int icon){
 
 
 
-#ifdef CPU_SLEEP_ENABLE
+#ifdef CPU_CONTROLL_ENABLE
+    void core_cpu_setup(){
+        driver_cpu_setup();
 
+        #ifdef ACCELEROMETER_ENABLE
+        #endif
+        //core_cpu_modemSleep();
+
+        //debug("Should be in sleep!");
+    }
+
+    void core_cpu_loop(){
+        
+        //core_cpu_sleep(SLEEP_MODEM);
+        /*
+        if(millis()/1000>10 && millis()/1000<15)
+        driver_cpu_sleep(SLEEP_LIGHT, 10);
+        */
+    }
+
+    void core_cpu_sleep(unsigned char SLEEP_TYPE){
+        core_cpu_sleep(SLEEP_TYPE, 0);
+    }
+
+    void core_cpu_sleep(unsigned char SLEEP_TYPE, long timeToWakeUp_s){
+        driver_accelerometer_sleep();
+        driver_cpu_sleep(SLEEP_TYPE, timeToWakeUp_s);
+        driver_accelerometer_wakeup();
+    }
 #endif
 
 #ifdef TOUCH_SCREEN_ENABLE
@@ -2818,8 +3505,13 @@ const unsigned char appNameClass::icon[] PROGMEM = {
     0x3F,0x80,0x00,0xFE,0x7F,0x00,0x00,0x3E,0x7C,0x00,0x00,0x0E,0x70,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,
 };
 
-#define appNameClass    BatteryApp              // App name without spaces
-#define appName         "Battery"              // App name with spaces 
+
+#define appNameClass                        BatteryApp              // App name without spaces
+#define appName                             "Battery"              // App name with spaces 
+
+#ifndef APP_BATTERY_UPDATE_EVERY_MS
+    #define APP_BATTERY_UPDATE_EVERY_MS         500
+#endif
 
 class appNameClass: public Application{
     public:
@@ -2834,6 +3526,9 @@ class appNameClass: public Application{
             onCreate(); 
         };
 
+        void drawInfo();
+        long lastUpdate = 0;
+
         static unsigned const char* getParams(const unsigned char type){
             switch(type){ 
               case PARAM_TYPE_NAME: return (unsigned char*)appName; 
@@ -2841,31 +3536,97 @@ class appNameClass: public Application{
               default: return (unsigned char*)""; }
         };
         const static unsigned char icon[] PROGMEM;
-      
+        
+        unsigned char currentPrintScreenString = 0;
+        void drawStringOnScreen(String stringToPrint);
 };
 
+void appNameClass::drawStringOnScreen(String stringToPrint){
+    drawString(stringToPrint, 5, STYLE_STATUSBAR_HEIGHT + currentPrintScreenString*10*FONT_SIZE_DEFAULT + 10, FONT_SIZE_DEFAULT);
+    currentPrintScreenString ++;
+}
+
+/*
+float driver_battery_getVoltage()
+int driver_battery_getVoltage_mV()
+float driver_battery_getCurent_mA()
+float driver_battery_getUsbVoltage()
+float driver_battery_getUsbCurent_mA()
+float driver_battery_controller_Temp()
+float driver_battery_Temp()
+unsigned char driver_battery_getPercent()
+*/
+
 void appNameClass::onCreate(){
-    /*
-        Write you code onCreate here
-    */
+    setBackgroundColor(0, 0, 0); 
+
+    DRAW_LIMITS_setEnable(true);
+    DRAW_LIMIT_reset();
+    DRAW_LIMITS_setEnable(STYLE_STATUSBAR_HEIGHT, -1, -1, -1);
+    this->drawInfo();
+}
+
+void appNameClass::drawInfo(){
+    this->lastUpdate = millis();
+    this->currentPrintScreenString = 0;
 
     setDrawColor(255, 255, 255);
     #ifdef BATTERY_ENABLE
-        drawString("Max analog: " + String(getMaxBatteryAnalogValue()), 5, STYLE_STATUSBAR_HEIGHT + 0*20 + 10, 2);
-        drawString("Raw battery: " + String(driver_battery_raw()), 5, STYLE_STATUSBAR_HEIGHT + 1*20 + 10, 2);
-        drawString("Voltage: " + String(driver_battery_getVoltage_mV()) + "0 mV", 5, STYLE_STATUSBAR_HEIGHT + 2*20 + 10, 2);
-        //drawString("Voltage: " + String(driver_battery_getVoltage() + " V"), 5, STYLE_STATUSBAR_HEIGHT + 3*20 + 10, 2);
-        drawString("Percent: " + String(driver_battery_getPercent()), 5, STYLE_STATUSBAR_HEIGHT + 4*20 + 10, 2);
-    #else
-        drawString("Battery not supported", 5, STYLE_STATUSBAR_HEIGHT + 0*20 + 10, 2);
-    #endif
+        //#ifdef NARROW_SCREEN
+            
+            drawStringOnScreen("Bat voltage:");
+            drawStringOnScreen(String(driver_battery_getVoltage()) + " V");
+            
+            drawStringOnScreen("Bat voltage:");
+            drawStringOnScreen(String(driver_battery_getVoltage_mV()) + " mV");
+            
+            drawStringOnScreen("Bat current:");
+            drawStringOnScreen(String(driver_battery_getCurent_mA()) + " mA");
+                        
+            drawStringOnScreen("Usb voltage:");
+            drawStringOnScreen(String(driver_battery_getUsbVoltage()) + " mV");
+
+            drawStringOnScreen("Usb current:");
+            drawStringOnScreen(String(driver_battery_getUsbCurent_mA()) + " mA");
+            
+            /*
+            drawStringOnScreen("Vin voltage:");
+            drawStringOnScreen(String(driver_battery_getVinVoltage()) + " mV");
+
+            drawStringOnScreen("Vin current:");
+            drawStringOnScreen(String(driver_battery_getVinCurent_mA()) + " mA");
+
+            drawStringOnScreen("Battery temp:");
+            drawStringOnScreen(String(driver_battery_Temp()) + " C");
+            
+            drawStringOnScreen("Controller temp:");
+            drawStringOnScreen(String(driver_battery_controller_Temp()) + " C");
+            */
+
+            drawStringOnScreen("Battery:");
+            drawStringOnScreen(String(core_battery_getPercent()) + " %");
     
+        //#else
+            
+        //#endif
+        
+    #else
+        drawStringOnScreen("Battery not supported");
+    #endif
 }
 
 void appNameClass::onLoop(){
     /*
         Write you code onLoop here
     */
+    #ifdef BATTERY_ENABLE
+        if(millis()-this->lastUpdate>APP_BATTERY_UPDATE_EVERY_MS){
+            //fillScreen(0, 0, 0);
+            setDrawColor_BackGoundColor();
+            drawRect(0, STYLE_STATUSBAR_HEIGHT, SCREEN_WIDTH, SCREEN_HEIGHT, true);
+            this->drawInfo();
+        }
+    #endif
 }
 
 void appNameClass::onDestroy(){
@@ -2875,20 +3636,26 @@ void appNameClass::onDestroy(){
 }
 
 void appNameClass::onEvent(unsigned char event, int val1, int val2){
-    
-    if(event==EVENT_BUTTON_PRESSED){
-        // Write you code on [val1] button pressed here
-        if(val1==BUTTON_BACK){
-            startApp(-1);
+    #if (DRIVER_CONTROLS_TOTALBUTTONS == 2 || DRIVER_CONTROLS_TOTALBUTTONS == 1)
+        if(event==EVENT_ON_TOUCH_DOUBLE_PRESS){
+            if(val1==BUTTON_SELECT){
+                startApp(-1);
+            }
         }
-    }else if(event==EVENT_BUTTON_RELEASED){
-        // Write you code on [val1] button released here
-    }else if(event==EVENT_BUTTON_LONG_PRESS){
-        // Write you code on [val1] button long press here
-    }else if(event==EVENT_ON_TIME_CHANGED){
-        // Write you code on system time changed
-    }
-    
+    #else
+        if(event==EVENT_BUTTON_PRESSED){
+            // Write you code on [val1] button pressed here
+            if(val1==BUTTON_BACK){
+                startApp(-1);
+            }
+        }else if(event==EVENT_BUTTON_RELEASED){
+            // Write you code on [val1] button released here
+        }else if(event==EVENT_BUTTON_LONG_PRESS){
+            // Write you code on [val1] button long press here
+        }else if(event==EVENT_ON_TIME_CHANGED){
+            // Write you code on system time changed
+        }
+    #endif
 }
 
 const unsigned char appNameClass::icon[] PROGMEM = {
@@ -2906,6 +3673,13 @@ const unsigned char appNameClass::icon[] PROGMEM = {
     0x08,0x10,0x00,0x00,0x08,0x10,0x00,0x00,0x08,0x10,0x00,0x00,0x08,0x10,0x00,0x00,0x08,0x10,0x00,0x00,0x08,0x10,0x00,0x00,0x08,
     0x10,0x00,0x00,0x08,0x10,0x00,0x00,0x08,0x10,0x00,0x00,0x08,0x10,0x00,0x00,0x08,0x0F,0xFF,0xFF,0xF0,
 };
+
+/* 
+* /
+#define DRIVER_CONTROLS_TOTALBUTTONS 1
+#define MAIN_MENU_SMOOTH_ANIMATION
+#define NARROW_SCREEN
+// */
 
 #define appNameClass    SettingsApp     // App name without spaces
 #define appName         "Settings"      // App name with spaces 
@@ -2955,11 +3729,18 @@ const unsigned char appNameClass::icon[] PROGMEM = {
 
 
 // SUBMENUES
-#define APP_SETTINGS_SUBMENU_MAIN 0x00
-#define APP_SETTINGS_SUBMENU_SET_TIME 0x01
+#define APP_SETTINGS_SUBMENU_MAIN           0x00
+#define APP_SETTINGS_SUBMENU_SET_TIME       0x01
+#define APP_SETTINGS_SUBMENU_SET_DATE       0x02
+#define APP_SETTINGS_SUBMENU_SCREEN         0x03
+//#define APP_SETTINGS_SUBMENU_POWERSAVE      0x04
 
 // SETTINGS PAGES
-#define APP_SETTINGS_PAGE_TOTAL_ELEMENTS_MAIN 4
+#define APP_SETTINGS_PAGE_TOTAL_ELEMENTS_MAIN       3
+#define APP_SETTINGS_PAGE_TOTAL_ELEMENTS_SET_TIME   3
+#define APP_SETTINGS_PAGE_TOTAL_ELEMENTS_SET_DATE   4
+#define APP_SETTINGS_PAGE_TOTAL_ELEMENTS_SCREEN     4
+
 
 // # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # //
 
@@ -2997,6 +3778,7 @@ class appNameClass: public Application{
         const static unsigned char icon_sleep[]         PROGMEM;
         unsigned char currentSubMenu       = APP_SETTINGS_SUBMENU_MAIN;
         String getApplicationSubTitle(unsigned char submenu, unsigned char num);
+        String getApplicationSubTitle(unsigned char submenu, unsigned char num, boolean getLast);
         void drawSettingsPageFirstTime();
         void clearWorkSpace();
         void switchToSubMenu(unsigned char newSubMenu);
@@ -3011,6 +3793,22 @@ class appNameClass: public Application{
         void pressNext();
         void pressSelect();
 
+        String lastTimeString           = "";
+        String lastDateString           = "";
+        String lastBatteryString        = "";
+
+        String lastTimeString_hours     = "";
+        String lastTimeString_minutes   = "";
+        String lastTimeString_seconds   = "";
+        String lastDateString_year      = "";
+        String lastDateString_month     = "";
+        String lastDateString_date      = "";
+        String lastDateString_weekDay   = "";
+
+        #if (DRIVER_CONTROLS_TOTALBUTTONS == 2 || DRIVER_CONTROLS_TOTALBUTTONS == 1)
+            unsigned long stillPressingSelect_time = 0;
+        #endif
+
         char currentSelectedPosition        = 0;
         bool currentPositionIsSelected      = false;
         
@@ -3023,10 +3821,16 @@ unsigned char appNameClass::getTotalPagesInSubMenu(unsigned char submenuType){
 
 unsigned char appNameClass::getTotalApplicationsInSubMenu(unsigned char submenuType){
     switch (submenuType){
-    case APP_SETTINGS_SUBMENU_MAIN:
-        return APP_SETTINGS_PAGE_TOTAL_ELEMENTS_MAIN;
-    default:
-        return APP_SETTINGS_PAGE_TOTAL_ELEMENTS_MAIN;
+        case APP_SETTINGS_SUBMENU_MAIN:
+            return APP_SETTINGS_PAGE_TOTAL_ELEMENTS_MAIN;
+        case APP_SETTINGS_SUBMENU_SET_TIME:
+            return APP_SETTINGS_PAGE_TOTAL_ELEMENTS_SET_TIME;
+        case APP_SETTINGS_SUBMENU_SET_DATE:
+            return APP_SETTINGS_PAGE_TOTAL_ELEMENTS_SET_DATE;
+        case APP_SETTINGS_SUBMENU_SCREEN:
+            return APP_SETTINGS_PAGE_TOTAL_ELEMENTS_SCREEN;
+        default:
+            return APP_SETTINGS_PAGE_TOTAL_ELEMENTS_MAIN;
     }
 }
 
@@ -3054,20 +3858,38 @@ void appNameClass::drawSettingsPageFirstTime(){
             this->drawActiveAppFrame(true);  
         #endif
         #endif
-    }if(currentSubMenu==APP_SETTINGS_SUBMENU_SET_TIME){
-        int y_position = (SCREEN_HEIGHT - STYLE_STATUSBAR_HEIGHT)/2;
-        //drawString("Setting up time", 80,80);
-        drawSettingTimeDigits(true);
-        drawSettingTimeSelect(true, getPositionBySelectedNumber(currentSelectedPosition));
+    }else if(currentSubMenu==APP_SETTINGS_SUBMENU_SET_TIME){
 
-        //drawSettingTimeArrows(true, TIME_SET_POSITION_1);
-        //drawSettingTimeArrows(true, TIME_SET_POSITION_2);
-        //drawSettingTimeArrows(true, TIME_SET_POSITION_3);
+        #ifdef NARROW_SCREEN
+            this->drawIcons(true);
+        #else
+            int y_position = (SCREEN_HEIGHT - STYLE_STATUSBAR_HEIGHT)/2;
 
-        //drawSettingTimeSelect(true, TIME_SET_POSITION_1);
-        //drawSettingTimeSelect(true, TIME_SET_POSITION_2);
-        //drawSettingTimeSelect(true, TIME_SET_POSITION_3);
-    }    
+            drawSettingTimeDigits(true);
+            drawSettingTimeSelect(true, getPositionBySelectedNumber(currentSelectedPosition));
+        #endif
+
+    }else if(currentSubMenu==APP_SETTINGS_SUBMENU_SET_DATE){
+
+        #ifdef NARROW_SCREEN
+            this->drawIcons(true);
+        #else
+            /*
+            TODO
+            */
+        #endif
+
+    }else if(currentSubMenu==APP_SETTINGS_SUBMENU_SCREEN){
+
+        #ifdef NARROW_SCREEN
+            this->drawIcons(true);
+        #else
+            /*
+            TODO
+            */
+        #endif
+
+    }      
 }
 
 int appNameClass::getPositionBySelectedNumber(unsigned char selectedNumber){
@@ -3127,6 +3949,8 @@ void appNameClass::switchToSubMenu(unsigned char newSubMenu){
 }
 
 void appNameClass::onCreate(){
+    setBackgroundColor(0,0,0);
+    setContrastColor(255, 255, 255);
     #ifndef TOUCH_SCREEN_ENABLE
         DRAW_LIMITS_setEnable(true);
         DRAW_LIMIT_reset();
@@ -3135,15 +3959,14 @@ void appNameClass::onCreate(){
 
     this->drawSettingsPageFirstTime();
     this->currentSubMenu = APP_SETTINGS_SUBMENU_MAIN;
-    //switchToSubMenu(APP_SETTINGS_SUBMENU_SET_TIME);
 }
 
 
 
 void appNameClass::updateActiveAppIndex(int newSelectedAppIndex){
 
-  if(newSelectedAppIndex<0) newSelectedAppIndex = getTotalApplicationsInSubMenu(APP_SETTINGS_SUBMENU_MAIN) - 1;
-  if(newSelectedAppIndex>=getTotalApplicationsInSubMenu(APP_SETTINGS_SUBMENU_MAIN)) newSelectedAppIndex = 0;
+  if(newSelectedAppIndex<0) newSelectedAppIndex = getTotalApplicationsInSubMenu(currentSubMenu) - 1;
+  if(newSelectedAppIndex>=getTotalApplicationsInSubMenu(currentSubMenu)) newSelectedAppIndex = 0;
 
   if(app_settings_selectedAppIndex!=newSelectedAppIndex){
     
@@ -3153,12 +3976,28 @@ void appNameClass::updateActiveAppIndex(int newSelectedAppIndex){
     #endif
     #endif
     
+    //debug("Current submenu: " + String(currentSubMenu));
+
     if( (int)((app_settings_selectedAppIndex)/APPS_ON_SINGLE_PAGE) != (int)((newSelectedAppIndex)/APPS_ON_SINGLE_PAGE)){
       // update page
       this->drawIcons(false);
-      core_views_draw_active_page(false, PAGES_LIST_POSITION, getTotalPagesInSubMenu(APP_SETTINGS_SUBMENU_MAIN), (int)(app_settings_selectedAppIndex/APPS_ON_SINGLE_PAGE));
+      if(
+          currentSubMenu!=APP_SETTINGS_SUBMENU_SET_TIME 
+          && currentSubMenu!=APP_SETTINGS_SUBMENU_SET_DATE
+          && currentSubMenu!=APP_SETTINGS_SUBMENU_SCREEN
+          ){
+        core_views_draw_active_page(false, PAGES_LIST_POSITION, getTotalPagesInSubMenu(currentSubMenu), (int)(app_settings_selectedAppIndex/APPS_ON_SINGLE_PAGE));
+      }
+      
       app_settings_selectedAppIndex = newSelectedAppIndex;
-      core_views_draw_active_page(true, PAGES_LIST_POSITION, getTotalPagesInSubMenu(APP_SETTINGS_SUBMENU_MAIN), (int)(app_settings_selectedAppIndex/APPS_ON_SINGLE_PAGE));
+
+      if(
+          currentSubMenu!=APP_SETTINGS_SUBMENU_SET_TIME 
+          && currentSubMenu!=APP_SETTINGS_SUBMENU_SET_DATE
+          && currentSubMenu!=APP_SETTINGS_SUBMENU_SCREEN
+          ){
+        core_views_draw_active_page(true, PAGES_LIST_POSITION, getTotalPagesInSubMenu(currentSubMenu), (int)(app_settings_selectedAppIndex/APPS_ON_SINGLE_PAGE));
+      }
       this->drawIcons(true);
     }else{
       app_settings_selectedAppIndex = newSelectedAppIndex;
@@ -3196,18 +4035,96 @@ void appNameClass::drawActiveAppFrame(bool draw){
 
 void appNameClass::drawIcons(bool draw){
     #ifdef NARROW_SCREEN
-
         int app_num = app_settings_selectedAppIndex;
-        //debug(String(app_num));
+        
+        #ifdef MAIN_MENU_SMOOTH_ANIMATION
+            if(this->scroll_x!=0){
+                this->preventInAppSleep=true;
+                if(this->scroll_x<0){
+                }else if(this->scroll_x>0){
+                    char elementsToPreDraw = this->scroll_x/SCREEN_WIDTH + 1;
+                    elementsToPreDraw = elementsToPreDraw%getTotalPagesInSubMenu(currentSubMenu);
+                    for(unsigned char elementDraw = 0; elementDraw<=elementsToPreDraw; elementDraw++){
+                        int appElementDraw = app_num - elementDraw;
+                        while(appElementDraw<0) appElementDraw+=getTotalPagesInSubMenu(currentSubMenu);
+                        appElementDraw = appElementDraw%getTotalPagesInSubMenu(currentSubMenu);
 
-        core_views_draw_settings_item(
-            draw, 
-            SCREEN_WIDTH/2,
-            SCREEN_HEIGHT/2, 
-            (const unsigned char*)this->getApplicationTitle(0, app_num), 
-            this->getApplicationSubTitle(0, app_num), 
-            this->getApplicationIcon(0, app_num)
-        );
+                        if(currentSubMenu==APP_SETTINGS_SUBMENU_MAIN){
+                            core_views_draw_settings_item(
+                                draw, 
+                                this->scroll_x + SCREEN_WIDTH/2 - elementDraw*SCREEN_WIDTH,
+                                SCREEN_HEIGHT/2, 
+                                (const unsigned char*)this->getApplicationTitle(APP_SETTINGS_SUBMENU_MAIN, appElementDraw), 
+                                this->getApplicationSubTitle(currentSubMenu, appElementDraw, !draw), 
+                                this->getApplicationIcon(currentSubMenu, appElementDraw)
+                            );
+                        }else if(
+                                    currentSubMenu==APP_SETTINGS_SUBMENU_SET_TIME 
+                                    || currentSubMenu==APP_SETTINGS_SUBMENU_SET_DATE 
+                                    || currentSubMenu==APP_SETTINGS_SUBMENU_SCREEN
+                                ){
+
+                            String stringTitle = reinterpret_cast<const char*>(this->getApplicationTitle(currentSubMenu, appElementDraw));
+
+                            core_views_draw_settings_item_noicon(
+                                draw, 
+                                this->scroll_x + SCREEN_WIDTH/2 - elementDraw*SCREEN_WIDTH, 
+                                SCREEN_HEIGHT/2, 
+                                stringTitle, 
+                                this->getApplicationSubTitle(currentSubMenu, appElementDraw, !draw), 
+                                1, 
+                                2
+                            );
+                        }
+                        
+                    }
+                }
+            }else{
+                if(draw) this->preventInAppSleep=false;
+                if(currentSubMenu==APP_SETTINGS_SUBMENU_MAIN){
+                    core_views_draw_settings_item(
+                        draw, 
+                        this->scroll_x + SCREEN_WIDTH/2,
+                        SCREEN_HEIGHT/2, 
+                        (const unsigned char*)this->getApplicationTitle(APP_SETTINGS_SUBMENU_MAIN, app_num), 
+                        this->getApplicationSubTitle(currentSubMenu, app_num, !draw), 
+                        this->getApplicationIcon(currentSubMenu, app_num)
+                    );
+                }else if(
+                            currentSubMenu==APP_SETTINGS_SUBMENU_SET_TIME 
+                            || currentSubMenu==APP_SETTINGS_SUBMENU_SET_DATE
+                            || currentSubMenu==APP_SETTINGS_SUBMENU_SCREEN
+                        ){
+                    String stringTitle = reinterpret_cast<const char*>(this->getApplicationTitle(currentSubMenu, app_num));
+                    core_views_draw_settings_item_noicon(
+                        draw, 
+                        this->scroll_x + SCREEN_WIDTH/2, 
+                        SCREEN_HEIGHT/2, 
+                        stringTitle, 
+                        this->getApplicationSubTitle(currentSubMenu, app_num, !draw), 
+                        1, 
+                        2
+                    );
+                }
+            }
+        #else
+            if(currentSubMenu==APP_SETTINGS_SUBMENU_MAIN){
+                core_views_draw_settings_item(
+                    draw, 
+                    SCREEN_WIDTH/2,
+                    SCREEN_HEIGHT/2, 
+                    (const unsigned char*)this->getApplicationTitle(APP_SETTINGS_SUBMENU_MAIN, app_num), 
+                    this->getApplicationSubTitle(currentSubMenu, app_num, !draw), 
+                    this->getApplicationIcon(currentSubMenu, app_num)
+                );
+            }else if(currentSubMenu==APP_SETTINGS_SUBMENU_SET_TIME){
+                // TODO
+            }else if(currentSubMenu==APP_SETTINGS_SUBMENU_SET_DATE){
+                // TODO
+            }else if(currentSubMenu==APP_SETTINGS_SUBMENU_SCREEN){
+                // TODO
+            }
+        #endif
 
 
     #else
@@ -3245,7 +4162,7 @@ void appNameClass::drawIcons(bool draw){
                                 -this->scroll_x + x0+35, 
                             #endif
                             y_center, 
-                            (const unsigned char*)this->getApplicationTitle(0, app_num), 
+                            (const unsigned char*)this->getApplicationTitle(APP_SETTINGS_SUBMENU_MAIN, app_num), 
                             this->getApplicationSubTitle(0, app_num), 
                             this->getApplicationIcon(0, app_num)
                         );
@@ -3260,6 +4177,126 @@ void appNameClass::drawIcons(bool draw){
 }
 
 void appNameClass::onLoop(){
+    #ifdef MAIN_MENU_SMOOTH_ANIMATION
+        if(this->scroll_x!=0){
+            this->drawIcons(false);
+            if(this->scroll_x!=0){
+                //this->scroll_x++;
+                int dx = abs(scroll_x)/SMOOTH_ANIMATION_COEFFICIENT + 1;
+                if(scroll_x>scroll_to_x) dx *= -1;
+                scroll_x+=dx;
+
+                if (abs(dx)<1) scroll_x=0;
+            }
+            this->drawIcons(true);
+        }
+    #endif
+    if(currentSubMenu==APP_SETTINGS_SUBMENU_SET_TIME){
+        if(stillPressingSelect_time!=0 && millis()-this->stillPressingSelect_time>=DRIVER_CONTROLS_DELAY_BEFORE_MULTY_PRESS){
+            stillPressingSelect_time = millis();
+            switch(app_settings_selectedAppIndex){
+                case 0:
+                    // Add hours
+                    core_time_setHours(core_time_getHours_byte() + 1);
+                    break;
+                case 1:
+                    // Add minutes
+                    core_time_setMinutes(core_time_getMinutes_byte() + 1);
+                    break;
+                case 2:
+                    // Reset seconds
+                    core_time_setSeconds(0);
+                    break;
+            } 
+            this->drawIcons(false);
+            this->drawIcons(true);
+        }
+    }else if(currentSubMenu==APP_SETTINGS_SUBMENU_SET_DATE){
+        if(stillPressingSelect_time!=0 && millis()-this->stillPressingSelect_time>=DRIVER_CONTROLS_DELAY_BEFORE_MULTY_PRESS){
+            stillPressingSelect_time = millis();
+            switch(app_settings_selectedAppIndex){
+                case 0:
+                    // Add year
+                    core_time_setYear(core_time_getYear() + 1);
+                    break;
+                case 1:
+                    // Add month
+                    core_time_setMonth(core_time_getMonth() + 1);
+                    break;
+                case 2:
+                    // Add date
+                    core_time_setDate(core_time_getDate() + 1);
+                    break;
+                case 3:
+                    // Set week day
+                    core_time_setWeekDay(core_time_getWeekDay() + 1);
+                    break;
+            } 
+            this->drawIcons(false);
+            this->drawIcons(true);
+        }
+    }else if(currentSubMenu==APP_SETTINGS_SUBMENU_SCREEN){
+        if(stillPressingSelect_time!=0 && millis()-this->stillPressingSelect_time>=DRIVER_CONTROLS_DELAY_BEFORE_MULTY_PRESS){
+            stillPressingSelect_time = millis();
+            int value = 0;
+
+            this->drawIcons(false);
+            switch(app_settings_selectedAppIndex){
+                case 0:
+                    #ifdef DISPLAY_BACKLIGHT_CONTROL_ENABLE
+                        // Change display brightness
+                        value = get_core_display_brightness();
+                        if(value>=100) value = 0;
+                        else value+=5;
+                        if(value==0) value = 1;
+                        if(value==6) value = 5;
+                        set_core_display_brightness(value);
+                    #endif
+                    break;
+                case 1:
+                    #ifdef DISPLAY_BACKLIGHT_FADE_CONTROL_ENABLE
+                        // Change display fade brightness
+                        value = get_core_display_brightness_fade();
+                        if(value>=100) value = 0;
+                        else value+=5;
+                        if(value==0) value = 1;
+                        if(value==6) value = 5;
+                        set_core_display_brightness_fade(value);
+                    #endif
+                    break;
+                case 2:
+                    #ifdef DISPLAY_BACKLIGHT_FADE_CONTROL_ENABLE
+                        // Change time delay to fade
+                        value = get_core_display_time_delay_to_fade();
+                        if(value>=240) value = 0;
+                        else{
+                            if(value<4)         value+=1;
+                            else if(value<10)   value+=2;
+                            else if(value<30)   value+=5;
+                            else if(value<100)  value+=10;
+                            else value+=20;
+                        }
+                        set_core_display_time_delay_to_fade(value);
+                        break;
+                    #endif
+                case 3:
+                    // Change time delay to poweroff
+                    value = get_core_display_time_delay_to_poweroff();
+                    if(value>=240) value = 1;
+                    else{
+                        if(value<4)         value+=1;
+                        else if(value<10)   value+=2;
+                        else if(value<30)   value+=5;
+                        else if(value<100)  value+=10;
+                        else value+=20;
+                    }
+                    set_core_display_time_delay_to_poweroff(value);
+                    break;
+            } 
+            this->drawIcons(true);
+        }
+    }
+
     
 }
 
@@ -3269,13 +4306,32 @@ void appNameClass::onDestroy(){
 void appNameClass::pressPrevious(){
     if(currentSubMenu==APP_SETTINGS_SUBMENU_MAIN){
         this->updateActiveAppIndex(app_settings_selectedAppIndex-1);
+        #ifdef MAIN_MENU_SMOOTH_ANIMATION
+          this->scroll_x -= SCREEN_WIDTH;
+        #endif
     } 
 }
 
 void appNameClass::pressNext(){
-    if(currentSubMenu==APP_SETTINGS_SUBMENU_MAIN){
-        this->updateActiveAppIndex(app_settings_selectedAppIndex+1);
-    } 
+    //if(currentSubMenu==APP_SETTINGS_SUBMENU_MAIN){
+    this->drawIcons(false);
+    #ifdef MAIN_MENU_SMOOTH_ANIMATION
+        this->scroll_x += SCREEN_WIDTH;
+    #endif
+    
+    if(
+            currentSubMenu==APP_SETTINGS_SUBMENU_SET_TIME || 
+            currentSubMenu==APP_SETTINGS_SUBMENU_SET_DATE || 
+            currentSubMenu==APP_SETTINGS_SUBMENU_SCREEN
+      ){
+        if(app_settings_selectedAppIndex>=this->getTotalApplicationsInSubMenu(currentSubMenu)-1){
+            this->scroll_x = 0;
+            switchToSubMenu(APP_SETTINGS_SUBMENU_MAIN);
+            return;
+        }
+    }
+
+    this->updateActiveAppIndex(this->app_settings_selectedAppIndex+1);
 }
 
 void appNameClass::pressSelect(){
@@ -3284,8 +4340,8 @@ void appNameClass::pressSelect(){
 
 void appNameClass::onEvent(unsigned char event, int val1, int val2){
     #ifdef TOUCH_SCREEN_ENABLE
-        if(event==EVENT_ON_TOUCH_DRAG){
 
+        if(event==EVENT_ON_TOUCH_DRAG){
             // SCREEN SCROLL
             this->drawIcons(false);
             this->scroll_x -= val1;
@@ -3298,43 +4354,70 @@ void appNameClass::onEvent(unsigned char event, int val1, int val2){
 
             this->drawIcons(true);
         }
+
     #else
 
         /**/
-        #if DRIVER_CONTROLS_TOTALBUTTONS == 2
+        #if (DRIVER_CONTROLS_TOTALBUTTONS == 2 || DRIVER_CONTROLS_TOTALBUTTONS == 1)
+            
             if(event==EVENT_BUTTON_PRESSED){
+                if(
+                    currentSubMenu==APP_SETTINGS_SUBMENU_SET_TIME 
+                    || currentSubMenu==APP_SETTINGS_SUBMENU_SET_DATE
+                    || currentSubMenu==APP_SETTINGS_SUBMENU_SCREEN
+                  ){
+                    if(this->stillPressingSelect_time==0) this->stillPressingSelect_time = millis();
+                }  
+            }else if(event==EVENT_BUTTON_RELEASED){
+                if(
+                    currentSubMenu==APP_SETTINGS_SUBMENU_SET_TIME 
+                    || currentSubMenu==APP_SETTINGS_SUBMENU_SET_DATE
+                    || currentSubMenu==APP_SETTINGS_SUBMENU_SCREEN
+                    ){
+                    this->stillPressingSelect_time = 0;
+                }
+            }else if(event==EVENT_BUTTON_LONG_PRESS){
+                //debug("EVENT_BUTTON_LONG_PRESS");
+                if(val1==BUTTON_SELECT){
+                    if(currentSubMenu==APP_SETTINGS_SUBMENU_MAIN){
+                        switch(app_settings_selectedAppIndex){
+                            case 0:
+                                switchToSubMenu(APP_SETTINGS_SUBMENU_SET_TIME);
+                                break;
+                            case 1:
+                                switchToSubMenu(APP_SETTINGS_SUBMENU_SET_DATE);
+                                break;
+                            case 2:
+                                switchToSubMenu(APP_SETTINGS_SUBMENU_SCREEN);
+                                break;
+                        }
+                    }
+                }else if(val1==BUTTON_BACK){
+                    startApp(-1);
+                }    
+            }else if(event==EVENT_BUTTON_SHORT_PRESS){
+                //debug("EVENT_BUTTON_SHORT_PRESS");
+            }else if(event==EVENT_BUTTON_SHORT_SINGLE_PRESS){
+                //debug("EVENT_BUTTON_SHORT_SINGLE_PRESS");
                 if(val1==BUTTON_SELECT){
                     this->pressNext();
-                }
-            }else if(event==EVENT_BUTTON_RELEASED){
-            }else if(event==EVENT_BUTTON_LONG_PRESS){
-                if(val1==BUTTON_SELECT){
-                }
-                if(val1==BUTTON_BACK){
+                }else if(val1==BUTTON_BACK){
                     startApp(-1);
                 }
-            }else if(event==EVENT_ON_TIME_CHANGED){
-
-            }else if(event==EVENT_BUTTON_SHORT_PRESS){
+            }else if(event==EVENT_ON_TOUCH_DOUBLE_PRESS){
+                //debug("EVENT_ON_TOUCH_DOUBLE_PRESS");
                 if(val1==BUTTON_SELECT){
-                }else if(val1==BUTTON_BACK){
+                    if(
+                        currentSubMenu==APP_SETTINGS_SUBMENU_SET_TIME 
+                        || currentSubMenu==APP_SETTINGS_SUBMENU_SET_DATE
+                        || currentSubMenu==APP_SETTINGS_SUBMENU_SCREEN
+                      ){
+                        this->pressNext();
+                    } else startApp(-1);
                 }
             }
-        #elif DRIVER_CONTROLS_TOTALBUTTONS == 1
-            if(event==EVENT_BUTTON_PRESSED){
-                if(val1==BUTTON_SELECT){
-                     this->pressNext();
-                }
-            }else if(event==EVENT_BUTTON_RELEASED){
-            }else if(event==EVENT_BUTTON_LONG_PRESS){
-            }else if(event==EVENT_ON_TIME_CHANGED){
-
-            }else if(event==EVENT_BUTTON_SHORT_PRESS){
-                if(val1==BUTTON_SELECT){
-                }
-            }
+            
         #else
-        /**/
             if(event==EVENT_BUTTON_PRESSED){
                 
                 if(currentSubMenu==APP_SETTINGS_SUBMENU_MAIN){
@@ -3349,7 +4432,19 @@ void appNameClass::onEvent(unsigned char event, int val1, int val2){
                             this->pressNext();   
                             break;
                         case BUTTON_SELECT:
-                            if(currentSubMenu==APP_SETTINGS_SUBMENU_MAIN && app_settings_selectedAppIndex==0) switchToSubMenu(APP_SETTINGS_SUBMENU_SET_TIME);
+                            if(currentSubMenu==APP_SETTINGS_SUBMENU_MAIN){
+                                switch (app_settings_selectedAppIndex){
+                                case 0:
+                                    switchToSubMenu(APP_SETTINGS_SUBMENU_SET_TIME);    
+                                    break;
+                                case 1:
+                                    switchToSubMenu(APP_SETTINGS_SUBMENU_SET_DATE);    
+                                    break;
+                                case 2:
+                                    switchToSubMenu(APP_SETTINGS_SUBMENU_SCREEN);    
+                                    break;
+                                }
+                            }
                             break;
                     }
                 }else if(currentSubMenu==APP_SETTINGS_SUBMENU_SET_TIME){
@@ -3384,6 +4479,10 @@ void appNameClass::onEvent(unsigned char event, int val1, int val2){
                             break;
                     }
 
+                }else if(currentSubMenu==APP_SETTINGS_SUBMENU_SET_DATE){
+                    // TODO
+                }else if(currentSubMenu==APP_SETTINGS_SUBMENU_SCREEN){
+                    // TODO
                 }
             
             }else if(event==EVENT_BUTTON_RELEASED){
@@ -3397,6 +4496,21 @@ void appNameClass::onEvent(unsigned char event, int val1, int val2){
 
     else if(event==EVENT_ON_TIME_CHANGED){
 
+        #ifdef SINGLE_ELEMENT_ON_SCREEN
+            /*
+            String lastTimeString;
+            String lastDateString;
+            String lastBatteryString;
+            */
+    
+            if(currentSubMenu==APP_SETTINGS_SUBMENU_MAIN && app_settings_selectedAppIndex==0 && app_settings_selectedAppIndex==0){
+                this->drawIcons(false);
+                this->drawIcons(true);
+            }else if(currentSubMenu==APP_SETTINGS_SUBMENU_SET_TIME || currentSubMenu==APP_SETTINGS_SUBMENU_SET_DATE){
+                this->drawIcons(false);
+                this->drawIcons(true);
+            }
+        #else
         if(currentSubMenu==APP_SETTINGS_SUBMENU_MAIN){
             if((int)((app_settings_selectedAppIndex)/APPS_ON_SINGLE_PAGE)==0){
                 int x_position = 0;
@@ -3440,12 +4554,13 @@ void appNameClass::onEvent(unsigned char event, int val1, int val2){
             }
             
         }
+        #endif
     }
 
 }
 
 const unsigned char* appNameClass::getApplicationTitle(unsigned char submenu, unsigned char num){
-    switch(APP_SETTINGS_SUBMENU_MAIN){
+    switch(submenu){
         case APP_SETTINGS_SUBMENU_MAIN:
             switch (num){
                 case 0:
@@ -3453,11 +4568,52 @@ const unsigned char* appNameClass::getApplicationTitle(unsigned char submenu, un
                 case 1:
                     return (const unsigned char*)"Date";
                 case 2:
-                    return (const unsigned char*)"Sleep timout";
+                    return (const unsigned char*)"Screen";
                 case 3:
-                    return (const unsigned char*)"Battery";
-                case 4:
-                    return (const unsigned char*)"Compass";                
+                    return (const unsigned char*)"Power save";               
+                default:
+                    return (const unsigned char*)"-";
+                    break;
+            }
+            break;
+        case APP_SETTINGS_SUBMENU_SET_TIME:
+            switch (num){
+                case 0:
+                    return (const unsigned char*)"Hours";
+                case 1:
+                    return (const unsigned char*)"Minutes";
+                case 2:
+                    return (const unsigned char*)"Seconds";          
+                default:
+                    return (const unsigned char*)"-";
+                    break;
+            }
+            break;
+        case APP_SETTINGS_SUBMENU_SET_DATE:
+            switch (num){
+                case 0:
+                    return (const unsigned char*)"Year";
+                case 1:
+                    return (const unsigned char*)"Month";
+                case 2:
+                    return (const unsigned char*)"Day";          
+                case 3:
+                    return (const unsigned char*)"Day"; 
+                default:
+                    return (const unsigned char*)"-";
+                    break;
+            }
+            break;
+        case APP_SETTINGS_SUBMENU_SCREEN:
+            switch (num){
+                case 0:
+                    return (const unsigned char*)"Brightness";
+                case 1:
+                    return (const unsigned char*)"Fade bright.";
+                case 2:
+                    return (const unsigned char*)"Fade after";          
+                case 3:
+                    return (const unsigned char*)"Sleep after"; 
                 default:
                     return (const unsigned char*)"-";
                     break;
@@ -3469,26 +4625,122 @@ const unsigned char* appNameClass::getApplicationTitle(unsigned char submenu, un
 }
 
 String appNameClass::getApplicationSubTitle(unsigned char submenu, unsigned char num){
-    switch(APP_SETTINGS_SUBMENU_MAIN){
+    return this->getApplicationSubTitle(submenu, num, false);
+}
+
+String appNameClass::getApplicationSubTitle(unsigned char submenu, unsigned char num, bool getLast){    
+
+    switch(submenu){
         case APP_SETTINGS_SUBMENU_MAIN:
             switch (num){
                 case 0:
-                    return core_time_getHourMinuteSecondsTime();
+                    if(getLast) return this->lastTimeString;
+                    else{
+                        this->lastTimeString = core_time_getHourMinuteSecondsTime();
+                        return this->lastTimeString;
+                    }
                 case 1:
-                    return core_time_getDateFull();
+                    if(getLast) return this->lastDateString;
+                    else{
+                        this->lastDateString = core_time_getDateFull();
+                        return this->lastDateString;
+                    }
                 case 2:
-                    #ifdef CPU_SLEEP_ENABLE
-                        return String(core_cpu_getCpuSleepTimeDelay());
-                    #else
-                        return "-";
-                    #endif
+                    return String(get_core_display_brightness()) + "%";
                 case 3:
-                    return String(core_battery_getPercent()) + "%";
+                    if(getLast) return this->lastBatteryString;
+                    else{
+                        this->lastBatteryString = String(core_battery_getPercent()) + "%";
+                        return this->lastBatteryString;
+                    }
                 case 4:
                     return "Calibrate";
                 default:
                     return "Reset maximum";
                     break;
+            }
+            break;
+        case APP_SETTINGS_SUBMENU_SET_TIME:
+            switch (num){
+                case 0:
+                    if(getLast) return this->lastTimeString_hours;
+                    else{
+                        this->lastTimeString_hours = core_time_getHours_String();
+                        return this->lastTimeString_hours;
+                    }
+                case 1:
+                    if(getLast) return this->lastTimeString_minutes;
+                    else{
+                        this->lastTimeString_minutes = core_time_getMinutes_String();
+                        return this->lastTimeString_minutes;
+                    }
+                case 2:
+                    if(getLast) return this->lastTimeString_seconds;
+                    else{
+                        this->lastTimeString_seconds = core_time_getSeconds_String();
+                        return this->lastTimeString_seconds;
+                    }      
+                default:
+                    return "-";
+                    break;
+            }
+            break;
+        case APP_SETTINGS_SUBMENU_SET_DATE:
+            switch (num){
+                case 0:
+                    if(getLast) return this->lastDateString_year;
+                    else{
+                        this->lastDateString_year = core_time_getYear();
+                        return this->lastDateString_year;
+                    }   
+                case 1:
+                    if(getLast) return this->lastDateString_month;
+                    else{
+                        this->lastDateString_month = core_time_getMonth_stringShort();
+                        return this->lastDateString_month;
+                    }   
+                case 2:
+                    if(getLast) return this->lastDateString_date;
+                    else{
+                        this->lastDateString_date = core_time_getDate();
+                        return this->lastDateString_date;
+                    }   
+                case 3:
+                    if(getLast) return this->lastDateString_weekDay;
+                    else{
+                        this->lastDateString_weekDay = core_time_getWeekDay_stringShort();
+                        return this->lastDateString_weekDay;
+                    }   
+                    
+                default:
+                    return "-";
+                    break;
+            }
+            break;
+        case APP_SETTINGS_SUBMENU_SCREEN:
+            switch (num){
+                case 0:
+                    #ifdef DISPLAY_BACKLIGHT_CONTROL_ENABLE 
+                        return String(get_core_display_brightness()) + " %";
+                    #else
+                        return "-";
+                    #endif
+                case 1:
+                    #ifdef DISPLAY_BACKLIGHT_FADE_CONTROL_ENABLE
+                        return String(get_core_display_brightness_fade()) + " %"; 
+                    #else
+                        return "-";
+                    #endif
+                case 2:
+                    #ifdef DISPLAY_BACKLIGHT_FADE_CONTROL_ENABLE
+                        return String(get_core_display_time_delay_to_fade()) + " s";  
+                    #else
+                        return "-";
+                    #endif
+                case 3:
+                    return String(get_core_display_time_delay_to_poweroff()) + " s";  
+                default:
+                    return "-";
             }
             break;
         default:
@@ -3961,17 +5213,41 @@ class appNameClass: public Application{
 
         void draw_current_time(bool draw);
         String timeString;
+
+        unsigned char last_seconds  = 0;
+        String last_hours           = "";
+        String last_minutes         = "";
+
+        #define BATTERY_ENABLE
+            String last_battery     = "";
+        #endif
+
+        #ifdef PEDOMETER_ENABLE
+            String last_pedometer   = "";
+        #endif
+
+        void drawSecondsCircle(bool draw, unsigned char second);
       
 };
+
+#define SECONDS_CIRCLE_X        (SCREEN_WIDTH/2) 
+#define SECONDS_CIRCLE_Y        (SCREEN_HEIGHT/2)
+#define SECONDS_CIRCLE_RADIUS   (SCREEN_WIDTH/2-2)
 
 void appNameClass::onCreate(){
     DRAW_LIMITS_setEnable(true);
     DRAW_LIMIT_reset();
-    //DRAW_LIMITS_setEnable(STYLE_STATUSBAR_HEIGHT, -1, -1, -1);
-
+    
     setBackgroundColor(0,0,0);
     setContrastColor(255, 255, 255);
+
+    setDrawColor(48, 48, 48);
+    drawCircle(SECONDS_CIRCLE_X, SECONDS_CIRCLE_Y, SECONDS_CIRCLE_RADIUS-1, true);
+
+    this->last_seconds = core_time_getSeconds_byte();
+    for(unsigned char isecond=0; isecond<=this->last_seconds; isecond++) this->drawSecondsCircle(true, isecond);
     this->draw_current_time(true);
+
 }
 
 void appNameClass::onLoop(){
@@ -4017,29 +5293,63 @@ void appNameClass::onEvent(unsigned char event, int val1, int val2){
         this->draw_current_time(false);
     }else if(event==EVENT_ON_WAKE_UP){
         this->draw_current_time(true);
+    }else if(event==EVENT_ON_TOUCH_DOUBLE_PRESS){
+        if(val1==BUTTON_SELECT){
+            startApp(-1);
+        }
     }
     
 }
 
-
+/*
 #define NARROW_CLOCK_STRING1 18
 #define NARROW_CLOCK_STRING2 73
 #define NARROW_CLOCK_STRING3 125
+*/
+
+void appNameClass::drawSecondsCircle(bool draw, unsigned char second){
+    if(draw)setGradientColor(255, 85, 0, 46, 255, 0, 60, second);
+    else setDrawColor_BackGoundColor();
+
+    int grad = 6*second;
+ 
+    drawArc(SECONDS_CIRCLE_X, SECONDS_CIRCLE_Y, SECONDS_CIRCLE_RADIUS, -90 + grad, -90 + grad + 6, 8, true);
+}
+
 void appNameClass::draw_current_time(bool draw){
+    #define CLOCK_FONT      2
+    #define CLOCK_MARGIN    3
+    #define STRINGS_OFFSET  2
+
+    this->preventSleep         = true;
+    this->preventInAppSleep    = true;
     if(draw){
         // Draw
         setDrawColor_ContrastColor();
         this->timeString = core_time_getHourMinuteSecondsTime();
         #ifdef NARROW_SCREEN
-            #define GRAY_HOURS 128
 
-            setDrawColor(GRAY_HOURS, GRAY_HOURS, GRAY_HOURS);
-            drawString_centered_fontSize(this->timeString.substring(0,2), NARROW_CLOCK_STRING1, 6);
-            setDrawColor(255, 255, 255);
-            drawString_centered_fontSize(this->timeString.substring(3,5), NARROW_CLOCK_STRING2, 6);
-            setDrawColor(GRAY_HOURS, 0, 0);
-            drawString_centered_fontSize(this->timeString.substring(6,8), NARROW_CLOCK_STRING3, 4);
+            // SECONDS CIRCLE
+            unsigned char seconds_draw;
+            if(core_time_getSeconds_byte()>this->last_seconds) seconds_draw = core_time_getSeconds_byte() - this->last_seconds;
+            else seconds_draw = 1;
             
+            this->last_seconds = core_time_getSeconds_byte();
+            for(char i_predrawSeconds=0; i_predrawSeconds<seconds_draw; i_predrawSeconds++) this->drawSecondsCircle(draw, this->last_seconds-i_predrawSeconds);
+            
+            // HOURS AND MINUTES 
+            setDrawColor_ContrastColor();
+
+            this->last_hours    = core_time_getHours_String();
+            this->last_minutes  = core_time_getMinutes_String();
+
+            drawString_centered(core_time_getHours_String(), SCREEN_WIDTH/2, STRINGS_OFFSET + SCREEN_HEIGHT/2-CLOCK_FONT*FONT_CHAR_HEIGHT - CLOCK_MARGIN, CLOCK_FONT);
+            drawString_centered(core_time_getMinutes_String(), SCREEN_WIDTH/2, STRINGS_OFFSET + SCREEN_HEIGHT/2 + CLOCK_MARGIN, CLOCK_FONT);
+            
+            #define BATTERY_ENABLE
+                // BATTERY
+                String last_battery     = "";
+            #endif
         #else
             drawString(this->timeString, 2, 90, 5);
         #endif
@@ -4047,9 +5357,24 @@ void appNameClass::draw_current_time(bool draw){
         // Clear
         setDrawColor_BackGoundColor();
         #ifdef NARROW_SCREEN
-            drawString_centered_fontSize(this->timeString.substring(0,2), NARROW_CLOCK_STRING1, 6);
-            drawString_centered_fontSize(this->timeString.substring(3,5), NARROW_CLOCK_STRING2, 6);
-            drawString_centered_fontSize(this->timeString.substring(6,8), NARROW_CLOCK_STRING3, 4);
+            
+            // SECONDS CIRCLE
+            if(this->last_seconds>core_time_getSeconds_byte()){
+                // if munutes changed
+                setDrawColor_BackGoundColor();
+                
+                for(int isecond=0; isecond<60; isecond++){
+                    drawSecondsCircle(draw, isecond);
+                }
+
+                setDrawColor(48, 48, 48);
+                drawCircle(SECONDS_CIRCLE_X, SECONDS_CIRCLE_Y, SECONDS_CIRCLE_RADIUS-1, true);
+                
+                clearString_centered(last_hours, SCREEN_WIDTH/2, STRINGS_OFFSET + SCREEN_HEIGHT/2-CLOCK_FONT*FONT_CHAR_HEIGHT - CLOCK_MARGIN, CLOCK_FONT);
+                clearString_centered(last_minutes, SCREEN_WIDTH/2, STRINGS_OFFSET + SCREEN_HEIGHT/2 + CLOCK_MARGIN, CLOCK_FONT);
+            }
+            
+
         #else
             clearString(this->timeString, 2, 90, 5);
         #endif
@@ -4088,6 +5413,8 @@ const unsigned char appNameClass::icon[] PROGMEM = {
     0x00,0x01,0x80,0x00,0x00,0x06,0x00,0x00,0x00,0x18,0x00,0x00,0x00,0x60,0x00,0x00,0x01,0x80,0x00,0x00,0x01,0x80,0x00,0x00,0x01,0x80,0x00,
     0x00,0x01,0x80,0x00,0x00,0x01,0x80,0x00,0x00,0x01,0x80,0x00,0x00,0x01,0x80,0x00,0x00,0x01,0x80,0x00,0x00,0x01,0x80,0x00,0x00,0x01,0x80,
     0x00,0x00,0x01,0x80,0x00,0x00,0x01,0x80,0x00,0x00,0x01,0x80,0x00,0x00,0x01,0x80,0x00,0x00,0x01,0x80,0x00,
+
+   
 };
 
 #define appNameClass    FileManagerApp          // App name without spaces

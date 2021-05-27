@@ -291,6 +291,10 @@ void debug(const char* string){
 #define ICON_BT_NOTCONNECTED        0x15
 #define ICON_BT_OFF                 0x16
 
+#define ICON_LEG                    0x17
+#define ICON_LEG_GREY               0x18
+
+
 #define PARAM_TYPE_ICON             0x01
 #define PARAM_TYPE_NAME             0x02
 

@@ -117,7 +117,7 @@
 #define WAKEUP_FROM_DEEP_SLEEP_EVERY_SECONDS 60*60*24
 
 #define USE_TYPE2_OF_IMAGES
-
+//#define PEDOMETER_ENABLE
 /*
     ############################################################################################
     #                                                                                          #
@@ -197,6 +197,7 @@
 //#undef DISPLAY_BACKLIGHT_CONTROL_ENABLE
 //#undef DISPLAY_BACKLIGHT_FADE_CONTROL_ENABLE
 
+#define PEDOMETER_ENABLE
 /*
     ############################################################################################
     #                                                                                          #
@@ -495,6 +496,10 @@ void debug(const char* string){
 #define ICON_BT_CONNECTED           0x14
 #define ICON_BT_NOTCONNECTED        0x15
 #define ICON_BT_OFF                 0x16
+
+#define ICON_LEG                    0x17
+#define ICON_LEG_GREY               0x18
+
 
 #define PARAM_TYPE_ICON             0x01
 #define PARAM_TYPE_NAME             0x02

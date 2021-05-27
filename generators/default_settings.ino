@@ -117,7 +117,7 @@
 #define WAKEUP_FROM_DEEP_SLEEP_EVERY_SECONDS 60*60*24
 
 #define USE_TYPE2_OF_IMAGES
-
+//#define PEDOMETER_ENABLE
 /*
     ############################################################################################
     #                                                                                          #
