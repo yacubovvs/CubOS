@@ -44,8 +44,6 @@ void driver_display_setup(){
     pinMode(33, INPUT);
     if(digitalRead(33)) debug(String(millis()) + " on");
     else debug(String(millis()) + " off");
-
-    delay(500);
   };
   */
 }

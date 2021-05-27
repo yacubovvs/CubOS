@@ -97,6 +97,22 @@ Application* currentApp;
 */
 
 void setup(){ 
+  #ifdef POWERSAVE_ENABLE
+    #ifdef CPU_SLEEP_ENABLE
+    unsigned char wakeUpReason = core_powersave_wakeup_reason();
+    if(wakeUpReason==WAKE_UP_REASON_TIMER){
+      backgroundWaorkAfterSleep();
+      /*
+      pinMode(10, OUTPUT);
+      digitalWrite(10, 1);
+      d elay(100);
+      digitalWrite(10, 0);
+      */
+      core_cpu_sleep(STAND_BY_SLEEP_TYPE, WAKEUP_FOR_BACKGROUND_WORK_STANDBY);
+    }
+    #endif
+  #endif
+
   #ifdef BATTERY_ENABLE
     driver_battery_setup();
   #endif

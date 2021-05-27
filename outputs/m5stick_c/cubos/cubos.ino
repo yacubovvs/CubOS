@@ -52,6 +52,14 @@
 #define EVENT_ON_TOUCH_SWIPE_FROM_BOTTOM    0x12
 
 
+// WAKEUP REASONS
+#define WAKE_UP_REASON_EXTERNAL_RTC_IO      0x01
+#define WAKE_UP_REASON_EXTERNAL_RTC_CNTL    0x02
+#define WAKE_UP_REASON_TIMER                0x03
+#define WAKE_UP_REASON_TPOUCHPAD            0x04
+#define WAKE_UP_REASON_ULP                  0x05
+#define WAKE_UP_REASON_NOT_DEEP_SLEEP       0x06
+
 /*
  ############################################################################
                                  SLEEP TYPES -                               
@@ -118,6 +126,9 @@
 
 #define USE_TYPE2_OF_IMAGES
 //#define PEDOMETER_ENABLE
+
+#define WAKEUP_FOR_BACKGROUND_WORK_STANDBY 100
+#define WAKEUP_FOR_BACKGROUND_WORK_IDLE 1000
 /*
     ############################################################################################
     #                                                                                          #
@@ -303,6 +314,22 @@ Application* currentApp;
 */
 
 void setup(){ 
+  #ifdef POWERSAVE_ENABLE
+    #ifdef CPU_SLEEP_ENABLE
+    unsigned char wakeUpReason = core_powersave_wakeup_reason();
+    if(wakeUpReason==WAKE_UP_REASON_TIMER){
+      backgroundWaorkAfterSleep();
+      /*
+      pinMode(10, OUTPUT);
+      digitalWrite(10, 1);
+      d elay(100);
+      digitalWrite(10, 0);
+      */
+      core_cpu_sleep(STAND_BY_SLEEP_TYPE, WAKEUP_FOR_BACKGROUND_WORK_STANDBY);
+    }
+    #endif
+  #endif
+
   #ifdef BATTERY_ENABLE
     driver_battery_setup();
   #endif

@@ -1,6 +1,21 @@
 //#define DEBUG_CORE_POWERSAVE
 
 #ifdef POWERSAVE_ENABLE
+
+    unsigned char core_powersave_wakeup_reason(){
+        esp_sleep_wakeup_cause_t wakeup_reason;
+        wakeup_reason = esp_sleep_get_wakeup_cause();
+        switch(wakeup_reason)
+        {
+            case 1  : return WAKE_UP_REASON_EXTERNAL_RTC_IO;
+            case 2  : return WAKE_UP_REASON_TPOUCHPAD;
+            case 3  :  return WAKE_UP_REASON_EXTERNAL_RTC_CNTL;
+            case 4  : return WAKE_UP_REASON_TIMER;
+            case 5  :  return WAKE_UP_REASON_ULP;
+            default :  return WAKE_UP_REASON_NOT_DEEP_SLEEP;
+        }
+    }
+
     long core_powersave_lastUserAction = 0;
     long core_powersave_lastUserAction_tick = 0;
 
@@ -52,7 +67,7 @@
                                 debug("Deep sleep");
                                 delay(25);
                             #endif
-                            core_cpu_sleep(STAND_BY_SLEEP_TYPE);
+                            core_cpu_sleep(STAND_BY_SLEEP_TYPE, WAKEUP_FOR_BACKGROUND_WORK_STANDBY);
                         }
                     #endif
                 }else{
@@ -95,7 +110,7 @@
                             debug("Deep sleep");
                             delay(25);
                         #endif
-                        core_cpu_sleep(STAND_BY_SLEEP_TYPE);
+                        core_cpu_sleep(STAND_BY_SLEEP_TYPE, WAKEUP_FOR_BACKGROUND_WORK_STANDBY);
                     }
                 #endif
             }
@@ -115,7 +130,7 @@
                             debug("Light sleep");
                             delay(25);
                         #endif
-                        core_cpu_sleep(SLEEP_LIGHT, 1);   
+                        core_cpu_sleep(SLEEP_LIGHT, WAKEUP_FOR_BACKGROUND_WORK_IDLE);   
                     }
                 #endif
                 

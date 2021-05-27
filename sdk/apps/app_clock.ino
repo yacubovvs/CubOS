@@ -137,8 +137,8 @@ void appNameClass::draw_current_time(bool draw){
     #define CLOCK_MARGIN    3
     #define STRINGS_OFFSET  2
 
-    this->preventSleep         = true;
-    this->preventInAppSleep    = true;
+    //this->preventSleep         = true;
+    //this->preventInAppSleep    = true;
 
     #ifdef NARROW_SCREEN
         // Draw

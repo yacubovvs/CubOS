@@ -44,5 +44,6 @@ cp sdk/core/core_time.ino               outputs/m5stick_c/cubos/
 cp sdk/core/core_cpu.ino                outputs/m5stick_c/cubos/  
 cp sdk/core/core_battery.ino            outputs/m5stick_c/cubos/  
 cp sdk/core/core_powersave.ino          outputs/m5stick_c/cubos/  
+cp sdk/core/core_background.ino         outputs/m5stick_c/cubos/  
 
 echo Finished

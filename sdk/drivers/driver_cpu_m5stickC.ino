@@ -15,7 +15,7 @@ void driver_cpu_wakeup(){
 
 }
 
-void driver_cpu_sleep(unsigned char sleepType, long timeout){
+void driver_cpu_sleep(unsigned char sleepType, long timeout_ms){
     
     switch (sleepType)
     {
@@ -34,8 +34,8 @@ void driver_cpu_sleep(unsigned char sleepType, long timeout){
             M5.Axp.SetLDO3(false);
 
     
-            if(timeout!=0){
-                M5.Axp.DeepSleep(SLEEP_SEC(timeout));
+            if(timeout_ms!=0){
+                M5.Axp.DeepSleep(SLEEP_SEC(timeout_ms)/1000);
             }else{
                 M5.Axp.DeepSleep();
             } 
@@ -46,8 +46,8 @@ void driver_cpu_sleep(unsigned char sleepType, long timeout){
             
             //esp_sleep_enable_ext0_wakeup(GPIO_NUM_35, LOW);
             
-            if(timeout!=0){    
-                M5.Axp.LightSleep(SLEEP_SEC(timeout));
+            if(timeout_ms!=0){    
+                M5.Axp.LightSleep(SLEEP_SEC(timeout_ms)/1000);
                 //M5.Axp.LightSleep();
             }else{
                 M5.Axp.LightSleep();

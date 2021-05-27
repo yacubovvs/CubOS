@@ -10,12 +10,6 @@
     }
 
     void core_cpu_loop(){
-        
-        //core_cpu_sleep(SLEEP_MODEM);
-        /*
-        if(millis()/1000>10 && millis()/1000<15)
-        driver_cpu_sleep(SLEEP_LIGHT, 10);
-        */
     }
 
     void core_cpu_sleep(unsigned char SLEEP_TYPE){

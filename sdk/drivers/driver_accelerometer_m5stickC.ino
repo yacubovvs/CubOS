@@ -62,12 +62,8 @@
     void driver_accelerometer_sleep(){
         switch(M5.IMU.imuType){
             case M5.IMU.ImuType::IMU_UNKNOWN:
-                debug("IMU_UNKNOWN");
-                delay(20);
                 break;
             case M5.IMU.ImuType::IMU_SH200Q:
-                debug("IMU_SH200Q");
-                delay(20);
                 break;
             case M5.IMU.ImuType::IMU_MPU6886:
                 //Just a hard code for m5stick
@@ -78,8 +74,6 @@
                 
                 break;
             default:
-                debug("IMU default");
-                delay(20);
                 break;
         }
     }
