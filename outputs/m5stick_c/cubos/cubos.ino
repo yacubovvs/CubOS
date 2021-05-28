@@ -127,7 +127,7 @@
 #define USE_TYPE2_OF_IMAGES
 //#define PEDOMETER_ENABLE
 
-#define WAKEUP_FOR_BACKGROUND_WORK_STANDBY 500
+#define WAKEUP_FOR_BACKGROUND_WORK_STANDBY 3000
 #define WAKEUP_FOR_BACKGROUND_WORK_IDLE 1000
 /*
     ############################################################################################
@@ -174,6 +174,7 @@
 //#define STARTING_APP_NUMM    1 // Settings
 //#define STARTING_APP_NUMM    7 // Battery
 #define STARTING_APP_NUMM    0 // Clock
+#define STARTING_APP_NUMM    8 // Pedometer
 
 #define FONT_SIZE_DEFAULT   1
 
@@ -561,6 +562,7 @@ void debug(const char* string){
 #define APP_MENU_APPLICATIONS_5             SimpleGameApp
 #define APP_MENU_APPLICATIONS_6             TestApplicationApp
 #define APP_MENU_APPLICATIONS_7             BatteryApp
+#define APP_MENU_APPLICATIONS_8             PedometerApp
 
 /*
     # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #

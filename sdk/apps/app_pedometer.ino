@@ -1,5 +1,5 @@
-#define appNameClass    NullApp         // App name without spaces
-#define appName         "App null"              // App name with spaces 
+#define appNameClass    PedometerApp         // App name without spaces
+#define appName         "Pedometer"              // App name with spaces 
 
 class appNameClass: public Application{
     public:
@@ -21,6 +21,8 @@ class appNameClass: public Application{
               default: return (unsigned char*)""; }
         };
         const static unsigned char icon[] PROGMEM;
+        void drawStringOnScreen(String stringToPrint);
+        int currentPrintScreenString = 0;
       
 };
 
@@ -28,8 +30,8 @@ void appNameClass::onCreate(){
     /*
         Write you code on App create here
     */
-    //this->preventSleep         = true;
-    //this->preventInAppSleep    = true;
+    this->preventSleep         = true;
+    this->preventInAppSleep    = true;
 
     DRAW_LIMITS_setEnable(true);
     DRAW_LIMIT_reset();
@@ -38,14 +40,26 @@ void appNameClass::onCreate(){
     setBackgroundColor(0,0,0);
     setContrastColor(255, 255, 255);
     setDrawColor_ContrastColor();
+    
+    //drawString(appName, 5, STYLE_STATUSBAR_HEIGHT + 10, FONT_SIZE_DEFAULT);
+}
 
-    drawString(appName, 5, STYLE_STATUSBAR_HEIGHT + 10, FONT_SIZE_DEFAULT);
+void appNameClass::drawStringOnScreen(String stringToPrint){
+    setDrawColor_ContrastColor();
+    drawString(stringToPrint, 5, STYLE_STATUSBAR_HEIGHT + currentPrintScreenString*10*FONT_SIZE_DEFAULT + 10, FONT_SIZE_DEFAULT);
+    currentPrintScreenString ++;
 }
 
 void appNameClass::onLoop(){
     /*
         Write you code onLoop here
     */
+    currentPrintScreenString = 0;
+    setDrawColor_BackGroundColor();
+    drawRect(0,0, SCREEN_WIDTH, SCREEN_HEIGHT, true);
+    drawStringOnScreen("Test 1");
+    drawStringOnScreen("Test 2");
+   
 }
 
 void appNameClass::onDestroy(){

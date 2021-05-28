@@ -24,7 +24,7 @@ void appNameClass::onCreate(){
         Write you code onCreate here
     */
     setDrawColor(255, 255, 255);
-    drawString(appName, 5, STYLE_STATUSBAR_HEIGHT + 10, 2);
+    drawString(appName, 5, STYLE_STATUSBAR_HEIGHT + 10, FONT_SIZE_DEFAULT);
 }
 
 void appNameClass::onLoop(){

@@ -125,7 +125,7 @@ void appNameClass::onEvent(unsigned char event, int val1, int val2){
 
 void appNameClass::drawSecondsCircle(bool draw, unsigned char second){
     if(draw)setGradientColor(255, 85, 0, 46, 255, 0, 60, second);
-    else setDrawColor_BackGoundColor();
+    else setDrawColor_BackGroundColor();
 
     int grad = 6*second;
  
@@ -163,7 +163,7 @@ void appNameClass::draw_current_time(bool draw){
         }else{
             if(this->last_seconds>core_time_getSeconds_byte()){
                 // if munutes changed
-                setDrawColor_BackGoundColor();  
+                setDrawColor_BackGroundColor();  
                 for(int isecond=0; isecond<60; isecond++){
                     drawSecondsCircle(draw, isecond);
                 }
@@ -195,7 +195,7 @@ void appNameClass::draw_current_time(bool draw){
                 setDrawColor_ContrastColor();
                 drawString(battery_percent_toPrint, SCREEN_WIDTH/2 - battery_percent_toPrint.length()*FONT_CHAR_WIDTH - 3 + BATTERY_LABEL_ICON_OFFSET, BATTERY_LABEL_Y_POSITION - FONT_CHAR_HEIGHT/2 + 1, 1);
             }else{
-                setDrawColor_BackGoundColor();  
+                setDrawColor_BackGroundColor();  
                 clearString(battery_percent_toPrint, SCREEN_WIDTH/2 - battery_percent_toPrint.length()*FONT_CHAR_WIDTH - 3 + BATTERY_LABEL_ICON_OFFSET, BATTERY_LABEL_Y_POSITION - FONT_CHAR_HEIGHT/2 + 1, 1);
             } 
         #endif
@@ -209,7 +209,7 @@ void appNameClass::draw_current_time(bool draw){
             setDrawColor(192,192,192);
             drawString_centered(last_date, SCREEN_WIDTH/2, DATE_LABEL_POSITION_Y, 1);
         }else{
-            setDrawColor_BackGoundColor();  
+            setDrawColor_BackGroundColor();  
             clearString_centered(last_date, SCREEN_WIDTH/2, DATE_LABEL_POSITION_Y, 1);
         }
         
@@ -253,7 +253,7 @@ void appNameClass::draw_current_time(bool draw){
                     PEDOMETER_LABEL_POSITION_Y + 1, 1);
                     */
             }else{
-                setDrawColor_BackGoundColor();  
+                setDrawColor_BackGroundColor();  
                 /*
                 clearString(pedometer_toPrint, 
                     SCREEN_WIDTH/2 - pedometer_toPrint.length()*FONT_CHAR_WIDTH - PEDOMETER_LABEL_POSITION_PADDING + PEDOMETER_LABEL_POSITION_X_OFFSET, 
@@ -272,7 +272,7 @@ void appNameClass::draw_current_time(bool draw){
             drawString(this->timeString, 2, 90, 5);
         }else{
 
-            setDrawColor_BackGoundColor();
+            setDrawColor_BackGroundColor();
             clearString(this->timeString, 2, 90, 5);
             
         }

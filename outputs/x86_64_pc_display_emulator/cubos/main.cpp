@@ -1542,7 +1542,7 @@ void setContrastColor(unsigned char r, unsigned char g, unsigned char b){
   contrast_blue   = b;
 } 
 
-void setDrawColor_BackGoundColor(){
+void setDrawColor_BackGroundColor(){
   setDrawColor(getBackgroundColor_red(), getBackgroundColor_green(), getBackgroundColor_blue());
 }
 
@@ -3085,7 +3085,7 @@ void core_views_draw_settings_item(bool draw, int x, int y, const unsigned char*
             drawString((char*)title, x - titleShift,    TITLE_Y_POSITION, 1);
             drawString(subTitle, x - subTitleShift,     SUBTITLE_Y_POSITION, 1);
         }else{
-            setDrawColor_BackGoundColor();
+            setDrawColor_BackGroundColor();
             clearString((char*)title, x - titleShift,   TITLE_Y_POSITION, 1);
             clearString(subTitle, x - subTitleShift,    SUBTITLE_Y_POSITION, 1);
         }
@@ -3126,7 +3126,7 @@ void core_views_draw_settings_item_noicon(bool draw, int x, int y, String title,
             subTitleFontSize                                                                // FONT SIZE
         );
     }else{
-        setDrawColor_BackGoundColor();
+        setDrawColor_BackGroundColor();
         clearString(
             title,                                                                          // TEXT
             x - title.length()*FONT_CHAR_WIDTH/2*titleFontSize,                             // X
@@ -3622,7 +3622,7 @@ void appNameClass::onLoop(){
     #ifdef BATTERY_ENABLE
         if(millis()-this->lastUpdate>APP_BATTERY_UPDATE_EVERY_MS){
             //fillScreen(0, 0, 0);
-            setDrawColor_BackGoundColor();
+            setDrawColor_BackGroundColor();
             drawRect(0, STYLE_STATUSBAR_HEIGHT, SCREEN_WIDTH, SCREEN_HEIGHT, true);
             this->drawInfo();
         }
@@ -5309,7 +5309,7 @@ void appNameClass::onEvent(unsigned char event, int val1, int val2){
 
 void appNameClass::drawSecondsCircle(bool draw, unsigned char second){
     if(draw)setGradientColor(255, 85, 0, 46, 255, 0, 60, second);
-    else setDrawColor_BackGoundColor();
+    else setDrawColor_BackGroundColor();
 
     int grad = 6*second;
  
@@ -5355,13 +5355,13 @@ void appNameClass::draw_current_time(bool draw){
         #endif
     }else{
         // Clear
-        setDrawColor_BackGoundColor();
+        setDrawColor_BackGroundColor();
         #ifdef NARROW_SCREEN
             
             // SECONDS CIRCLE
             if(this->last_seconds>core_time_getSeconds_byte()){
                 // if munutes changed
-                setDrawColor_BackGoundColor();
+                setDrawColor_BackGroundColor();
                 
                 for(int isecond=0; isecond<60; isecond++){
                     drawSecondsCircle(draw, isecond);

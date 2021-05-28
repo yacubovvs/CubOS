@@ -115,7 +115,7 @@ void appNameClass::onLoop(){
     #ifdef BATTERY_ENABLE
         if(millis()-this->lastUpdate>APP_BATTERY_UPDATE_EVERY_MS){
             //fillScreen(0, 0, 0);
-            setDrawColor_BackGoundColor();
+            setDrawColor_BackGroundColor();
             drawRect(0, STYLE_STATUSBAR_HEIGHT, SCREEN_WIDTH, SCREEN_HEIGHT, true);
             this->drawInfo();
         }
