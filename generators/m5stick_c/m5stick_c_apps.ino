@@ -14,6 +14,7 @@
 #define APP_MENU_APPLICATIONS_5             SimpleGameApp
 #define APP_MENU_APPLICATIONS_6             TestApplicationApp
 #define APP_MENU_APPLICATIONS_7             BatteryApp
+#define APP_MENU_APPLICATIONS_8             PedometerApp
 
 /*
     # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
