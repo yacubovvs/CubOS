@@ -1,6 +1,7 @@
 #define appNameClass    CompassApp          // App name without spaces
 #define appName         "Compass"              // App name with spaces 
 
+
 class appNameClass: public Application{
     public:
         virtual void onLoop() override;
@@ -8,7 +9,12 @@ class appNameClass: public Application{
         virtual void onEvent(unsigned char event, int val1, int val2) override;
 
         void onCreate();
-        appNameClass(){ fillScreen(0, 0, 0); super_onCreate(); onCreate(); };
+        appNameClass(){ 
+            fillScreen(0, 0, 0);  // filling background
+            super_onCreate();           // Drawind statusbar and etc if needed
+            onCreate(); 
+        };
+
         static unsigned const char* getParams(const unsigned char type){
             switch(type){ 
               case PARAM_TYPE_NAME: return (unsigned char*)appName; 
@@ -16,21 +22,65 @@ class appNameClass: public Application{
               default: return (unsigned char*)""; }
         };
         const static unsigned char icon[] PROGMEM;
+        void drawStringOnScreen(String stringToPrint);
+        int currentPrintScreenString = 0;
       
 };
 
 void appNameClass::onCreate(){
     /*
-        Write you code onCreate here
+        Write you code on App create here
     */
-    setDrawColor(255, 255, 255);
-    drawString(appName, 5, STYLE_STATUSBAR_HEIGHT + 10, FONT_SIZE_DEFAULT);
+    this->preventSleep         = true;
+    this->preventInAppSleep    = true;
+
+    DRAW_LIMITS_setEnable(true);
+    DRAW_LIMIT_reset();
+    DRAW_LIMITS_setEnable(STYLE_STATUSBAR_HEIGHT, -1, -1, -1);
+    
+    setBackgroundColor(0,0,0);
+    setContrastColor(255, 255, 255);
+    setDrawColor_ContrastColor();
+    
+    //drawString(appName, 5, STYLE_STATUSBAR_HEIGHT + 10, FONT_SIZE_DEFAULT);
+}
+
+void appNameClass::drawStringOnScreen(String stringToPrint){
+    setDrawColor_ContrastColor();
+    drawString(stringToPrint, 5, STYLE_STATUSBAR_HEIGHT + currentPrintScreenString*10*FONT_SIZE_DEFAULT + 10, FONT_SIZE_DEFAULT);
+    currentPrintScreenString ++;
 }
 
 void appNameClass::onLoop(){
     /*
         Write you code onLoop here
     */
+    currentPrintScreenString = 0;
+    setDrawColor_BackGroundColor();
+    drawRect(0,0, SCREEN_WIDTH, SCREEN_HEIGHT, true);
+
+    driver_accelerometer_update();
+
+    /*
+    float get_driver_accelerometer_temperature(){return temp;}
+    float get_driver_accelerometer_pitch(){return pitch;}
+    float get_driver_accelerometer_roll(){return roll;}
+    float get_driver_accelerometer_yaw(){return yaw;}
+    float get_driver_accelerometer_gyroscope_x(){return gyroX;}
+    float get_driver_accelerometer_gyroscope_y(){return gyroY;}
+    float get_driver_accelerometer_gyroscope_z(){return gyroZ;}
+    float get_driver_accelerometer_x(){return accX;}
+    float get_driver_accelerometer_y(){return accY;}
+    float get_driver_accelerometer_z(){return accZ;}
+    */
+
+    drawStringOnScreen("Pitch:");
+    drawStringOnScreen(String(get_driver_accelerometer_pitch()));
+    drawStringOnScreen("Roll:");
+    drawStringOnScreen(String(get_driver_accelerometer_roll()));
+    drawStringOnScreen("Yaw:");
+    drawStringOnScreen(String(get_driver_accelerometer_yaw()));
+   
 }
 
 void appNameClass::onDestroy(){
@@ -41,18 +91,73 @@ void appNameClass::onDestroy(){
 
 void appNameClass::onEvent(unsigned char event, int val1, int val2){
     
-    if(event==EVENT_BUTTON_PRESSED){
-        // Write you code on [val1] button pressed here
-        if(val1==BUTTON_BACK){
-            startApp(-1);
+     #ifdef TOUCH_SCREEN_ENABLE
+
+        if(event==EVENT_ON_TOUCH_DRAG){
+            // SCREEN SCROLL
+            this->drawIcons(false);
+            this->scroll_x -= val1;
+            if(this->scroll_x<0) scroll_x = 0;
+
+            int max_scroll = (this->getTotalApplicationsInSubMenu(APP_SETTINGS_SUBMENU_MAIN) - 1 ) * SCREEN_WIDTH;
+            if(this->scroll_x>max_scroll) {
+                this->scroll_x = max_scroll;
+            }
+
+            this->drawIcons(true);
         }
-    }else if(event==EVENT_BUTTON_RELEASED){
-        // Write you code on [val1] button released here
-    }else if(event==EVENT_BUTTON_LONG_PRESS){
-        // Write you code on [val1] button long press here
-    }else if(event==EVENT_ON_TIME_CHANGED){
-        // Write you code on system time changed
-    }
+
+    #else
+
+        /**/
+        #if (DRIVER_CONTROLS_TOTALBUTTONS == 2 || DRIVER_CONTROLS_TOTALBUTTONS == 1)
+            
+            if(event==EVENT_BUTTON_PRESSED){
+            }else if(event==EVENT_BUTTON_RELEASED){
+            }else if(event==EVENT_BUTTON_LONG_PRESS){
+                if(val1==BUTTON_SELECT){
+                }else if(val1==BUTTON_BACK){
+                    startApp(-1);
+                }    
+            }else if(event==EVENT_BUTTON_SHORT_PRESS){
+            }else if(event==EVENT_BUTTON_SHORT_SINGLE_PRESS){
+                if(val1==BUTTON_SELECT){
+                }else if(val1==BUTTON_BACK){
+                }
+            }else if(event==EVENT_ON_TOUCH_DOUBLE_PRESS){
+                #if (DRIVER_CONTROLS_TOTALBUTTONS == 1)
+                    if(val1==BUTTON_SELECT){
+                        startApp(-1);
+                    }
+                #else
+                #endif
+                
+            }
+            
+        #else
+            if(event==EVENT_BUTTON_PRESSED){
+                
+                if(currentSubMenu==APP_SETTINGS_SUBMENU_MAIN){
+                    switch(val1){
+                        case BUTTON_UP:
+                            break;
+                        case BUTTON_BACK:
+                            break;
+                        case BUTTON_DOWN:
+                            break;
+                        case BUTTON_SELECT:
+                            break;
+                    }
+                }   
+            
+            }else if(event==EVENT_BUTTON_RELEASED){
+
+            }else if(event==EVENT_BUTTON_LONG_PRESS){
+
+            }
+        #endif
+    
+    #endif
     
 }
 

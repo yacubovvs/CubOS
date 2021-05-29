@@ -32,8 +32,8 @@
         driver_accelerometer_update_temperature();
     }
 
-    void driver_accelerometer_update_accelerometer(){M5.IMU.getGyroData(&gyroX,&gyroY,&gyroZ);}
-    void driver_accelerometer_update_gyroscope(){M5.IMU.getAccelData(&accX,&accY,&accZ);}
+    void driver_accelerometer_update_gyroscope(){M5.IMU.getGyroData(&gyroX,&gyroY,&gyroZ);}
+    void driver_accelerometer_update_accelerometer(){M5.IMU.getAccelData(&accX,&accY,&accZ);}
     void driver_accelerometer_update_angles(){M5.IMU.getAhrsData(&pitch,&roll,&yaw);}
     void driver_accelerometer_update_temperature(){M5.IMU.getTempData(&temp);}
     void driver_accelerometer_poweroff(){}
@@ -78,4 +78,8 @@
         }
     }
 
+    float driver_accelerometer_get_accel_total(){
+        return sqrt(pow(get_driver_accelerometer_x(),2) + pow(get_driver_accelerometer_y(),2) + pow(get_driver_accelerometer_z(),2));
+    }
+    
 #endif

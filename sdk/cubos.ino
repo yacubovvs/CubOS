@@ -152,6 +152,10 @@ void setup(){
   #ifdef ACCELEROMETER_ENABLE
     driver_accelerometer_setup();
   #endif
+
+  #ifdef PEDOMETER_ENABLE
+    core_pedometer_setup();
+  #endif
   
   currentApp = getApp(STARTING_APP_NUMM);
   
@@ -190,6 +194,10 @@ void loop(){
 
   #ifdef ACCELEROMETER_ENABLE
     driver_accelerometer_loop();
+  #endif
+
+  #ifdef PEDOMETER_ENABLE
+    core_pedometer_loop();
   #endif
 
   currentApp->onLoop(); 

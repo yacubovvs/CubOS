@@ -127,7 +127,7 @@
 #define USE_TYPE2_OF_IMAGES
 //#define PEDOMETER_ENABLE
 
-#define WAKEUP_FOR_BACKGROUND_WORK_STANDBY 3000
+#define WAKEUP_FOR_BACKGROUND_WORK_STANDBY 10000
 #define WAKEUP_FOR_BACKGROUND_WORK_IDLE 1000
 /*
     ############################################################################################
@@ -370,6 +370,10 @@ void setup(){
   #ifdef ACCELEROMETER_ENABLE
     driver_accelerometer_setup();
   #endif
+
+  #ifdef PEDOMETER_ENABLE
+    core_pedometer_setup();
+  #endif
   
   currentApp = getApp(STARTING_APP_NUMM);
   
@@ -408,6 +412,10 @@ void loop(){
 
   #ifdef ACCELEROMETER_ENABLE
     driver_accelerometer_loop();
+  #endif
+
+  #ifdef PEDOMETER_ENABLE
+    core_pedometer_loop();
   #endif
 
   currentApp->onLoop(); 
