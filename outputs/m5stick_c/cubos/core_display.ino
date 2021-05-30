@@ -226,10 +226,10 @@ bool DRAW_LIMITS_getEnable(){
 unsigned char core_display_brightness             = 100;
 
 #ifdef DISPLAY_BACKLIGHT_FADE_CONTROL_ENABLE
-  unsigned char core_display_brightness_fade        = 20;
-  unsigned char core_display_time_delay_to_fade     = 15;
+  unsigned char core_display_brightness_fade        = 15;
+  unsigned char core_display_time_delay_to_fade     = 10;
 #endif
-unsigned char core_display_time_delay_to_poweroff = 10;
+unsigned char core_display_time_delay_to_poweroff = 5;
 
 #ifdef DISPLAY_BACKLIGHT_CONTROL_ENABLE
   void set_core_display_brightness(unsigned char value){ 

@@ -32,8 +32,8 @@ void appNameClass::onCreate(){
     /*
         Write you code on App create here
     */
-    this->preventSleep         = true;
-    this->preventInAppSleep    = true;
+    //this->preventSleep         = true;
+    //this->preventInAppSleep    = true;
 
     DRAW_LIMITS_setEnable(true);
     DRAW_LIMIT_reset();
@@ -42,6 +42,8 @@ void appNameClass::onCreate(){
     setBackgroundColor(0,0,0);
     setContrastColor(255, 255, 255);
     setDrawColor_ContrastColor();
+
+    core_pedometer_setEnable(true);
     
     //drawString(appName, 5, STYLE_STATUSBAR_HEIGHT + 10, FONT_SIZE_DEFAULT);
     //core_pedometer_start_step_detection();
@@ -58,70 +60,25 @@ void appNameClass::onLoop(){
         Write you code onLoop here
     */
 
+   
     currentPrintScreenString = 0;
     setDrawColor_BackGroundColor();
     drawRect(0,0, SCREEN_WIDTH, SCREEN_HEIGHT, true);
 
-    //driver_accelerometer_update();
-    driver_accelerometer_update_accelerometer();
+    drawStringOnScreen("Steps: ");
+    drawStringOnScreen(String(get_pedometer_steps()));
 
     /*
-    float get_driver_accelerometer_temperature(){return temp;}
-    float get_driver_accelerometer_pitch(){return pitch;}
-    float get_driver_accelerometer_roll(){return roll;}
-    float get_driver_accelerometer_yaw(){return yaw;}
-    float get_driver_accelerometer_gyroscope_x(){return gyroX;}
-    float get_driver_accelerometer_gyroscope_y(){return gyroY;}
-    float get_driver_accelerometer_gyroscope_z(){return gyroZ;}
-    float get_driver_accelerometer_x(){return accX;}
-    float get_driver_accelerometer_y(){return accY;}
-    float get_driver_accelerometer_z(){return accZ;}
+    drawStringOnScreen("delta_value: ");
+    drawStringOnScreen(String(get_analysis_delta_value()));
+    drawStringOnScreen("central_weight_value: ");
+    drawStringOnScreen(String(get_analysis_central_weight_value()));
+    drawStringOnScreen("central_value: ");
+    drawStringOnScreen(String(get_analysis_central_value()));
+    drawStringOnScreen("axis_crossings: ");
+    drawStringOnScreen(String(get_analysis_axis_crossings()));
     */
-    
-    //drawStringOnScreen(String(get_driver_accelerometer_x()) + " " + String(get_driver_accelerometer_y()) + " " + String(get_driver_accelerometer_y()));
-    
-    drawStringOnScreen(String(get_driver_accelerometer_x()));
-    drawStringOnScreen(String(get_driver_accelerometer_y()));
-    drawStringOnScreen(String(get_driver_accelerometer_z()));
-    drawStringOnScreen("");
-    
-
-    float acceleration_qudr = driver_accelerometer_get_accel_total();
-
-    if(acceleration_max==0) acceleration_max = acceleration_qudr;
-    if(acceleration_min==0) acceleration_min = acceleration_qudr;
-
-    if(acceleration_qudr>acceleration_max) acceleration_max = acceleration_qudr;
-    if(acceleration_qudr<acceleration_min) acceleration_min = acceleration_qudr;
-
-    //if(acceleration_current_max>acceleration_max) acceleration_max = acceleration_current_max;
-    //if(acceleration_current_min<acceleration_min) acceleration_min = acceleration_current_min;
-
-    //drawStringOnScreen(String(acceleration_min));
-    //drawStringOnScreen(String(acceleration_qudr));
-    //drawStringOnScreen(String(acceleration_max));
-
-    //drawStringOnScreen("");
-
-    drawStringOnScreen(String(acceleration_min));
-    drawStringOnScreen(String(acceleration_qudr));
-    drawStringOnScreen(String(acceleration_max));
-
-    /*
-    if(acceleration_qudr>1.5) digitalWrite(10,0);
-    else if(acceleration_qudr<0.5) digitalWrite(10,0);
-    else digitalWrite(10,1);
-    */
-
-    //drawStringOnScreen("Gyroscope:");
-    //drawStringOnScreen(String(get_driver_accelerometer_gyroscope_x()) + " " + String(get_driver_accelerometer_gyroscope_y()) + " " + String(get_driver_accelerometer_gyroscope_z()));
-
-    //drawStringOnScreen("get_driver_accelerometer_temperature:");
-    //drawStringOnScreen(String(get_driver_accelerometer_temperature()));
-
-    //drawStringOnScreen("Pitch, roll, yaw:");
-    //drawStringOnScreen(String(get_driver_accelerometer_pitch()) + " " + String(get_driver_accelerometer_roll()) + " " + String(get_driver_accelerometer_yaw()));
-   
+  
 }
 
 void appNameClass::onDestroy(){
@@ -129,6 +86,7 @@ void appNameClass::onDestroy(){
         Write you code onDestroy here
     */
     digitalWrite(10,1);
+    core_pedometer_setEnable(false);
 }
 
 void appNameClass::onEvent(unsigned char event, int val1, int val2){

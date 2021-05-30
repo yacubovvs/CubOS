@@ -62,7 +62,6 @@ void driver_cpu_sleep(unsigned char sleepType, long timeout){
             WiFi.mode(WIFI_OFF);
             btStop();
 
-            debug("Set sleep wifi + bt");
             break;
         case SLEEP_DISPLAY:
             break;

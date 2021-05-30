@@ -1,3 +1,12 @@
+long getCurrentSystemTime(){
+    #ifdef RTC_ENABLE
+        long currentSystemTime =  ((long)core_time_getHours_byte())*60*60 + ((long)core_time_getMinutes_byte())*60 + ((long)core_time_getSeconds_byte());
+        return currentSystemTime;
+    #else
+        return millis()/1000;
+    #endif
+}
+
 unsigned char core_time_getHours_byte(){
     #ifdef RTC_ENABLE
         return driver_RTC_getHours();

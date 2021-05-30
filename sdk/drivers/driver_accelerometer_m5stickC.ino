@@ -19,7 +19,7 @@
     float get_driver_accelerometer_z(){return accZ;}
 
     void driver_accelerometer_setup(){
-        M5.begin();
+        //M5.begin(); // No need for accelerometer
         M5.IMU.Init();
     }
 

@@ -18,38 +18,6 @@ void fillScreen(unsigned char red, unsigned char green, unsigned char blue);
     ############################################################################################
 */
 
-/*
-    ############################################################################################
-    #                                                                                          #
-    #                                         EVENTS +                                         #
-    #                                                                                          #
-    ############################################################################################
-*/
-
-/*
-#define EVENT_BUTTON_PRESSED            0x00
-#define EVENT_BUTTON_RELEASED           0x01
-#define EVENT_BUTTON_LONG_PRESS         0x02
-#define EVENT_ON_TIME_CHANGED           0x03
-#define EVENT_ON_GOING_TO_SLEEP         0x04
-#define EVENT_ON_WAKE_UP                0x05
-
-#define EVENT_ON_TOUCH_START            0x06
-#define EVENT_ON_TOUCH_RELEASED         0x07
-#define EVENT_ON_TOUCH_CLICK            0x08
-#define EVENT_ON_TOUCH_LONG_PRESS       0x09
-#define EVENT_ON_TOUCH_DRAG             0x0A
-#define EVENT_ON_TOUCH_DOUBLE_CLICK     0x0B
-*/
-
-/*
-    ############################################################################################
-    #                                                                                          #
-    #                                         EVENTS -                                         #
-    #                                                                                          #
-    ############################################################################################
-*/
-
 
 /*
     ############################################################################################
@@ -97,21 +65,30 @@ Application* currentApp;
 */
 
 void setup(){ 
+  #ifdef DEBUG_SERIAL
+      Serial.begin(115200);
+      //delay(100);
+      //d ebug("Serial debug started", 10);
+  #endif
+
   #ifdef POWERSAVE_ENABLE
     #ifdef CPU_SLEEP_ENABLE
-    unsigned char wakeUpReason = core_powersave_wakeup_reason();
-    if(wakeUpReason==WAKE_UP_REASON_TIMER){
-      backgroundWaorkAfterSleep();
-      /*
-      pinMode(10, OUTPUT);
-      digitalWrite(10, 1);
-      d elay(100);
-      digitalWrite(10, 0);
-      */
-      core_cpu_sleep(STAND_BY_SLEEP_TYPE, WAKEUP_FOR_BACKGROUND_WORK_STANDBY);
-    }
+      unsigned char wakeUpReason = core_powersave_wakeup_reason();
+      if(wakeUpReason==WAKE_UP_REASON_TIMER){
+        //d ebug("Background start", 10);
+        //core_cpu_setup();
+        driver_controls_setup();
+        backgroundWorkAfterSleep();
+        //debug("Going to sleep again");
+        //debug("", 10);
+        core_cpu_sleep(STAND_BY_SLEEP_TYPE, WAKEUP_FOR_BACKGROUND_WORK_STANDBY);
+      }else{
+        //debug("Not backgtound start", 10);
+      }
     #endif
   #endif
+  //debug("**** Main app start", 10);
+
 
   #ifdef BATTERY_ENABLE
     driver_battery_setup();
@@ -119,11 +96,6 @@ void setup(){
 
   #ifdef RTC_ENABLE
       driver_RTC_setup();
-  #endif
-
-  #ifdef DEBUG_SERIAL
-      Serial.begin(115200);
-      debug("Serial debug started");
   #endif
 
   #ifdef ESP8266
@@ -197,7 +169,7 @@ void loop(){
   #endif
 
   #ifdef PEDOMETER_ENABLE
-    core_pedometer_loop();
+    //core_pedometer_loop(false);
   #endif
 
   currentApp->onLoop(); 
@@ -208,38 +180,7 @@ void loop(){
     ESP.wdtFeed();
   #endif
 
-/*
-  #ifdef CPU_SLEEP_ENABLE
-//driver_cpu_sleep();
-    if(millis() - driver_control_get_last_user_avtivity() > CPU_SLEEP_TIME_DELAY){
-        if(!isInSleep){
-            isInSleep = true;
-            currentApp->onEvent(EVENT_ON_GOING_TO_SLEEP, 0, 0);
-            powerOff_displayDriver();
-        }
-
-        do_cpu_sleep();
-      
-    }else{
-      if(isInSleep){
-        isInSleep = false;
-        driver_cpu_wakeup();
-        currentApp->onEvent(EVENT_ON_WAKE_UP, 0, 0);
-      }
-    }
-    //driver_cpu_wakeup();
-  #endif
-*/
-
 }
-
-/*
-#ifdef CPU_SLEEP_ENABLE
-  void do_cpu_sleep(){
-      driver_cpu_sleep();
-  }
-#endif
-*/
 
 void debug(String string){
   debug(string, 0);
@@ -260,6 +201,7 @@ void debug(String string, int delaytime){
 
     #ifdef DEBUG_SERIAL
       Serial.println(string);
+      delay(delaytime);
     #endif
 
     #ifdef screenDebug
@@ -270,16 +212,6 @@ void debug(String string, int delaytime){
       drawString(string, 5, STYLE_STATUSBAR_HEIGHT + 10, 2);
     #endif
 }
-
-/*
-void debug(const char* string, int delaytime){
-  debug(String(string), delaytime);
-}
-
-void debug(const char* string){
-  debug(String(string));
-}*/
-
 
 /*
     ############################################################################################

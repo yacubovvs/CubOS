@@ -58,10 +58,6 @@ void driver_cpu_sleep(){
         gpio_pin_wakeup_enable(GPIO_ID_PIN(12), GPIO_PIN_INTR_LOLEVEL); // GPIO_PIN_INTR_LOLEVEL 
 
         wifi_fpm_do_sleep(0xFFFFFFF);
-        delay(50);
-        debug("Going to sleep ");
-        debug(String(millis()));
-        debug("\n");
 
     /*
     powerOff_displayDriver();

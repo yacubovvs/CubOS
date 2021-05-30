@@ -19,19 +19,14 @@
     long core_powersave_lastUserAction = 0;
     long core_powersave_lastUserAction_tick = 0;
 
+    long get_core_powersave_lastUserAction(){
+        return core_powersave_lastUserAction;
+    }
+
+
     void set_core_powersave_lastUserAction(){
         core_powersave_lastUserAction = getCurrentSystemTime();
         core_powersave_lastUserAction_tick = millis();
-    }
-
-    long getCurrentSystemTime(){
-        #ifdef RTC_ENABLE
-            long currentSystemTime =  ((long)core_time_getHours_byte())*60*60 + ((long)core_time_getMinutes_byte())*60 + ((long)core_time_getSeconds_byte());
-            return currentSystemTime;
-            //return millis()/1000;
-        #else
-            return millis()/1000;
-        #endif
     }
 
     void core_powersave_setup(){
@@ -55,14 +50,15 @@
         #ifdef DISPLAY_BACKLIGHT_FADE_CONTROL_ENABLE
             if(timeSincelastUserAction>=get_core_display_time_delay_to_fade()){
                 if(timeSincelastUserAction - get_core_display_time_delay_to_fade()>=get_core_display_time_delay_to_poweroff()){
-                    // switch off screen
-                    if(driver_display_getBrightness()!=0){
-                        driver_display_setBrightness(0);
-                    }
-
+                    
                     #ifdef CPU_SLEEP_ENABLE
                         // Going to sleep
                         if(currentApp->preventSleep==false){
+                            // switch off screen
+                            if(driver_display_getBrightness()!=0){
+                                driver_display_setBrightness(0);
+                            }
+                            
                             #ifdef DEBUG_CORE_POWERSAVE
                                 debug("Deep sleep");
                                 delay(25);
@@ -99,13 +95,14 @@
         #else
             if(timeSincelastUserAction>=get_core_display_time_delay_to_poweroff()){
 
-                if(driver_display_getBrightness()!=0){
-                    driver_display_setBrightness(0);
-                }
-
                 #ifdef CPU_SLEEP_ENABLE
                     // Going to sleep
                     if(currentApp->preventSleep==false){
+                        // switch off screen
+                        if(driver_display_getBrightness()!=0){
+                            driver_display_setBrightness(0);
+                        }
+                        
                         #ifdef DEBUG_CORE_POWERSAVE
                             debug("Deep sleep");
                             delay(25);

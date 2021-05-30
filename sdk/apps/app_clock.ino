@@ -220,7 +220,7 @@ void appNameClass::draw_current_time(bool draw){
         #define PEDOMETER_LABEL_POSITION_PADDING (3)
         #ifdef PEDOMETER_ENABLE
 
-            if(draw) this->last_pedometer = 43;
+            if(draw) this->last_pedometer = get_pedometer_steps();
             String pedometer_toPrint = String(this->last_pedometer);
 
             // 16 - leg icon width
