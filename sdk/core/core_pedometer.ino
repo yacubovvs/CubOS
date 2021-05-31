@@ -27,8 +27,10 @@
 
     void core_pedometer_setup(){
         // Just for test M5StickC
-        //pinMode(10, OUTPUT);
-        ///digitalWrite(10, 1);
+        #ifdef PEDOMETER_DEBUG
+            pinMode(10, OUTPUT);
+            digitalWrite(10, 1);
+        #endif
     }
 
     void core_pedometer_loop(bool inBackGroung){
