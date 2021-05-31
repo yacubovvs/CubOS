@@ -127,12 +127,17 @@
 #define USE_TYPE2_OF_IMAGES
 //#define PEDOMETER_ENABLE
 
-#define PEDOMETER_STEP_DETECTION_DELAY                  30000
+//#define PEDOMETER_STEP_DETECTION_DELAY                  30000
+#define PEDOMETER_STEP_DETECTION_DELAY                  10000
 #define PEDOMETER_STEP_DETECTION_PERIOD_MS              1000
-#define PEDOMETER_MESURES_IN_STEP_DETECTION_PERIOD      20
+#define PEDOMETER_MESURES_IN_STEP_DETECTION_PERIOD      5
+#define PEDOMETER_ENABLE_ON_START                       true
 
 #define WAKEUP_FOR_BACKGROUND_WORK_STANDBY PEDOMETER_STEP_DETECTION_DELAY
 #define WAKEUP_FOR_BACKGROUND_WORK_IDLE 1000
+
+//#define PEDOMETER_DEBUG // Just for teste
+
 /*
     ############################################################################################
     #                                                                                          #
@@ -176,9 +181,9 @@
 
 #define STARTING_APP_NUMM   -1    // for Mainmenu (default app)
 //#define STARTING_APP_NUMM    1 // Settings
-//#define STARTING_APP_NUMM    7 // Battery
+//#define STARTING_APP_NUMM    3 // Battery
 #define STARTING_APP_NUMM    0 // Clock
-//#define STARTING_APP_NUMM    8 // Pedometer
+//#define STARTING_APP_NUMM    2 // Pedometer
 
 #define FONT_SIZE_DEFAULT   1
 
@@ -500,13 +505,13 @@ void debug(String string, int delaytime){
 
 #define APP_MENU_APPLICATIONS_0             ClockApp
 #define APP_MENU_APPLICATIONS_1             SettingsApp
-#define APP_MENU_APPLICATIONS_2             CompassApp
-#define APP_MENU_APPLICATIONS_3             I2CScannerApp
-#define APP_MENU_APPLICATIONS_4             AlarmApp
-#define APP_MENU_APPLICATIONS_5             SimpleGameApp
-#define APP_MENU_APPLICATIONS_6             TestApplicationApp
-#define APP_MENU_APPLICATIONS_7             BatteryApp
-#define APP_MENU_APPLICATIONS_8             PedometerApp
+#define APP_MENU_APPLICATIONS_2             PedometerApp
+#define APP_MENU_APPLICATIONS_3             BatteryApp
+#define APP_MENU_APPLICATIONS_4             I2CScannerApp
+
+//#define APP_MENU_APPLICATIONS_5             TestApplicationApp
+
+
 
 /*
     # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
@@ -517,6 +522,10 @@ void debug(String string, int delaytime){
 */
 
 /*
+#define APP_MENU_APPLICATIONS_6             AppName
+#define APP_MENU_APPLICATIONS_7             AppName
+#define APP_MENU_APPLICATIONS_8             AppName
+#define APP_MENU_APPLICATIONS_9             AppName
 #define APP_MENU_APPLICATIONS_10            AppName
 #define APP_MENU_APPLICATIONS_11            AppName
 #define APP_MENU_APPLICATIONS_12            AppName

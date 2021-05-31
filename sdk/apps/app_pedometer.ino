@@ -32,8 +32,8 @@ void appNameClass::onCreate(){
     /*
         Write you code on App create here
     */
-    //this->preventSleep         = true;
-    //this->preventInAppSleep    = true;
+    this->preventSleep         = true;
+    this->preventInAppSleep    = true;
 
     DRAW_LIMITS_setEnable(true);
     DRAW_LIMIT_reset();
@@ -42,8 +42,6 @@ void appNameClass::onCreate(){
     setBackgroundColor(0,0,0);
     setContrastColor(255, 255, 255);
     setDrawColor_ContrastColor();
-
-    core_pedometer_setEnable(true);
     
     //drawString(appName, 5, STYLE_STATUSBAR_HEIGHT + 10, FONT_SIZE_DEFAULT);
     //core_pedometer_start_step_detection();
@@ -60,6 +58,7 @@ void appNameClass::onLoop(){
         Write you code onLoop here
     */
 
+    core_pedometer_loop(false);
    
     currentPrintScreenString = 0;
     setDrawColor_BackGroundColor();
@@ -67,17 +66,18 @@ void appNameClass::onLoop(){
 
     drawStringOnScreen("Steps: ");
     drawStringOnScreen(String(get_pedometer_steps()));
-
-    /*
-    drawStringOnScreen("delta_value: ");
-    drawStringOnScreen(String(get_analysis_delta_value()));
-    drawStringOnScreen("central_weight_value: ");
-    drawStringOnScreen(String(get_analysis_central_weight_value()));
-    drawStringOnScreen("central_value: ");
-    drawStringOnScreen(String(get_analysis_central_value()));
-    drawStringOnScreen("axis_crossings: ");
-    drawStringOnScreen(String(get_analysis_axis_crossings()));
-    */
+    drawStringOnScreen("");
+    
+    #ifdef PEDOMETER_DEBUG
+        drawStringOnScreen("delta_value: ");
+        drawStringOnScreen(String(get_analysis_delta_value()));
+        drawStringOnScreen("central_weight_value: ");
+        drawStringOnScreen(String(get_analysis_central_weight_value()));
+        //drawStringOnScreen("central_value: ");
+        //drawStringOnScreen(String(get_analysis_central_value()));
+    #endif
+    
+    
   
 }
 
@@ -86,7 +86,6 @@ void appNameClass::onDestroy(){
         Write you code onDestroy here
     */
     digitalWrite(10,1);
-    core_pedometer_setEnable(false);
 }
 
 void appNameClass::onEvent(unsigned char event, int val1, int val2){

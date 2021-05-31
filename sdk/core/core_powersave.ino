@@ -31,7 +31,7 @@
 
     void core_powersave_setup(){
         #ifdef RTC_ENABLE
-            driver_RTC_refresh();
+            core_time_driver_RTC_refresh();
         #endif
 
         set_core_powersave_lastUserAction();

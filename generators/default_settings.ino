@@ -127,12 +127,17 @@
 #define USE_TYPE2_OF_IMAGES
 //#define PEDOMETER_ENABLE
 
-#define PEDOMETER_STEP_DETECTION_DELAY                  30000
+//#define PEDOMETER_STEP_DETECTION_DELAY                  30000
+#define PEDOMETER_STEP_DETECTION_DELAY                  10000
 #define PEDOMETER_STEP_DETECTION_PERIOD_MS              1000
-#define PEDOMETER_MESURES_IN_STEP_DETECTION_PERIOD      20
+#define PEDOMETER_MESURES_IN_STEP_DETECTION_PERIOD      5
+#define PEDOMETER_ENABLE_ON_START                       true
 
 #define WAKEUP_FOR_BACKGROUND_WORK_STANDBY PEDOMETER_STEP_DETECTION_DELAY
 #define WAKEUP_FOR_BACKGROUND_WORK_IDLE 1000
+
+//#define PEDOMETER_DEBUG // Just for teste
+
 /*
     ############################################################################################
     #                                                                                          #

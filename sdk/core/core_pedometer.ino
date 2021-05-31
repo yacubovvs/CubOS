@@ -1,18 +1,21 @@
-//#define PEDOMETER_ENABLE // just for tests
-//#define PEDOMETER_DEBUG // just for tests
+#define PEDOMETER_ENABLE // just for tests
 
 #ifdef PEDOMETER_ENABLE
     RTC_DATA_ATTR long pedometer_steps = 0;
     long get_pedometer_steps(){ return pedometer_steps;}
     void set_pedometer_steps(long steps){pedometer_steps = steps;}
 
+    void core_pedometer_newDate(){
+        set_pedometer_steps(0);
+    }
+
     #ifndef PEDOMETER_STEPS_IN_SEC
-        #define PEDOMETER_STEPS_IN_SEC                          1.8f
+        #define PEDOMETER_STEPS_IN_SEC                          1.5f
     #endif
 
     #define CORE_PEDOMETER_MESURE_EVERY_MS                      (PEDOMETER_STEP_DETECTION_PERIOD_MS/PEDOMETER_MESURES_IN_STEP_DETECTION_PERIOD)
 
-    bool pedometer_on = false;
+    bool pedometer_on = PEDOMETER_ENABLE_ON_START;
     void core_pedometer_setEnable(bool enable){
         pedometer_on = enable;
     }
@@ -30,14 +33,20 @@
 
     void core_pedometer_loop(bool inBackGroung){
         if(pedometer_on){
-            //d ebug("Pedometer -  on!", 10);
+            #ifdef PEDOMETER_DEBUG
+                //debug("Pedometer is ON!", 10);
+            #endif 
+
             if(core_pedometer_current_step_detection!=-1){
-                //d ebug("Pedometer - Not first mesure!", 10);
+                #ifdef PEDOMETER_DEBUG
+                    //debug("Pedometer - Not first mesure!", 10);
+                #endif
                 core_pedometer_mesure_loop(inBackGroung);
             }else{
-                //d ebug("Pedometer - check time!", 10);
-                //d ebug(String(getCurrentSystemTime()));
-                //d ebug(String(lastTimeWalkingDetection));
+                #ifdef PEDOMETER_DEBUG 
+                    //debug("Pedometer - check time!", 10);
+                #endif
+                
                 if(getCurrentSystemTime()<lastTimeWalkingDetection) lastTimeWalkingDetection = getCurrentSystemTime();
 
                 if( (inBackGroung && (lastTimeWalkingDetection + (PEDOMETER_STEP_DETECTION_DELAY)/1000<=getCurrentSystemTime()))
@@ -46,17 +55,27 @@
                     if(inBackGroung){
                         #ifdef ACCELEROMETER_ENABLE
                             driver_accelerometer_setup();
-                            //d ebug("Accelerometer is setted up", 10);
+                            #ifdef PEDOMETER_DEBUG
+                                debug("Accelerometer is setted up", 10);
+                            #endif
                         #endif
                     }
 
-                    //d ebug("Pedometer - Start step!", 10);
+                    #ifdef PEDOMETER_DEBUG
+                        debug("Pedometer - Start step!", 10);
+                    #endif
                     core_pedometer_start_step_detection(inBackGroung);
                     core_pedometer_mesure_loop(inBackGroung);
                 }else{
-                    //d ebug("!!!!! Time not come");
+                    #ifdef PEDOMETER_DEBUG
+                        //debug("!!!!! Time not come", 10);
+                    #endif
                 }
             }
+        }else{
+            #ifdef PEDOMETER_DEBUG
+                debug("Pedometer is OFF!", 10);
+            #endif 
         }
     }
 
@@ -70,24 +89,28 @@
                 ( (millis()-core_pedometer_step_detection_start_time)/CORE_PEDOMETER_MESURE_EVERY_MS >= core_pedometer_current_step_detection ) 
                 ){ // Mesure condition
 
-                //d ebug("Mesure " + String( core_pedometer_current_step_detection));
+                #ifdef PEDOMETER_DEBUG
+                    debug("Mesure " + String( core_pedometer_current_step_detection));
+                #endif
 
                 driver_accelerometer_update_accelerometer();
                 core_pedometer_step_detection_arrays[core_pedometer_current_step_detection] = driver_accelerometer_get_accel_total();
                 core_pedometer_current_step_detection++;
                 if(core_pedometer_current_step_detection==PEDOMETER_MESURES_IN_STEP_DETECTION_PERIOD){
                     core_pedometer_current_step_detection=-1;
-                    core_pedometer_analyse_steps_mesure();
+                    core_pedometer_analyse_steps_mesure(inBackGroung);
                 }
             }
 
             if(inBackGroung){
-                //d ebug("PEDOMETER MESURE", 10);
+                #ifdef PEDOMETER_DEBUG
+                    // debug("PEDOMETER MESURE IN BACKGROUN", 10);
+                #endif
                 /*
                 if( getCurrentSystemTime()==get_core_powersave_lastUserAction()){
                     core_cpu_sleep(STAND_BY_SLEEP_TYPE, 1);   
                 }*/
-                core_cpu_sleep(SLEEP_LIGHT, CORE_PEDOMETER_MESURE_EVERY_MS); 
+                core_cpu_sleep(SLEEP_LIGHT, CORE_PEDOMETER_MESURE_EVERY_MS, false); 
                 core_pedometer_mesure_loop(true);
             }
         }
@@ -118,7 +141,7 @@
         int get_analysis_axis_crossings(){          return analysis_axis_crossings;}
     #endif
 
-    bool core_pedometer_analyse_steps_mesure(){
+    bool core_pedometer_analyse_steps_mesure(bool inBackground){
 
         // # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 
@@ -175,16 +198,17 @@
 
         analysis_central_weight_value = analysis_central_weight_value/PEDOMETER_MESURES_IN_STEP_DETECTION_PERIOD;
 
-        /*
-        d ebug("# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #");
-        d ebug( String("max_value: ") + analysis_max_value);
-        d ebug( String("min_value: ") + analysis_min_value);
-        d ebug( String("delta_value: ") + analysis_delta_value);
-        d ebug( String("axis_crossings: ") + analysis_axis_crossings);
-        d ebug( String("central_value: ") + analysis_central_value);
-        d ebug( String("central_weight_value: ") + analysis_central_weight_value);
-        d ebug("                                                                    ");
-        */
+        #ifdef PEDOMETER_DEBUG
+            debug("# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #");
+            debug( String("max_value: ") + analysis_max_value);
+            debug( String("min_value: ") + analysis_min_value);
+            debug( String("delta_value: ") + analysis_delta_value);
+            debug( String("axis_crossings: ") + analysis_axis_crossings);
+            debug( String("central_value: ") + analysis_central_value);
+            debug( String("central_weight_value: ") + analysis_central_weight_value);
+            debug("                                                                    ");
+        #endif
+        
 
         #define PEDOMETER_CROSSINGS_MIN             (8*1000/PEDOMETER_STEP_DETECTION_PERIOD_MS)
         #define PEDOMETER_CROSSINGS_MAX             (16*1000/PEDOMETER_STEP_DETECTION_PERIOD_MS)
@@ -193,23 +217,31 @@
 
         // # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 
-        if(
-            analysis_axis_crossings<=PEDOMETER_CROSSINGS_MAX 
-            && analysis_axis_crossings>=PEDOMETER_CROSSINGS_MIN
-            && analysis_delta_value >= PEDOMETER_DELTA_VALUE_MIN
-            && analysis_central_value>=PEDOMETER_CENTRALWIGHT_VALUE_MIN
+        if( true && //|| 
+                (
+                    true
+                    //&& analysis_axis_crossings<=PEDOMETER_CROSSINGS_MAX 
+                    //&& analysis_axis_crossings>=PEDOMETER_CROSSINGS_MIN
+                    && analysis_delta_value >= PEDOMETER_DELTA_VALUE_MIN
+                    && analysis_central_value>=PEDOMETER_CENTRALWIGHT_VALUE_MIN
+                )
             ){
-                //digitalWrite(10,0);
-                //d ebug("Is walking");
+                //
+                #ifdef PEDOMETER_DEBUG
+                    debug("Is walking", 10);
+                    if(!inBackground) digitalWrite(10,0);
+                #endif
                 pedometer_steps += (PEDOMETER_STEPS_IN_SEC*( (float)(PEDOMETER_STEP_DETECTION_DELAY + PEDOMETER_STEP_DETECTION_PERIOD_MS)))/1000;
             }else{
-                //d ebug("Is not walking");
-                //d ebug(String(analysis_central_value), 10);
-                //digitalWrite(10,1);
+                #ifdef PEDOMETER_DEBUG
+                    debug("Is not walking", 10);
+                    if(!inBackground) digitalWrite(10,1);
+                #endif
+                
             }
 
         core_pedometer_step_detection_start_time = millis();
-        lastTimeWalkingDetection = getCurrentSystemTime();;
+        lastTimeWalkingDetection = getCurrentSystemTime();
         return true;
     }
 

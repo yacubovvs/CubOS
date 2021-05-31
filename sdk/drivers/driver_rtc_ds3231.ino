@@ -9,35 +9,7 @@ void driver_RTC_setup(){
 
 	rtc.set_rtc_address(0x68);
 	rtc.set_model(URTCLIB_MODEL_DS3231);
-
-	// Only used once, then disabled
-	//rtc.set(0, 42, 16, 6, 2, 5, 15);
-	//  RTCLib::set(unsigned char second, unsigned char minute, unsigned char hour, unsigned char dayOfWeek, unsigned char dayOfMonth, unsigned char month, unsigned char year)
-
-    /*
-	if (rtc.enableBattery()) {
-		Serial.println("Battery activated correctly.");
-	} else {
-		Serial.println("ERROR activating battery.");
-	}*/
-
-    /*
-	Serial.print("Lost power status: ");
-	if (rtc.lostPower()) {
-		Serial.print("POWER FAILED. Clearing flag...");
-		rtc.lostPowerClear();
-		Serial.println(" done.");
-	} else {
-		Serial.println("POWER OK");
-	}
-
-
-	Serial.print("Aging register value: ");
-	Serial.println(rtc.agingGet());
-
-	Serial.println("Not changing aging register value. To do so you can execute: rtc.agingSet(newValue)");
-
-    */
+	
 }
 
 void driver_RTC_refresh(){

@@ -1,3 +1,13 @@
+void core_time_onNewDate(){ 
+    // Calling once in a day
+    // Clearing all counting data for a day
+    #ifdef PEDOMETER_ENABLE
+        core_pedometer_newDate();
+    #endif
+
+    debug("New day!", 10);
+}
+
 long getCurrentSystemTime(){
     #ifdef RTC_ENABLE
         long currentSystemTime =  ((long)core_time_getHours_byte())*60*60 + ((long)core_time_getMinutes_byte())*60 + ((long)core_time_getSeconds_byte());
@@ -6,6 +16,24 @@ long getCurrentSystemTime(){
         return millis()/1000;
     #endif
 }
+
+#ifdef RTC_ENABLE
+    RTC_DATA_ATTR unsigned char lastDay = 0;
+    unsigned long driver_RTC_lastTimeRefresh = 0;
+
+    void core_time_driver_RTC_refresh(){
+        core_time_driver_RTC_refresh(false);
+    }
+    void core_time_driver_RTC_refresh(bool hard){
+        if(hard || (millis() - driver_RTC_lastTimeRefresh>=UPDATE_RTC_EVERY)){
+            driver_RTC_refresh(hard);
+            if(core_time_getDate()!=lastDay){
+                core_time_onNewDate();
+                lastDay = core_time_getDate();
+            }
+        }
+    }
+#endif
 
 unsigned char core_time_getHours_byte(){
     #ifdef RTC_ENABLE
@@ -69,14 +97,14 @@ String core_time_getSeconds_String(){
 
 String core_time_getHourMinuteSecondsTime(){
     #ifdef RTC_ENABLE
-        driver_RTC_refresh();
+        core_time_driver_RTC_refresh();
     #endif
     return core_time_getHours_String() + ":" + core_time_getMinutes_String() + ":" + core_time_getSeconds_String();
 }
 
 String core_time_getHourMinuteTime(){
     #ifdef RTC_ENABLE
-        driver_RTC_refresh();
+        core_time_driver_RTC_refresh();
     #endif
     return core_time_getHours_String() + ":" + core_time_getMinutes_String();
 }
@@ -266,7 +294,7 @@ void core_time_loop(){
                 core_views_statusBar_draw_time(true);
             }
         #endif
-        driver_RTC_refresh();
+        core_time_driver_RTC_refresh();
         currentApp->onEvent(EVENT_ON_TIME_CHANGED, currentTime, 0);
         lastTimeChange = currentTime;
     }

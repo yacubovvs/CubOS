@@ -2,21 +2,15 @@
 RTC_TimeTypeDef RTC_TimeStruct;
 RTC_DateTypeDef RTC_DateStruct;
 
-unsigned long driver_RTC_lastTimeRefresh = 0;
-
 void driver_RTC_setup(){
 	//M5.begin();
 	M5.Rtc.begin();
 }
 
 void driver_RTC_refresh(bool hard){
-	//if(hard) driver_RTC_lastTimeRefresh = 0;
-	if(hard || (millis() - driver_RTC_lastTimeRefresh>=UPDATE_RTC_EVERY)){
-		M5.Rtc.GetTime(&RTC_TimeStruct);
-		M5.Rtc.GetData(&RTC_DateStruct);
-		driver_RTC_lastTimeRefresh = millis();
-	}
-	
+	M5.Rtc.GetTime(&RTC_TimeStruct);
+	M5.Rtc.GetData(&RTC_DateStruct);
+	driver_RTC_lastTimeRefresh = millis();
 }
 
 void driver_RTC_refresh(){
