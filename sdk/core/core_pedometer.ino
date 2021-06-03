@@ -10,7 +10,7 @@
     }
 
     #ifndef PEDOMETER_STEPS_IN_SEC
-        #define PEDOMETER_STEPS_IN_SEC                          1.5f
+        #define PEDOMETER_STEPS_IN_SEC                          1.8f
     #endif
 
     #define CORE_PEDOMETER_MESURE_EVERY_MS                      (PEDOMETER_STEP_DETECTION_PERIOD_MS/PEDOMETER_MESURES_IN_STEP_DETECTION_PERIOD)
