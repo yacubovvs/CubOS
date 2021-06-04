@@ -22,7 +22,7 @@
 
 #define DRIVER_CONTROLS_TOTALBUTTONS 3
 #define DRIVER_CONTROLS_DELAY_BEFORE_LONG_PRESS     50
-#define DRIVER_CONTROLS_DELAY_BEFORE_MULRI_PRESS    400
+#define DRIVER_CONTROLS_DELAY_BEFORE_MULTY_PRESS    400
 
 /*
 ############################################################################
@@ -51,6 +51,14 @@
 #define EVENT_ON_TOUCH_SWIPE_FROM_TOP       0x11
 #define EVENT_ON_TOUCH_SWIPE_FROM_BOTTOM    0x12
 
+
+// WAKEUP REASONS
+#define WAKE_UP_REASON_EXTERNAL_RTC_IO      0x01
+#define WAKE_UP_REASON_EXTERNAL_RTC_CNTL    0x02
+#define WAKE_UP_REASON_TIMER                0x03
+#define WAKE_UP_REASON_TPOUCHPAD            0x04
+#define WAKE_UP_REASON_ULP                  0x05
+#define WAKE_UP_REASON_NOT_DEEP_SLEEP       0x06
 
 /*
  ############################################################################
@@ -107,13 +115,28 @@
 // #define NARROW_SCREEN
 
 #define UPDATE_BATTERY_EVERY_MS 3000
-#define SMOOTH_BACKLIGHT_CONTROL_DELAY  4
+#define SMOOTH_BACKLIGHT_CONTROL_DELAY_CHANGE  4
 
 // #define ACCELEROMETER_ENABLE
 #define DISPLAY_BACKLIGHT_CONTROL_ENABLE
+#define DISPLAY_BACKLIGHT_FADE_CONTROL_ENABLE
 
 #define WAKEUP_FROM_LIGHT_SLEEP_EVERY_MS 1000
 #define WAKEUP_FROM_DEEP_SLEEP_EVERY_SECONDS 60*60*24
+
+#define USE_TYPE2_OF_IMAGES
+//#define PEDOMETER_ENABLE
+
+//#define PEDOMETER_STEP_DETECTION_DELAY                  30000
+#define PEDOMETER_STEP_DETECTION_DELAY                  15000
+#define PEDOMETER_STEP_DETECTION_PERIOD_MS              1000
+#define PEDOMETER_MESURES_IN_STEP_DETECTION_PERIOD      5
+#define PEDOMETER_ENABLE_ON_START                       true
+
+#define WAKEUP_FOR_BACKGROUND_WORK_STANDBY PEDOMETER_STEP_DETECTION_DELAY
+#define WAKEUP_FOR_BACKGROUND_WORK_IDLE 1000
+
+//#define PEDOMETER_DEBUG // Just for teste
 
 /*
     ############################################################################################
@@ -170,7 +193,7 @@
 #define CLOCK_ENABLE
 //#define USE_PRIMITIVE_HARDWARE_DRAW_ACCELERATION
 
-#define USE_RTC
+#define RTC_ENABLE
 
 #define SCREEN_ROTATION_0
 //#define SCREEN_ROTATION_90
@@ -195,7 +218,7 @@
 //#define STAND_BY_SLEEP_TYPE     SLEEP_LIGHT
 #define STAND_BY_SLEEP_TYPE     SLEEP_DEEP
 
-#undef SMOOTH_BACKLIGHT_CONTROL_DELAY
+#undef SMOOTH_BACKLIGHT_CONTROL_DELAY_CHANGE
 #undef DISPLAY_BACKLIGHT_CONTROL_ENABLE
 
 #define SMOOTH_ANIMATION_COEFFICIENT    4
@@ -222,38 +245,6 @@ void fillScreen(unsigned char red, unsigned char green, unsigned char blue);
 /*
     ############################################################################################
     #                                     PREDEFINED -                                         #
-    ############################################################################################
-*/
-
-/*
-    ############################################################################################
-    #                                                                                          #
-    #                                         EVENTS +                                         #
-    #                                                                                          #
-    ############################################################################################
-*/
-
-/*
-#define EVENT_BUTTON_PRESSED            0x00
-#define EVENT_BUTTON_RELEASED           0x01
-#define EVENT_BUTTON_LONG_PRESS         0x02
-#define EVENT_ON_TIME_CHANGED           0x03
-#define EVENT_ON_GOING_TO_SLEEP         0x04
-#define EVENT_ON_WAKE_UP                0x05
-
-#define EVENT_ON_TOUCH_START            0x06
-#define EVENT_ON_TOUCH_RELEASED         0x07
-#define EVENT_ON_TOUCH_CLICK            0x08
-#define EVENT_ON_TOUCH_LONG_PRESS       0x09
-#define EVENT_ON_TOUCH_DRAG             0x0A
-#define EVENT_ON_TOUCH_DOUBLE_CLICK     0x0B
-*/
-
-/*
-    ############################################################################################
-    #                                                                                          #
-    #                                         EVENTS -                                         #
-    #                                                                                          #
     ############################################################################################
 */
 
@@ -304,17 +295,37 @@ Application* currentApp;
 */
 
 void setup(){ 
+  #ifdef DEBUG_SERIAL
+      Serial.begin(115200);
+      //delay(100);
+      //d ebug("Serial debug started", 10);
+  #endif
+
+  #ifdef POWERSAVE_ENABLE
+    #ifdef CPU_SLEEP_ENABLE
+      unsigned char wakeUpReason = core_powersave_wakeup_reason();
+      if(wakeUpReason==WAKE_UP_REASON_TIMER){
+        //d ebug("Background start", 10);
+        //core_cpu_setup();
+        driver_controls_setup();
+        backgroundWorkAfterSleep();
+        //debug("Going to sleep again");
+        //debug("", 10);
+        core_cpu_sleep(STAND_BY_SLEEP_TYPE, WAKEUP_FOR_BACKGROUND_WORK_STANDBY);
+      }else{
+        //debug("Not backgtound start", 10);
+      }
+    #endif
+  #endif
+  //debug("**** Main app start", 10);
+
+
   #ifdef BATTERY_ENABLE
     driver_battery_setup();
   #endif
 
-  #ifdef USE_RTC
+  #ifdef RTC_ENABLE
       driver_RTC_setup();
-  #endif
-
-  #ifdef DEBUG_SERIAL
-      Serial.begin(115200);
-      debug("Serial debug started");
   #endif
 
   #ifdef ESP8266
@@ -342,6 +353,10 @@ void setup(){
 
   #ifdef ACCELEROMETER_ENABLE
     driver_accelerometer_setup();
+  #endif
+
+  #ifdef PEDOMETER_ENABLE
+    core_pedometer_setup();
   #endif
   
   currentApp = getApp(STARTING_APP_NUMM);
@@ -383,6 +398,10 @@ void loop(){
     driver_accelerometer_loop();
   #endif
 
+  #ifdef PEDOMETER_ENABLE
+    //core_pedometer_loop(false);
+  #endif
+
   currentApp->onLoop(); 
   //currentApp->onLoop(); 
 
@@ -391,38 +410,7 @@ void loop(){
     ESP.wdtFeed();
   #endif
 
-/*
-  #ifdef CPU_SLEEP_ENABLE
-//driver_cpu_sleep();
-    if(millis() - driver_control_get_last_user_avtivity() > CPU_SLEEP_TIME_DELAY){
-        if(!isInSleep){
-            isInSleep = true;
-            currentApp->onEvent(EVENT_ON_GOING_TO_SLEEP, 0, 0);
-            powerOff_displayDriver();
-        }
-
-        do_cpu_sleep();
-      
-    }else{
-      if(isInSleep){
-        isInSleep = false;
-        driver_cpu_wakeup();
-        currentApp->onEvent(EVENT_ON_WAKE_UP, 0, 0);
-      }
-    }
-    //driver_cpu_wakeup();
-  #endif
-*/
-
 }
-
-/*
-#ifdef CPU_SLEEP_ENABLE
-  void do_cpu_sleep(){
-      driver_cpu_sleep();
-  }
-#endif
-*/
 
 void debug(String string){
   debug(string, 0);
@@ -443,6 +431,7 @@ void debug(String string, int delaytime){
 
     #ifdef DEBUG_SERIAL
       Serial.println(string);
+      delay(delaytime);
     #endif
 
     #ifdef screenDebug
@@ -453,16 +442,6 @@ void debug(String string, int delaytime){
       drawString(string, 5, STYLE_STATUSBAR_HEIGHT + 10, 2);
     #endif
 }
-
-/*
-void debug(const char* string, int delaytime){
-  debug(String(string), delaytime);
-}
-
-void debug(const char* string){
-  debug(String(string));
-}*/
-
 
 /*
     ############################################################################################
@@ -497,6 +476,10 @@ void debug(const char* string){
 #define ICON_BT_CONNECTED           0x14
 #define ICON_BT_NOTCONNECTED        0x15
 #define ICON_BT_OFF                 0x16
+
+#define ICON_LEG                    0x17
+#define ICON_LEG_GREY               0x18
+
 
 #define PARAM_TYPE_ICON             0x01
 #define PARAM_TYPE_NAME             0x02

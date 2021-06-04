@@ -35,12 +35,13 @@ void driver_controls_loop(){
     //if (digitalRead(driver_control_buttonsPins[i])){
     if ((driver_control_isPositive[i]==true) ? (!digitalRead(driver_control_buttonsPins[i])) : (digitalRead(driver_control_buttonsPins[i]))){
 
+      set_core_powersave_lastUserAction();
       last_user_activity = _millis();
       if(driver_control_pressed[i]==false){
         // press start
         driver_control_pressed[i]=true;
         driver_control_time_pressed[i] = _millis();
-        set_core_powersave_lastUserAction();
+        //set_core_powersave_lastUserAction();
         onButtonEvent(EVENT_BUTTON_PRESSED, i);
         //debug("EVENT_BUTTON_PRESSED");
         if(driver_control_DOUBLE_PRESS_lastPress[i]!=0){
@@ -69,7 +70,7 @@ void driver_controls_loop(){
       if(driver_control_pressed[i]==true){
         // released
         driver_control_pressed[i]=false;
-        set_core_powersave_lastUserAction();
+        //set_core_powersave_lastUserAction();
         onButtonEvent(EVENT_BUTTON_RELEASED, i);
         //debug("EVENT_BUTTON_RELEASED");
         

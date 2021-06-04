@@ -12,6 +12,53 @@ uint16_t get_uint16Color(unsigned char red, unsigned char green, unsigned char b
   #endif
 }
 
+void setGradientColor(
+    unsigned char r1, 
+    unsigned char g1, 
+    unsigned char b1, 
+    unsigned char r2, 
+    unsigned char g2, 
+    unsigned char b2, 
+    unsigned int steps, 
+    unsigned int current_steps
+    ){
+
+  unsigned char r;
+  unsigned char g;
+  unsigned char b;
+
+  unsigned char r_min = min(r1,r2);
+  unsigned char g_min = min(g1,g2);
+  unsigned char b_min = min(b1,b2);
+
+  unsigned char r_max = max(r1,r2);
+  unsigned char g_max = max(g1,g2);
+  unsigned char b_max = max(b1,b2);
+
+  float k = (float)current_steps/(float)steps;
+
+  if(r1==r2) r = r1;
+  else{
+    if(r1>r2) r = r_min + ((float)(r_max - r_min))*k;
+    else r = r_max - ((float)(r_max - r_min))*k; 
+  }
+  
+
+  if(g1==g2) g = g1;
+  else{
+    if(g1>g2) g = g_min + ((float)(g_max - g_min))*k;
+    else g = g_max - ((float)(g_max - g_min))*k; 
+  }
+
+  if(b1==b2) b = b1;
+  else{
+    if(b1>b2) b = b_min + ((float)(b_max - b_min))*k;
+    else b = b_max - ((float)(b_max - b_min))*k; 
+  }
+
+  setDrawColor(r, g, b);
+}
+
 /*
 * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * 
                                   FRAMEBUFFER
@@ -23,6 +70,33 @@ FRAMEBUFFER_ENABLE
 FRAMEBUFFER_TWIN_FULL
 FRAMEBUFFER_BYTE_PER_PIXEL
 */
+
+unsigned char current_red;
+unsigned char current_green;
+unsigned char current_blue;
+
+unsigned char get_current_red(){
+  return current_red;
+}
+
+unsigned char get_current_green(){
+  return current_green;
+}
+
+unsigned char get_current_blue(){
+  return current_blue;
+}
+
+void setDrawColor(unsigned char red_new, unsigned char green_new, unsigned char blue_new){
+  current_red     = red_new;
+  current_green   = green_new;
+  current_blue    = blue_new;
+  driver_display_setDrawColor(red_new, green_new, blue_new);
+}
+
+void setDrawColor(uint16_t color){
+  driver_display_setDrawColor(color);
+}
 
 #ifdef FRAMEBUFFER_ENABLE
 
@@ -149,27 +223,33 @@ bool DRAW_LIMITS_getEnable(){
                                   POWER CONTROLL
 * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * 
 */
-
 unsigned char core_display_brightness             = 100;
-unsigned char core_display_brightness_fade        = 20;
-unsigned char core_display_time_delay_to_fade     = 5;
-unsigned char core_display_time_delay_to_poweroff = 5;
 
-void set_core_display_brightness(unsigned char value){ 
-  if(value>100) value = 100;
-  core_display_brightness = value;
-  driver_display_setBrightness(core_display_brightness);
-}
+#ifdef DISPLAY_BACKLIGHT_FADE_CONTROL_ENABLE
+  unsigned char core_display_brightness_fade        = 15;
+  unsigned char core_display_time_delay_to_fade     = 10; //10
+#endif
+unsigned char core_display_time_delay_to_poweroff = 5; //5
 
-void set_core_display_brightness_fade(unsigned char value){ 
-  if(value>100) value = 100;
-  core_display_brightness_fade = value;
-}
+#ifdef DISPLAY_BACKLIGHT_CONTROL_ENABLE
+  void set_core_display_brightness(unsigned char value){ 
+    if(value>100) value = 100;
+    core_display_brightness = value;
+    driver_display_setBrightness(core_display_brightness);
+  }
+#endif
 
-void set_core_display_time_delay_to_fade(unsigned char value){
-  if(value>240) value = 240;
-  core_display_time_delay_to_fade = value;
-}
+#ifdef DISPLAY_BACKLIGHT_FADE_CONTROL_ENABLE
+  void set_core_display_brightness_fade(unsigned char value){ 
+    if(value>100) value = 100;
+    core_display_brightness_fade = value;
+  }
+
+  void set_core_display_time_delay_to_fade(unsigned char value){
+    if(value>240) value = 240;
+    core_display_time_delay_to_fade = value;
+  }
+#endif
 
 void set_core_display_time_delay_to_poweroff(unsigned char value){ 
   if(value==0) value = 1;
@@ -178,8 +258,10 @@ void set_core_display_time_delay_to_poweroff(unsigned char value){
 }
 
 unsigned char get_core_display_brightness(){return core_display_brightness; }
-unsigned char get_core_display_brightness_fade(){return core_display_brightness_fade; }
-unsigned char get_core_display_time_delay_to_fade(){return core_display_time_delay_to_fade; }
+#ifdef DISPLAY_BACKLIGHT_FADE_CONTROL_ENABLE
+  unsigned char get_core_display_brightness_fade(){return core_display_brightness_fade; }
+  unsigned char get_core_display_time_delay_to_fade(){return core_display_time_delay_to_fade; }
+#endif
 unsigned char get_core_display_time_delay_to_poweroff(){return core_display_time_delay_to_poweroff; }
 
 /*
@@ -216,7 +298,7 @@ void setContrastColor(unsigned char r, unsigned char g, unsigned char b){
   contrast_blue   = b;
 } 
 
-void setDrawColor_BackGoundColor(){
+void setDrawColor_BackGroundColor(){
   setDrawColor(getBackgroundColor_red(), getBackgroundColor_green(), getBackgroundColor_blue());
 }
 
@@ -822,6 +904,126 @@ void drawRect(int x0, int y0, int x1, int y1, bool fill){
   }
 }
 
+
+void drawCircle(int x0, int y0, int radius){
+  drawCircle(x0, y0, radius, false);
+}
+
+/*
+void drawArc_fade(int x0, int y0, int radius, int drawFromAngle, int drawToAngle, uint16_t width, byte r, byte g, byte b, byte r_fade, byte g_fade, byte b_fade){
+  float start_angle = DEG_TO_RAD*drawFromAngle;
+  float end_angle = DEG_TO_RAD*drawToAngle;
+  float r = radius;
+
+  float step = 1.0/((float)radius*1.6); // 1.6 imperical value
+  for(float i = start_angle; i < end_angle; i = i + step)
+  {
+    float t_cos = cos(i);
+    float t_sin = sin(i);
+
+    setDrawColor(r_fade, g_fade, b_fade);
+    drawPixel(x0 + t_cos * (r-0.8), y0 + t_sin * (r-0.8));
+    drawPixel(x0 + t_cos * (r-width+0.8), y0 + t_sin * (r-width+0.8));
+
+    setDrawColor(r, g, b);
+    for(float radius_i=r-0.8; radius_i>=r-width+0.8; radius_i-=0.8){ // 0.8 imperical value
+      drawPixel(x0 + t_cos * radius_i, y0 + t_sin * radius_i);
+    }
+  }
+}
+*/
+
+void drawArc(int x0, int y0, int radius, int drawFromAngle, int drawToAngle, uint16_t width){
+  drawArc(x0, y0, radius, drawFromAngle, drawToAngle, width, false);
+}
+
+void drawArc(int x0, int y0, int radius, int drawFromAngle, int drawToAngle, uint16_t width, bool drawFading){
+  double start_angle = DEG_TO_RAD*drawFromAngle;
+  double end_angle = DEG_TO_RAD*drawToAngle;
+  double r = radius;
+
+  double step = 1.0/((double)radius*1.6); // 1.6 imperical value
+
+  unsigned char draw_red    = get_current_red();
+  unsigned char draw_green  = get_current_green();
+  unsigned char draw_blue   = get_current_blue();
+
+  for(double i = start_angle; i < end_angle; i = i + step){
+    double t_cos = cos(i);
+    double t_sin = sin(i);
+    if(!drawFading){
+      for(double radius_i=r; radius_i>=r-width; radius_i-=0.8){ // 0.8 imperical value
+        drawPixel(round(x0 + t_cos * radius_i), round(y0 + t_sin * radius_i));
+      }
+    }else{
+      
+      setDrawColor(draw_red, draw_green, draw_blue);
+
+      //for(double radius_i=r-0.4; radius_i>=r-width+0.4; radius_i-=0.8){ // 0.8 imperical value
+      for(double radius_i=r; radius_i>=r-width; radius_i-=0.8){ // 0.8 imperical value
+        drawPixel(round(x0 + t_cos * radius_i), round(y0 + t_sin * radius_i));
+      }
+
+      setDrawColor( 
+        (draw_red    + getBackgroundColor_red())/3, 
+        (draw_green  + getBackgroundColor_green())/3, 
+        (draw_blue   + getBackgroundColor_blue())/3
+      );
+
+      drawPixel(round(x0 + t_cos * (r)), round(y0 + t_sin * (r)));
+      drawPixel(round(x0 + t_cos * (r-width)), round(y0 + t_sin * (r-width)));
+
+      setDrawColor( 
+        (draw_red    + getBackgroundColor_red())/2, 
+        (draw_green  + getBackgroundColor_green())/2, 
+        (draw_blue   + getBackgroundColor_blue())/2
+      );
+
+      drawPixel(round(x0 + t_cos * (r-0.4)), round(y0 + t_sin * (r-0.4)));
+      drawPixel(round(x0 + t_cos * (r-width+0.8)), round(y0 + t_sin * (r-width+0.8)));
+
+    }
+    
+  }
+}
+
+// The Bresenham algorithm
+void drawCircle(int x0, int y0, int radius, bool fill){
+	int x = 0;
+	int y = radius;
+	int delta = 1 - 2 * radius;
+	int error = 0;
+	while(y >= 0) {
+    if(fill){
+      drawLine(x0 + x, y0 + y, x0 + x, y0);
+      drawLine(x0 + x, y0 - y, x0 + x, y0);
+      drawLine(x0 - x, y0 + y, x0 - x, y0);
+      drawLine(x0 - x, y0 - y, x0 - x, y0);
+    }else{
+      drawPixel(x0 + x, y0 + y);
+      drawPixel(x0 + x, y0 - y);
+      drawPixel(x0 - x, y0 + y);
+      drawPixel(x0 - x, y0 - y);
+    }
+
+		error = 2 * (delta + y) - 1;
+		if(delta < 0 && error <= 0) {
+			++x;
+			delta += 2 * x + 1;
+			continue;
+		}
+		error = 2 * (delta - x) - 1;
+		if(delta > 0 && error > 0) {
+			--y;
+			delta += 1 - 2 * y;
+			continue;
+		}
+		++x;
+		delta += 2 * (x - y);
+		--y;
+	}
+}
+
 // System function
 int treangle_area(int x0, int y0, int x1, int y1, int x2, int y2){
    return abs((x0 - x2)*(y1 - y2) + (x1-x2)*(y2-y0));
@@ -861,7 +1063,7 @@ void drawRect_custom( int x0, int y0, int x1, int y1, int x2, int y2, int x3, in
   }
 }
 
-void drawIcon(bool draw, const unsigned char* data, int x, int y){
+void drawImage(bool draw, const unsigned char* data, int x, int y){
     /*
     DRAW_LIMITS_Enabled
     DRAW_LIMITS_top
@@ -985,15 +1187,45 @@ void drawIcon(bool draw, const unsigned char* data, int x, int y){
 
     }
       
+  #ifdef USE_TYPE2_OF_IMAGES
+    }else if(image_type==0x02){
+      // TYPE 2
+      //image_wigth
+      //image_height
+      if(draw){
+        uint16_t byte1;
+        unsigned char byte2;
+        for(icon_x=0; icon_x<image_wigth; icon_x++){
+          for(icon_y=0; icon_y<image_height; icon_y++){
+            byte1 = readRawChar(data, readPosition); 
+            byte2 = readRawChar(data, readPosition); 
+
+            uint16_t color = (byte1<<8) + byte2;
+          
+            //debug(String(byte1));
+            //debug(String(byte2));
+            //debug(String(color));
+            //return;
+
+            setDrawColor(color);
+            drawPixel(x + icon_x, y + icon_y);
+          }
+        }
+      }else{
+        drawRect(x, y, x+image_wigth, y+image_height, true);
+      }
+      
+  #endif
   }else{
     // Unknow type of image
+    
 
   }
 
 }
 
-void drawIcon(const unsigned char* data, int x, int y){
-  drawIcon(1, data, x, y);
+void drawImage(const unsigned char* data, int x, int y){
+  drawImage(1, data, x, y);
 }
 
 bool getBitInByte(unsigned char currentbyte, unsigned char bitNum){

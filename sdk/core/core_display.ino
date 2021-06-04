@@ -65,12 +65,6 @@ void setGradientColor(
 * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * 
 */
 
-/*
-FRAMEBUFFER_ENABLE
-FRAMEBUFFER_TWIN_FULL
-FRAMEBUFFER_BYTE_PER_PIXEL
-*/
-
 unsigned char current_red;
 unsigned char current_green;
 unsigned char current_blue;
@@ -107,6 +101,10 @@ void setDrawColor(uint16_t color){
 
     #if FRAMEBUFFER_BYTE_PER_PIXEL==2
       #define FRAMEBUFFER_TYPE uint16_t
+    #endif
+
+    #if FRAMEBUFFER_BYTE_PER_PIXEL==1
+      #define FRAMEBUFFER_TYPE uint8_t
     #endif
 
     bool FRAMEBUFFER_isChanged = false;
@@ -148,36 +146,77 @@ void setDrawColor(uint16_t color){
       FRAMEBUFFER_fill(0);
     }
 
-    void FRAMEBUFFER_new_setPixel(uint16_t x, uint16_t y, FRAMEBUFFER_TYPE color){
+    void FRAMEBUFFER_new_setPixel(uint16_t x, uint16_t y, uint16_t color){
       long position = y * (SCREEN_WIDTH-1) + x;
-      FRAMEBUFFER_newFrame[position] = color;
+      FRAMEBUFFER_newFrame[position] = FRAMEBUFFER_16bitColor_to_framebufferColor(color);
     }
 
-    void FRAMEBUFFER_current_setPixel(uint16_t x, uint16_t y, FRAMEBUFFER_TYPE color){
+    void FRAMEBUFFER_current_setPixel(uint16_t x, uint16_t y, uint16_t color){
       long position = y * (SCREEN_WIDTH-1) + x;
-      FRAMEBUFFER_currentFrame[position] = color;
+      FRAMEBUFFER_currentFrame[position] = FRAMEBUFFER_16bitColor_to_framebufferColor(color);
     }
 
-    void FRAMEBUFFER_current_setPixel(uint16_t position, FRAMEBUFFER_TYPE color){
-      FRAMEBUFFER_currentFrame[position] = color;
+    void FRAMEBUFFER_current_setPixel(uint16_t position, uint16_t color){
+      FRAMEBUFFER_currentFrame[position] = FRAMEBUFFER_16bitColor_to_framebufferColor(color);
     }
 
-    FRAMEBUFFER_TYPE FRAMEBUFFER_new_getPixel(uint16_t x, uint16_t y){
+    FRAMEBUFFER_TYPE FRAMEBUFFER_16bitColor_to_framebufferColor(uint16_t color){
+      
+      #if FRAMEBUFFER_BYTE_PER_PIXEL==2
+        return color;
+      #elif FRAMEBUFFER_BYTE_PER_PIXEL==1
+
+        unsigned char r = (color & 0xF800) >> 11; //  5bit
+        unsigned char g = (color & 0x07E0) >> 5;  //  6bit
+        unsigned char b = color & 0x001F;         //  5bit
+
+        r = (r * 7) / 31;
+        g = (g * 7) / 63;
+        b = (b * 3) / 31;
+
+        int bufferCollor = (r<<5) | (g<<2) | b;
+        return (FRAMEBUFFER_TYPE)bufferCollor;
+      #endif
+      
+    }
+
+    uint16_t FRAMEBUFFER_framebufferColor_to_16bitColor(FRAMEBUFFER_TYPE color){
+      
+      #if FRAMEBUFFER_BYTE_PER_PIXEL==2
+        return color;
+      #elif FRAMEBUFFER_BYTE_PER_PIXEL==1
+        
+        unsigned char r = (color & 0b11100000) >> 5; //  3bit
+        unsigned char g = (color & 0b00011100) >> 2;  //  3bit
+        unsigned char b = color & 0b00000011;         //  2bit
+
+        r = (r * 31) / 7;
+        g = (g * 63) / 7;
+        b = (b * 31) / 3;
+
+        uint16_t bufferCollor = (r<<11) | (g<<5) | b;
+
+        return (uint16_t)bufferCollor;
+      #endif
+      
+    }
+
+    uint16_t FRAMEBUFFER_new_getPixel(uint16_t x, uint16_t y){
       long position = y * (SCREEN_WIDTH-1) + x;
-      return FRAMEBUFFER_newFrame[position];
+      return FRAMEBUFFER_framebufferColor_to_16bitColor(FRAMEBUFFER_newFrame[position]);
     }
 
-    FRAMEBUFFER_TYPE FRAMEBUFFER_new_getPixel(uint16_t position){
-      return FRAMEBUFFER_newFrame[position];
+    uint16_t FRAMEBUFFER_new_getPixel(uint16_t position){
+      return FRAMEBUFFER_framebufferColor_to_16bitColor(FRAMEBUFFER_newFrame[position]);
     }
 
-    FRAMEBUFFER_TYPE FRAMEBUFFER_current_getPixel(uint16_t x, uint16_t y){
+    uint16_t FRAMEBUFFER_current_getPixel(uint16_t x, uint16_t y){
       long position = y * (SCREEN_WIDTH-1) + x;
-      return FRAMEBUFFER_currentFrame[position];
+      return FRAMEBUFFER_framebufferColor_to_16bitColor(FRAMEBUFFER_currentFrame[position]);
     }
 
-    FRAMEBUFFER_TYPE FRAMEBUFFER_current_getPixel(uint16_t position){
-      return FRAMEBUFFER_currentFrame[position];
+    uint16_t FRAMEBUFFER_current_getPixel(uint16_t position){
+      return FRAMEBUFFER_framebufferColor_to_16bitColor(FRAMEBUFFER_currentFrame[position]);
     }
 
   #endif

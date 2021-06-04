@@ -1,5 +1,42 @@
+void core_time_onNewDate(){ 
+    // Calling once in a day
+    // Clearing all counting data for a day
+    #ifdef PEDOMETER_ENABLE
+        core_pedometer_newDate();
+    #endif
+
+    debug("New day!", 10);
+}
+
+long getCurrentSystemTime(){
+    #ifdef RTC_ENABLE
+        long currentSystemTime =  ((long)core_time_getHours_byte())*60*60 + ((long)core_time_getMinutes_byte())*60 + ((long)core_time_getSeconds_byte());
+        return currentSystemTime;
+    #else
+        return millis()/1000;
+    #endif
+}
+
+#ifdef RTC_ENABLE
+    RTC_DATA_ATTR unsigned char lastDay = 0;
+    unsigned long driver_RTC_lastTimeRefresh = 0;
+
+    void core_time_driver_RTC_refresh(){
+        core_time_driver_RTC_refresh(false);
+    }
+    void core_time_driver_RTC_refresh(bool hard){
+        if(hard || (millis() - driver_RTC_lastTimeRefresh>=UPDATE_RTC_EVERY)){
+            driver_RTC_refresh(hard);
+            if(core_time_getDate()!=lastDay){
+                core_time_onNewDate();
+                lastDay = core_time_getDate();
+            }
+        }
+    }
+#endif
+
 unsigned char core_time_getHours_byte(){
-    #ifdef USE_RTC
+    #ifdef RTC_ENABLE
         return driver_RTC_getHours();
     #else
         return millis()/(1000*60*60)%24;
@@ -7,7 +44,7 @@ unsigned char core_time_getHours_byte(){
 }
 
 void core_time_setHours(unsigned char hours){
-    #ifdef USE_RTC
+    #ifdef RTC_ENABLE
         driver_RTC_setHours(hours);
     #else
         // TODO
@@ -15,7 +52,7 @@ void core_time_setHours(unsigned char hours){
 }
 
 unsigned char core_time_getMinutes_byte(){
-    #ifdef USE_RTC
+    #ifdef RTC_ENABLE
         return driver_RTC_getMinutes();
     #else
         return millis()/(1000*60)%60;
@@ -23,7 +60,7 @@ unsigned char core_time_getMinutes_byte(){
 }
 
 void core_time_setMinutes(unsigned char minutes){
-    #ifdef USE_RTC
+    #ifdef RTC_ENABLE
         driver_RTC_setMinutes(minutes);
     #else
         // TODO
@@ -31,7 +68,7 @@ void core_time_setMinutes(unsigned char minutes){
 }
 
 unsigned char core_time_getSeconds_byte(){
-    #ifdef USE_RTC
+    #ifdef RTC_ENABLE
         return driver_RTC_getSeconds();
     #else
         return millis()/(1000)%60;
@@ -39,7 +76,7 @@ unsigned char core_time_getSeconds_byte(){
 }
 
 void core_time_setSeconds(unsigned char seconds){
-    #ifdef USE_RTC
+    #ifdef RTC_ENABLE
         driver_RTC_setSeconds(seconds);
     #else
         // TODO
@@ -59,22 +96,22 @@ String core_time_getSeconds_String(){
 }
 
 String core_time_getHourMinuteSecondsTime(){
-    #ifdef USE_RTC
-        driver_RTC_refresh();
+    #ifdef RTC_ENABLE
+        core_time_driver_RTC_refresh();
     #endif
     return core_time_getHours_String() + ":" + core_time_getMinutes_String() + ":" + core_time_getSeconds_String();
 }
 
 String core_time_getHourMinuteTime(){
-    #ifdef USE_RTC
-        driver_RTC_refresh();
+    #ifdef RTC_ENABLE
+        core_time_driver_RTC_refresh();
     #endif
     return core_time_getHours_String() + ":" + core_time_getMinutes_String();
 }
 
 unsigned char core_time_getMonth(){
     //return "February";
-    #ifdef USE_RTC
+    #ifdef RTC_ENABLE
         return driver_RTC_getMonth();
     #else
         return 1;
@@ -144,7 +181,7 @@ String core_time_getMonth_stringShort(){
 }
 
 unsigned char core_time_getDate(){
-    #ifdef USE_RTC
+    #ifdef RTC_ENABLE
         return driver_RTC_getDate();
     #else
         return 1;
@@ -152,7 +189,7 @@ unsigned char core_time_getDate(){
 }
 
 unsigned char core_time_getWeekDay(){
-    #ifdef USE_RTC
+    #ifdef RTC_ENABLE
         return driver_RTC_getWeekDay();
     #else
         return 0;
@@ -202,7 +239,7 @@ String core_time_getWeekDay_stringShort(){
 }
 
 uint16_t core_time_getYear(){
-    #ifdef USE_RTC
+    #ifdef RTC_ENABLE
         return driver_RTC_getYear();
     #else
         return 2021;
@@ -214,7 +251,7 @@ String core_time_getDateFull(){
 }
 
 void core_time_setYear(uint16_t year){
-    #ifdef USE_RTC
+    #ifdef RTC_ENABLE
         return driver_RTC_setYear(year);
     #else
         // TODO
@@ -222,7 +259,7 @@ void core_time_setYear(uint16_t year){
 }
 
 void core_time_setMonth(unsigned char month){
-    #ifdef USE_RTC
+    #ifdef RTC_ENABLE
         return driver_RTC_setMonth(month);
     #else
         // TODO
@@ -230,7 +267,7 @@ void core_time_setMonth(unsigned char month){
 }
 
 void core_time_setDate(unsigned char date){
-    #ifdef USE_RTC
+    #ifdef RTC_ENABLE
         return driver_RTC_setDate(date);
     #else
         // TODO
@@ -238,7 +275,7 @@ void core_time_setDate(unsigned char date){
 }
 
 void core_time_setWeekDay(unsigned char weekDay){
-    #ifdef USE_RTC
+    #ifdef RTC_ENABLE
         return driver_RTC_setWeekDay(weekDay);
     #else
         // TODO
@@ -257,7 +294,7 @@ void core_time_loop(){
                 core_views_statusBar_draw_time(true);
             }
         #endif
-
+        core_time_driver_RTC_refresh();
         currentApp->onEvent(EVENT_ON_TIME_CHANGED, currentTime, 0);
         lastTimeChange = currentTime;
     }

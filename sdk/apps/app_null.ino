@@ -60,16 +60,6 @@ void appNameClass::onEvent(unsigned char event, int val1, int val2){
 
         if(event==EVENT_ON_TOUCH_DRAG){
             // SCREEN SCROLL
-            this->drawIcons(false);
-            this->scroll_x -= val1;
-            if(this->scroll_x<0) scroll_x = 0;
-
-            int max_scroll = (this->getTotalApplicationsInSubMenu(APP_SETTINGS_SUBMENU_MAIN) - 1 ) * SCREEN_WIDTH;
-            if(this->scroll_x>max_scroll) {
-                this->scroll_x = max_scroll;
-            }
-
-            this->drawIcons(true);
         }
 
     #else

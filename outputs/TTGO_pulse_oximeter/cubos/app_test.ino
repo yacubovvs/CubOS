@@ -46,7 +46,7 @@ void appNameClass::onCreate(){
         0x30,0x03,0xFF,0xC0,
     };
 
-    drawIcon(true, testIcon, 70, 70); 
+    drawImage(true, testIcon, 70, 70); 
 
     /* * /
     fillScreen(0, 0, 0);
@@ -89,8 +89,8 @@ void appNameClass::onCreate(){
     drawString("Icon test", 5, STYLE_STATUSBAR_HEIGHT + 10 + 16*0, 2);
     
     for(unsigned char i=0; i<30; i++){
-        drawIcon(true, testIcon, 120, 120);      
-        drawIcon(false, testIcon, 120, 120);      
+        drawImage(true, testIcon, 120, 120);      
+        drawImage(false, testIcon, 120, 120);      
     }
 
     setDrawColor(255, 255, 255);
