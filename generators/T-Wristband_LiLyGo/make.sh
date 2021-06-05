@@ -25,6 +25,7 @@ cp sdk/apps/app_filemanager.ino     outputs/T-Wristband_LiLyGo/cubos/
 cp sdk/apps/app_internet.ino        outputs/T-Wristband_LiLyGo/cubos/
 cp sdk/apps/app_simplegame.ino      outputs/T-Wristband_LiLyGo/cubos/
 cp sdk/apps/app_z_menu.ino          outputs/T-Wristband_LiLyGo/cubos/
+cp sdk/apps/app_pedometer.ino       outputs/T-Wristband_LiLyGo/cubos/
 
 # Drivers
 cp sdk/drivers/driver_battery_T-Wristband_LiLyGo.ino                outputs/T-Wristband_LiLyGo/cubos/     
@@ -44,6 +45,8 @@ cp sdk/core/core_time.ino               outputs/T-Wristband_LiLyGo/cubos/
 cp sdk/core/core_cpu.ino                outputs/T-Wristband_LiLyGo/cubos/  
 cp sdk/core/core_battery.ino            outputs/T-Wristband_LiLyGo/cubos/  
 cp sdk/core/core_powersave.ino          outputs/T-Wristband_LiLyGo/cubos/  
+cp sdk/core/core_background.ino         outputs/T-Wristband_LiLyGo/cubos/  
+cp sdk/core/core_pedometer.ino          outputs/T-Wristband_LiLyGo/cubos/  
 
 #external libs
 cp external_libs/MPU9250_LiLyGO_T-Wristband/MPU9250.cpp                 outputs/T-Wristband_LiLyGo/cubos/ 

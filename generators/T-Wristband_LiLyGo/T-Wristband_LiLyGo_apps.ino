@@ -8,12 +8,9 @@
 
 #define APP_MENU_APPLICATIONS_0             ClockApp
 #define APP_MENU_APPLICATIONS_1             SettingsApp
-#define APP_MENU_APPLICATIONS_2             CompassApp
-#define APP_MENU_APPLICATIONS_3             I2CScannerApp
-#define APP_MENU_APPLICATIONS_4             AlarmApp
-#define APP_MENU_APPLICATIONS_5             SimpleGameApp
-#define APP_MENU_APPLICATIONS_6             TestApplicationApp
-#define APP_MENU_APPLICATIONS_7             BatteryApp
+#define APP_MENU_APPLICATIONS_2             PedometerApp
+#define APP_MENU_APPLICATIONS_3             BatteryApp
+#define APP_MENU_APPLICATIONS_4             I2CScannerApp
 
 /*
     # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
@@ -24,6 +21,11 @@
 */
 
 /*
+#define APP_MENU_APPLICATIONS_5             AppName
+#define APP_MENU_APPLICATIONS_6             AppName
+#define APP_MENU_APPLICATIONS_7             AppName
+#define APP_MENU_APPLICATIONS_8             AppName
+#define APP_MENU_APPLICATIONS_9             AppName
 #define APP_MENU_APPLICATIONS_10            AppName
 #define APP_MENU_APPLICATIONS_11            AppName
 #define APP_MENU_APPLICATIONS_12            AppName

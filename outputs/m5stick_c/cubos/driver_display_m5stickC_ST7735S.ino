@@ -1,5 +1,9 @@
 // Download library from https://github.com/m5stack/M5StickC
-#include <M5StickC.h>
+#ifdef M5STICKC_PLUS
+  #include <M5StickCPlus.h>
+#else
+  #include <M5StickC.h>
+#endif
 
 uint16_t current_drawColor;
 

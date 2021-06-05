@@ -65,15 +65,16 @@
                                  SLEEP TYPES -                               
 */
 
-#define SLEEP_IDLE_CPU           0x01
-#define SLEEP_DEEP          0x02
-#define SLEEP_LIGHT         0x03
-#define SLEEP_MODEM         0x04
-#define SLEEP_DISPLAY       0x05
-#define SLEEP_HIBERNATE     0x03
-#define WAKE_MODEM          0x06
-#define WAKE_DISPLAY        0x07
-#define WAKE                0x08
+#define SLEEP_IDLE_CPU          0x01
+#define SLEEP_DEEP              0x02
+#define SLEEP_LIGHT             0x03
+#define SLEEP_MODEM             0x04
+#define SLEEP_DISPLAY           0x05
+#define SLEEP_HIBERNATE         0x03
+#define WAKE_MODEM              0x06
+#define WAKE_DISPLAY            0x07
+#define WAKE                    0x08
+#define SLEEP_LIGHT_SCREEN_OFF  0x09
 
 
 #define IN_APP_SLEEP_TYPE       SLEEP_LIGHT
@@ -122,13 +123,14 @@
 #define DISPLAY_BACKLIGHT_FADE_CONTROL_ENABLE
 
 #define WAKEUP_FROM_LIGHT_SLEEP_EVERY_MS 1000
-#define WAKEUP_FROM_DEEP_SLEEP_EVERY_SECONDS 60*60*24
+#define WAKEUP_FROM_DEEP_SLEEP_EVERY_SECONDS 60*60*24 // Wake up if no any other background works as pedometer
 
 #define USE_TYPE2_OF_IMAGES
 //#define PEDOMETER_ENABLE
 
-//#define PEDOMETER_STEP_DETECTION_DELAY                  30000
+//#define PEDOMETER_STEP_DETECTION_DELAY                30000
 #define PEDOMETER_STEP_DETECTION_DELAY                  15000
+//#define PEDOMETER_STEP_DETECTION_DELAY                  1000
 #define PEDOMETER_STEP_DETECTION_PERIOD_MS              1000
 #define PEDOMETER_MESURES_IN_STEP_DETECTION_PERIOD      5
 #define PEDOMETER_ENABLE_ON_START                       true
@@ -137,6 +139,10 @@
 #define WAKEUP_FOR_BACKGROUND_WORK_IDLE 1000
 
 //#define PEDOMETER_DEBUG // Just for teste
+
+#define FORCE_DISPLAY_UPDATE_ON_START // Will quick update screen on start and wakeup. Comment on unknown error.
+#define DEFAULT_TIME_TO_POWEROFF_DISPLAY 7
+#define DEFAULT_DELAY_TO_FADE_DISPLAY 7
 
 /*
     ############################################################################################

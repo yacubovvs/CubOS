@@ -590,7 +590,7 @@ void TFT_eSPI::init(uint8_t tc)
   writecommand(TFT_SWRST); // Software reset
 #endif
 
-  delay(150); // Wait for reset to complete
+  delay(50); // Wait for reset to complete
 
   begin_tft_write();
 

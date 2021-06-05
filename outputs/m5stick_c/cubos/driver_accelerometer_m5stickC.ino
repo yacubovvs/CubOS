@@ -1,6 +1,10 @@
 #ifdef ACCELEROMETER_ENABLE
 
-    #include <M5StickC.h>
+    #ifdef M5STICKC_PLUS
+        #include <M5StickCPlus.h>
+    #else
+        #include <M5StickC.h>
+    #endif
 
     float accX = 0.0F; float accY = 0.0F; float accZ = 0.0F;
     float gyroX = 0.0F; float gyroY = 0.0F; float gyroZ = 0.0F;

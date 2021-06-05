@@ -1,4 +1,9 @@
-#include <M5StickC.h>
+#ifdef M5STICKC_PLUS
+  #include <M5StickCPlus.h>
+#else
+  #include <M5StickC.h>
+#endif
+
 RTC_TimeTypeDef RTC_TimeStruct;
 RTC_DateTypeDef RTC_DateStruct;
 

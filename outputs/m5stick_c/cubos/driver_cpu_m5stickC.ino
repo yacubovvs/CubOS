@@ -1,5 +1,11 @@
 #include "esp_sleep.h"
-#include <M5StickC.h>
+
+#ifdef M5STICKC_PLUS
+  #include <M5StickCPlus.h>
+#else
+  #include <M5StickC.h>
+#endif
+
 #include <WiFi.h>
 
 void driver_cpu_setup(){

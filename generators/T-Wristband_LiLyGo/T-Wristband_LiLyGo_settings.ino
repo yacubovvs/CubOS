@@ -35,13 +35,12 @@
 
 #define STARTING_APP_NUMM   -1    // for Mainmenu (default app)
 //#define STARTING_APP_NUMM    1 // Settings
-//#define STARTING_APP_NUMM    7 // Battery
+//#define STARTING_APP_NUMM    2 // Pedometer
+#define STARTING_APP_NUMM    0
 
 #define FONT_SIZE_DEFAULT   1
 
 #define CPU_SLEEP_ENABLE
-
-#define ACCELEROMETER_ENABLE
 
 #define BATTERY_ENABLE
 #define CLOCK_ENABLE
@@ -69,13 +68,19 @@
 #define DRIVER_RTC_INTERRUPT_PIN    34
 
 #define IN_APP_SLEEP_TYPE       SLEEP_LIGHT
-//#define STAND_BY_SLEEP_TYPE     SLEEP_LIGHT
+//#define STAND_BY_SLEEP_TYPE     SLEEP_LIGHT_SCREEN_OFF
 #define STAND_BY_SLEEP_TYPE     SLEEP_DEEP
 
 #undef SMOOTH_BACKLIGHT_CONTROL_DELAY_CHANGE
 #undef DISPLAY_BACKLIGHT_CONTROL_ENABLE
 
 #define SMOOTH_ANIMATION_COEFFICIENT    4
+
+#define ACCELEROMETER_ENABLE
+//#define MAGNITOMETER_ENABLE
+#define PEDOMETER_ENABLE
+//#define PEDOMETER_DEBUG
+#undef DISPLAY_BACKLIGHT_FADE_CONTROL_ENABLE
 /*
     ############################################################################################
     #                                                                                          #

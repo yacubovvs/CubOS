@@ -64,38 +64,56 @@ Application* currentApp;
     ############################################################################################
 */
 
+//#define WAKEUP_DEBUG
+
 void setup(){ 
   #ifdef DEBUG_SERIAL
       Serial.begin(115200);
-      //delay(100);
-      //d ebug("Serial debug started", 10);
+      #ifdef WAKEUP_DEBUG
+        delay(100);
+        debug("Serial debug started", 10);
+      #endif
   #endif
 
   #ifdef POWERSAVE_ENABLE
     #ifdef CPU_SLEEP_ENABLE
       unsigned char wakeUpReason = core_powersave_wakeup_reason();
       if(wakeUpReason==WAKE_UP_REASON_TIMER){
-        //d ebug("Background start", 10);
-        //core_cpu_setup();
+        #ifdef WAKEUP_DEBUG
+          debug("Background start", 10);
+          core_cpu_setup();
+        #endif
         driver_controls_setup();
         backgroundWorkAfterSleep();
-        //debug("Going to sleep again");
-        //debug("", 10);
+        #ifdef WAKEUP_DEBUG
+          debug("Going to sleep again");
+          debug("", 10);
+        #endif
         core_cpu_sleep(STAND_BY_SLEEP_TYPE, WAKEUP_FOR_BACKGROUND_WORK_STANDBY);
       }else{
-        //debug("Not backgtound start", 10);
+        #ifdef WAKEUP_DEBUG
+          debug("Not background start", 10);
+        #endif
       }
     #endif
   #endif
   //debug("**** Main app start", 10);
 
+  driver_display_setup();
+  core_display_setup();
+  
+  #ifdef RTC_ENABLE
+      driver_RTC_setup();
+  #endif
+
+  #ifdef FORCE_DISPLAY_UPDATE_ON_START
+    currentApp = getApp(STARTING_APP_NUMM);
+    core_display_loop();
+    driver_display_loop();
+  #endif
 
   #ifdef BATTERY_ENABLE
     driver_battery_setup();
-  #endif
-
-  #ifdef RTC_ENABLE
-      driver_RTC_setup();
   #endif
 
   #ifdef ESP8266
@@ -105,9 +123,6 @@ void setup(){
   #ifdef CPU_CONTROLL_ENABLE
     core_cpu_setup();
   #endif
-  
-  driver_display_setup();
-  core_display_setup();
 
   #ifdef HARDWARE_BUTTONS_ENABLED
     driver_controls_setup();
@@ -129,7 +144,9 @@ void setup(){
     core_pedometer_setup();
   #endif
   
-  currentApp = getApp(STARTING_APP_NUMM);
+  #ifndef FORCE_DISPLAY_UPDATE_ON_START
+    currentApp = getApp(STARTING_APP_NUMM);
+  #endif
   
 }
 
