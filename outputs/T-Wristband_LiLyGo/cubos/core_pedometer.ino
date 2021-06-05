@@ -8,7 +8,7 @@
     }
 
     #ifndef PEDOMETER_STEPS_IN_SEC
-        #define PEDOMETER_STEPS_IN_SEC                          1.8f
+        #define PEDOMETER_STEPS_IN_SEC                          1.65f
     #endif
 
     #define CORE_PEDOMETER_MESURE_EVERY_MS                      (PEDOMETER_STEP_DETECTION_PERIOD_MS/PEDOMETER_MESURES_IN_STEP_DETECTION_PERIOD)
@@ -26,8 +26,8 @@
     void core_pedometer_setup(){
         // Just for test M5StickC
         #ifdef PEDOMETER_DEBUG
-            pinMode(10, OUTPUT);
-            digitalWrite(10, 1);
+            //pinMode(10, OUTPUT);
+            //digitalWrite(10, 1);
         #endif
     }
 
@@ -229,13 +229,13 @@
                 //
                 #ifdef PEDOMETER_DEBUG
                     debug("Is walking", 10);
-                    if(!inBackground) digitalWrite(10,0);
+                    //if(!inBackground) digitalWrite(10,0);
                 #endif
                 pedometer_steps += (PEDOMETER_STEPS_IN_SEC*( (float)(PEDOMETER_STEP_DETECTION_DELAY + PEDOMETER_STEP_DETECTION_PERIOD_MS)))/1000;
             }else{
                 #ifdef PEDOMETER_DEBUG
                     debug("Is not walking", 10);
-                    if(!inBackground) digitalWrite(10,1);
+                    //if(!inBackground) digitalWrite(10,1);
                 #endif
                 
             }

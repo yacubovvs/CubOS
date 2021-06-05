@@ -48,6 +48,8 @@ void sleep_displayDriver(){
   tft.writecommand(ST7735_SWRESET);
   tft.writecommand(ST7735_SLPIN);
   tft.writecommand(ST7735_DISPOFF);
+
+  driver_display_setBrightness(0);
 }
 
 void wakeup_displayDriver(){
@@ -87,12 +89,12 @@ unsigned char driver_display_getBrightness(){
 
 void driver_display_setBrightness(unsigned int brightness){
   #ifdef DISPLAY_BACKLIGHT_CONTROL_ENABLE
-    if(brightness==0) ledcAttachPin(TFT_BL, 0);
-    else ledcAttachPin(TFT_BL, 1);
+    //if(brightness==0) ledcAttachPin(TFT_BL, 1);
+    //else ledcAttachPin(TFT_BL, 0);
   #else
-    driver_display_screenBrightness = brightness;
-    brightness = (((long)brightness)*1024/100);
-    ledcWrite(0, brightness);
+    //driver_display_screenBrightness = brightness;
+    //brightness = (((long)brightness)*1024/100);
+    //ledcWrite(0, brightness);
   #endif
 }
 

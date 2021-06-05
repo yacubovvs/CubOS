@@ -144,6 +144,8 @@
 #define DEFAULT_TIME_TO_POWEROFF_DISPLAY 7
 #define DEFAULT_DELAY_TO_FADE_DISPLAY 7
 
+//#define DEBUG_SERIAL
+
 /*
     ############################################################################################
     #                                                                                          #

@@ -144,6 +144,8 @@
 #define DEFAULT_TIME_TO_POWEROFF_DISPLAY 7
 #define DEFAULT_DELAY_TO_FADE_DISPLAY 7
 
+//#define DEBUG_SERIAL
+
 /*
     ############################################################################################
     #                                                                                          #
@@ -162,7 +164,7 @@
 //      FOR ESP8266 USE NONOSSDK 2.2.2 +
 // ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! !
 
-#define DEBUG_SERIAL
+//#define DEBUG_SERIAL
 
 #define SCREEN_WIDTH            80     // Screen resolution width
 #define SCREEN_HEIGHT           160     // Screen resolution height
@@ -233,6 +235,8 @@
 #define PEDOMETER_ENABLE
 //#define PEDOMETER_DEBUG
 #undef DISPLAY_BACKLIGHT_FADE_CONTROL_ENABLE
+
+#define PEDOMETER_STEP_DETECTION_DELAY                  15000 // Wake up to check accelerometer
 /*
     ############################################################################################
     #                                                                                          #

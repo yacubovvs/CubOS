@@ -34,6 +34,11 @@ void driver_cpu_sleep(unsigned char sleepType, long timeout){
             break;
         case SLEEP_LIGHT_SCREEN_OFF:
             sleep_displayDriver();
+
+            #ifdef ACCELEROMETER_ENABLE
+                driver_accelerometer_sleep();
+            #endif
+
             gpio_hold_en((gpio_num_t) 26);
             gpio_deep_sleep_hold_en();
             esp_sleep_enable_timer_wakeup(timeout*1000);
