@@ -57,7 +57,7 @@ void driver_cpu_sleep(unsigned char sleepType, long timeout){
             //esp_sleep_enable_ext0_wakeup(GPIO_NUM_33, HIGH);
             gpio_hold_en((gpio_num_t) 26);
             gpio_deep_sleep_hold_en();
-            esp_sleep_enable_timer_wakeup(WAKEUP_FROM_LIGHT_SLEEP_EVERY_MS*1000);
+            esp_sleep_enable_timer_wakeup(timeout*1000);
             //0000000200000000
             /*
             rtc.disableAlarm();

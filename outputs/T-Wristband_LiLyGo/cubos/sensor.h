@@ -13,13 +13,14 @@
 MPU9250 IMU;
 
 void setupMPU9250() {
-  byte c = IMU.readByte(MPU9250_ADDRESS, WHO_AM_I_MPU9250);
+  //byte c = IMU.readByte(MPU9250_ADDRESS, WHO_AM_I_MPU9250);
   //Serial.print("MPU9250 "); Serial.print("I AM "); Serial.print(c, HEX);
   //Serial.print(" I should be "); Serial.println(0x71, HEX);
-  if (c == 0x71) {
+  //if (c == 0x71) {
     //Serial.println("MPU9250 is online...");
     // Start by performing self test and reporting values
-    IMU.MPU9250SelfTest(IMU.SelfTest);
+    //IMU.MPU9250SelfTest(IMU.SelfTest);
+    /*
     if (SerialDebugCalibrate) {
       Serial.print("x-axis self test: acceleration trim within : ");
       Serial.print(IMU.SelfTest[0], 1); Serial.println("% of factory value");
@@ -33,11 +34,11 @@ void setupMPU9250() {
       Serial.print(IMU.SelfTest[4], 1); Serial.println("% of factory value");
       Serial.print("z-axis self test: gyration trim within : ");
       Serial.print(IMU.SelfTest[5], 1); Serial.println("% of factory value");
-    }
+    }*/
     //Serial.println("MPU9250 acceleration and gyration self test done!");
 
     // Calibrate gyro and accelerometers, load biases in bias registers
-    IMU.calibrateMPU9250(IMU.gyroBias, IMU.accelBias);
+    //IMU.calibrateMPU9250(IMU.gyroBias, IMU.accelBias);
 
     IMU.initMPU9250();
     // Initialize device for active mode read of acclerometer, gyroscope, and
@@ -46,11 +47,12 @@ void setupMPU9250() {
 
     // Read the WHO_AM_I register of the magnetometer, this is a good test of
     // communication
-    byte d = IMU.readByte(AK8963_ADDRESS, WHO_AM_I_AK8963);
+    //byte d = IMU.readByte(AK8963_ADDRESS, WHO_AM_I_AK8963);
     //Serial.print("AK8963 "); Serial.print("I AM "); Serial.print(d, HEX);
     //Serial.print(" I should be "); Serial.println(0x48, HEX);
 
     // Get magnetometer calibration from AK8963 ROM
+    /*
     IMU.initAK8963(IMU.magCalibration);
     // Initialize device for active mode read of magnetometer
     //Serial.println("AK8963 initialized for active data mode....");
@@ -64,7 +66,7 @@ void setupMPU9250() {
       Serial.println(IMU.magCalibration[2], 2);
     }
     //Serial.println("AK8963 magCalibration done!");
-  }
+  //}*/
 }
 
 void readMPU9250() {

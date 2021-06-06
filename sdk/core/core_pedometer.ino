@@ -55,6 +55,9 @@
                     if(inBackGroung){
                         #ifdef ACCELEROMETER_ENABLE
                             driver_accelerometer_setup();
+                            #ifdef WAKEUP_DEBUG
+                                debug("Accelerometer is setted up " + String(millis()), 10);;
+                            #endif
                             #ifdef PEDOMETER_DEBUG
                                 debug("Accelerometer is setted up", 10);
                             #endif
@@ -81,7 +84,6 @@
 
     void core_pedometer_mesure_loop(){ core_pedometer_mesure_loop(true); }
     void core_pedometer_mesure_loop(bool inBackGroung){
-
         if(core_pedometer_current_step_detection!=-1){
 
             if(
@@ -106,15 +108,16 @@
                 #ifdef PEDOMETER_DEBUG
                     // debug("PEDOMETER MESURE IN BACKGROUN", 10);
                 #endif
-                /*
-                if( getCurrentSystemTime()==get_core_powersave_lastUserAction()){
-                    core_cpu_sleep(STAND_BY_SLEEP_TYPE, 1);   
-                }*/
+                
+                #ifdef WAKEUP_DEBUG
+                    debug("Mesure in BG "  + String(millis()), 10);
+                #endif
                 core_cpu_sleep(SLEEP_LIGHT, CORE_PEDOMETER_MESURE_EVERY_MS, false); 
                 core_pedometer_mesure_loop(true);
             }
         }
         
+
     }
 
     void core_pedometer_start_step_detection(bool inBackGroung){

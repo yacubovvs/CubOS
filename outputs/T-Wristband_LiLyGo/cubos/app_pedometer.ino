@@ -58,7 +58,8 @@ void appNameClass::onLoop(){
         Write you code onLoop here
     */
     #ifdef ACCELEROMETER_ENABLE
-        core_pedometer_loop(false);
+        //core_pedometer_loop(false);
+        driver_accelerometer_update_accelerometer();
     #endif
    
     currentPrintScreenString = 0;

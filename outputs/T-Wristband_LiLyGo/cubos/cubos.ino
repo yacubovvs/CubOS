@@ -164,8 +164,6 @@
 //      FOR ESP8266 USE NONOSSDK 2.2.2 +
 // ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! !
 
-//#define DEBUG_SERIAL
-
 #define SCREEN_WIDTH            80     // Screen resolution width
 #define SCREEN_HEIGHT           160     // Screen resolution height
 
@@ -236,7 +234,13 @@
 //#define PEDOMETER_DEBUG
 #undef DISPLAY_BACKLIGHT_FADE_CONTROL_ENABLE
 
-#define PEDOMETER_STEP_DETECTION_DELAY                  15000 // Wake up to check accelerometer
+#define PEDOMETER_STEP_DETECTION_DELAY          20000 // Wake up to check accelerometer
+#define DEFAULT_TIME_TO_POWEROFF_DISPLAY        5
+#define DEFAULT_DELAY_TO_FADE_DISPLAY           0
+
+// #define DEBUG_SERIAL
+// #define WAKEUP_DEBUG
+
 /*
     ############################################################################################
     #                                                                                          #
@@ -309,8 +313,6 @@ Application* currentApp;
     ############################################################################################
 */
 
-//#define WAKEUP_DEBUG
-
 void setup(){ 
   #ifdef DEBUG_SERIAL
       Serial.begin(115200);
@@ -325,14 +327,16 @@ void setup(){
       unsigned char wakeUpReason = core_powersave_wakeup_reason();
       if(wakeUpReason==WAKE_UP_REASON_TIMER){
         #ifdef WAKEUP_DEBUG
-          debug("Background start", 10);
-          core_cpu_setup();
+          debug("Background start " + String(millis()), 10);
+          //core_cpu_setup();
         #endif
         driver_controls_setup();
+        #ifdef WAKEUP_DEBUG
+          debug("Backgroung controls inited "  + String(millis()), 10);
+        #endif
         backgroundWorkAfterSleep();
         #ifdef WAKEUP_DEBUG
-          debug("Going to sleep again");
-          debug("", 10);
+          debug("Going to sleep again "  + String(millis()), 10);
         #endif
         core_cpu_sleep(STAND_BY_SLEEP_TYPE, WAKEUP_FOR_BACKGROUND_WORK_STANDBY);
       }else{

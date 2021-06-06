@@ -64,8 +64,6 @@ Application* currentApp;
     ############################################################################################
 */
 
-//#define WAKEUP_DEBUG
-
 void setup(){ 
   #ifdef DEBUG_SERIAL
       Serial.begin(115200);
@@ -80,14 +78,16 @@ void setup(){
       unsigned char wakeUpReason = core_powersave_wakeup_reason();
       if(wakeUpReason==WAKE_UP_REASON_TIMER){
         #ifdef WAKEUP_DEBUG
-          debug("Background start", 10);
-          core_cpu_setup();
+          debug("Background start " + String(millis()), 10);
+          //core_cpu_setup();
         #endif
         driver_controls_setup();
+        #ifdef WAKEUP_DEBUG
+          debug("Backgroung controls inited "  + String(millis()), 10);
+        #endif
         backgroundWorkAfterSleep();
         #ifdef WAKEUP_DEBUG
-          debug("Going to sleep again");
-          debug("", 10);
+          debug("Going to sleep again "  + String(millis()), 10);
         #endif
         core_cpu_sleep(STAND_BY_SLEEP_TYPE, WAKEUP_FOR_BACKGROUND_WORK_STANDBY);
       }else{
