@@ -144,6 +144,8 @@
         int get_analysis_axis_crossings(){          return analysis_axis_crossings;}
     #endif
 
+    #define ABS(x) ((x)>0?(x):-(x))
+
     bool core_pedometer_analyse_steps_mesure(bool inBackground){
 
         // # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
@@ -192,11 +194,13 @@
             }
 
             //analysis_central_weight_value += core_pedometer_step_detection_arrays[i];
+            /*
             if(core_pedometer_step_detection_arrays[i]>=analysis_central_value){
                 analysis_central_weight_value += core_pedometer_step_detection_arrays[i] - analysis_central_value;
             }else{
                 analysis_central_weight_value += analysis_central_value - core_pedometer_step_detection_arrays[i];
-            }
+            }*/
+            analysis_central_weight_value += ABS(core_pedometer_step_detection_arrays[i] - analysis_central_value);
         }
 
         analysis_central_weight_value = analysis_central_weight_value/PEDOMETER_MESURES_IN_STEP_DETECTION_PERIOD;
@@ -230,7 +234,7 @@
                     //&& analysis_axis_crossings<=PEDOMETER_CROSSINGS_MAX 
                     //&& analysis_axis_crossings>=PEDOMETER_CROSSINGS_MIN
                     && analysis_delta_value >= PEDOMETER_DELTA_VALUE_MIN
-                    && analysis_central_value>=PEDOMETER_CENTRALWIGHT_VALUE_MIN
+                    && analysis_central_weight_value>=PEDOMETER_CENTRALWIGHT_VALUE_MIN
                 )
             ){
                 //

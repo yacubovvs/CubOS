@@ -78,12 +78,11 @@ void appNameClass::onLoop(){
     #endif
 
     #ifdef PEDOMETER_DEBUG
-        drawStringOnScreen("delta_value: ");
+        drawStringOnScreen(" ");
+        drawStringOnScreen("Delta: ");
         drawStringOnScreen(String(get_analysis_delta_value()));
-        drawStringOnScreen("central_weight_value: ");
+        drawStringOnScreen("Central weight: ");
         drawStringOnScreen(String(get_analysis_central_weight_value()));
-        drawStringOnScreen("central_value: ");
-        drawStringOnScreen(String(get_analysis_central_value()));
     #endif
     
     
