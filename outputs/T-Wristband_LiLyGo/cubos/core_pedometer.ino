@@ -215,8 +215,12 @@
 
         #define PEDOMETER_CROSSINGS_MIN             (8*1000/PEDOMETER_STEP_DETECTION_PERIOD_MS)
         #define PEDOMETER_CROSSINGS_MAX             (16*1000/PEDOMETER_STEP_DETECTION_PERIOD_MS)
-        #define PEDOMETER_DELTA_VALUE_MIN           0.5f
-        #define PEDOMETER_CENTRALWIGHT_VALUE_MIN    0.1f
+        #ifndef PEDOMETER_DELTA_VALUE_MIN
+            #define PEDOMETER_DELTA_VALUE_MIN           0.5f
+        #endif
+        #ifndef PEDOMETER_CENTRALWIGHT_VALUE_MIN
+            #define PEDOMETER_CENTRALWIGHT_VALUE_MIN    0.1f
+        #endif
 
         // # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 

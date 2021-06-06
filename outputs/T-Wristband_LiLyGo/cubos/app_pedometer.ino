@@ -60,6 +60,7 @@ void appNameClass::onLoop(){
     #ifdef ACCELEROMETER_ENABLE
         //core_pedometer_loop(false);
         driver_accelerometer_update_accelerometer();
+        core_pedometer_loop(false);
     #endif
    
     currentPrintScreenString = 0;
@@ -77,12 +78,12 @@ void appNameClass::onLoop(){
     #endif
 
     #ifdef PEDOMETER_DEBUG
-        //drawStringOnScreen("delta_value: ");
-        //drawStringOnScreen(String(get_analysis_delta_value()));
-        //drawStringOnScreen("central_weight_value: ");
-        //drawStringOnScreen(String(get_analysis_central_weight_value()));
-        //drawStringOnScreen("central_value: ");
-        //drawStringOnScreen(String(get_analysis_central_value()));
+        drawStringOnScreen("delta_value: ");
+        drawStringOnScreen(String(get_analysis_delta_value()));
+        drawStringOnScreen("central_weight_value: ");
+        drawStringOnScreen(String(get_analysis_central_weight_value()));
+        drawStringOnScreen("central_value: ");
+        drawStringOnScreen(String(get_analysis_central_value()));
     #endif
     
     

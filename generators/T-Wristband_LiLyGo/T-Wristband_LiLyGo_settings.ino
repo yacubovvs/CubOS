@@ -80,10 +80,17 @@
 //#define PEDOMETER_DEBUG
 #undef DISPLAY_BACKLIGHT_FADE_CONTROL_ENABLE
 
+//#define PEDOMETER_STEP_DETECTION_DELAY          20000 // Wake up to check accelerometer
 #define PEDOMETER_STEP_DETECTION_DELAY          20000 // Wake up to check accelerometer
 #define DEFAULT_TIME_TO_POWEROFF_DISPLAY        5
 #define DEFAULT_DELAY_TO_FADE_DISPLAY           0
+#define PEDOMETER_STEP_DETECTION_PERIOD_MS              1000
+#define PEDOMETER_MESURES_IN_STEP_DETECTION_PERIOD      5
 
+#define PEDOMETER_CENTRALWIGHT_VALUE_MIN    0.25f
+#define PEDOMETER_DELTA_VALUE_MIN           1.5f
+
+#define PEDOMETER_DEBUG
 // #define DEBUG_SERIAL
 // #define WAKEUP_DEBUG
 

@@ -126,6 +126,7 @@
 
     float driver_accelerometer_get_accel_total(){
         return sqrt(pow(get_driver_accelerometer_x(),2) + pow(get_driver_accelerometer_y(),2) + pow(get_driver_accelerometer_z(),2));
+        //return abs(get_driver_accelerometer_x());
     }
 
 #endif
