@@ -170,7 +170,7 @@ void driver_display_loop(){
   }
 }
 
-void setPixel(int x, int y){
+void display_driver_setPixel(int x, int y){
   sendMessageToDisplay("P " + String(x) + " " + String(y) + "\n");
   driver_display_needToUpdateScreen = true;
   #if defined(SCREEN_ROTATION_90)
@@ -188,7 +188,7 @@ void setDrawColor(unsigned char red_new, unsigned char green_new, unsigned char 
   sendMessageToDisplay("C " + String(red_new) + " " + String(green_new) + " " + String(blue_new) + "\n");
 }
 
-void fillScreen(unsigned char red, unsigned char green, unsigned char blue){
+void deriver_displayfillScreen(unsigned char red, unsigned char green, unsigned char blue){
   //debug("Fill screen");
   setDrawColor(red, green, blue);
   sendMessageToDisplay("F\n");

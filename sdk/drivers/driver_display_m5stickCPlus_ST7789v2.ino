@@ -29,7 +29,7 @@ void powerOn_displayDriver(){
 }
 
 
-void fillScreen(unsigned char red, unsigned char green, unsigned char blue){
+void deriver_displayfillScreen(unsigned char red, unsigned char green, unsigned char blue){
   bool lastLimits = DRAW_LIMITS_getEnable();
   DRAW_LIMITS_setEnable(false);
   setDrawColor(red, green, blue);
@@ -67,7 +67,7 @@ unsigned char driver_display_getBrightness(){
 void driver_display_loop(){
 }
 
-void setPixel(int x, int y){
+void display_driver_setPixel(int x, int y){
   #if defined(SCREEN_ROTATION_90)
     M5.Lcd.drawPixel(SCREEN_WIDTH-x, SCREEN_HEIGHT-y, current_drawColor);
   #elif defined(SCREEN_ROTATION_180)
@@ -79,7 +79,7 @@ void setPixel(int x, int y){
   #endif
 }
 
-void setPixel(int x, int y, uint16_t color){
+void display_driver_setPixel(int x, int y, uint16_t color){
     #if defined(SCREEN_ROTATION_90)
       M5.Lcd.drawPixel(SCREEN_WIDTH-x, SCREEN_HEIGHT-y, color);
     #elif defined(SCREEN_ROTATION_180)

@@ -61,7 +61,7 @@ void powerOn_displayDriver(){
 }
 
 
-void fillScreen(unsigned char red, unsigned char green, unsigned char blue){
+void deriver_displayfillScreen(unsigned char red, unsigned char green, unsigned char blue){
   TEMPORARILY_DISABLE_LIMITS();
 
   #ifdef FRAMEBUFFER_ENABLE
@@ -93,12 +93,12 @@ void driver_display_setBrightness(unsigned char brightness){
 void driver_display_loop(){
 }
 
-void setPixel(int x, int y){
+void display_driver_setPixel(int x, int y){
   //M5.Lcd.drawPixel(SCREEN_WIDTH-x, SCREEN_HEIGHT-y, current_drawColor);
   tft.drawPixel(x, y, current_drawColor);
 }
 
-void setPixel(int x, int y, uint16_t color){
+void display_driver_setPixel(int x, int y, uint16_t color){
   //M5.Lcd.drawPixel(x, y, color);
   tft.drawPixel(x, y, color);
 }

@@ -1,4 +1,5 @@
 
+#include <Arduino.h>
 
 /*
     ############################################################################################
@@ -67,10 +68,8 @@ Application* currentApp;
 void setup(){ 
   #ifdef DEBUG_SERIAL
       Serial.begin(115200);
-      #ifdef WAKEUP_DEBUG
-        delay(100);
-        debug("Serial debug started", 10);
-      #endif
+      delay(100);
+      debug("Serial debug started", 10);
   #endif
 
   #ifdef POWERSAVE_ENABLE
@@ -152,9 +151,12 @@ void setup(){
 
 bool isInSleep = false;
 void loop(){
-  
   core_display_loop();
   driver_display_loop();
+
+  #ifdef CPU_CONTROLL_ENABLE
+    core_cpu_loop();
+  #endif
 
   #ifdef HARDWARE_BUTTONS_ENABLED
     driver_controls_loop();
@@ -171,10 +173,6 @@ void loop(){
 
   #ifdef CLOCK_ENABLE
     core_time_loop();
-  #endif
-
-  #ifdef CPU_CONTROLL_ENABLE
-    core_cpu_loop();
   #endif
 
   #ifdef POWERSAVE_ENABLE

@@ -476,7 +476,7 @@ void driver_display_loop(){
   }
 }
 
-void setPixel(int x, int y){
+void display_driver_setPixel(int x, int y){
   sendMessageToDisplay("P " + String(x) + " " + String(y) + "\n");
   driver_display_needToUpdateScreen = true;
   #if defined(SCREEN_ROTATION_90)
@@ -1986,7 +1986,7 @@ void core_display_loop(){
               uint16_t newColor = FRAMEBUFFER_new_getPixel(position);
               if(FRAMEBUFFER_current_getPixel(position)!=newColor){
                 //if(getDrawColor()!=newColor) setDrawColor(newColor);
-                setPixel(x, y, newColor);
+                display_driver_setPixel(x, y, newColor);
                 //if(x>=SCREEN_WIDTH) debug("XMORE!");
                 //if(y>=SCREEN_HEIGHT) debug("YMORE!");
 
@@ -2030,10 +2030,10 @@ void drawPixel(int x, int y){
 
       if(!getFRAMEBUFFER_isChanged()) setFRAMEBUFFER_isChanged(true);
       
-      //setPixel(x, y);
+      //display_driver_setPixel(x, y);
     #endif
   #else
-    setPixel(x, y);
+    display_driver_setPixel(x, y);
   #endif
   
 }

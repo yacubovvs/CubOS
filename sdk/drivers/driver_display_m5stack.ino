@@ -23,11 +23,11 @@ void driver_display_setup(){
   M5.Lcd.setCursor(0, 0);
 }
 
-void fillScreen(unsigned char red, unsigned char green, unsigned char blue){
+void deriver_displayfillScreen(unsigned char red, unsigned char green, unsigned char blue){
   M5.Lcd.fillScreen(get_m5ColorFromPallette(red, green, blue));
 }
 
-void setPixel(int x, int y){
+void display_driver_setPixel(int x, int y){
 	M5.Lcd.drawPixel(x, y, current_drawColor);
 }
 

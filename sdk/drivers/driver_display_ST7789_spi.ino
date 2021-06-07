@@ -47,7 +47,7 @@ void powerOn_displayDriver(){
 }
 
 
-void fillScreen(unsigned char red, unsigned char green, unsigned char blue){
+void deriver_displayfillScreen(unsigned char red, unsigned char green, unsigned char blue){
   tft.fillScreen(get_uint16Color(red, green, blue));
 }
 
@@ -55,7 +55,7 @@ void driver_display_loop(){
   
 }
 
-void setPixel(int x, int y){
+void display_driver_setPixel(int x, int y){
   #if defined(SCREEN_ROTATION_90)
     tft.drawPixel(SCREEN_WIDTH-x, SCREEN_HEIGHT-y, current_drawColor);
   #elif defined(SCREEN_ROTATION_180)
