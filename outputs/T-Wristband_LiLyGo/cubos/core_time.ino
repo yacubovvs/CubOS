@@ -294,12 +294,16 @@ void core_time_loop(){
                 core_views_statusBar_draw_time(true);
             }
         #endif
-        core_time_driver_RTC_refresh();
+        #ifdef RTC_ENABLE
+            core_time_driver_RTC_refresh();
+        #endif
         currentApp->onEvent(EVENT_ON_TIME_CHANGED, currentTime, 0);
         lastTimeChange = currentTime;
     }
 }
 
 void core_time_setAlarmBySeconds(unsigned char seconds){
-    driver_RTC_setAlarmBySeconds(seconds);
+    #ifdef RTC_ENABLE
+        driver_RTC_setAlarmBySeconds(seconds);
+    #endif
 }

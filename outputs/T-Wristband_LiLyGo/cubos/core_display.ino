@@ -1,3 +1,5 @@
+#include <Arduino.h>
+
 uint16_t get_uint16Color(unsigned char red, unsigned char green, unsigned char blue){
   #ifdef SCREEN_INVERT_COLORS
     red = 255 - red;
@@ -135,6 +137,7 @@ void setDrawColor(uint16_t color){
     }
 
     void FRAMEBUFFER_reset(){
+      
       #ifdef FRAMEBUFFER_PSRAM
         FRAMEBUFFER_currentFrame  = (FRAMEBUFFER_TYPE *)ps_malloc(FRAMEBUFFER_SIZE);
         FRAMEBUFFER_newFrame      = (FRAMEBUFFER_TYPE *)ps_malloc(FRAMEBUFFER_SIZE);
@@ -222,6 +225,27 @@ void setDrawColor(uint16_t color){
   #endif
 
 #endif
+
+void fillScreen(unsigned char red, unsigned char green, unsigned char blue){
+  TEMPORARILY_DISABLE_LIMITS();
+
+  #ifdef FRAMEBUFFER_ENABLE
+
+    setDrawColor(red, green, blue);
+    for(int x=0; x<SCREEN_WIDTH; x++){
+      for(int y=0; y<SCREEN_HEIGHT; y++){
+        drawPixel(x,y);
+      }
+    }
+
+  #else
+
+    deriver_displayfillScreen(red, green, blue);
+
+  #endif
+
+  TEMPORARILY_RESTORE_LIMITS();
+}
 
 /*
 * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * 
@@ -790,7 +814,7 @@ void core_display_loop(){
               uint16_t newColor = FRAMEBUFFER_new_getPixel(position);
               if(FRAMEBUFFER_current_getPixel(position)!=newColor){
                 //if(getDrawColor()!=newColor) setDrawColor(newColor);
-                setPixel(x, y, newColor);
+                display_driver_setPixel(x, y, newColor);
                 //if(x>=SCREEN_WIDTH) debug("XMORE!");
                 //if(y>=SCREEN_HEIGHT) debug("YMORE!");
 
@@ -834,10 +858,10 @@ void drawPixel(int x, int y){
 
       if(!getFRAMEBUFFER_isChanged()) setFRAMEBUFFER_isChanged(true);
       
-      //setPixel(x, y);
+      //display_driver_setPixel(x, y);
     #endif
   #else
-    setPixel(x, y);
+    display_driver_setPixel(x, y);
   #endif
   
 }

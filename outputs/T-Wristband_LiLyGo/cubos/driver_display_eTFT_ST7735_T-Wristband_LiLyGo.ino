@@ -62,7 +62,7 @@ void powerOn_displayDriver(){
 }
 
 
-void fillScreen(unsigned char red, unsigned char green, unsigned char blue){
+void deriver_displayfillScreen(unsigned char red, unsigned char green, unsigned char blue){
   TEMPORARILY_DISABLE_LIMITS();
 
   #ifdef FRAMEBUFFER_ENABLE
@@ -101,12 +101,12 @@ void driver_display_setBrightness(unsigned int brightness){
 void driver_display_loop(){
 }
 
-void setPixel(int x, int y){
+void display_driver_setPixel(int x, int y){
   //M5.Lcd.drawPixel(SCREEN_WIDTH-x, SCREEN_HEIGHT-y, current_drawColor);
   tft.drawPixel(x, y, current_drawColor);
 }
 
-void setPixel(int x, int y, uint16_t color){
+void display_driver_setPixel(int x, int y, uint16_t color){
   //M5.Lcd.drawPixel(x, y, color);
   tft.drawPixel(x, y, color);
 }
@@ -114,47 +114,3 @@ void setPixel(int x, int y, uint16_t color){
 uint16_t getDrawColor(){
   return current_drawColor;
 }
-
-/*
-#ifdef USE_PRIMITIVE_HARDWARE_DRAW_ACCELERATION
-  void driver_display_drawFastVLine(int16_t x, int16_t y, int16_t h){
-
-    #if defined(SCREEN_ROTATION_90)
-      //tft.drawFastVLine(SCREEN_WIDTH-x, SCREEN_HEIGHT-y, h+1, current_drawColor);
-    #elif defined(SCREEN_ROTATION_180)
-      //tft.drawFastVLine(SCREEN_WIDTH-x, SCREEN_HEIGHT-y-h, h+1, current_drawColor);
-    #elif defined(SCREEN_ROTATION_270)
-      //tft.drawFastVLine(SCREEN_WIDTH-x, SCREEN_HEIGHT-y, h+1, current_drawColor);
-    #else
-      //tft.drawFastVLine(x, y, h+1, current_drawColor);
-    #endif
-    
-
-  }
-
-  void driver_display_drawFastHLine(int16_t x, int16_t y, int16_t h){
-    
-    #if defined(SCREEN_ROTATION_90)
-      //tft.drawFastHLine(SCREEN_WIDTH-x, SCREEN_HEIGHT-y, h+1, current_drawColor);
-    #elif defined(SCREEN_ROTATION_180)
-      //tft.drawFastHLine(SCREEN_WIDTH-x-h, SCREEN_HEIGHT-y, h+1, current_drawColor);
-    #elif defined(SCREEN_ROTATION_270)
-      //tft.drawFastHLine(SCREEN_WIDTH-x, SCREEN_HEIGHT-y, h+1, current_drawColor);
-    #else
-      //tft.drawFastHLine(x, y, h+1, current_drawColor);
-    #endif
-  }
-
-  void driver_display_fillRect(int16_t x, int16_t y, int16_t w, int16_t h){
-    #if defined(SCREEN_ROTATION_90)
-      //tft.fillRect(SCREEN_WIDTH-x-w, SCREEN_HEIGHT-y-h, w+1, h+1, current_drawColor);
-    #elif defined(SCREEN_ROTATION_180)
-      //tft.fillRect(SCREEN_WIDTH-x-w, SCREEN_HEIGHT-y-h, w+1, h+1, current_drawColor);
-    #elif defined(SCREEN_ROTATION_270)
-      //tft.fillRect(SCREEN_WIDTH-x-w, SCREEN_HEIGHT-y-h, w+1, h+1, current_drawColor);
-    #else
-      //tft.fillRect(x, y, w+1, h+1, current_drawColor);
-    #endif
-  }
-#endif
-*/

@@ -117,6 +117,7 @@
 
 #define UPDATE_BATTERY_EVERY_MS 3000
 #define SMOOTH_BACKLIGHT_CONTROL_DELAY_CHANGE  4
+#define BATTERY_ENABLE
 
 // #define ACCELEROMETER_ENABLE
 #define DISPLAY_BACKLIGHT_CONTROL_ENABLE
@@ -234,14 +235,14 @@
 //#define PEDOMETER_DEBUG
 #undef DISPLAY_BACKLIGHT_FADE_CONTROL_ENABLE
 
-#define PEDOMETER_STEP_DETECTION_DELAY          20000 // Wake up to check accelerometer
+#define PEDOMETER_STEP_DETECTION_DELAY          15000 // Wake up to check accelerometer
 //#define PEDOMETER_STEP_DETECTION_DELAY          1000 // Wake up to check accelerometer
 #define DEFAULT_TIME_TO_POWEROFF_DISPLAY        5
 #define DEFAULT_DELAY_TO_FADE_DISPLAY           0
 #define PEDOMETER_STEP_DETECTION_PERIOD_MS              1000
 #define PEDOMETER_MESURES_IN_STEP_DETECTION_PERIOD      5
 
-#define PEDOMETER_DELTA_VALUE_MIN           1.3f
+#define PEDOMETER_DELTA_VALUE_MIN           0.5f
 #define PEDOMETER_CENTRALWIGHT_VALUE_MIN    0.2f
 
 //#define PEDOMETER_DEBUG
@@ -255,6 +256,7 @@
     #                                                                                          #
     ############################################################################################
 */
+#include <Arduino.h>
 
 /*
     ############################################################################################
@@ -323,10 +325,8 @@ Application* currentApp;
 void setup(){ 
   #ifdef DEBUG_SERIAL
       Serial.begin(115200);
-      #ifdef WAKEUP_DEBUG
-        delay(100);
-        debug("Serial debug started", 10);
-      #endif
+      delay(100);
+      debug("Serial debug started", 10);
   #endif
 
   #ifdef POWERSAVE_ENABLE
@@ -408,9 +408,12 @@ void setup(){
 
 bool isInSleep = false;
 void loop(){
-  
   core_display_loop();
   driver_display_loop();
+
+  #ifdef CPU_CONTROLL_ENABLE
+    core_cpu_loop();
+  #endif
 
   #ifdef HARDWARE_BUTTONS_ENABLED
     driver_controls_loop();
@@ -427,10 +430,6 @@ void loop(){
 
   #ifdef CLOCK_ENABLE
     core_time_loop();
-  #endif
-
-  #ifdef CPU_CONTROLL_ENABLE
-    core_cpu_loop();
   #endif
 
   #ifdef POWERSAVE_ENABLE

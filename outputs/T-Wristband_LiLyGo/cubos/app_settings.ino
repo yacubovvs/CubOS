@@ -516,83 +516,102 @@ void appNameClass::onLoop(){
         }
     #endif
     if(currentSubMenu==APP_SETTINGS_SUBMENU_SET_TIME){
-        if(stillPressingSelect_time!=0 && millis()-this->stillPressingSelect_time>=DRIVER_CONTROLS_DELAY_BEFORE_MULTY_PRESS){
-            stillPressingSelect_time = millis();
-            switch(app_settings_selectedAppIndex){
-                case 0:
-                    // Add hours
-                    core_time_setHours(core_time_getHours_byte() + 1);
-                    break;
-                case 1:
-                    // Add minutes
-                    core_time_setMinutes(core_time_getMinutes_byte() + 1);
-                    break;
-                case 2:
-                    // Reset seconds
-                    core_time_setSeconds(0);
-                    break;
-            } 
-            this->drawIcons(false);
-            this->drawIcons(true);
-        }
+        #if (DRIVER_CONTROLS_TOTALBUTTONS == 2 || DRIVER_CONTROLS_TOTALBUTTONS == 1)
+            if(stillPressingSelect_time!=0 && millis()-this->stillPressingSelect_time>=DRIVER_CONTROLS_DELAY_BEFORE_MULTY_PRESS){
+                stillPressingSelect_time = millis();
+                switch(app_settings_selectedAppIndex){
+                    case 0:
+                        // Add hours
+                        core_time_setHours(core_time_getHours_byte() + 1);
+                        break;
+                    case 1:
+                        // Add minutes
+                        core_time_setMinutes(core_time_getMinutes_byte() + 1);
+                        break;
+                    case 2:
+                        // Reset seconds
+                        core_time_setSeconds(0);
+                        break;
+                } 
+                this->drawIcons(false);
+                this->drawIcons(true);
+            }
+        #endif
     }else if(currentSubMenu==APP_SETTINGS_SUBMENU_SET_DATE){
-        if(stillPressingSelect_time!=0 && millis()-this->stillPressingSelect_time>=DRIVER_CONTROLS_DELAY_BEFORE_MULTY_PRESS){
-            stillPressingSelect_time = millis();
-            switch(app_settings_selectedAppIndex){
-                case 0:
-                    // Add year
-                    core_time_setYear(core_time_getYear() + 1);
-                    break;
-                case 1:
-                    // Add month
-                    core_time_setMonth(core_time_getMonth() + 1);
-                    break;
-                case 2:
-                    // Add date
-                    core_time_setDate(core_time_getDate() + 1);
-                    break;
-                case 3:
-                    // Set week day
-                    core_time_setWeekDay(core_time_getWeekDay() + 1);
-                    break;
-            } 
-            this->drawIcons(false);
-            this->drawIcons(true);
-        }
+        #if (DRIVER_CONTROLS_TOTALBUTTONS == 2 || DRIVER_CONTROLS_TOTALBUTTONS == 1)
+            if(stillPressingSelect_time!=0 && millis()-this->stillPressingSelect_time>=DRIVER_CONTROLS_DELAY_BEFORE_MULTY_PRESS){
+                stillPressingSelect_time = millis();
+                switch(app_settings_selectedAppIndex){
+                    case 0:
+                        // Add year
+                        core_time_setYear(core_time_getYear() + 1);
+                        break;
+                    case 1:
+                        // Add month
+                        core_time_setMonth(core_time_getMonth() + 1);
+                        break;
+                    case 2:
+                        // Add date
+                        core_time_setDate(core_time_getDate() + 1);
+                        break;
+                    case 3:
+                        // Set week day
+                        core_time_setWeekDay(core_time_getWeekDay() + 1);
+                        break;
+                } 
+                this->drawIcons(false);
+                this->drawIcons(true);
+            }
+        #endif
     }else if(currentSubMenu==APP_SETTINGS_SUBMENU_SCREEN){
-        if(stillPressingSelect_time!=0 && millis()-this->stillPressingSelect_time>=DRIVER_CONTROLS_DELAY_BEFORE_MULTY_PRESS){
-            stillPressingSelect_time = millis();
-            int value = 0;
+        #if (DRIVER_CONTROLS_TOTALBUTTONS == 2 || DRIVER_CONTROLS_TOTALBUTTONS == 1)
+            if(stillPressingSelect_time!=0 && millis()-this->stillPressingSelect_time>=DRIVER_CONTROLS_DELAY_BEFORE_MULTY_PRESS){
+                stillPressingSelect_time = millis();
+                int value = 0;
 
-            this->drawIcons(false);
-            switch(app_settings_selectedAppIndex){
-                case 0:
-                    #ifdef DISPLAY_BACKLIGHT_CONTROL_ENABLE
-                        // Change display brightness
-                        value = get_core_display_brightness();
-                        if(value>=100) value = 0;
-                        else value+=5;
-                        if(value==0) value = 1;
-                        if(value==6) value = 5;
-                        set_core_display_brightness(value);
-                    #endif
-                    break;
-                case 1:
-                    #ifdef DISPLAY_BACKLIGHT_FADE_CONTROL_ENABLE
-                        // Change display fade brightness
-                        value = get_core_display_brightness_fade();
-                        if(value>=100) value = 0;
-                        else value+=5;
-                        if(value==0) value = 1;
-                        if(value==6) value = 5;
-                        set_core_display_brightness_fade(value);
-                    #endif
-                    break;
-                case 2:
-                    #ifdef DISPLAY_BACKLIGHT_FADE_CONTROL_ENABLE
-                        // Change time delay to fade
-                        value = get_core_display_time_delay_to_fade();
-                        if(value>=240) value = 0;
+                this->drawIcons(false);
+                switch(app_settings_selectedAppIndex){
+                    case 0:
+                        #ifdef DISPLAY_BACKLIGHT_CONTROL_ENABLE
+                            // Change display brightness
+                            value = get_core_display_brightness();
+                            if(value>=100) value = 0;
+                            else value+=5;
+                            if(value==0) value = 1;
+                            if(value==6) value = 5;
+                            set_core_display_brightness(value);
+                        #endif
+                        break;
+                    case 1:
+                        #ifdef DISPLAY_BACKLIGHT_FADE_CONTROL_ENABLE
+                            // Change display fade brightness
+                            value = get_core_display_brightness_fade();
+                            if(value>=100) value = 0;
+                            else value+=5;
+                            if(value==0) value = 1;
+                            if(value==6) value = 5;
+                            set_core_display_brightness_fade(value);
+                        #endif
+                        break;
+                    case 2:
+                        #ifdef DISPLAY_BACKLIGHT_FADE_CONTROL_ENABLE
+                            // Change time delay to fade
+                            value = get_core_display_time_delay_to_fade();
+                            if(value>=240) value = 0;
+                            else{
+                                if(value<4)         value+=1;
+                                else if(value<10)   value+=2;
+                                else if(value<30)   value+=5;
+                                else if(value<100)  value+=10;
+                                else value+=20;
+                            }
+                            set_core_display_time_delay_to_fade(value);
+                            break;
+                        #endif
+                    case 3:
+                        // Change time delay to poweroff
+                        value = get_core_display_time_delay_to_poweroff();
+                        if(value>=240) value = 1;
                         else{
                             if(value<4)         value+=1;
                             else if(value<10)   value+=2;
@@ -600,25 +619,12 @@ void appNameClass::onLoop(){
                             else if(value<100)  value+=10;
                             else value+=20;
                         }
-                        set_core_display_time_delay_to_fade(value);
+                        set_core_display_time_delay_to_poweroff(value);
                         break;
-                    #endif
-                case 3:
-                    // Change time delay to poweroff
-                    value = get_core_display_time_delay_to_poweroff();
-                    if(value>=240) value = 1;
-                    else{
-                        if(value<4)         value+=1;
-                        else if(value<10)   value+=2;
-                        else if(value<30)   value+=5;
-                        else if(value<100)  value+=10;
-                        else value+=20;
-                    }
-                    set_core_display_time_delay_to_poweroff(value);
-                    break;
-            } 
-            this->drawIcons(true);
-        }
+                } 
+                this->drawIcons(true);
+            }
+        #endif
     }
 
     
@@ -974,8 +980,12 @@ String appNameClass::getApplicationSubTitle(unsigned char submenu, unsigned char
                 case 3:
                     if(getLast) return this->lastBatteryString;
                     else{
-                        this->lastBatteryString = String(core_battery_getPercent()) + "%";
-                        return this->lastBatteryString;
+                        #ifdef BATTERY_ENABLE
+                            this->lastBatteryString = String(core_battery_getPercent()) + "%";
+                            return this->lastBatteryString;
+                        #else
+                            return "-";
+                        #endif
                     }
                 case 4:
                     return "Calibrate";

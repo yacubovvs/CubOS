@@ -10,6 +10,7 @@
     }
 
     void core_cpu_loop(){
+        driver_cpu_loop();
     }
     void core_cpu_sleep(unsigned char SLEEP_TYPE){
         core_cpu_sleep(SLEEP_TYPE, 0, true);
