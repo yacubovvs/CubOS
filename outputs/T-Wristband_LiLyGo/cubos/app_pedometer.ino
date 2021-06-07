@@ -114,6 +114,7 @@ void appNameClass::onEvent(unsigned char event, int val1, int val2){
                 if(val1==BUTTON_SELECT){
                     acceleration_max = 0;
                     acceleration_min = 0;
+                    set_pedometer_steps(0);
                 }else if(val1==BUTTON_BACK){
                     startApp(-1);
                 }    
