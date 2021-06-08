@@ -1,4 +1,3 @@
-#include <Arduino.h>
 
 uint16_t get_uint16Color(unsigned char red, unsigned char green, unsigned char blue){
   #ifdef SCREEN_INVERT_COLORS
@@ -976,6 +975,43 @@ void drawRect(int x0, int y0, int x1, int y1, bool fill){
   }
 }
 
+// The Bresenham algorithm
+void drawCircle(int x0, int y0, int radius, bool fill){
+	int x = 0;
+	int y = radius;
+	int delta = 1 - 2 * radius;
+	int error = 0;
+	while(y >= 0) {
+    if(fill){
+      drawLine(x0 + x, y0 + y, x0 + x, y0);
+      drawLine(x0 + x, y0 - y, x0 + x, y0);
+      drawLine(x0 - x, y0 + y, x0 - x, y0);
+      drawLine(x0 - x, y0 - y, x0 - x, y0);
+    }else{
+      drawPixel(x0 + x, y0 + y);
+      drawPixel(x0 + x, y0 - y);
+      drawPixel(x0 - x, y0 + y);
+      drawPixel(x0 - x, y0 - y);
+    }
+
+		error = 2 * (delta + y) - 1;
+		if(delta < 0 && error <= 0) {
+			++x;
+			delta += 2 * x + 1;
+			continue;
+		}
+		error = 2 * (delta - x) - 1;
+		if(delta > 0 && error > 0) {
+			--y;
+			delta += 1 - 2 * y;
+			continue;
+		}
+		++x;
+		delta += 2 * (x - y);
+		--y;
+	}
+}
+
 
 void drawCircle(int x0, int y0, int radius){
   drawCircle(x0, y0, radius, false);
@@ -1004,10 +1040,6 @@ void drawArc_fade(int x0, int y0, int radius, int drawFromAngle, int drawToAngle
   }
 }
 */
-
-void drawArc(int x0, int y0, int radius, int drawFromAngle, int drawToAngle, uint16_t width){
-  drawArc(x0, y0, radius, drawFromAngle, drawToAngle, width, false);
-}
 
 void drawArc(int x0, int y0, int radius, int drawFromAngle, int drawToAngle, uint16_t width, bool drawFading){
   double start_angle = DEG_TO_RAD*drawFromAngle;
@@ -1059,41 +1091,8 @@ void drawArc(int x0, int y0, int radius, int drawFromAngle, int drawToAngle, uin
   }
 }
 
-// The Bresenham algorithm
-void drawCircle(int x0, int y0, int radius, bool fill){
-	int x = 0;
-	int y = radius;
-	int delta = 1 - 2 * radius;
-	int error = 0;
-	while(y >= 0) {
-    if(fill){
-      drawLine(x0 + x, y0 + y, x0 + x, y0);
-      drawLine(x0 + x, y0 - y, x0 + x, y0);
-      drawLine(x0 - x, y0 + y, x0 - x, y0);
-      drawLine(x0 - x, y0 - y, x0 - x, y0);
-    }else{
-      drawPixel(x0 + x, y0 + y);
-      drawPixel(x0 + x, y0 - y);
-      drawPixel(x0 - x, y0 + y);
-      drawPixel(x0 - x, y0 - y);
-    }
-
-		error = 2 * (delta + y) - 1;
-		if(delta < 0 && error <= 0) {
-			++x;
-			delta += 2 * x + 1;
-			continue;
-		}
-		error = 2 * (delta - x) - 1;
-		if(delta > 0 && error > 0) {
-			--y;
-			delta += 1 - 2 * y;
-			continue;
-		}
-		++x;
-		delta += 2 * (x - y);
-		--y;
-	}
+void drawArc(int x0, int y0, int radius, int drawFromAngle, int drawToAngle, uint16_t width){
+  drawArc(x0, y0, radius, drawFromAngle, drawToAngle, width, false);
 }
 
 // System function

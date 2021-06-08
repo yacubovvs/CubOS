@@ -16,6 +16,9 @@
 #endif
 */
 
+uint16_t current_drawColor;
+unsigned char driver_display_screenBrightness = 0;
+
 #include <iostream>
 
 #if defined(_WIN32) || defined(_WIN64)
@@ -53,10 +56,6 @@
 #endif
 
 bool driver_display_needToUpdateScreen = false;
-
-uint16_t get_uint16Color(unsigned char red, unsigned char green, unsigned char blue){
-  return ( (red*31/255) <<11)|( (green*31/255) <<6)|( (blue*31/255) <<0);
-}
 
 #if defined(_WIN32) || defined(_WIN64) 
 #else
@@ -184,7 +183,21 @@ void display_driver_setPixel(int x, int y){
   #endif
 }
 
-void setDrawColor(unsigned char red_new, unsigned char green_new, unsigned char blue_new){
+void driver_display_setDrawColor(uint16_t color){
+  current_drawColor = color;
+
+  unsigned char r = (color & 0xF800) >> 11; //  5bit
+  unsigned char g = (color & 0x07E0) >> 5;  //  6bit
+  unsigned char b = color & 0x001F;         //  5bit
+
+  r = (r * 255) / 31;
+  g = (g * 255) / 63;
+  b = (b * 255) / 31;
+  sendMessageToDisplay("C " + String(r) + " " + String(g) + " " + String(b) + "\n");
+}
+
+void driver_display_setDrawColor(unsigned char red_new, unsigned char green_new, unsigned char blue_new){
+  current_drawColor = get_uint16Color(red_new, green_new, blue_new);
   sendMessageToDisplay("C " + String(red_new) + " " + String(green_new) + " " + String(blue_new) + "\n");
 }
 
@@ -296,3 +309,9 @@ void driver_display_updateControls(){
     #endif
   }
 #endif
+
+void driver_display_setBrightness(unsigned char brightness){
+  // brightness: 0..100%
+  brightness =  (unsigned char)((int)brightness*255/100);
+  //M5.Lcd.setBrightness(brightness);
+}

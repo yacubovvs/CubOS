@@ -17,9 +17,9 @@ void driver_cpu_setup(){
     M5.Axp.DisableAllIRQ();
 }
 
-void driver_cpu_wakeup(){
+void driver_cpu_wakeup(){}
 
-}
+void driver_cpu_loop(){}
 
 void driver_cpu_sleep(unsigned char sleepType, long timeout_ms){
     

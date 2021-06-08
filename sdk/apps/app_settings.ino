@@ -102,7 +102,7 @@ class appNameClass: public Application{
         const static unsigned char icon_sleep[]         PROGMEM;
         unsigned char currentSubMenu       = APP_SETTINGS_SUBMENU_MAIN;
         String getApplicationSubTitle(unsigned char submenu, unsigned char num);
-        String getApplicationSubTitle(unsigned char submenu, unsigned char num, boolean getLast);
+        String getApplicationSubTitle(unsigned char submenu, unsigned char num, bool getLast);
         void drawSettingsPageFirstTime();
         void clearWorkSpace();
         void switchToSubMenu(unsigned char newSubMenu);

@@ -57,24 +57,32 @@ void appNameClass::onLoop(){
     /*
         Write you code onLoop here
     */
-
-    core_pedometer_loop(false);
+    #ifdef ACCELEROMETER_ENABLE
+        //core_pedometer_loop(false);
+        driver_accelerometer_update_accelerometer();
+        core_pedometer_loop(false);
+    #endif
    
     currentPrintScreenString = 0;
     setDrawColor_BackGroundColor();
     drawRect(0,0, SCREEN_WIDTH, SCREEN_HEIGHT, true);
 
-    drawStringOnScreen("Steps: ");
-    drawStringOnScreen(String(get_pedometer_steps()));
-    drawStringOnScreen("");
-    
+    #ifdef ACCELEROMETER_ENABLE
+        drawStringOnScreen("Steps: ");
+        drawStringOnScreen(String(get_pedometer_steps()));
+        drawStringOnScreen("");
+        
+
+        drawStringOnScreen("Accerometer: ");
+        drawStringOnScreen(String(driver_accelerometer_get_accel_total()));
+    #endif
+
     #ifdef PEDOMETER_DEBUG
-        drawStringOnScreen("delta_value: ");
+        drawStringOnScreen(" ");
+        drawStringOnScreen("Delta: ");
         drawStringOnScreen(String(get_analysis_delta_value()));
-        drawStringOnScreen("central_weight_value: ");
+        drawStringOnScreen("Central weight: ");
         drawStringOnScreen(String(get_analysis_central_weight_value()));
-        //drawStringOnScreen("central_value: ");
-        //drawStringOnScreen(String(get_analysis_central_value()));
     #endif
     
     
@@ -106,6 +114,7 @@ void appNameClass::onEvent(unsigned char event, int val1, int val2){
                 if(val1==BUTTON_SELECT){
                     acceleration_max = 0;
                     acceleration_min = 0;
+                    set_pedometer_steps(0);
                 }else if(val1==BUTTON_BACK){
                     startApp(-1);
                 }    

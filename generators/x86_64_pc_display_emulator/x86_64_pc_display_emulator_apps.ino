@@ -9,16 +9,15 @@
 #define APP_MENU_APPLICATIONS_0             AlarmApp
 #define APP_MENU_APPLICATIONS_1             BarometerApp
 #define APP_MENU_APPLICATIONS_2             ClockApp
-#define APP_MENU_APPLICATIONS_3             CompassApp
-#define APP_MENU_APPLICATIONS_4             FileManagerApp
-#define APP_MENU_APPLICATIONS_5             InternetApp
-#define APP_MENU_APPLICATIONS_6             SettingsApp
-#define APP_MENU_APPLICATIONS_7             SimpleGameApp
-#define APP_MENU_APPLICATIONS_8             TestApplicationApp
-#define APP_MENU_APPLICATIONS_9             BatteryApp
-#define APP_MENU_APPLICATIONS_10            TouchCalibration
-#define APP_MENU_APPLICATIONS_11            TouchTest
-#define APP_MENU_APPLICATIONS_12            KeyboardTest
+#define APP_MENU_APPLICATIONS_3             FileManagerApp
+#define APP_MENU_APPLICATIONS_4             InternetApp
+#define APP_MENU_APPLICATIONS_5             SettingsApp
+#define APP_MENU_APPLICATIONS_6             SimpleGameApp
+#define APP_MENU_APPLICATIONS_7             TestApplicationApp
+#define APP_MENU_APPLICATIONS_8             BatteryApp
+#define APP_MENU_APPLICATIONS_9             TouchCalibration
+#define APP_MENU_APPLICATIONS_10            TouchTest
+#define APP_MENU_APPLICATIONS_11            KeyboardTest
 
 
 /*

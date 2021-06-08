@@ -90,9 +90,9 @@ cat sdk/core/core_touchscreen.ino       >> $OUTPUT_DIRECTORY/cubos/main.cpp
 echo "
 "   >> $OUTPUT_DIRECTORY/cubos/main.cpp
 cat sdk/apps/app_alarm.ino           >> $OUTPUT_DIRECTORY/cubos/main.cpp
-echo "
-"   >> $OUTPUT_DIRECTORY/cubos/main.cpp
-cat sdk/apps/app_compass.ino         >> $OUTPUT_DIRECTORY/cubos/main.cpp
+#echo "
+#"   >> $OUTPUT_DIRECTORY/cubos/main.cpp
+#cat sdk/apps/app_compass.ino         >> $OUTPUT_DIRECTORY/cubos/main.cpp
 echo "
 "   >> $OUTPUT_DIRECTORY/cubos/main.cpp
 cat sdk/apps/app_battery.ino         >> $OUTPUT_DIRECTORY/cubos/main.cpp

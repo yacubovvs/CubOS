@@ -35,3 +35,29 @@ unsigned char driver_battery_getPercent(){
     }
     return 0;
 }
+
+/**/
+
+float driver_battery_getCurent_mA(){
+  return 100.0f;
+}
+
+float driver_battery_getUsbVoltage(){
+  return 5.2f;
+}
+
+float driver_battery_getUsbCurent_mA(){
+  return 150.0f;
+}
+
+float driver_battery_controller_Temp(){
+  return 35.2f;
+}
+
+float driver_battery_Temp(){
+  return 28.1f;
+}
+
+bool driver_battery_isCharging(){
+    return true;
+}

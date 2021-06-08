@@ -65,15 +65,16 @@
                                  SLEEP TYPES -                               
 */
 
-#define SLEEP_IDLE_CPU           0x01
-#define SLEEP_DEEP          0x02
-#define SLEEP_LIGHT         0x03
-#define SLEEP_MODEM         0x04
-#define SLEEP_DISPLAY       0x05
-#define SLEEP_HIBERNATE     0x03
-#define WAKE_MODEM          0x06
-#define WAKE_DISPLAY        0x07
-#define WAKE                0x08
+#define SLEEP_IDLE_CPU          0x01
+#define SLEEP_DEEP              0x02
+#define SLEEP_LIGHT             0x03
+#define SLEEP_MODEM             0x04
+#define SLEEP_DISPLAY           0x05
+#define SLEEP_HIBERNATE         0x03
+#define WAKE_MODEM              0x06
+#define WAKE_DISPLAY            0x07
+#define WAKE                    0x08
+#define SLEEP_LIGHT_SCREEN_OFF  0x09
 
 
 #define IN_APP_SLEEP_TYPE       SLEEP_LIGHT
@@ -116,19 +117,21 @@
 
 #define UPDATE_BATTERY_EVERY_MS 3000
 #define SMOOTH_BACKLIGHT_CONTROL_DELAY_CHANGE  4
+#define BATTERY_ENABLE
 
 // #define ACCELEROMETER_ENABLE
 #define DISPLAY_BACKLIGHT_CONTROL_ENABLE
 #define DISPLAY_BACKLIGHT_FADE_CONTROL_ENABLE
 
 #define WAKEUP_FROM_LIGHT_SLEEP_EVERY_MS 1000
-#define WAKEUP_FROM_DEEP_SLEEP_EVERY_SECONDS 60*60*24
+#define WAKEUP_FROM_DEEP_SLEEP_EVERY_SECONDS 60*60*24 // Wake up if no any other background works as pedometer
 
 #define USE_TYPE2_OF_IMAGES
 //#define PEDOMETER_ENABLE
 
-//#define PEDOMETER_STEP_DETECTION_DELAY                  30000
+//#define PEDOMETER_STEP_DETECTION_DELAY                30000
 #define PEDOMETER_STEP_DETECTION_DELAY                  15000
+//#define PEDOMETER_STEP_DETECTION_DELAY                  1000
 #define PEDOMETER_STEP_DETECTION_PERIOD_MS              1000
 #define PEDOMETER_MESURES_IN_STEP_DETECTION_PERIOD      5
 #define PEDOMETER_ENABLE_ON_START                       true
@@ -137,6 +140,12 @@
 #define WAKEUP_FOR_BACKGROUND_WORK_IDLE 1000
 
 //#define PEDOMETER_DEBUG // Just for teste
+
+#define FORCE_DISPLAY_UPDATE_ON_START // Will quick update screen on start and wakeup. Comment on unknown error.
+#define DEFAULT_TIME_TO_POWEROFF_DISPLAY 7
+#define DEFAULT_DELAY_TO_FADE_DISPLAY 7
+
+//#define DEBUG_SERIAL
 
 /*
     ############################################################################################
@@ -156,7 +165,7 @@
 //      FOR ESP8266 USE NONOSSDK 2.2.2 +
 // ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! !
 
-#define DEBUG_SERIAL
+//#define DEBUG_SERIAL
 
 #define SCREEN_WIDTH            80     // Screen resolution width
 #define SCREEN_HEIGHT           160     // Screen resolution height
@@ -226,6 +235,7 @@
     #                                                                                          #
     ############################################################################################
 */
+#include <Arduino.h>
 
 /*
     ############################################################################################
@@ -294,35 +304,51 @@ Application* currentApp;
 void setup(){ 
   #ifdef DEBUG_SERIAL
       Serial.begin(115200);
-      //delay(100);
-      //d ebug("Serial debug started", 10);
+      delay(100);
+      debug("Serial debug started", 10);
   #endif
 
   #ifdef POWERSAVE_ENABLE
     #ifdef CPU_SLEEP_ENABLE
       unsigned char wakeUpReason = core_powersave_wakeup_reason();
       if(wakeUpReason==WAKE_UP_REASON_TIMER){
-        //d ebug("Background start", 10);
-        //core_cpu_setup();
+        #ifdef WAKEUP_DEBUG
+          debug("Background start " + String(millis()), 10);
+          //core_cpu_setup();
+        #endif
         driver_controls_setup();
+        #ifdef WAKEUP_DEBUG
+          debug("Backgroung controls inited "  + String(millis()), 10);
+        #endif
         backgroundWorkAfterSleep();
-        //debug("Going to sleep again");
-        //debug("", 10);
+        #ifdef WAKEUP_DEBUG
+          debug("Going to sleep again "  + String(millis()), 10);
+        #endif
         core_cpu_sleep(STAND_BY_SLEEP_TYPE, WAKEUP_FOR_BACKGROUND_WORK_STANDBY);
       }else{
-        //debug("Not backgtound start", 10);
+        #ifdef WAKEUP_DEBUG
+          debug("Not background start", 10);
+        #endif
       }
     #endif
   #endif
   //debug("**** Main app start", 10);
 
+  driver_display_setup();
+  core_display_setup();
+  
+  #ifdef RTC_ENABLE
+      driver_RTC_setup();
+  #endif
+
+  #ifdef FORCE_DISPLAY_UPDATE_ON_START
+    currentApp = getApp(STARTING_APP_NUMM);
+    core_display_loop();
+    driver_display_loop();
+  #endif
 
   #ifdef BATTERY_ENABLE
     driver_battery_setup();
-  #endif
-
-  #ifdef RTC_ENABLE
-      driver_RTC_setup();
   #endif
 
   #ifdef ESP8266
@@ -332,9 +358,6 @@ void setup(){
   #ifdef CPU_CONTROLL_ENABLE
     core_cpu_setup();
   #endif
-  
-  driver_display_setup();
-  core_display_setup();
 
   #ifdef HARDWARE_BUTTONS_ENABLED
     driver_controls_setup();
@@ -356,15 +379,20 @@ void setup(){
     core_pedometer_setup();
   #endif
   
-  currentApp = getApp(STARTING_APP_NUMM);
+  #ifndef FORCE_DISPLAY_UPDATE_ON_START
+    currentApp = getApp(STARTING_APP_NUMM);
+  #endif
   
 }
 
 bool isInSleep = false;
 void loop(){
-  
   core_display_loop();
   driver_display_loop();
+
+  #ifdef CPU_CONTROLL_ENABLE
+    core_cpu_loop();
+  #endif
 
   #ifdef HARDWARE_BUTTONS_ENABLED
     driver_controls_loop();
@@ -381,10 +409,6 @@ void loop(){
 
   #ifdef CLOCK_ENABLE
     core_time_loop();
-  #endif
-
-  #ifdef CPU_CONTROLL_ENABLE
-    core_cpu_loop();
   #endif
 
   #ifdef POWERSAVE_ENABLE

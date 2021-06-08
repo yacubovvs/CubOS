@@ -1,3 +1,5 @@
+#include <Arduino.h>
+
 uint16_t get_uint16Color(unsigned char red, unsigned char green, unsigned char blue){
   #ifdef SCREEN_INVERT_COLORS
     red = 255 - red;
@@ -135,6 +137,7 @@ void setDrawColor(uint16_t color){
     }
 
     void FRAMEBUFFER_reset(){
+      
       #ifdef FRAMEBUFFER_PSRAM
         FRAMEBUFFER_currentFrame  = (FRAMEBUFFER_TYPE *)ps_malloc(FRAMEBUFFER_SIZE);
         FRAMEBUFFER_newFrame      = (FRAMEBUFFER_TYPE *)ps_malloc(FRAMEBUFFER_SIZE);
@@ -223,6 +226,27 @@ void setDrawColor(uint16_t color){
 
 #endif
 
+void fillScreen(unsigned char red, unsigned char green, unsigned char blue){
+  TEMPORARILY_DISABLE_LIMITS();
+
+  #ifdef FRAMEBUFFER_ENABLE
+
+    setDrawColor(red, green, blue);
+    for(int x=0; x<SCREEN_WIDTH; x++){
+      for(int y=0; y<SCREEN_HEIGHT; y++){
+        drawPixel(x,y);
+      }
+    }
+
+  #else
+
+    deriver_displayfillScreen(red, green, blue);
+
+  #endif
+
+  TEMPORARILY_RESTORE_LIMITS();
+}
+
 /*
 * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * 
                                   DRAW LIMITS
@@ -264,11 +288,20 @@ bool DRAW_LIMITS_getEnable(){
 */
 unsigned char core_display_brightness             = 100;
 
+#ifndef DEFAULT_TIME_TO_POWEROFF_DISPLAY
+  #define DEFAULT_TIME_TO_POWEROFF_DISPLAY 5;
+#endif
+
+#ifndef DEFAULT_DELAY_TO_FADE_DISPLAY
+  #define DEFAULT_DELAY_TO_FADE_DISPLAY 10;
+#endif
+
+
 #ifdef DISPLAY_BACKLIGHT_FADE_CONTROL_ENABLE
   unsigned char core_display_brightness_fade        = 15;
-  unsigned char core_display_time_delay_to_fade     = 10; //10
+  unsigned char core_display_time_delay_to_fade     = DEFAULT_DELAY_TO_FADE_DISPLAY; //10
 #endif
-unsigned char core_display_time_delay_to_poweroff = 5; //5
+unsigned char core_display_time_delay_to_poweroff = DEFAULT_TIME_TO_POWEROFF_DISPLAY; //5
 
 #ifdef DISPLAY_BACKLIGHT_CONTROL_ENABLE
   void set_core_display_brightness(unsigned char value){ 
@@ -781,7 +814,7 @@ void core_display_loop(){
               uint16_t newColor = FRAMEBUFFER_new_getPixel(position);
               if(FRAMEBUFFER_current_getPixel(position)!=newColor){
                 //if(getDrawColor()!=newColor) setDrawColor(newColor);
-                setPixel(x, y, newColor);
+                display_driver_setPixel(x, y, newColor);
                 //if(x>=SCREEN_WIDTH) debug("XMORE!");
                 //if(y>=SCREEN_HEIGHT) debug("YMORE!");
 
@@ -825,10 +858,10 @@ void drawPixel(int x, int y){
 
       if(!getFRAMEBUFFER_isChanged()) setFRAMEBUFFER_isChanged(true);
       
-      //setPixel(x, y);
+      //display_driver_setPixel(x, y);
     #endif
   #else
-    setPixel(x, y);
+    display_driver_setPixel(x, y);
   #endif
   
 }

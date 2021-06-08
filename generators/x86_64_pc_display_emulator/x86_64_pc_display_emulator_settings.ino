@@ -43,8 +43,9 @@
 //#define STARTING_APP_NUMM   -1    // for Mainmenu (default app)
 #define STARTING_APP_NUMM   6     // for App number 7
 
-#define CPU_SLEEP_ENABLE
-#define CPU_SLEEP_TIME_DELAY 25000
+#undef CPU_SLEEP_ENABLE
+#undef POWERSAVE_ENABLE
+//#define CPU_SLEEP_TIME_DELAY 25000
 
 #define BUTTON_UP       0
 #define BUTTON_SELECT   1

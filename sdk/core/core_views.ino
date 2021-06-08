@@ -81,6 +81,21 @@
     };
 #endif
 
+String core_views_statusBar_draw_time_TimeString = "";
+void core_views_statusBar_draw_time(bool draw){
+    bool lastLimits = DRAW_LIMITS_getEnable();
+    DRAW_LIMITS_setEnable(false);
+    if(draw){
+        setDrawColor(STYLE_STATUSBAR_TEXT_RED, STYLE_STATUSBAR_TEXT_GREEN, STYLE_STATUSBAR_TEXT_BLUE);
+        core_views_statusBar_draw_time_TimeString = core_time_getHourMinuteTime();
+        drawString(core_views_statusBar_draw_time_TimeString, 5, STYLE_STATUSBAR_HEIGHT/2 - FONT_CHAR_HEIGHT/2 + ( (STYLE_STATUSBAR_HEIGHT)%2 ) + ( (FONT_CHAR_HEIGHT)%2 ) + 2, FONT_SIZE_DEFAULT);
+    }else{
+        setDrawColor(STYLE_STATUSBAR_BACKGROUND_RED, STYLE_STATUSBAR_BACKGROUND_GREEN, STYLE_STATUSBAR_BACKGROUND_BLUE);
+        clearString(core_views_statusBar_draw_time_TimeString, 5, STYLE_STATUSBAR_HEIGHT/2 - FONT_CHAR_HEIGHT/2 + ( (STYLE_STATUSBAR_HEIGHT)%2 ) + ( (FONT_CHAR_HEIGHT)%2 ) + 2, FONT_SIZE_DEFAULT);
+    }
+    DRAW_LIMITS_setEnable(lastLimits);
+}
+
 void core_views_statusBar_draw(){
     /*
             [ TIME | ----- | NOTIFICATIONS | BATTERY ]
@@ -155,22 +170,6 @@ void core_views_statusBar_draw(){
         }
     }
 #endif
-
-String core_views_statusBar_draw_time_TimeString = "";
-void core_views_statusBar_draw_time(bool draw){
-    bool lastLimits = DRAW_LIMITS_getEnable();
-    DRAW_LIMITS_setEnable(false);
-    if(draw){
-        setDrawColor(STYLE_STATUSBAR_TEXT_RED, STYLE_STATUSBAR_TEXT_GREEN, STYLE_STATUSBAR_TEXT_BLUE);
-        core_views_statusBar_draw_time_TimeString = core_time_getHourMinuteTime();
-        drawString(core_views_statusBar_draw_time_TimeString, 5, STYLE_STATUSBAR_HEIGHT/2 - FONT_CHAR_HEIGHT/2 + ( (STYLE_STATUSBAR_HEIGHT)%2 ) + ( (FONT_CHAR_HEIGHT)%2 ) + 2, FONT_SIZE_DEFAULT);
-    }else{
-        setDrawColor(STYLE_STATUSBAR_BACKGROUND_RED, STYLE_STATUSBAR_BACKGROUND_GREEN, STYLE_STATUSBAR_BACKGROUND_BLUE);
-        clearString(core_views_statusBar_draw_time_TimeString, 5, STYLE_STATUSBAR_HEIGHT/2 - FONT_CHAR_HEIGHT/2 + ( (STYLE_STATUSBAR_HEIGHT)%2 ) + ( (FONT_CHAR_HEIGHT)%2 ) + 2, FONT_SIZE_DEFAULT);
-    }
-    DRAW_LIMITS_setEnable(lastLimits);
-}
-
 
 /*
     ############################################################################################

@@ -1,5 +1,3 @@
-#define PEDOMETER_ENABLE // just for tests
-
 #ifdef PEDOMETER_ENABLE
     RTC_DATA_ATTR long pedometer_steps = 0;
     long get_pedometer_steps(){ return pedometer_steps;}
@@ -10,7 +8,7 @@
     }
 
     #ifndef PEDOMETER_STEPS_IN_SEC
-        #define PEDOMETER_STEPS_IN_SEC                          1.8f
+        #define PEDOMETER_STEPS_IN_SEC                          1.65f
     #endif
 
     #define CORE_PEDOMETER_MESURE_EVERY_MS                      (PEDOMETER_STEP_DETECTION_PERIOD_MS/PEDOMETER_MESURES_IN_STEP_DETECTION_PERIOD)
@@ -28,8 +26,8 @@
     void core_pedometer_setup(){
         // Just for test M5StickC
         #ifdef PEDOMETER_DEBUG
-            pinMode(10, OUTPUT);
-            digitalWrite(10, 1);
+            //pinMode(10, OUTPUT);
+            //digitalWrite(10, 1);
         #endif
     }
 
@@ -57,6 +55,9 @@
                     if(inBackGroung){
                         #ifdef ACCELEROMETER_ENABLE
                             driver_accelerometer_setup();
+                            #ifdef WAKEUP_DEBUG
+                                debug("Accelerometer is setted up " + String(millis()), 10);;
+                            #endif
                             #ifdef PEDOMETER_DEBUG
                                 debug("Accelerometer is setted up", 10);
                             #endif
@@ -83,7 +84,6 @@
 
     void core_pedometer_mesure_loop(){ core_pedometer_mesure_loop(true); }
     void core_pedometer_mesure_loop(bool inBackGroung){
-
         if(core_pedometer_current_step_detection!=-1){
 
             if(
@@ -97,7 +97,17 @@
 
                 driver_accelerometer_update_accelerometer();
                 core_pedometer_step_detection_arrays[core_pedometer_current_step_detection] = driver_accelerometer_get_accel_total();
+
                 core_pedometer_current_step_detection++;
+                if(
+                    core_pedometer_step_detection_arrays[core_pedometer_current_step_detection-1]<0.2f ||
+                    core_pedometer_step_detection_arrays[core_pedometer_current_step_detection-1]>1.8f
+                ){
+                    core_pedometer_step_detection_arrays[core_pedometer_current_step_detection-1] = 1;
+                    core_pedometer_current_step_detection--;
+                    // Testnig fot detecting noise n103
+                }
+
                 if(core_pedometer_current_step_detection==PEDOMETER_MESURES_IN_STEP_DETECTION_PERIOD){
                     core_pedometer_current_step_detection=-1;
                     core_pedometer_analyse_steps_mesure(inBackGroung);
@@ -108,15 +118,16 @@
                 #ifdef PEDOMETER_DEBUG
                     // debug("PEDOMETER MESURE IN BACKGROUN", 10);
                 #endif
-                /*
-                if( getCurrentSystemTime()==get_core_powersave_lastUserAction()){
-                    core_cpu_sleep(STAND_BY_SLEEP_TYPE, 1);   
-                }*/
+                
+                #ifdef WAKEUP_DEBUG
+                    debug("Mesure in BG "  + String(millis()), 10);
+                #endif
                 core_cpu_sleep(SLEEP_LIGHT, CORE_PEDOMETER_MESURE_EVERY_MS, false); 
                 core_pedometer_mesure_loop(true);
             }
         }
         
+
     }
 
     void core_pedometer_start_step_detection(bool inBackGroung){
@@ -142,6 +153,8 @@
         float get_analysis_central_value(){         return analysis_central_value;}
         int get_analysis_axis_crossings(){          return analysis_axis_crossings;}
     #endif
+
+    #define ABS(x) ((x)>0?(x):-(x))
 
     bool core_pedometer_analyse_steps_mesure(bool inBackground){
 
@@ -191,11 +204,13 @@
             }
 
             //analysis_central_weight_value += core_pedometer_step_detection_arrays[i];
+            /*
             if(core_pedometer_step_detection_arrays[i]>=analysis_central_value){
                 analysis_central_weight_value += core_pedometer_step_detection_arrays[i] - analysis_central_value;
             }else{
                 analysis_central_weight_value += analysis_central_value - core_pedometer_step_detection_arrays[i];
-            }
+            }*/
+            analysis_central_weight_value += ABS(core_pedometer_step_detection_arrays[i] - analysis_central_value);
         }
 
         analysis_central_weight_value = analysis_central_weight_value/PEDOMETER_MESURES_IN_STEP_DETECTION_PERIOD;
@@ -214,8 +229,12 @@
 
         #define PEDOMETER_CROSSINGS_MIN             (8*1000/PEDOMETER_STEP_DETECTION_PERIOD_MS)
         #define PEDOMETER_CROSSINGS_MAX             (16*1000/PEDOMETER_STEP_DETECTION_PERIOD_MS)
-        #define PEDOMETER_DELTA_VALUE_MIN           0.5f
-        #define PEDOMETER_CENTRALWIGHT_VALUE_MIN    0.1f
+        #ifndef PEDOMETER_DELTA_VALUE_MIN
+            #define PEDOMETER_DELTA_VALUE_MIN           0.5f
+        #endif
+        #ifndef PEDOMETER_CENTRALWIGHT_VALUE_MIN
+            #define PEDOMETER_CENTRALWIGHT_VALUE_MIN    0.1f
+        #endif
 
         // # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 
@@ -225,19 +244,19 @@
                     //&& analysis_axis_crossings<=PEDOMETER_CROSSINGS_MAX 
                     //&& analysis_axis_crossings>=PEDOMETER_CROSSINGS_MIN
                     && analysis_delta_value >= PEDOMETER_DELTA_VALUE_MIN
-                    && analysis_central_value>=PEDOMETER_CENTRALWIGHT_VALUE_MIN
+                    && analysis_central_weight_value>=PEDOMETER_CENTRALWIGHT_VALUE_MIN
                 )
             ){
                 //
                 #ifdef PEDOMETER_DEBUG
                     debug("Is walking", 10);
-                    if(!inBackground) digitalWrite(10,0);
+                    //if(!inBackground) digitalWrite(10,0);
                 #endif
                 pedometer_steps += (PEDOMETER_STEPS_IN_SEC*( (float)(PEDOMETER_STEP_DETECTION_DELAY + PEDOMETER_STEP_DETECTION_PERIOD_MS)))/1000;
             }else{
                 #ifdef PEDOMETER_DEBUG
                     debug("Is not walking", 10);
-                    if(!inBackground) digitalWrite(10,1);
+                    //if(!inBackground) digitalWrite(10,1);
                 #endif
                 
             }

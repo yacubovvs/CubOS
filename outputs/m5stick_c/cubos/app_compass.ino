@@ -59,7 +59,9 @@ void appNameClass::onLoop(){
     setDrawColor_BackGroundColor();
     drawRect(0,0, SCREEN_WIDTH, SCREEN_HEIGHT, true);
 
-    driver_accelerometer_update();
+    #ifdef MAGNITOMETER_ENABLE
+        driver_accelerometer_update();
+    #endif
 
     /*
     float get_driver_accelerometer_temperature(){return temp;}
@@ -74,12 +76,14 @@ void appNameClass::onLoop(){
     float get_driver_accelerometer_z(){return accZ;}
     */
 
+    /*
     drawStringOnScreen("Pitch:");
     drawStringOnScreen(String(get_driver_accelerometer_pitch()));
     drawStringOnScreen("Roll:");
     drawStringOnScreen(String(get_driver_accelerometer_roll()));
     drawStringOnScreen("Yaw:");
     drawStringOnScreen(String(get_driver_accelerometer_yaw()));
+    */
    
 }
 

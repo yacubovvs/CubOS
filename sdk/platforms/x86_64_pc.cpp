@@ -98,3 +98,19 @@ int main()
       loop();
   }
 }
+
+void core_battery_loop();
+void core_views_statusBar_draw();
+void setBackgroundColor(unsigned char r, unsigned char g, unsigned char b);
+void drawRect(int x0, int y0, int x1, int y1, bool fill);
+void setDrawColor(unsigned char red, unsigned char green, unsigned char blue);
+void fillScreen(unsigned char red, unsigned char green, unsigned char blue);
+bool DRAW_LIMITS_getEnable();
+uint16_t get_uint16Color(unsigned char red, unsigned char green, unsigned char blue);
+void DRAW_LIMITS_setEnable(bool enabled);
+void core_views_statusBar_draw_time(bool draw);
+void core_views_draw_statusbar_battery(bool draw, unsigned char batteryCharge);
+void drawBatteryIcon(int x, int y, unsigned char charge, bool isCharging, bool draw);
+
+#define DEG_TO_RAD      0.01745329
+#define RAD_TO_DEG      57.2957786

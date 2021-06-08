@@ -1,24 +1,4 @@
 
-#include <Arduino.h>
-
-/*
-    ############################################################################################
-    #                                     PREDEFINED +                                         #
-    ############################################################################################
-*/
-
-void core_views_statusBar_draw();
-void setBackgroundColor(unsigned char r, unsigned char g, unsigned char b);
-void drawRect(int x0, int y0, int x1, int y1, bool fill);
-void setDrawColor(unsigned char red, unsigned char green, unsigned char blue);
-void fillScreen(unsigned char red, unsigned char green, unsigned char blue);
-
-/*
-    ############################################################################################
-    #                                     PREDEFINED -                                         #
-    ############################################################################################
-*/
-
 
 /*
     ############################################################################################
