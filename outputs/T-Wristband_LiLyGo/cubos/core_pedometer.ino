@@ -97,7 +97,17 @@
 
                 driver_accelerometer_update_accelerometer();
                 core_pedometer_step_detection_arrays[core_pedometer_current_step_detection] = driver_accelerometer_get_accel_total();
+
                 core_pedometer_current_step_detection++;
+                if(
+                    core_pedometer_step_detection_arrays[core_pedometer_current_step_detection-1]<0.2f ||
+                    core_pedometer_step_detection_arrays[core_pedometer_current_step_detection-1]>1.8f
+                ){
+                    core_pedometer_step_detection_arrays[core_pedometer_current_step_detection-1] = 1;
+                    core_pedometer_current_step_detection--;
+                    // Testnig fot detecting noise n103
+                }
+
                 if(core_pedometer_current_step_detection==PEDOMETER_MESURES_IN_STEP_DETECTION_PERIOD){
                     core_pedometer_current_step_detection=-1;
                     core_pedometer_analyse_steps_mesure(inBackGroung);
