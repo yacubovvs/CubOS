@@ -2,7 +2,7 @@
 
 <img alt="CubOS onM5StickC view" src="images\view.png" width="200">
 
-## Build features
+## Features
 * RTC
 * Pedometer
 * Up to 2 days on one charge
