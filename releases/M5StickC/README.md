@@ -10,7 +10,7 @@
 
 
 ## Controls
-<img alt="CubOS onM5StickC view" src="images\buttons.png" width="300">
+<img alt="CubOS onM5StickC view" src="images\buttons.PNG" width="300">
 
 ### Power button
 * Press for 6sec - power off
