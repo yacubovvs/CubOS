@@ -2,11 +2,7 @@
 
 A tiny operating system for embedded and wearable devices to interact with users
 
-<img alt="CubOS watch screenshot" src="documentation\images\screenshots\clock.png" width="150">
-<img alt="CubOS menu clock screenshot" src="documentation\images\screenshots\menu1.png" width="150">
-<img alt="CubOS menu files screenshot" src="documentation\images\screenshots\menu2.png" width="150">
-<img alt="CubOS time settings screenshot" src="documentation\images\screenshots\settings1.png" width="150">
-
+<img alt="CubOS watch screenshot" src="documentation\images\screenshots\screenshots.png" width="403">
 
 ### Minimum system requirements for CubOS:
 * 32 kB ROM
