@@ -22,7 +22,7 @@
 * Double click - back
 
 ## Extra
-###Holder model
-STL holder model: https://github.com/yacubovvs/cubos3/tree/main/releases/M5StickC/models
+### Holder model
+STL holder model for 3D printing: https://github.com/yacubovvs/cubos3/tree/main/releases/M5StickC/models
 <img alt="CubOS onM5StickC view" src="images\m5stickc_with_holder.png" height="400">
 <img alt="CubOS onM5StickC view" src="images\m5Watch.png" height="400">
