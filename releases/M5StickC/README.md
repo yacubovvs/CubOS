@@ -20,3 +20,9 @@
 * One click - next
 * Long click - select
 * Double click - back
+
+## Extra
+###Holder model
+STL holder model: https://github.com/yacubovvs/cubos3/tree/main/releases/M5StickC/models
+<img alt="CubOS onM5StickC view" src="images\m5stickc_with_holder.png" width="300">
+<img alt="CubOS onM5StickC view" src="images\m5Watch.png" width="300">
