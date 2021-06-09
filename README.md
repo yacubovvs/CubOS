@@ -8,7 +8,7 @@ A tiny operating system for embedded and wearable devices to interact with users
 * С++ compiler
 
 ### Builds:
-* [M5Stick C] (releases/M5StickC/).
+* [M5Stick C](releases/M5StickC/).
 
 
 
