@@ -30,5 +30,5 @@ STL holder model for 3D printing: https://github.com/yacubovvs/cubos3/tree/main/
 ## How to install
 1. Install Arduino IDE
 2. Add ESP32 boards support to Arduino IDE
-3. Add library (https://github.com/m5stack/M5StickC) to Android IDE
+3. Add library (https://github.com/m5stack/M5StickC) to Arduino IDE
 4. Download and upload Arduino project https://github.com/yacubovvs/cubos3/tree/main/releases/M5StickC/cubos
