@@ -1,4 +1,4 @@
-# Releaese CubOS for M5StickC 2021-06-08
+# Release CubOS for M5StickC 2021-06-08
 
 <img alt="CubOS onM5StickC view" src="images\view.png" width="200">
 
