@@ -34,7 +34,7 @@ cp sdk/drivers/driver_display_eTFT_ST7735_T-Wristband_LiLyGo.ino    outputs/T-Wr
 cp sdk/drivers/driver_controls_T-Wristband_LiLyGo.ino               outputs/T-Wristband_LiLyGo/cubos/     
 cp sdk/drivers/driver_rtc_pcf8563.ino                               outputs/T-Wristband_LiLyGo/cubos/     
 cp sdk/drivers/driver_cpu_T-Wristband_LiLyGo.ino                    outputs/T-Wristband_LiLyGo/cubos/     
-cp sdk/drivers/driver_MPU9250_T-Wristband_LiLyGo.ino                outputs/T-Wristband_LiLyGo/cubos/     
+cp sdk/drivers/driver_IMU_MPU9250_T-Wristband_LiLyGo.ino                outputs/T-Wristband_LiLyGo/cubos/     
 
 # Core
 cp sdk/core/core_basic.ino              outputs/T-Wristband_LiLyGo/cubos/  

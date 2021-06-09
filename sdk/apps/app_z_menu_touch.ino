@@ -230,7 +230,7 @@ void appNameClass::onEvent(unsigned char event, int val1, int val2){
 
     }else if(event==EVENT_ON_TOUCH_RELEASED){
       #ifdef TOUCH_SCREEN_ENABLE
-        #ifdef PLATFORM_PC_emulator
+        #ifdef PLATFORM_PC_EMULATOR
           this->drawIcons(false);
           float position = ((float)this->scroll_y)/((float)SINGLE_ELEMENT_REAL_HEIGHT);
           this->scroll_y = round(position) * SINGLE_ELEMENT_REAL_HEIGHT;

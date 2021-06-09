@@ -2,11 +2,14 @@ package ru.cubos.server;
 
 import ru.cubos.emulator.Emulator;
 
+import javax.imageio.ImageIO;
 import java.awt.*;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
+import java.awt.image.BufferedImage;
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -15,8 +18,11 @@ import java.net.InetSocketAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.nio.charset.StandardCharsets;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
+import java.util.Locale;
 
 public class SocketServer extends Emulator {
 
@@ -81,6 +87,19 @@ public class SocketServer extends Emulator {
                         break;
                     case 38:
                         keys[3] = "0";
+                        break;
+                    case 83:
+                        //Saving screenshot
+                        Date date = new Date();
+                        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd_HH-mm-ss", Locale.getDefault());
+                        String image_file = "screenshots/" + dateFormat.format(date) + ".png";
+                        File outputfile = new File(image_file);
+                        try {
+                            ImageIO.write(SocketServer.this.image, "png", outputfile);
+                        } catch (IOException e) {
+                            e.printStackTrace();
+                        }
+
                         break;
 
                 }

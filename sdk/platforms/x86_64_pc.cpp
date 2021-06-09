@@ -111,6 +111,17 @@ void DRAW_LIMITS_setEnable(bool enabled);
 void core_views_statusBar_draw_time(bool draw);
 void core_views_draw_statusbar_battery(bool draw, unsigned char batteryCharge);
 void drawBatteryIcon(int x, int y, unsigned char charge, bool isCharging, bool draw);
+unsigned char core_time_getHours_byte();
+unsigned char core_time_getMinutes_byte();
+unsigned char core_time_getDate();
+unsigned char core_time_getSeconds_byte();
+void driver_accelerometer_setup();
+void driver_accelerometer_loop();
+void core_pedometer_setup();
+long get_pedometer_steps();
+void core_pedometer_newDate();
 
 #define DEG_TO_RAD      0.01745329
 #define RAD_TO_DEG      57.2957786
+
+#define RTC_DATA_ATTR /*Nothing*/

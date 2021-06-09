@@ -172,17 +172,20 @@
 //#define screenDebug
 #define TERMINAL_DEBUG
 
-#define SCREEN_WIDTH            240     // Screen resolution width
-#define SCREEN_HEIGHT           240     // Screen resolution height
+#define SCREEN_WIDTH            80     // Screen resolution width
+#define SCREEN_HEIGHT           160     // Screen resolution height
 
 #define FONT_CHAR_WIDTH         6     // Font letter size width
 #define FONT_CHAR_HEIGHT        8     // Font letter size height
 
 //#define device_has_battery
 
-#define PLATFORM_PC_emulator
+#define PLATFORM_PC_EMULATOR
 #define device_has_bluetooth
 #define device_has_wifi
+
+#define MAIN_MENU_SMOOTH_ANIMATION
+#define NARROW_SCREEN
 
 #define ON_TIME_CHANGE_EVERY_MS 1000
 
@@ -198,7 +201,7 @@
 //#define toDefaultApp_onLeftLongPress
 
 //#define STARTING_APP_NUMM   -1    // for Mainmenu (default app)
-#define STARTING_APP_NUMM   6     // for App number 7
+#define STARTING_APP_NUMM   2     // for App number 7
 
 #undef CPU_SLEEP_ENABLE
 #undef POWERSAVE_ENABLE
@@ -213,17 +216,22 @@
 #define CLOCK_ENABLE
 //#define USE_PRIMITIVE_HARDWARE_DRAW_ACCELERATION
 
-//#define RTC_ENABLE
-
+#define RTC_ENABLE
+#define FONT_SIZE_DEFAULT 2
 #define SCREEN_ROTATION_0
 //#define SCREEN_ROTATION_90
 //#define SCREEN_ROTATION_180
 //#define SCREEN_ROTATION_270
 
-#define STYLE_STATUSBAR_HEIGHT  40
+//#define PEDOMETER_ENABLE
+//#define ACCELEROMETER_ENABLE
+#define STYLE_STATUSBAR_HEIGHT  20
 
 #undef I2C_ENABLE
 #undef CPU_CONTROLL_ENABLE
+
+#define PEDOMETER_EMULATOR
+#define FONT_SIZE_DEFAULT   1
 
 /*
     ############################################################################################
@@ -346,9 +354,20 @@ void DRAW_LIMITS_setEnable(bool enabled);
 void core_views_statusBar_draw_time(bool draw);
 void core_views_draw_statusbar_battery(bool draw, unsigned char batteryCharge);
 void drawBatteryIcon(int x, int y, unsigned char charge, bool isCharging, bool draw);
+unsigned char core_time_getHours_byte();
+unsigned char core_time_getMinutes_byte();
+unsigned char core_time_getDate();
+unsigned char core_time_getSeconds_byte();
+void driver_accelerometer_setup();
+void driver_accelerometer_loop();
+void core_pedometer_setup();
+long get_pedometer_steps();
+void core_pedometer_newDate();
 
 #define DEG_TO_RAD      0.01745329
 #define RAD_TO_DEG      57.2957786
+
+#define RTC_DATA_ATTR /*Nothing*/
 
 
 
@@ -737,6 +756,113 @@ float driver_battery_Temp(){
 
 bool driver_battery_isCharging(){
     return true;
+}
+
+
+unsigned char driver_rtc_emulator_hours 	= 18;
+unsigned char driver_rtc_emulator_minutes 	= 23;
+unsigned char driver_rtc_emulator_seconds 	= 48;
+uint16_t driver_rtc_emulator_year			= 2021;
+unsigned char driver_rtc_emulator_date		= 9;
+unsigned char driver_rtc_emulator_month		= 6;
+unsigned char driver_rtc_emulator_weekday 	= 5;
+
+unsigned char driver_rtc_emulator_temperature;
+
+void driver_RTC_setup(){}
+
+void driver_RTC_refresh(bool hard){
+}
+
+void driver_RTC_refresh(){
+	driver_RTC_refresh(false);
+}
+
+unsigned char driver_RTC_getMinutes(){
+	return driver_rtc_emulator_minutes;
+}
+
+void driver_RTC_setMinutes(unsigned char minutes){
+	minutes = minutes%60;
+	driver_rtc_emulator_minutes = minutes;
+}
+
+unsigned char driver_RTC_getSeconds(){
+	return driver_rtc_emulator_seconds;
+}
+
+void driver_RTC_setSeconds(unsigned char seconds){
+	seconds = seconds%60;
+	driver_rtc_emulator_seconds = seconds;
+}
+
+unsigned char driver_RTC_getHours(){
+	return driver_rtc_emulator_hours;
+}
+
+void driver_RTC_setHours(unsigned char hours){
+	hours = hours%24;
+	driver_rtc_emulator_hours = hours;
+}
+
+unsigned char driver_RTC_getTemperature(){
+	return driver_rtc_emulator_temperature;
+}
+
+unsigned char driver_RTC_getWeekDay(){
+	// TODO
+	return driver_rtc_emulator_weekday;
+}
+
+void driver_RTC_setWeekDay(unsigned char weekDay){
+	weekDay = weekDay%7;
+	driver_rtc_emulator_weekday = weekDay;
+	// TODO
+}
+
+unsigned char driver_RTC_getDate(){
+	return driver_rtc_emulator_date;
+}
+
+void driver_RTC_setDate(unsigned char date){
+	date = date%31;
+	driver_rtc_emulator_date = date;
+}
+
+unsigned char driver_RTC_getMonth(){
+	return driver_rtc_emulator_month;
+}
+
+void driver_RTC_setMonth(unsigned char month){
+	month = month%12;
+	driver_rtc_emulator_month = month;
+}
+
+uint16_t driver_RTC_getYear(){
+	return driver_rtc_emulator_year;
+}
+
+
+void driver_RTC_setYear(int year){
+	#ifndef RTC_MIN_YEAR
+		#define RTC_MIN_YEAR 2020
+	#endif
+	#ifndef RTC_MAX_YEAR
+		#define RTC_MAX_YEAR 2070
+	#endif
+
+	if(year<RTC_MIN_YEAR) year = RTC_MAX_YEAR;
+	if(year>RTC_MAX_YEAR) year = RTC_MIN_YEAR;
+	
+	driver_rtc_emulator_year = year;
+}
+
+void driver_RTC_setAlarmBySeconds(unsigned char seconds){
+	/*
+	rtc.disableAlarm();
+    rtc.setAlarmBySeconds((driver_RTC_getSeconds()+seconds)%60);
+    rtc.enableAlarm();
+	*/
 }
 
 
@@ -2607,6 +2733,7 @@ void drawDebugString(int val, int y){
 }
 
 
+
 void core_time_onNewDate(){ 
     // Calling once in a day
     // Clearing all counting data for a day
@@ -2629,10 +2756,7 @@ long getCurrentSystemTime(){
 #ifdef RTC_ENABLE
     RTC_DATA_ATTR unsigned char lastDay = 0;
     unsigned long driver_RTC_lastTimeRefresh = 0;
-
-    void core_time_driver_RTC_refresh(){
-        core_time_driver_RTC_refresh(false);
-    }
+    
     void core_time_driver_RTC_refresh(bool hard){
         if(hard || (millis() - driver_RTC_lastTimeRefresh>=UPDATE_RTC_EVERY)){
             driver_RTC_refresh(hard);
@@ -2641,6 +2765,10 @@ long getCurrentSystemTime(){
                 lastDay = core_time_getDate();
             }
         }
+    }
+
+    void core_time_driver_RTC_refresh(){
+        core_time_driver_RTC_refresh(false);
     }
 #endif
 
@@ -3333,7 +3461,8 @@ const unsigned char icon_arrow_bottom[] PROGMEM = {
     0x02,0x01,0x02,0x18,0x02,0x10,0x04,0xff,0xff,0xff,0xFF,0xFF,0xFF,0x7F,0xFF,0xFE,0x3F,0xFF,0xFC,0x1F,0xFF,0xF8,0x0F,0xFF,0xF0,0x07,0xFF,0xE0,0x03,0xFF,0xC0,0x01,0xFF,0x80,0x00,0xFF,0x00,0x00,0x7E,0x00,0x00,0x3C,0x00,0x00,0x18,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,
 };
 
-#ifdef PEDOMETER_ENABLE
+#if defined(PEDOMETER_ENABLE) || defined(PEDOMETER_EMULATOR)
+
     const unsigned char icon_leg[] PROGMEM = {
         //0x02,0x02,0x02,0x18,0x02,0x10,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x73,0x8E,0xFF,0xDF,0xFF,0xDF,0xFF,0xDF,0xCE,0x59,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x39,0xC7,0xFF,0xDF,0xFF,0xDF,0xFF,0xDF,0xFF,0xDF,0xFF,0xDF,0x5A,0xCB,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0xCE,0x59,0xFF,0xDF,0xFF,0xDF,0xFF,0xDF,0xFF,0xDF,0xFF,0xDF,0xBD,0xD7,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x39,0xC7,0xFF,0xDF,0xFF,0xDF,0xFF,0xDF,0xFF,0xDF,0xFF,0xDF,0xFF,0xDF,0xE7,0x1C,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0xA5,0x14,0xFF,0xDF,0xFF,0xDF,0xFF,0xDF,0xFF,0xDF,0xFF,0xDF,0xFF,0xDF,0xEF,0x5D,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0xDE,0xDB,0xFF,0xDF,0xFF,0xDF,0xFF,0xDF,0xFF,0xDF,0xFF,0xDF,0xFF,0xDF,0xE7,0x1C,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0xF7,0x9E,0xFF,0xDF,0xFF,0xDF,0xFF,0xDF,0xFF,0xDF,0xFF,0xDF,0xFF,0xDF,0xBD,0xD7,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x21,0x04,0xFF,0xDF,0xFF,0xDF,0xFF,0xDF,0xFF,0xDF,0xFF,0xDF,0xFF,0xDF,0xF7,0x9E,0x39,0xC7,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x84,0x10,0xFF,0xDF,0xFF,0xDF,0xFF,0xDF,0xFF,0xDF,0xFF,0xDF,0xFF,0xDF,0x84,0x10,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0xE7,0x1C,0xFF,0xDF,0xFF,0xDF,0xFF,0xDF,0xFF,0xDF,0xFF,0xDF,0xB5,0x96,0x10,0x82,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x8C,0x51,0xFF,0xDF,0xFF,0xDF,0xFF,0xDF,0xFF,0xDF,0xFF,0xDF,0xFF,0xDF,0x7B,0xCF,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0xF7,0x9E,0xFF,0xDF,0xFF,0xDF,0xFF,0xDF,0xFF,0xDF,0xFF,0xDF,0xFF,0xDF,0xD6,0x9A,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x7B,0xCF,0xFF,0xDF,0xFF,0xDF,0xFF,0xDF,0xFF,0xDF,0xFF,0xDF,0xFF,0xDF,0xFF,0xDF,0xFF,0xDF,0xA5,0x14,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0xB5,0x96,0xFF,0xDF,0xFF,0xDF,0xFF,0xDF,0xFF,0xDF,0xFF,0xDF,0xFF,0xDF,0xFF,0xDF,0xFF,0xDF,0xFF,0xDF,0x63,0x0C,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0xCE,0x59,0xFF,0xDF,0xFF,0xDF,0xFF,0xDF,0xFF,0xDF,0xFF,0xDF,0xFF,0xDF,0xFF,0xDF,0xFF,0xDF,0xFF,0xDF,0xE7,0x1C,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0xA5,0x14,0xFF,0xDF,0xFF,0xDF,0xFF,0xDF,0xFF,0xDF,0xFF,0xDF,0xFF,0xDF,0xFF,0xDF,0xFF,0xDF,0xFF,0xDF,0xFF,0xDF,0x08,0x41,0x00,0x00,0x00,0x00,0x08,0x41,0x52,0x8A,0x63,0x0C,0xD6,0x9A,0xFF,0xDF,0xFF,0xDF,0xFF,0xDF,0xFF,0xDF,0xFF,0xDF,0xFF,0xDF,0xFF,0xDF,0xFF,0xDF,0xEF,0x5D,0x00,0x00,0x00,0x00,0x00,0x00,0x52,0x8A,0xE7,0x1C,0x94,0x92,0x52,0x8A,0xC6,0x18,0xFF,0xDF,0xFF,0xDF,0xFF,0xDF,0xFF,0xDF,0xFF,0xDF,0xFF,0xDF,0xFF,0xDF,0xA5,0x14,0x00,0x00,0x00,0x00,0x00,0x00,0x5A,0xCB,0xDE,0xDB,0xB5,0x96,0x73,0x8E,0x63,0x0C,0x73,0x8E,0xDE,0xDB,0xFF,0xDF,0xFF,0xDF,0xFF,0xDF,0xFF,0xDF,0xCE,0x59,0x29,0x45,0x00,0x00,0x00,0x00,0x00,0x00,0x08,0x41,0x4A,0x49,0xBD,0xD7,0xEF,0x5D,0x8C,0x51,0x21,0x04,0x52,0x8A,0x6B,0x4D,0xB5,0x96,0xDE,0xDB,0x5A,0xCB,0x42,0x08,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x9C,0xD3,0xFF,0xDF,0xC6,0x18,0xBD,0xD7,0xAD,0x55,0x08,0x41,0x29,0x45,0x39,0xC7,0x63,0x0C,0xAD,0x55,0xAD,0x55,0x63,0x0C,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x18,0xC3,0x31,0x86,0xA5,0x14,0xFF,0xDF,0xF7,0x9E,0xAD,0x55,0xC6,0x18,0xAD,0x55,0xD6,0x9A,0xFF,0xDF,0xFF,0xDF,0xCE,0x59,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x18,0xC3,0xBD,0xD7,0x94,0x92,0xF7,0x9E,0xFF,0xDF,0xEF,0x5D,0xF7,0x9E,0xFF,0xDF,0xFF,0xDF,0xD6,0x9A,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x9C,0xD3,0xFF,0xDF,0x84,0x10,0x94,0x92,0xFF,0xDF,0xFF,0xDF,0x7B,0xCF,0x00,0x00,
         0x02,0x01,0x02,0x10,0x02,0x10,0x04,0x00,0x00,0x00,0xC7,0xE3,0x83,0xC1,0x03,0xC1,0x01,0x80,0x01,0x80,0x01,0x80,0x01,0x80,0x01,0x81,0x83,0xC1,0xC3,0xC3,0xFF,0xFF,0xFF,0xFF,0xE3,0xC7,0xC1,0x83,0xC1,0x83,0xE3,0xC7,0x04,0xff,0xff,0xff,0x38,0x1C,0x7C,0x3E,0xFC,0x3E,0xFE,0x7F,0xFE,0x7F,0xFE,0x7F,0xFE,0x7F,0xFE,0x7E,0x7C,0x3E,0x3C,0x3C,0x00,0x00,0x00,0x00,0x1C,0x38,0x3E,0x7C,0x3E,0x7C,0x1C,0x38,
@@ -3362,7 +3491,7 @@ const byte* getIcon(int icon){
             case ICON_BATTERY_10:           return battery10;  
             case ICON_BATTERY_0:            return battery0;
         #endif
-        #ifdef PEDOMETER_ENABLE
+        #if defined(PEDOMETER_ENABLE) || defined(PEDOMETER_EMULATOR)
             case ICON_LEG:                  return icon_leg;
             case ICON_LEG_GREY:             return icon_leg_grey;
         #endif
@@ -5310,6 +5439,12 @@ const unsigned char appNameClass::icon[] PROGMEM = {
 #define appNameClass    ClockApp          // App name without spaces
 #define appName         "Clock"              // App name with spaces 
 
+#ifdef PLATFORM_PC_EMULATOR
+    long get_pedometer_steps(){
+        return 12315;
+    }
+#endif
+
 class appNameClass: public Application{
     public:
         bool isfullScreen         = true;
@@ -5346,7 +5481,7 @@ class appNameClass: public Application{
             bool last_battery_charging  = "";
         #endif
 
-        #ifdef PEDOMETER_ENABLE
+        #if defined(PEDOMETER_ENABLE) || defined(PEDOMETER_EMULATOR)
             unsigned int last_pedometer   = 0;
         #endif
 
@@ -5527,8 +5662,8 @@ void appNameClass::draw_current_time(bool draw){
         #define PEDOMETER_LABEL_POSITION_Y (SCREEN_HEIGHT - 18)
         #define PEDOMETER_LABEL_POSITION_X_OFFSET (0)
         #define PEDOMETER_LABEL_POSITION_PADDING (3)
-        #ifdef PEDOMETER_ENABLE
-
+        #if defined(PEDOMETER_ENABLE) || defined(PEDOMETER_EMULATOR)
+            
             if(draw) this->last_pedometer = get_pedometer_steps();
             String pedometer_toPrint = String(this->last_pedometer);
 
@@ -5541,38 +5676,20 @@ void appNameClass::draw_current_time(bool draw){
                 PEDOMETER_LABEL_POSITION_Y + PEDOMETER_LABEL_POSITION_PADDING - 9
             );
 
-            /*
-            drawImage(draw, getIcon(ICON_LEG_GREY), 
-                SCREEN_WIDTH/2 + PEDOMETER_LABEL_POSITION_X_OFFSET, 
-                PEDOMETER_LABEL_POSITION_Y + PEDOMETER_LABEL_POSITION_PADDING - 9
-            );
-            */
-
             if(draw){
                 
-                //setDrawColor_ContrastColor();
                 setDrawColor(192,192,192);
                 drawString(pedometer_toPrint, 
                     SCREEN_WIDTH/2 - pedometer_label_width_05 + PEDOMETER_LABEL_POSITION_X_OFFSET, 
                     PEDOMETER_LABEL_POSITION_Y + 1, 1);
 
-                /*
-                drawString(pedometer_toPrint, 
-                    SCREEN_WIDTH/2 - pedometer_toPrint.length()*FONT_CHAR_WIDTH - PEDOMETER_LABEL_POSITION_PADDING + PEDOMETER_LABEL_POSITION_X_OFFSET, 
-                    PEDOMETER_LABEL_POSITION_Y + 1, 1);
-                    */
             }else{
                 setDrawColor_BackGroundColor();  
-                /*
                 clearString(pedometer_toPrint, 
-                    SCREEN_WIDTH/2 - pedometer_toPrint.length()*FONT_CHAR_WIDTH - PEDOMETER_LABEL_POSITION_PADDING + PEDOMETER_LABEL_POSITION_X_OFFSET, 
-                    PEDOMETER_LABEL_POSITION_Y + 1, 1);
-                */
-
-               clearString(pedometer_toPrint, 
                     SCREEN_WIDTH/2 - pedometer_label_width_05 + PEDOMETER_LABEL_POSITION_X_OFFSET, 
                     PEDOMETER_LABEL_POSITION_Y + 1, 1);
             }
+            
         #endif
             
     #else
@@ -6197,26 +6314,48 @@ const unsigned char appNameClass::icon[] PROGMEM = {
     0xC0,0x00,0x00,0x03,0xC0,0x00,0x00,0x03,0xC0,0x00,0x00,0x03,0xC0,0x00,0x00,0x03,0xC0,0x00,0x00,0x03,0xFF,0x00,
     0x00,0xFF,0xFF,0x00,0x00,0xFF,
 };
-
+#
 #define appNameClass    MainMenuApp      // App name without spaces
 #define appName         "Main menu"      // App name with spaces 
 
+#define PAGES_LIST_HEIGHT               20
 #define ACTIVE_SCREEN_WIDTH             SCREEN_WIDTH
-#define ACTIVE_SCREEN_HEIGHT            (SCREEN_HEIGHT - STYLE_STATUSBAR_HEIGHT)
+#define ACTIVE_SCREEN_HEIGHT            (SCREEN_HEIGHT - STYLE_STATUSBAR_HEIGHT - PAGES_LIST_HEIGHT)
 #define SINGLE_ELEMENT_MIN_WIDTH        100
 #define SINGLE_ELEMENT_MIN_HEIGHT       80
 
 #define SINGLE_ELEMENTS_IN_X            ((int)(ACTIVE_SCREEN_WIDTH/SINGLE_ELEMENT_MIN_WIDTH))
 #define SINGLE_ELEMENTS_IN_Y            ((int)(ACTIVE_SCREEN_HEIGHT/SINGLE_ELEMENT_MIN_HEIGHT))
 
+#define SINGLE_ELEMENTS_IN_X_MACRO      ((ACTIVE_SCREEN_WIDTH/SINGLE_ELEMENT_MIN_WIDTH))
+#define SINGLE_ELEMENTS_IN_Y_MACRO      ((ACTIVE_SCREEN_HEIGHT/SINGLE_ELEMENT_MIN_HEIGHT))
+
+#if ((ACTIVE_SCREEN_WIDTH/SINGLE_ELEMENT_MIN_WIDTH)) < 1
+  #define SINGLE_ELEMENTS_IN_X 1
+  #define SINGLE_ELEMENTS_IN_X_MACRO 1
+#endif
+
+#if ((ACTIVE_SCREEN_HEIGHT/SINGLE_ELEMENT_MIN_HEIGHT)) < 1
+  #define SINGLE_ELEMENTS_IN_Y 1
+  #define SINGLE_ELEMENTS_IN_Y_MACRO 1
+#endif
+
+#if ( ((SINGLE_ELEMENTS_IN_X_MACRO)==1) && ((SINGLE_ELEMENTS_IN_Y_MACRO)==1))
+  #define SINGLE_ELEMENT_ON_SCREEN
+#endif
+
+#ifdef NARROW_SCREEN
+  #define SINGLE_ELEMENTS_IN_X 1
+  #define SINGLE_ELEMENTS_IN_X_MACRO 1
+  #define SINGLE_ELEMENTS_IN_Y 1
+  #define SINGLE_ELEMENTS_IN_Y_MACRO 1
+  #define SINGLE_ELEMENT_ON_SCREEN
+#endif
+
 #define SINGLE_ELEMENT_REAL_WIDTH       ((int)(ACTIVE_SCREEN_WIDTH/SINGLE_ELEMENTS_IN_X))
 #define SINGLE_ELEMENT_REAL_HEIGHT      ((int)(ACTIVE_SCREEN_HEIGHT/SINGLE_ELEMENTS_IN_Y))
-
-#define PAGES_LIST_POSITION             (SCREEN_HEIGHT)
-
+#define PAGES_LIST_POSITION             (SCREEN_HEIGHT-PAGES_LIST_HEIGHT/2)
 #define APPS_ON_SINGLE_PAGE             (SINGLE_ELEMENTS_IN_X * SINGLE_ELEMENTS_IN_Y)
-
-
 
 
 #ifdef  APP_MENU_APPLICATIONS_0
@@ -6343,6 +6482,8 @@ class appNameClass: public Application{
         const unsigned char* getApplicationTitle(int num);
         const unsigned char* getApplicationIcon(int num);
         void drawIcons(bool draw);
+        void updateActiveAppIndex(int newSelectedAppIndex);
+        void drawActiveAppFrame(bool draw);
 
 };
 
@@ -6368,116 +6509,225 @@ const unsigned char appNameClass::icon[] PROGMEM = {
 };
 
 void appNameClass::onCreate(){
+    
+    DRAW_LIMITS_setEnable(true);
+    DRAW_LIMIT_reset();
+    DRAW_LIMITS_setEnable(STYLE_STATUSBAR_HEIGHT, -1, -1, -1);
+
+    setBackgroundColor(0,0,0);
+    setContrastColor(255, 255, 255);
+
+    unsigned char app_z_menu_selectedAppIndex_presaved = app_z_menu_selectedAppIndex;
+    app_z_menu_selectedAppIndex=0;
+    #ifndef SINGLE_ELEMENT_ON_SCREEN
+      core_views_draw_pages_list_simple(true, PAGES_LIST_POSITION, TOTAL_PAGES);
+    #endif
+
+    unsigned char currentPage = app_z_menu_selectedAppIndex_presaved/APPS_ON_SINGLE_PAGE;
+    if(currentPage==0) core_views_draw_active_page(true, PAGES_LIST_POSITION, TOTAL_PAGES, currentPage);
+    //else this->updateActiveAppIndex(app_z_menu_selectedAppIndex_presaved);  
+    this->updateActiveAppIndex(app_z_menu_selectedAppIndex_presaved);  
+
+    // Drawing icons
     this->drawIcons(true);
+    #ifndef SINGLE_ELEMENT_ON_SCREEN
+      this->drawActiveAppFrame(true);  
+    #endif
     
 }
 
-void appNameClass::drawIcons(bool draw){
+void appNameClass::updateActiveAppIndex(int newSelectedAppIndex){
 
-  DRAW_LIMITS_setEnable(true);
-  DRAW_LIMIT_reset();
-  DRAW_LIMITS_setEnable(STYLE_STATUSBAR_HEIGHT, -1, -1, -1);
+  if(newSelectedAppIndex<0) newSelectedAppIndex = APP_MENU_APPLICATIONS_QUANTITY - 1;
+  if(newSelectedAppIndex>=APP_MENU_APPLICATIONS_QUANTITY) newSelectedAppIndex = 0;
+
+  if(app_z_menu_selectedAppIndex!=newSelectedAppIndex){
+    #ifndef SINGLE_ELEMENT_ON_SCREEN
+      this->drawActiveAppFrame(false);
+    #endif
+
+    if( (int)((app_z_menu_selectedAppIndex)/APPS_ON_SINGLE_PAGE) != (int)((newSelectedAppIndex)/APPS_ON_SINGLE_PAGE)){
+      // update page
+      this->drawIcons(false);
+      core_views_draw_active_page(false, PAGES_LIST_POSITION, TOTAL_PAGES, (int)(app_z_menu_selectedAppIndex/APPS_ON_SINGLE_PAGE));
+      app_z_menu_selectedAppIndex = newSelectedAppIndex;
+      core_views_draw_active_page(true, PAGES_LIST_POSITION, TOTAL_PAGES, (int)(app_z_menu_selectedAppIndex/APPS_ON_SINGLE_PAGE));
+      this->drawIcons(true);
+    }else{
+      app_z_menu_selectedAppIndex = newSelectedAppIndex;
+    }
+
+    // update selected app frame
+    #ifndef SINGLE_ELEMENT_ON_SCREEN
+      this->drawActiveAppFrame(true);
+    #endif
+  }
+}
+
+void appNameClass::drawActiveAppFrame(bool draw){
+  #ifdef SINGLE_ELEMENT_ON_SCREEN
+    return;
+  #endif
+
+  unsigned char positionOnScreen     = app_z_menu_selectedAppIndex%APPS_ON_SINGLE_PAGE;
+  unsigned char positionOnScreen_x   = app_z_menu_selectedAppIndex%SINGLE_ELEMENTS_IN_X;
+  unsigned char positionOnScreen_y   = positionOnScreen/SINGLE_ELEMENTS_IN_X;
+
+  int x0 = positionOnScreen_x*SINGLE_ELEMENT_REAL_WIDTH;
+  int y0 = positionOnScreen_y*SINGLE_ELEMENT_REAL_HEIGHT + STYLE_STATUSBAR_HEIGHT+1;
+  int x1 = x0+SINGLE_ELEMENT_REAL_WIDTH;
+  int y1 = y0+SINGLE_ELEMENT_REAL_HEIGHT;
+
+  if(draw) setDrawColor(196, 196, 196);
+  else setDrawColor(getBackgroundColor_red(), getBackgroundColor_green(), getBackgroundColor_blue());
+
+  for(unsigned char i=0; i<4; i++){
+    unsigned char delta = 5+i;
+    drawRect(x0+delta, y0+delta, x1-delta, y1-delta);  
+  }
   
-	for(unsigned char app_num=0; app_num<APP_MENU_APPLICATIONS_QUANTITY; app_num++){
+}
 
-		unsigned char x_position = app_num%SINGLE_ELEMENTS_IN_X;
-		unsigned char y_position = app_num/SINGLE_ELEMENTS_IN_Y;
+void appNameClass::drawIcons(bool draw){
+  for (unsigned char y_position=0; y_position<SINGLE_ELEMENTS_IN_Y; y_position++){
+        for (unsigned char x_position=0; x_position<SINGLE_ELEMENTS_IN_X; x_position++){
+            int x0 = x_position*SINGLE_ELEMENT_REAL_WIDTH;
+            int y0 = y_position*SINGLE_ELEMENT_REAL_HEIGHT + STYLE_STATUSBAR_HEIGHT+1;
+            int x1 = x0+SINGLE_ELEMENT_REAL_WIDTH;
+            int y1 = y0+SINGLE_ELEMENT_REAL_HEIGHT;
 
-		int x0 = x_position*SINGLE_ELEMENT_REAL_WIDTH;
-		int y0 = y_position*SINGLE_ELEMENT_REAL_HEIGHT + STYLE_STATUSBAR_HEIGHT+1;
-		int x1 = x0+SINGLE_ELEMENT_REAL_WIDTH;
-		int y1 = y0+SINGLE_ELEMENT_REAL_HEIGHT;
+            int x_center = (x0+x1)/2;
+            int y_center = (y0+y1)/2;
 
-		int x_center = (x0+x1)/2;
-		int y_center = (y0+y1)/2;
+            int app_num = y_position*(SINGLE_ELEMENTS_IN_X) + x_position + APPS_ON_SINGLE_PAGE*(int)(app_z_menu_selectedAppIndex/APPS_ON_SINGLE_PAGE);
 
-		core_views_draw_app_icon(
-			draw, 
-			x_center, y_center - this->scroll_y, 
-			(const unsigned char*)this->getApplicationTitle(app_num), 
-			this->getApplicationIcon(app_num)
-		);
-	}
+            if(app_num<APP_MENU_APPLICATIONS_QUANTITY){
+              #ifdef ESP8266
+                ESP.wdtDisable();
+              #endif
 
-  DRAW_LIMITS_setEnable(false);
+              //debug(String(app_num), 1000);
+              #ifdef MAIN_MENU_SMOOTH_ANIMATION
+                if(this->scroll_x!=0){
+                  if(this->scroll_x<0){
+                  }else if(this->scroll_x>0){
+                    // unsigned char lastIcon=this->scroll_x/SCREEN_WIDTH;
+                    //debug(String(lastIcon));
+                    
+                    char elementsToPreDraw = this->scroll_x/SCREEN_WIDTH + 1;
+                    elementsToPreDraw = elementsToPreDraw%APP_MENU_APPLICATIONS_QUANTITY;
+                    for(unsigned char elementDraw = 0; elementDraw<=elementsToPreDraw; elementDraw++){
+                      int appElementDraw = app_num - elementDraw;
+                      while(appElementDraw<0) appElementDraw+=APP_MENU_APPLICATIONS_QUANTITY;
+                      appElementDraw = appElementDraw%APP_MENU_APPLICATIONS_QUANTITY;
+
+                      core_views_draw_app_icon(
+                        draw, 
+                        this->scroll_x + x_center - elementDraw*SCREEN_WIDTH , y_center, 
+                        (const unsigned char*)this->getApplicationTitle(appElementDraw), 
+                        this->getApplicationIcon(appElementDraw)
+                      );
+                    }
+
+                  }
+                }
+              #endif
+
+              core_views_draw_app_icon(
+                draw, 
+                this->scroll_x + x_center, y_center, 
+                (const unsigned char*)this->getApplicationTitle(app_num), 
+                this->getApplicationIcon(app_num)
+              );
+            }
+        }
+    }
 }
 
 void appNameClass::onLoop(){
+  #ifdef MAIN_MENU_SMOOTH_ANIMATION
+    if(this->scroll_x!=0){
+      this->drawIcons(false);
+      if(this->scroll_x!=0){
+        //this->scroll_x++;
+        int dx = abs(scroll_x)/SMOOTH_ANIMATION_COEFFICIENT + 1;
+        if(scroll_x>scroll_to_x) dx *= -1;
+        scroll_x+=dx;
+
+        if (abs(dx)<1) scroll_x=0;
+      }
+      this->drawIcons(true);
+    }
+  #endif
 }
 
 void appNameClass::onDestroy(){
 }
 
 void appNameClass::onEvent(unsigned char event, int val1, int val2){
+    
+  /*
+  BUTTON_UP
+  BUTTON_SELECT
+  BUTTON_DOWN
+  BUTTON_BACK
+  BUTTON_POWER
+  */
 
-    if(event==EVENT_ON_TOUCH_START){
-
-    }else if(event==EVENT_ON_TOUCH_CLICK){    
-
-      int position_x = (this->scroll_x + val1)/(SINGLE_ELEMENT_REAL_WIDTH);
-      int position_y = (this->scroll_y + val2 + STYLE_STATUSBAR_HEIGHT)/(SINGLE_ELEMENT_REAL_HEIGHT);
-      //if(position_y<0) position_y = 1;
-
-      position_y -= 1;
-      if(position_y<0) position_y = 0;
-      if(position_x>SINGLE_ELEMENTS_IN_X-1)position_x=SINGLE_ELEMENTS_IN_X-1;
-      if(position_x<0) position_x = 0;
+  #if (DRIVER_CONTROLS_TOTALBUTTONS == 1 || DRIVER_CONTROLS_TOTALBUTTONS == 2)
+    if(event==EVENT_BUTTON_PRESSED){
       
-      int appNum = position_x + position_y*SINGLE_ELEMENTS_IN_X;
-      //if(appNum<0) appNum = 0;
-      if(appNum<0 || appNum>APP_MENU_APPLICATIONS_QUANTITY-1) return; //appNum = APP_MENU_APPLICATIONS_QUANTITY-1;
-      startApp(appNum);
-
-    }else if(event==EVENT_ON_TOUCH_RELEASED){
-      #ifdef TOUCH_SCREEN_ENABLE
-        #ifdef PLATFORM_PC_emulator
-          this->drawIcons(false);
-          float position = ((float)this->scroll_y)/((float)SINGLE_ELEMENT_REAL_HEIGHT);
-          this->scroll_y = round(position) * SINGLE_ELEMENT_REAL_HEIGHT;
-          this->drawIcons(true);
-        #else
-          if(millis() - getTOUCH_SCREEN_touch_start_ms()<150){
-            // Fast scroll (swipe)
-            if(abs(getTOUCH_SCREEN_touch_start_y()-val2)>10){
-              // Slow scroll
-              this->drawIcons(false);
-              float position = ((float)this->scroll_y)/((float)SINGLE_ELEMENT_REAL_HEIGHT);
-
-              if(getTOUCH_SCREEN_touch_start_y()-val2>0) this->scroll_y = round(position+2) * SINGLE_ELEMENT_REAL_HEIGHT;
-              else this->scroll_y = round(position-2) * SINGLE_ELEMENT_REAL_HEIGHT;
-
-              int max_scroll = (APP_MENU_APPLICATIONS_QUANTITY-1)/SINGLE_ELEMENTS_IN_Y*SINGLE_ELEMENT_REAL_HEIGHT + STYLE_STATUSBAR_HEIGHT+1+SINGLE_ELEMENT_REAL_HEIGHT - SCREEN_HEIGHT;
-              if(scroll_y>max_scroll) {
-                scroll_y = max_scroll;
-              }
-              if(scroll_y<0){
-                scroll_y=0;
-              }
-              this->drawIcons(true);    
-            }
-          }else{
-            // Slow scroll
-            this->drawIcons(false);
-            float position = ((float)this->scroll_y)/((float)SINGLE_ELEMENT_REAL_HEIGHT);
-            this->scroll_y = round(position) * SINGLE_ELEMENT_REAL_HEIGHT;
-            this->drawIcons(true);
-          }
-        #endif
-      #endif
-    }else if(event==EVENT_ON_TOUCH_DRAG){
-
-      // SCREEN SCROLL
-      this->drawIcons(false);
-      this->scroll_y -= val2;
-      if(scroll_y<0) scroll_y = 0;
-
-      int max_scroll = (APP_MENU_APPLICATIONS_QUANTITY-1)/SINGLE_ELEMENTS_IN_Y*SINGLE_ELEMENT_REAL_HEIGHT + STYLE_STATUSBAR_HEIGHT+1+SINGLE_ELEMENT_REAL_HEIGHT - SCREEN_HEIGHT;
-      if(scroll_y>max_scroll) {
-        scroll_y = max_scroll;
+    }else if(event==EVENT_BUTTON_RELEASED){
+    }else if(event==EVENT_BUTTON_LONG_PRESS){
+      if(val1==BUTTON_SELECT){
+        startApp(app_z_menu_selectedAppIndex);
       }
-
-      this->drawIcons(true);
+    }else if(event==EVENT_ON_TIME_CHANGED){
+    //}else if(event==EVENT_BUTTON_SHORT_SINGLE_PRESS){
+    }else if(event==EVENT_BUTTON_SHORT_PRESS){
+      if(val1==BUTTON_BACK){
+        this->updateActiveAppIndex(app_z_menu_selectedAppIndex-1);
+      }else if(val1==BUTTON_SELECT){
+        this->drawIcons(false);
+        #ifdef MAIN_MENU_SMOOTH_ANIMATION
+          this->scroll_x += SCREEN_WIDTH;
+        #endif
+        this->updateActiveAppIndex(app_z_menu_selectedAppIndex+1);
+      }
+    }else if(event==EVENT_ON_TOUCH_DOUBLE_PRESS){
+      if(val1==BUTTON_SELECT){
+        this->drawIcons(false);
+        #ifdef MAIN_MENU_SMOOTH_ANIMATION
+          this->scroll_x += SCREEN_WIDTH;
+        #endif
+        this->updateActiveAppIndex(app_z_menu_selectedAppIndex+1);
+      }
     }
+  #else
+    if(event==EVENT_BUTTON_PRESSED){
+      switch(val1){
+        case BUTTON_UP:
+          this->updateActiveAppIndex(app_z_menu_selectedAppIndex-1);
+          break;
+        case BUTTON_SELECT:
+          startApp(app_z_menu_selectedAppIndex);
+          break;
+        case BUTTON_DOWN:
+          this->updateActiveAppIndex(app_z_menu_selectedAppIndex+1);
+          break;
+      }
+    }else if(event==EVENT_BUTTON_RELEASED){
+
+    }else if(event==EVENT_BUTTON_LONG_PRESS){
+
+    }else if(event==EVENT_ON_TIME_CHANGED){
+
+    }else if(event==EVENT_BUTTON_SHORT_SINGLE_PRESS){
+
+    }
+
+    
+  #endif
 
 }
 

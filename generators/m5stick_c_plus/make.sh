@@ -35,7 +35,7 @@ cp sdk/drivers/driver_controls_m5stickC.ino                 outputs/m5stick_c_pl
 cp sdk/drivers/driver_rtc_m5stack_bm8563.ino                outputs/m5stick_c_plus/cubos/     
 cp sdk/drivers/driver_cpu_m5stickC.ino                      outputs/m5stick_c_plus/cubos/   
 cp sdk/drivers/driver_device_m5stickC.ino                   outputs/m5stick_c_plus/cubos/
-cp sdk/drivers/driver_accelerometer_m5stickC.ino            outputs/m5stick_c_plus/cubos/
+cp sdk/drivers/driver_IMU_m5stickC.ino            outputs/m5stick_c_plus/cubos/
 
 # Core
 cp sdk/core/core_basic.ino              outputs/m5stick_c_plus/cubos/  

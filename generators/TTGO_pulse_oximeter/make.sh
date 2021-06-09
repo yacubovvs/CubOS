@@ -33,7 +33,7 @@ cp sdk/drivers/driver_display_eTFT_ST7735_T-Wristband_LiLyGo.ino    outputs/TTGO
 cp sdk/drivers/driver_controls_T-Wristband_LiLyGo.ino               outputs/TTGO_pulse_oximeter/cubos/     
 cp sdk/drivers/driver_rtc_pcf8563.ino                               outputs/TTGO_pulse_oximeter/cubos/     
 cp sdk/drivers/driver_cpu_T-Wristband_LiLyGo.ino                    outputs/TTGO_pulse_oximeter/cubos/     
-cp sdk/drivers/driver_MPU9250_T-Wristband_LiLyGo.ino                outputs/TTGO_pulse_oximeter/cubos/     
+cp sdk/drivers/driver_IMU_MPU9250_T-Wristband_LiLyGo.ino                outputs/TTGO_pulse_oximeter/cubos/     
 
 # Core
 cp sdk/core/core_basic.ino              outputs/TTGO_pulse_oximeter/cubos/  

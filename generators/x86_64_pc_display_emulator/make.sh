@@ -31,6 +31,9 @@ echo "
 cat "sdk/drivers/driver_battery_emulator.ino"       >> $OUTPUT_DIRECTORY/cubos/main.cpp
 echo "
 "   >> $OUTPUT_DIRECTORY/cubos/main.cpp
+cat "sdk/drivers/driver_rtc_emulator.ino"       >> $OUTPUT_DIRECTORY/cubos/main.cpp
+echo "
+"   >> $OUTPUT_DIRECTORY/cubos/main.cpp
 
 # Platform libs
 #cp sdk/platforms/core_esp8266_noniso.c  $OUTPUT_DIRECTORY/cubos/
@@ -85,7 +88,6 @@ echo "
 "   >> $OUTPUT_DIRECTORY/cubos/main.cpp
 cat sdk/core/core_touchscreen.ino       >> $OUTPUT_DIRECTORY/cubos/main.cpp
 
-
 # Applications
 echo "
 "   >> $OUTPUT_DIRECTORY/cubos/main.cpp
@@ -127,10 +129,13 @@ echo "
 "   >> $OUTPUT_DIRECTORY/cubos/main.cpp
 cat sdk/apps/app_touchTest.ino             >> $OUTPUT_DIRECTORY/cubos/main.cpp
 echo "
-"   >> $OUTPUT_DIRECTORY/cubos/main.cpp
-cat sdk/apps/app_z_menu_touch.ino          >> $OUTPUT_DIRECTORY/cubos/main.cpp
+#"   >> $OUTPUT_DIRECTORY/cubos/main.cpp
+cat sdk/apps/app_z_menu.ino          >> $OUTPUT_DIRECTORY/cubos/main.cpp
 echo "
 "   >> $OUTPUT_DIRECTORY/cubos/main.cpp
+#cat sdk/apps/app_z_menu_touch.ino          >> $OUTPUT_DIRECTORY/cubos/main.cpp
+#echo "
+#"   >> $OUTPUT_DIRECTORY/cubos/main.cpp
 
 #cat sdk/libs/Arduino_ST7789.cpp          $OUTPUT_DIRECTORY/cubos/main.cpp
 #cat sdk/libs/Arduino_ST7789.h            $OUTPUT_DIRECTORY/cubos/main.cpp

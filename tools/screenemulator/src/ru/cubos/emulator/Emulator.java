@@ -11,7 +11,7 @@ import java.util.List;
 
 public class Emulator extends JFrame {
     private ImagePanel imageWrapper;
-    private BufferedImage image;
+    public BufferedImage image;
 
     protected int width;
     protected int height;
