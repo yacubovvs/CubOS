@@ -21,7 +21,7 @@
 * Long click - select
 * Double click - back
 
-## Extra
+## Extras
 ### Holder model
 STL holder model for 3D printing: https://github.com/yacubovvs/cubos3/tree/main/releases/M5StickC/models
 <img alt="CubOS onM5StickC view" src="images\m5stickc_with_holder.png" height="400">
