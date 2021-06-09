@@ -1024,7 +1024,7 @@ String appNameClass::getApplicationSubTitle(unsigned char submenu, unsigned char
                 case 0:
                     if(getLast) return this->lastDateString_year;
                     else{
-                        this->lastDateString_year = core_time_getYear();
+                        this->lastDateString_year = String(core_time_getYear());
                         return this->lastDateString_year;
                     }   
                 case 1:
@@ -1036,7 +1036,7 @@ String appNameClass::getApplicationSubTitle(unsigned char submenu, unsigned char
                 case 2:
                     if(getLast) return this->lastDateString_date;
                     else{
-                        this->lastDateString_date = core_time_getDate();
+                        this->lastDateString_date = String(core_time_getDate());
                         return this->lastDateString_date;
                     }   
                 case 3:

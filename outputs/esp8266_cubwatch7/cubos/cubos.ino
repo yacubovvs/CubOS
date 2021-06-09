@@ -39,15 +39,15 @@
 #define device_has_battery
 
 #define platform_esp32
-#define device_has_bluetooth
-#define device_has_wifi
+#define BLUETOOTH_ENABLE
+#define WIFI_ENABLE
 
 #define ON_TIME_CHANGE_EVERY_MS 1000
 
 #define HARDWARE_BUTTONS_ENABLED              // Conf of controls with hardware btns    
 //#define isTouchScreen                 // Conf of controls
 
-#define colorScreen                     // Screen is colored
+#define COLOR_SCREEN                     // Screen is colored
 #define noAnimation                     // Caurse of framebuffer type
 
 //#define toDefaultApp_onLeftLongPress

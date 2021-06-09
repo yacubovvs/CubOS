@@ -1,5 +1,5 @@
-#define CORE_TOUCH_DEBUG
-#define TOUCH_SCREEN_ENABLE
+//#define CORE_TOUCH_DEBUG
+//#define TOUCH_SCREEN_ENABLE
 
 #ifdef TOUCH_SCREEN_ENABLE
     bool TOUCH_SCREEN_last_isTouching   = false;

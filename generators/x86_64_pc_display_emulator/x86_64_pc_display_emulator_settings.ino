@@ -15,8 +15,8 @@
 //#define screenDebug
 #define TERMINAL_DEBUG
 
-#define SCREEN_WIDTH            80     // Screen resolution width
-#define SCREEN_HEIGHT           160     // Screen resolution height
+#define SCREEN_WIDTH            800     // Screen resolution width
+#define SCREEN_HEIGHT           480     // Screen resolution height
 
 #define FONT_CHAR_WIDTH         6     // Font letter size width
 #define FONT_CHAR_HEIGHT        8     // Font letter size height
@@ -24,11 +24,11 @@
 //#define device_has_battery
 
 #define PLATFORM_PC_EMULATOR
-#define device_has_bluetooth
-#define device_has_wifi
+#define BLUETOOTH_ENABLE
+#define WIFI_ENABLE
 
-#define MAIN_MENU_SMOOTH_ANIMATION
-#define NARROW_SCREEN
+//#define MAIN_MENU_SMOOTH_ANIMATION
+//#define NARROW_SCREEN
 
 #define ON_TIME_CHANGE_EVERY_MS 1000
 
@@ -38,13 +38,13 @@
 #define TOUCH_SCREEN_DELTA_MOVE_FOR_DRAG 7
 #define TOUCH_SCREEN_TIME_MS_FOT_LONG_TOUCH 300
 
-#define colorScreen                     // Screen is colored
+#define COLOR_SCREEN                     // Screen is colored
 //#define noAnimation                   // Caurse of framebuffer type
 
 //#define toDefaultApp_onLeftLongPress
 
-//#define STARTING_APP_NUMM   -1    // for Mainmenu (default app)
-#define STARTING_APP_NUMM   2     // for App number 7
+#define STARTING_APP_NUMM   -1    // for Mainmenu (default app)
+//#define STARTING_APP_NUMM   2     // for App number 7
 
 #undef CPU_SLEEP_ENABLE
 #undef POWERSAVE_ENABLE
