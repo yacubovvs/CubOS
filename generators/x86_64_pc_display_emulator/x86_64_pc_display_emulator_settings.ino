@@ -76,6 +76,16 @@
 #define PEDOMETER_EMULATOR
 #define FONT_SIZE_DEFAULT   1
 
+#define SOFTWARE_BUTTONS_ENABLE
+#define SOFTWARE_BUTTONS_PORITION_RIGHT
+
+#define SOFTWARE_BUTTONS_BAR_SIZE 30
+#define SOFTWARE_BUTTONS_PADDING 50
+
+#define SOFTWARE_KEYBOARD_ENABLE
+
+
+//#define NARROW_SCREEN
 /*
     ############################################################################################
     #                                                                                          #

@@ -60,6 +60,12 @@
 #define WAKE_UP_REASON_ULP                  0x05
 #define WAKE_UP_REASON_NOT_DEEP_SLEEP       0x06
 
+// SOFTWARE_BUTTONS
+#define SOFTWARE_BAR_BUTTON_UP              0x0001
+#define SOFTWARE_BAR_BUTTON_SELECT          0x0002
+#define SOFTWARE_BAR_BUTTON_DOWN            0x0003
+#define SOFTWARE_BAR_BUTTON_BACK            0x0004
+
 /*
  ############################################################################
                                  SLEEP TYPES -                               
@@ -92,6 +98,14 @@
 */
 
 #define COREVIEWS_NO_ICON_ELEMENT_HEIGHT 40
+
+#define SOFTWARE_BUTTONS_COLOR_RED          255
+#define SOFTWARE_BUTTONS_COLOR_GREEN        255
+#define SOFTWARE_BUTTONS_COLOR_BLUE         255
+
+#define SOFTWARE_BUTTONS_COLOR_RED_BG       59
+#define SOFTWARE_BUTTONS_COLOR_GREEN_BG     35
+#define SOFTWARE_BUTTONS_COLOR_BLUE_BG      71
 
 /*
 ############################################################################
@@ -147,6 +161,8 @@
 
 //#define DEBUG_SERIAL
 
+#define SOFTWARE_BUTTONS_BAR_SIZE 0
+
 /*
     ############################################################################################
     #                                                                                          #
@@ -154,3 +170,4 @@
     #                                                                                          #
     ############################################################################################
 */
+

@@ -60,6 +60,12 @@
 #define WAKE_UP_REASON_ULP                  0x05
 #define WAKE_UP_REASON_NOT_DEEP_SLEEP       0x06
 
+// SOFTWARE_BUTTONS
+#define SOFTWARE_BAR_BUTTON_UP              0x0001
+#define SOFTWARE_BAR_BUTTON_SELECT          0x0002
+#define SOFTWARE_BAR_BUTTON_DOWN            0x0003
+#define SOFTWARE_BAR_BUTTON_BACK            0x0004
+
 /*
  ############################################################################
                                  SLEEP TYPES -                               
@@ -92,6 +98,14 @@
 */
 
 #define COREVIEWS_NO_ICON_ELEMENT_HEIGHT 40
+
+#define SOFTWARE_BUTTONS_COLOR_RED          255
+#define SOFTWARE_BUTTONS_COLOR_GREEN        255
+#define SOFTWARE_BUTTONS_COLOR_BLUE         255
+
+#define SOFTWARE_BUTTONS_COLOR_RED_BG       59
+#define SOFTWARE_BUTTONS_COLOR_GREEN_BG     35
+#define SOFTWARE_BUTTONS_COLOR_BLUE_BG      71
 
 /*
 ############################################################################
@@ -147,6 +161,8 @@
 
 //#define DEBUG_SERIAL
 
+#define SOFTWARE_BUTTONS_BAR_SIZE 0
+
 /*
     ############################################################################################
     #                                                                                          #
@@ -154,6 +170,8 @@
     #                                                                                          #
     ############################################################################################
 */
+
+
 
 
 /*
@@ -233,6 +251,16 @@
 #define PEDOMETER_EMULATOR
 #define FONT_SIZE_DEFAULT   1
 
+#define SOFTWARE_BUTTONS_ENABLE
+#define SOFTWARE_BUTTONS_PORITION_RIGHT
+
+#define SOFTWARE_BUTTONS_BAR_SIZE 30
+#define SOFTWARE_BUTTONS_PADDING 50
+
+#define SOFTWARE_KEYBOARD_ENABLE
+
+
+//#define NARROW_SCREEN
 /*
     ############################################################################################
     #                                                                                          #
@@ -363,6 +391,8 @@ void driver_accelerometer_loop();
 void core_pedometer_setup();
 long get_pedometer_steps();
 void core_pedometer_newDate();
+void core_views_softwareButtons_draw();
+void core_views_softwareButtons_draw(uint16_t offset, uint8_t color_red, uint8_t color_green, uint8_t color_blue);
 
 #define DEG_TO_RAD      0.01745329
 #define RAD_TO_DEG      57.2957786
@@ -892,6 +922,10 @@ class Application{
     bool preventSleep         = false;
     bool preventInAppSleep    = false;
 
+    #ifdef SOFTWARE_BUTTONS_ENABLE
+      bool showSoftWareButtons = true;
+    #endif
+
     virtual void onLoop()     = 0;
     virtual void onDestroy()  = 0;
     virtual void onEvent(unsigned char event, int val1, int val2) = 0;
@@ -900,6 +934,9 @@ class Application{
       this->preventSleep = false;
       this->preventInAppSleep = false;
       if(this->showStatusBar) core_views_statusBar_draw();
+      #ifdef SOFTWARE_BUTTONS_ENABLE
+        if(this->showSoftWareButtons) core_views_softwareButtons_draw();
+      #endif
     }
 
     Application(){};
@@ -3175,6 +3212,112 @@ void core_views_statusBar_draw_time(bool draw){
     DRAW_LIMITS_setEnable(lastLimits);
 }
 
+#ifdef SOFTWARE_BUTTONS_ENABLE
+    
+    #define SOFTWARE_BUTTON_SIZE (SOFTWARE_BUTTONS_BAR_SIZE/2)
+
+    #define SOFTWARE_BUTTON1_X (SCREEN_WIDTH - SOFTWARE_BUTTONS_BAR_SIZE/2)
+    #define SOFTWARE_BUTTON1_Y (SCREEN_HEIGHT)/2
+
+    #define SOFTWARE_BUTTON2_X SOFTWARE_BUTTON1_X 
+    #define SOFTWARE_BUTTON2_Y (SOFTWARE_BUTTON1_Y - SOFTWARE_BUTTONS_PADDING)
+
+    #define SOFTWARE_BUTTON3_X SOFTWARE_BUTTON1_X 
+    #define SOFTWARE_BUTTON3_Y (SOFTWARE_BUTTON1_Y + SOFTWARE_BUTTONS_PADDING)
+
+    #define SOFTWARE_BUTTON4_X SOFTWARE_BUTTON1_X 
+    #define SOFTWARE_BUTTON4_Y (SCREEN_HEIGHT - SOFTWARE_BUTTON_SIZE)
+
+    void core_views_softwareButtons_draw(uint16_t offset, uint8_t color_red, uint8_t color_green, uint8_t color_blue, uint8_t color_red_bg, uint8_t color_green_bg, uint8_t color_blue_bg){
+        #ifdef SOFTWARE_BUTTONS_PORITION_RIGHT
+            setDrawColor(color_red_bg, color_green_bg, color_blue_bg);
+            drawRect(SCREEN_WIDTH, offset + 1, SCREEN_WIDTH - SOFTWARE_BUTTONS_BAR_SIZE, SCREEN_HEIGHT, true);
+
+            setDrawColor(color_red, color_green, color_blue);
+
+            // Button 1
+            drawCircle(SOFTWARE_BUTTON1_X, SOFTWARE_BUTTON1_Y, SOFTWARE_BUTTON_SIZE/2, false);
+        
+            // Button 2
+            drawLine(SOFTWARE_BUTTON2_X - SOFTWARE_BUTTON_SIZE/2, SOFTWARE_BUTTON2_Y + SOFTWARE_BUTTON_SIZE/2, SOFTWARE_BUTTON2_X, SOFTWARE_BUTTON2_Y - SOFTWARE_BUTTON_SIZE/3);
+            drawLine(SOFTWARE_BUTTON2_X + SOFTWARE_BUTTON_SIZE/2, SOFTWARE_BUTTON2_Y + SOFTWARE_BUTTON_SIZE/2, SOFTWARE_BUTTON2_X, SOFTWARE_BUTTON2_Y - SOFTWARE_BUTTON_SIZE/3);
+            drawLine(SOFTWARE_BUTTON2_X + SOFTWARE_BUTTON_SIZE/2, SOFTWARE_BUTTON2_Y + SOFTWARE_BUTTON_SIZE/2, SOFTWARE_BUTTON2_X - SOFTWARE_BUTTON_SIZE/2, SOFTWARE_BUTTON2_Y + SOFTWARE_BUTTON_SIZE/2);
+
+            // Button 3
+            drawLine(SOFTWARE_BUTTON3_X + SOFTWARE_BUTTON_SIZE/2, SOFTWARE_BUTTON3_Y - SOFTWARE_BUTTON_SIZE/2, SOFTWARE_BUTTON3_X, SOFTWARE_BUTTON3_Y + SOFTWARE_BUTTON_SIZE/3);
+            drawLine(SOFTWARE_BUTTON3_X - SOFTWARE_BUTTON_SIZE/2, SOFTWARE_BUTTON3_Y - SOFTWARE_BUTTON_SIZE/2, SOFTWARE_BUTTON3_X, SOFTWARE_BUTTON3_Y + SOFTWARE_BUTTON_SIZE/3);
+            drawLine(SOFTWARE_BUTTON3_X - SOFTWARE_BUTTON_SIZE/2, SOFTWARE_BUTTON3_Y - SOFTWARE_BUTTON_SIZE/2, SOFTWARE_BUTTON3_X + SOFTWARE_BUTTON_SIZE/2, SOFTWARE_BUTTON3_Y - SOFTWARE_BUTTON_SIZE/2);
+
+            // Button 4
+            drawLine(SOFTWARE_BUTTON4_X - SOFTWARE_BUTTON_SIZE/2, SOFTWARE_BUTTON4_Y, SOFTWARE_BUTTON4_X + SOFTWARE_BUTTON_SIZE/2, SOFTWARE_BUTTON4_Y);            
+            drawLine(SOFTWARE_BUTTON4_X - SOFTWARE_BUTTON_SIZE/2, SOFTWARE_BUTTON4_Y - SOFTWARE_BUTTON_SIZE/2, SOFTWARE_BUTTON4_X - SOFTWARE_BUTTON_SIZE/2, SOFTWARE_BUTTON4_Y);
+            drawLine(SOFTWARE_BUTTON4_X + SOFTWARE_BUTTON_SIZE/2, SOFTWARE_BUTTON4_Y - SOFTWARE_BUTTON_SIZE/2, SOFTWARE_BUTTON4_X + SOFTWARE_BUTTON_SIZE/2, SOFTWARE_BUTTON4_Y);
+            drawLine(SOFTWARE_BUTTON4_X - SOFTWARE_BUTTON_SIZE/2, SOFTWARE_BUTTON4_Y - SOFTWARE_BUTTON_SIZE/2, SOFTWARE_BUTTON4_X, SOFTWARE_BUTTON4_Y - SOFTWARE_BUTTON_SIZE);
+            drawLine(SOFTWARE_BUTTON4_X + SOFTWARE_BUTTON_SIZE/2, SOFTWARE_BUTTON4_Y - SOFTWARE_BUTTON_SIZE/2, SOFTWARE_BUTTON4_X, SOFTWARE_BUTTON4_Y - SOFTWARE_BUTTON_SIZE);
+            //drawLine(SOFTWARE_BUTTON4_X + SOFTWARE_BUTTON_SIZE/2, SOFTWARE_BUTTON4_Y - SOFTWARE_BUTTON_SIZE/3, SOFTWARE_BUTTON4_X, SOFTWARE_BUTTON4_Y - SOFTWARE_BUTTON_SIZE);
+            
+
+            //void drawArc(int x0, int y0, int radius, int drawFromAngle, int drawToAngle, uint16_t width, bool drawFading){
+        #else
+            // for SOFTWARE_BUTTONS_PORITION_BOTTOM
+        #endif
+    }
+
+    void core_views_softwareButtons_draw(){
+        #ifdef SOFTWARE_BUTTONS_PORITION_RIGHT
+            core_views_softwareButtons_draw(STYLE_STATUSBAR_HEIGHT, SOFTWARE_BUTTONS_COLOR_RED,SOFTWARE_BUTTONS_COLOR_GREEN, SOFTWARE_BUTTONS_COLOR_BLUE, SOFTWARE_BUTTONS_COLOR_RED_BG,SOFTWARE_BUTTONS_COLOR_GREEN_BG, SOFTWARE_BUTTONS_COLOR_BLUE_BG);
+
+
+        #else
+            // for SOFTWARE_BUTTONS_PORITION_BOTTOM
+        #endif
+    }
+#endif
+
+#if defined(SOFTWARE_BUTTONS_ENABLE) || defined(SOFTWARE_KEYBOARD_ENABLE)
+    uint16_t core_view_isSoftwareButtons_clicked(int x, int y){
+        #ifdef SOFTWARE_BUTTONS_ENABLE
+            #ifdef SOFTWARE_BUTTONS_PORITION_RIGHT
+                if(x>=SCREEN_WIDTH-SOFTWARE_BUTTONS_BAR_SIZE){
+
+                    if ( abs(SOFTWARE_BUTTON1_Y-y)<=SOFTWARE_BUTTONS_BAR_SIZE*2 ){
+                        return SOFTWARE_BAR_BUTTON_UP;
+                    }
+
+                    if ( abs(SOFTWARE_BUTTON2_Y-y)<=SOFTWARE_BUTTONS_BAR_SIZE*2 ){
+                        return SOFTWARE_BAR_BUTTON_SELECT;
+                    }
+
+                    if ( abs(SOFTWARE_BUTTON3_Y-y)<=SOFTWARE_BUTTONS_BAR_SIZE*2 ){
+                        return SOFTWARE_BAR_BUTTON_DOWN;
+                    }
+
+                    if ( abs(SOFTWARE_BUTTON4_Y-y)<=SOFTWARE_BUTTONS_BAR_SIZE*2 ){
+                        return SOFTWARE_BAR_BUTTON_BACK;
+                    }
+
+                    /*
+                    #define SOFTWARE_BUTTON_SIZE (SOFTWARE_BUTTONS_BAR_SIZE/2)
+
+                    #define SOFTWARE_BUTTON1_X (SCREEN_WIDTH - SOFTWARE_BUTTONS_BAR_SIZE/2)
+                    #define SOFTWARE_BUTTON1_Y (SCREEN_HEIGHT - offset)/2
+
+                    #define SOFTWARE_BUTTON2_X SOFTWARE_BUTTON1_X 
+                    #define SOFTWARE_BUTTON2_Y (SOFTWARE_BUTTON1_Y - SOFTWARE_BUTTONS_PADDING)
+
+                    #define SOFTWARE_BUTTON3_X SOFTWARE_BUTTON1_X 
+                    #define SOFTWARE_BUTTON3_Y (SOFTWARE_BUTTON1_Y + SOFTWARE_BUTTONS_PADDING)
+
+                    #define SOFTWARE_BUTTON4_X SOFTWARE_BUTTON1_X 
+                    #define SOFTWARE_BUTTON4_Y (SCREEN_HEIGHT - SOFTWARE_BUTTON_SIZE)
+                    */
+                }
+            #endif
+        #endif
+        return 0;
+    }
+#endif
+
 void core_views_statusBar_draw(){
     /*
             [ TIME | ----- | NOTIFICATIONS | BATTERY ]
@@ -3539,7 +3682,7 @@ const unsigned char* getIcon(int icon){
     }
 #endif
 
-//#define CORE_TOUCH_DEBUG
+#define CORE_TOUCH_DEBUG
 //#define TOUCH_SCREEN_ENABLE
 
 #ifdef TOUCH_SCREEN_ENABLE
@@ -3605,10 +3748,25 @@ const unsigned char* getIcon(int icon){
             currentApp->onEvent(EVENT_ON_TOUCH_RELEASED, getTOUCH_SCREEN_X(), getTOUCH_SCREEN_Y());
 
             if(!TOUCH_SCREEN_isDragging && millis()-TOUCH_SCREEN_touch_start_ms<TOUCH_SCREEN_TIME_MS_FOT_LONG_TOUCH){
-                #ifdef CORE_TOUCH_DEBUG
-                    debug("Touch click");
+                
+                #if defined(SOFTWARE_BUTTONS_ENABLE) || defined(SOFTWARE_KEYBOARD_ENABLE)
+                    if(core_view_isSoftwareButtons_clicked(getTOUCH_SCREEN_X(), getTOUCH_SCREEN_Y())){
+                        #ifdef CORE_TOUCH_DEBUG
+                            debug("Touch click on software button");
+                        #endif    
+                    }else{
+                        #ifdef CORE_TOUCH_DEBUG
+                            debug("Touch click");
+                        #endif    
+                        currentApp->onEvent(EVENT_ON_TOUCH_CLICK, getTOUCH_SCREEN_X(), getTOUCH_SCREEN_Y());
+                    }
+                #else
+                    #ifdef CORE_TOUCH_DEBUG
+                        debug("Touch click");
+                    #endif    
+                    currentApp->onEvent(EVENT_ON_TOUCH_CLICK, getTOUCH_SCREEN_X(), getTOUCH_SCREEN_Y());
                 #endif
-                currentApp->onEvent(EVENT_ON_TOUCH_CLICK, getTOUCH_SCREEN_X(), getTOUCH_SCREEN_Y());
+                
             }else{
                 TOUCH_SCREEN_isDragging = false;
                 TOUCH_SCREEN_isLongPressed = false;
@@ -6318,7 +6476,12 @@ const unsigned char appNameClass::icon[] PROGMEM = {
 #define appNameClass    MainMenuApp      // App name without spaces
 #define appName         "Main menu"      // App name with spaces 
 
-#define ACTIVE_SCREEN_WIDTH             SCREEN_WIDTH
+#ifdef SOFTWARE_BUTTONS_PORITION_RIGHT
+  #define ACTIVE_SCREEN_WIDTH             (SCREEN_WIDTH - SOFTWARE_BUTTONS_BAR_SIZE)
+#else
+  #define ACTIVE_SCREEN_WIDTH             (SCREEN_WIDTH)
+#endif
+
 #define ACTIVE_SCREEN_HEIGHT            (SCREEN_HEIGHT - STYLE_STATUSBAR_HEIGHT)
 #define SINGLE_ELEMENT_MIN_WIDTH        100
 #define SINGLE_ELEMENT_MIN_HEIGHT       80
@@ -6330,11 +6493,21 @@ const unsigned char appNameClass::icon[] PROGMEM = {
 #define SINGLE_ELEMENT_REAL_HEIGHT      ((int)(ACTIVE_SCREEN_HEIGHT/SINGLE_ELEMENTS_IN_Y))
 
 #define PAGES_LIST_POSITION             (SCREEN_HEIGHT)
+#if ((ACTIVE_SCREEN_WIDTH/SINGLE_ELEMENT_MIN_WIDTH)) < 1
+  #define SINGLE_ELEMENTS_IN_X 1
+  #define SINGLE_ELEMENTS_IN_X_MACRO 1
+#endif
+
+#if ((ACTIVE_SCREEN_HEIGHT/SINGLE_ELEMENT_MIN_HEIGHT)) < 1
+  #define SINGLE_ELEMENTS_IN_Y 1
+  #define SINGLE_ELEMENTS_IN_Y_MACRO 1
+#endif
+
+#if ( ((SINGLE_ELEMENTS_IN_X_MACRO)==1) && ((SINGLE_ELEMENTS_IN_Y_MACRO)==1))
+  #define SINGLE_ELEMENT_ON_SCREEN
+#endif
 
 #define APPS_ON_SINGLE_PAGE             (SINGLE_ELEMENTS_IN_X * SINGLE_ELEMENTS_IN_Y)
-
-
-
 
 #ifdef  APP_MENU_APPLICATIONS_0
   #define APP_MENU_APPLICATIONS_QUANTITY 1

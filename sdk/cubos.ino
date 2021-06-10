@@ -23,6 +23,10 @@ class Application{
     bool preventSleep         = false;
     bool preventInAppSleep    = false;
 
+    #ifdef SOFTWARE_BUTTONS_ENABLE
+      bool showSoftWareButtons = true;
+    #endif
+
     virtual void onLoop()     = 0;
     virtual void onDestroy()  = 0;
     virtual void onEvent(unsigned char event, int val1, int val2) = 0;
@@ -31,6 +35,9 @@ class Application{
       this->preventSleep = false;
       this->preventInAppSleep = false;
       if(this->showStatusBar) core_views_statusBar_draw();
+      #ifdef SOFTWARE_BUTTONS_ENABLE
+        if(this->showSoftWareButtons) core_views_softwareButtons_draw();
+      #endif
     }
 
     Application(){};

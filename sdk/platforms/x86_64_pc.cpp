@@ -120,6 +120,8 @@ void driver_accelerometer_loop();
 void core_pedometer_setup();
 long get_pedometer_steps();
 void core_pedometer_newDate();
+void core_views_softwareButtons_draw();
+void core_views_softwareButtons_draw(uint16_t offset, uint8_t color_red, uint8_t color_green, uint8_t color_blue);
 
 #define DEG_TO_RAD      0.01745329
 #define RAD_TO_DEG      57.2957786

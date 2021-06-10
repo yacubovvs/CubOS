@@ -96,6 +96,112 @@ void core_views_statusBar_draw_time(bool draw){
     DRAW_LIMITS_setEnable(lastLimits);
 }
 
+#ifdef SOFTWARE_BUTTONS_ENABLE
+    
+    #define SOFTWARE_BUTTON_SIZE (SOFTWARE_BUTTONS_BAR_SIZE/2)
+
+    #define SOFTWARE_BUTTON1_X (SCREEN_WIDTH - SOFTWARE_BUTTONS_BAR_SIZE/2)
+    #define SOFTWARE_BUTTON1_Y (SCREEN_HEIGHT)/2
+
+    #define SOFTWARE_BUTTON2_X SOFTWARE_BUTTON1_X 
+    #define SOFTWARE_BUTTON2_Y (SOFTWARE_BUTTON1_Y - SOFTWARE_BUTTONS_PADDING)
+
+    #define SOFTWARE_BUTTON3_X SOFTWARE_BUTTON1_X 
+    #define SOFTWARE_BUTTON3_Y (SOFTWARE_BUTTON1_Y + SOFTWARE_BUTTONS_PADDING)
+
+    #define SOFTWARE_BUTTON4_X SOFTWARE_BUTTON1_X 
+    #define SOFTWARE_BUTTON4_Y (SCREEN_HEIGHT - SOFTWARE_BUTTON_SIZE)
+
+    void core_views_softwareButtons_draw(uint16_t offset, uint8_t color_red, uint8_t color_green, uint8_t color_blue, uint8_t color_red_bg, uint8_t color_green_bg, uint8_t color_blue_bg){
+        #ifdef SOFTWARE_BUTTONS_PORITION_RIGHT
+            setDrawColor(color_red_bg, color_green_bg, color_blue_bg);
+            drawRect(SCREEN_WIDTH, offset + 1, SCREEN_WIDTH - SOFTWARE_BUTTONS_BAR_SIZE, SCREEN_HEIGHT, true);
+
+            setDrawColor(color_red, color_green, color_blue);
+
+            // Button 1
+            drawCircle(SOFTWARE_BUTTON1_X, SOFTWARE_BUTTON1_Y, SOFTWARE_BUTTON_SIZE/2, false);
+        
+            // Button 2
+            drawLine(SOFTWARE_BUTTON2_X - SOFTWARE_BUTTON_SIZE/2, SOFTWARE_BUTTON2_Y + SOFTWARE_BUTTON_SIZE/2, SOFTWARE_BUTTON2_X, SOFTWARE_BUTTON2_Y - SOFTWARE_BUTTON_SIZE/3);
+            drawLine(SOFTWARE_BUTTON2_X + SOFTWARE_BUTTON_SIZE/2, SOFTWARE_BUTTON2_Y + SOFTWARE_BUTTON_SIZE/2, SOFTWARE_BUTTON2_X, SOFTWARE_BUTTON2_Y - SOFTWARE_BUTTON_SIZE/3);
+            drawLine(SOFTWARE_BUTTON2_X + SOFTWARE_BUTTON_SIZE/2, SOFTWARE_BUTTON2_Y + SOFTWARE_BUTTON_SIZE/2, SOFTWARE_BUTTON2_X - SOFTWARE_BUTTON_SIZE/2, SOFTWARE_BUTTON2_Y + SOFTWARE_BUTTON_SIZE/2);
+
+            // Button 3
+            drawLine(SOFTWARE_BUTTON3_X + SOFTWARE_BUTTON_SIZE/2, SOFTWARE_BUTTON3_Y - SOFTWARE_BUTTON_SIZE/2, SOFTWARE_BUTTON3_X, SOFTWARE_BUTTON3_Y + SOFTWARE_BUTTON_SIZE/3);
+            drawLine(SOFTWARE_BUTTON3_X - SOFTWARE_BUTTON_SIZE/2, SOFTWARE_BUTTON3_Y - SOFTWARE_BUTTON_SIZE/2, SOFTWARE_BUTTON3_X, SOFTWARE_BUTTON3_Y + SOFTWARE_BUTTON_SIZE/3);
+            drawLine(SOFTWARE_BUTTON3_X - SOFTWARE_BUTTON_SIZE/2, SOFTWARE_BUTTON3_Y - SOFTWARE_BUTTON_SIZE/2, SOFTWARE_BUTTON3_X + SOFTWARE_BUTTON_SIZE/2, SOFTWARE_BUTTON3_Y - SOFTWARE_BUTTON_SIZE/2);
+
+            // Button 4
+            drawLine(SOFTWARE_BUTTON4_X - SOFTWARE_BUTTON_SIZE/2, SOFTWARE_BUTTON4_Y, SOFTWARE_BUTTON4_X + SOFTWARE_BUTTON_SIZE/2, SOFTWARE_BUTTON4_Y);            
+            drawLine(SOFTWARE_BUTTON4_X - SOFTWARE_BUTTON_SIZE/2, SOFTWARE_BUTTON4_Y - SOFTWARE_BUTTON_SIZE/2, SOFTWARE_BUTTON4_X - SOFTWARE_BUTTON_SIZE/2, SOFTWARE_BUTTON4_Y);
+            drawLine(SOFTWARE_BUTTON4_X + SOFTWARE_BUTTON_SIZE/2, SOFTWARE_BUTTON4_Y - SOFTWARE_BUTTON_SIZE/2, SOFTWARE_BUTTON4_X + SOFTWARE_BUTTON_SIZE/2, SOFTWARE_BUTTON4_Y);
+            drawLine(SOFTWARE_BUTTON4_X - SOFTWARE_BUTTON_SIZE/2, SOFTWARE_BUTTON4_Y - SOFTWARE_BUTTON_SIZE/2, SOFTWARE_BUTTON4_X, SOFTWARE_BUTTON4_Y - SOFTWARE_BUTTON_SIZE);
+            drawLine(SOFTWARE_BUTTON4_X + SOFTWARE_BUTTON_SIZE/2, SOFTWARE_BUTTON4_Y - SOFTWARE_BUTTON_SIZE/2, SOFTWARE_BUTTON4_X, SOFTWARE_BUTTON4_Y - SOFTWARE_BUTTON_SIZE);
+            //drawLine(SOFTWARE_BUTTON4_X + SOFTWARE_BUTTON_SIZE/2, SOFTWARE_BUTTON4_Y - SOFTWARE_BUTTON_SIZE/3, SOFTWARE_BUTTON4_X, SOFTWARE_BUTTON4_Y - SOFTWARE_BUTTON_SIZE);
+            
+
+            //void drawArc(int x0, int y0, int radius, int drawFromAngle, int drawToAngle, uint16_t width, bool drawFading){
+        #else
+            // for SOFTWARE_BUTTONS_PORITION_BOTTOM
+        #endif
+    }
+
+    void core_views_softwareButtons_draw(){
+        #ifdef SOFTWARE_BUTTONS_PORITION_RIGHT
+            core_views_softwareButtons_draw(STYLE_STATUSBAR_HEIGHT, SOFTWARE_BUTTONS_COLOR_RED,SOFTWARE_BUTTONS_COLOR_GREEN, SOFTWARE_BUTTONS_COLOR_BLUE, SOFTWARE_BUTTONS_COLOR_RED_BG,SOFTWARE_BUTTONS_COLOR_GREEN_BG, SOFTWARE_BUTTONS_COLOR_BLUE_BG);
+
+
+        #else
+            // for SOFTWARE_BUTTONS_PORITION_BOTTOM
+        #endif
+    }
+#endif
+
+#if defined(SOFTWARE_BUTTONS_ENABLE) || defined(SOFTWARE_KEYBOARD_ENABLE)
+    uint16_t core_view_isSoftwareButtons_clicked(int x, int y){
+        #ifdef SOFTWARE_BUTTONS_ENABLE
+            #ifdef SOFTWARE_BUTTONS_PORITION_RIGHT
+                if(x>=SCREEN_WIDTH-SOFTWARE_BUTTONS_BAR_SIZE){
+
+                    if ( abs(SOFTWARE_BUTTON1_Y-y)<=SOFTWARE_BUTTONS_BAR_SIZE ){
+                        return SOFTWARE_BAR_BUTTON_UP;
+                    }
+
+                    if ( abs(SOFTWARE_BUTTON2_Y-y)<=SOFTWARE_BUTTONS_BAR_SIZE ){
+                        return SOFTWARE_BAR_BUTTON_SELECT;
+                    }
+
+                    if ( abs(SOFTWARE_BUTTON3_Y-y)<=SOFTWARE_BUTTONS_BAR_SIZE ){
+                        return SOFTWARE_BAR_BUTTON_DOWN;
+                    }
+
+                    if ( abs(SOFTWARE_BUTTON4_Y-y)<=SOFTWARE_BUTTONS_BAR_SIZE ){
+                        return SOFTWARE_BAR_BUTTON_BACK;
+                    }
+
+                    /*
+                    #define SOFTWARE_BUTTON_SIZE (SOFTWARE_BUTTONS_BAR_SIZE/2)
+
+                    #define SOFTWARE_BUTTON1_X (SCREEN_WIDTH - SOFTWARE_BUTTONS_BAR_SIZE/2)
+                    #define SOFTWARE_BUTTON1_Y (SCREEN_HEIGHT - offset)/2
+
+                    #define SOFTWARE_BUTTON2_X SOFTWARE_BUTTON1_X 
+                    #define SOFTWARE_BUTTON2_Y (SOFTWARE_BUTTON1_Y - SOFTWARE_BUTTONS_PADDING)
+
+                    #define SOFTWARE_BUTTON3_X SOFTWARE_BUTTON1_X 
+                    #define SOFTWARE_BUTTON3_Y (SOFTWARE_BUTTON1_Y + SOFTWARE_BUTTONS_PADDING)
+
+                    #define SOFTWARE_BUTTON4_X SOFTWARE_BUTTON1_X 
+                    #define SOFTWARE_BUTTON4_Y (SCREEN_HEIGHT - SOFTWARE_BUTTON_SIZE)
+                    */
+                }
+            #endif
+        #endif
+        return 0;
+    }
+#endif
+
 void core_views_statusBar_draw(){
     /*
             [ TIME | ----- | NOTIFICATIONS | BATTERY ]
