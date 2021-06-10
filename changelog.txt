@@ -1,0 +1,2 @@
+2021-06-10
+    Added software buttons for big touch screens
