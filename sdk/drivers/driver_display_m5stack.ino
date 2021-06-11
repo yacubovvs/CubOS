@@ -40,7 +40,6 @@ void driver_display_setBrightness(unsigned char brightness){
 /*
 #include <M5Stack.h>
 
-
 int drawLimit_x_min = 0;
 int drawLimit_y_min = 0;
 int drawLimit_x_max = SCREEN_WIDTH;

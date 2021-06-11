@@ -95,7 +95,6 @@ int main()
   debug("App started");
   setup();
   while(true){
-      
       loop();
   }
 }
