@@ -95,12 +95,12 @@ int main()
   debug("App started");
   setup();
   while(true){
+      
       loop();
   }
 }
 
 void core_battery_loop();
-void core_views_statusBar_draw();
 void setBackgroundColor(unsigned char r, unsigned char g, unsigned char b);
 void drawRect(int x0, int y0, int x1, int y1, bool fill);
 void setDrawColor(unsigned char red, unsigned char green, unsigned char blue);
