@@ -102,7 +102,7 @@ class appNameClass: public Application{
         const static unsigned char icon_sleep[]         PROGMEM;
         unsigned char currentSubMenu       = APP_SETTINGS_SUBMENU_MAIN;
         String getApplicationSubTitle(unsigned char submenu, unsigned char num);
-        String getApplicationSubTitle(unsigned char submenu, unsigned char num, boolean getLast);
+        String getApplicationSubTitle(unsigned char submenu, unsigned char num, bool getLast);
         void drawSettingsPageFirstTime();
         void clearWorkSpace();
         void switchToSubMenu(unsigned char newSubMenu);
@@ -228,11 +228,11 @@ int appNameClass::getPositionBySelectedNumber(unsigned char selectedNumber){
 void appNameClass::drawSettingTimeArrows(bool draw, int position){
     //drawRect(x0+delta, y0+delta, x1-delta, y1-delta);  
 
-    //drawImage(draw, icon_arrow_top, position + 3 - 16, SCREEN_HEIGHT/2 - 19 - 15 );
+    //drawImage(draw, icon_arrow_up, position + 3 - 16, SCREEN_HEIGHT/2 - 19 - 15 );
     //drawImage(draw, icon_arrow_bottom, position + 3 - 16, SCREEN_HEIGHT/2 + 20 + 15);
 
-    drawImage(draw, getIcon(ICON_ARROW_UP), position + 3 - 16, SCREEN_HEIGHT/2 - 19 - 15 );
-    drawImage(draw, getIcon(ICON_ARROW_DOWN), position + 3 - 16, SCREEN_HEIGHT/2 + 20 + 15);
+    drawImage(draw, getIcon_arrow_up(), position + 3 - 16, SCREEN_HEIGHT/2 - 19 - 15 );
+    drawImage(draw, getIcon_arrow_bottom(), position + 3 - 16, SCREEN_HEIGHT/2 + 20 + 15);
 }
 
 void appNameClass::drawSettingTimeSelect(bool draw, int position){
@@ -1024,7 +1024,7 @@ String appNameClass::getApplicationSubTitle(unsigned char submenu, unsigned char
                 case 0:
                     if(getLast) return this->lastDateString_year;
                     else{
-                        this->lastDateString_year = core_time_getYear();
+                        this->lastDateString_year = String(core_time_getYear());
                         return this->lastDateString_year;
                     }   
                 case 1:
@@ -1036,7 +1036,7 @@ String appNameClass::getApplicationSubTitle(unsigned char submenu, unsigned char
                 case 2:
                     if(getLast) return this->lastDateString_date;
                     else{
-                        this->lastDateString_date = core_time_getDate();
+                        this->lastDateString_date = String(core_time_getDate());
                         return this->lastDateString_date;
                     }   
                 case 3:

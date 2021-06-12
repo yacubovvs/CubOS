@@ -60,6 +60,12 @@
 #define WAKE_UP_REASON_ULP                  0x05
 #define WAKE_UP_REASON_NOT_DEEP_SLEEP       0x06
 
+// SOFTWARE_BUTTONS
+#define SOFTWARE_BAR_BUTTON_UP              0x0001
+#define SOFTWARE_BAR_BUTTON_SELECT          0x0002
+#define SOFTWARE_BAR_BUTTON_DOWN            0x0003
+#define SOFTWARE_BAR_BUTTON_BACK            0x0004
+
 /*
  ############################################################################
                                  SLEEP TYPES -                               
@@ -92,6 +98,14 @@
 */
 
 #define COREVIEWS_NO_ICON_ELEMENT_HEIGHT 40
+
+#define SOFTWARE_BUTTONS_COLOR_RED          255
+#define SOFTWARE_BUTTONS_COLOR_GREEN        255
+#define SOFTWARE_BUTTONS_COLOR_BLUE         255
+
+#define SOFTWARE_BUTTONS_COLOR_RED_BG       59
+#define SOFTWARE_BUTTONS_COLOR_GREEN_BG     35
+#define SOFTWARE_BUTTONS_COLOR_BLUE_BG      71
 
 /*
 ############################################################################
@@ -147,13 +161,17 @@
 
 //#define DEBUG_SERIAL
 
+#define SOFTWARE_BUTTONS_BAR_SIZE 0
+//#define LEGACY_GET_ICONS
 /*
     ############################################################################################
     #                                                                                          #
     #                                    DEFAULT SETTINGS +                                    #
     #                                                                                          #
     ############################################################################################
-*//*
+*/
+
+/*
     ############################################################################################
     #                                                                                          #
     #                                   M5STICK SETTINGS +                                     #
@@ -192,7 +210,7 @@
 //#define STARTING_APP_NUMM    2 // Pedometer
 //#define STARTING_APP_NUMM    0
 
-#define FONT_SIZE_DEFAULT   2
+#define FONT_SIZE_DEFAULT   1
 
 //#define CPU_SLEEP_ENABLE
 
@@ -261,6 +279,14 @@
 // #define WAKEUP_DEBUG
 */
 
+#define SOFTWARE_BUTTONS_ENABLE
+#define SOFTWARE_BUTTONS_PORITION_RIGHT
+
+#define SOFTWARE_BUTTONS_BAR_SIZE 30
+#define SOFTWARE_BUTTONS_PADDING 50
+
+#define SOFTWARE_KEYBOARD_ENABLE
+
 #define DEBUG_SERIAL
 
 /*
@@ -270,26 +296,6 @@
     #                                                                                          #
     ############################################################################################
 */
-#include <Arduino.h>
-
-/*
-    ############################################################################################
-    #                                     PREDEFINED +                                         #
-    ############################################################################################
-*/
-
-void core_views_statusBar_draw();
-void setBackgroundColor(unsigned char r, unsigned char g, unsigned char b);
-void drawRect(int x0, int y0, int x1, int y1, bool fill);
-void setDrawColor(unsigned char red, unsigned char green, unsigned char blue);
-void fillScreen(unsigned char red, unsigned char green, unsigned char blue);
-
-/*
-    ############################################################################################
-    #                                     PREDEFINED -                                         #
-    ############################################################################################
-*/
-
 
 /*
     ############################################################################################
@@ -299,6 +305,10 @@ void fillScreen(unsigned char red, unsigned char green, unsigned char blue);
     ############################################################################################
 */
 
+void core_views_statusBar_draw();
+#ifdef SOFTWARE_BUTTONS_ENABLE
+  void core_views_softwareButtons_draw();
+#endif
 
 /////////////////////////////////////
 // APPLICATION CLASS
@@ -314,6 +324,10 @@ class Application{
     bool preventSleep         = false;
     bool preventInAppSleep    = false;
 
+    #ifdef SOFTWARE_BUTTONS_ENABLE
+      bool showSoftWareButtons = true;
+    #endif
+
     virtual void onLoop()     = 0;
     virtual void onDestroy()  = 0;
     virtual void onEvent(unsigned char event, int val1, int val2) = 0;
@@ -322,6 +336,9 @@ class Application{
       this->preventSleep = false;
       this->preventInAppSleep = false;
       if(this->showStatusBar) core_views_statusBar_draw();
+      #ifdef SOFTWARE_BUTTONS_ENABLE
+        if(this->showSoftWareButtons) core_views_softwareButtons_draw();
+      #endif
     }
 
     Application(){};

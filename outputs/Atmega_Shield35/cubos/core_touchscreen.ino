@@ -1,5 +1,5 @@
-#define CORE_TOUCH_DEBUG
-#define TOUCH_SCREEN_ENABLE
+//#define CORE_TOUCH_DEBUG
+//#define TOUCH_SCREEN_ENABLE
 
 #ifdef TOUCH_SCREEN_ENABLE
     bool TOUCH_SCREEN_last_isTouching   = false;
@@ -64,10 +64,25 @@
             currentApp->onEvent(EVENT_ON_TOUCH_RELEASED, getTOUCH_SCREEN_X(), getTOUCH_SCREEN_Y());
 
             if(!TOUCH_SCREEN_isDragging && millis()-TOUCH_SCREEN_touch_start_ms<TOUCH_SCREEN_TIME_MS_FOT_LONG_TOUCH){
-                #ifdef CORE_TOUCH_DEBUG
-                    debug("Touch click");
+                
+                #if defined(SOFTWARE_BUTTONS_ENABLE) || defined(SOFTWARE_KEYBOARD_ENABLE)
+                    if(core_view_isSoftwareButtons_clicked(getTOUCH_SCREEN_X(), getTOUCH_SCREEN_Y())){
+                        #ifdef CORE_TOUCH_DEBUG
+                            debug("Touch click on software button");
+                        #endif    
+                    }else{
+                        #ifdef CORE_TOUCH_DEBUG
+                            debug("Touch click");
+                        #endif    
+                        currentApp->onEvent(EVENT_ON_TOUCH_CLICK, getTOUCH_SCREEN_X(), getTOUCH_SCREEN_Y());
+                    }
+                #else
+                    #ifdef CORE_TOUCH_DEBUG
+                        debug("Touch click");
+                    #endif    
+                    currentApp->onEvent(EVENT_ON_TOUCH_CLICK, getTOUCH_SCREEN_X(), getTOUCH_SCREEN_Y());
                 #endif
-                currentApp->onEvent(EVENT_ON_TOUCH_CLICK, getTOUCH_SCREEN_X(), getTOUCH_SCREEN_Y());
+                
             }else{
                 TOUCH_SCREEN_isDragging = false;
                 TOUCH_SCREEN_isLongPressed = false;
