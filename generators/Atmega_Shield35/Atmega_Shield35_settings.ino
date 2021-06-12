@@ -10,8 +10,8 @@
 //      FOR ESP8266 USE NONOSSDK 2.2.2 +
 // ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! !
 
-#define SCREEN_WIDTH            800     // Screen resolution width
-#define SCREEN_HEIGHT           480     // Screen resolution height
+#define SCREEN_WIDTH            480     // Screen resolution width
+#define SCREEN_HEIGHT           320     // Screen resolution height
 
 #define FONT_CHAR_WIDTH         6     // Font letter size width
 #define FONT_CHAR_HEIGHT        8     // Font letter size height
@@ -42,7 +42,7 @@
 //#define CPU_SLEEP_ENABLE
 
 //#define BATTERY_ENABLE
-#define CLOCK_ENABLE
+//#define CLOCK_ENABLE
 //#define USE_PRIMITIVE_HARDWARE_DRAW_ACCELERATION
 
 //#define RTC_ENABLE
@@ -67,11 +67,6 @@
 //#define SCREEN_INVERT_COLORS
 //#define SCREEN_CHANGE_BLUE_RED
 
-#define DRIVER_RTC_INTERRUPT_PIN    34
-
-#define IN_APP_SLEEP_TYPE       SLEEP_LIGHT
-//#define STAND_BY_SLEEP_TYPE     SLEEP_LIGHT_SCREEN_OFF
-#define STAND_BY_SLEEP_TYPE     SLEEP_DEEP
 
 #undef SMOOTH_BACKLIGHT_CONTROL_DELAY_CHANGE
 //#undef DISPLAY_BACKLIGHT_CONTROL_ENABLE
@@ -90,7 +85,7 @@
 #define DEFAULT_DELAY_TO_FADE_DISPLAY           10
 
 #undef POWERSAVE_ENABLE
-#define CPU_CONTROLL_ENABLE
+#undef CPU_CONTROLL_ENABLE
 #undef BATTERY_ENABLE
 
 /*
@@ -105,6 +100,14 @@
 //#define PEDOMETER_DEBUG
 // #define WAKEUP_DEBUG
 */
+
+#define SOFTWARE_BUTTONS_ENABLE
+#define SOFTWARE_BUTTONS_PORITION_RIGHT
+
+#define SOFTWARE_BUTTONS_BAR_SIZE 30
+#define SOFTWARE_BUTTONS_PADDING 50
+
+#define SOFTWARE_KEYBOARD_ENABLE
 
 #define DEBUG_SERIAL
 

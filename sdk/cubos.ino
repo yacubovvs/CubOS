@@ -8,7 +8,15 @@
     ############################################################################################
 */
 
-void core_views_statusBar_draw();
+#ifdef PLATFORM_AVR
+  // PREDEFINITION FOR AVR
+  void core_views_statusBar_draw();
+  #ifdef SOFTWARE_BUTTONS_ENABLE
+    void core_views_softwareButtons_draw();
+  #endif
+  class Application;
+  Application *getApp(unsigned char i);
+#endif
 
 /////////////////////////////////////
 // APPLICATION CLASS

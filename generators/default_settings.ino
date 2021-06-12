@@ -162,7 +162,7 @@
 //#define DEBUG_SERIAL
 
 #define SOFTWARE_BUTTONS_BAR_SIZE 0
-
+//#define LEGACY_GET_ICONS
 /*
     ############################################################################################
     #                                                                                          #

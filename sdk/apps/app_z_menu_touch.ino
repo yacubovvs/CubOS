@@ -192,11 +192,11 @@ void appNameClass::drawIcons(bool draw){
   DRAW_LIMITS_setEnable(true);
   DRAW_LIMIT_reset();
   DRAW_LIMITS_setEnable(STYLE_STATUSBAR_HEIGHT, -1, -1, -1);
-  
+
 	for(unsigned char app_num=0; app_num<APP_MENU_APPLICATIONS_QUANTITY; app_num++){
 
 		unsigned char x_position = app_num%SINGLE_ELEMENTS_IN_X;
-		unsigned char y_position = app_num/SINGLE_ELEMENTS_IN_Y;
+		unsigned char y_position = app_num/SINGLE_ELEMENTS_IN_X;
 
 		int x0 = x_position*SINGLE_ELEMENT_REAL_WIDTH;
 		int y0 = y_position*SINGLE_ELEMENT_REAL_HEIGHT + STYLE_STATUSBAR_HEIGHT+1;
