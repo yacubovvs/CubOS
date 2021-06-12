@@ -8,15 +8,14 @@
     ############################################################################################
 */
 
-#ifdef PLATFORM_AVR
-  // PREDEFINITION FOR AVR
-  void core_views_statusBar_draw();
-  #ifdef SOFTWARE_BUTTONS_ENABLE
-    void core_views_softwareButtons_draw();
-  #endif
-  class Application;
-  Application *getApp(unsigned char i);
+// PREDEFINITION
+void core_views_statusBar_draw();
+#ifdef SOFTWARE_BUTTONS_ENABLE
+  void core_views_softwareButtons_draw();
 #endif
+class Application;
+Application *getApp(unsigned char i);
+
 
 /////////////////////////////////////
 // APPLICATION CLASS
@@ -61,9 +60,13 @@ Application* currentApp;
     ############################################################################################
 */
 
-void setup(){ 
+void setup(){   
+  #ifdef CORE_SETUP_INIT
+    core_setup_driver();
+  #endif
+
   #ifdef DEBUG_SERIAL
-      Serial.begin(115200);
+      DEBUG_SERIAL_PORT.begin(115200);
       delay(100);
       debug("Serial debug started", 10);
   #endif
@@ -93,8 +96,6 @@ void setup(){
     #endif
   #endif
   //debug("**** Main app start", 10);
-
-  driver_display_setup();
   core_display_setup();
   
   #ifdef RTC_ENABLE
@@ -215,7 +216,7 @@ void debug(String string, int delaytime){
       delay(delaytime);
     #endif
 
-    #ifdef screenDebug
+    #ifdef DEBUG_ON_SCREEN
       setDrawColor(255, 255, 255);
       drawString(string, 5, STYLE_STATUSBAR_HEIGHT + 10, 2);
       delay(delaytime);

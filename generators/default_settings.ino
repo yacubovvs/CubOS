@@ -7,13 +7,10 @@
 */
 
 // TOUCH
-
-
 #define TOUCH_SCREEN_DELTA_MOVE_FOR_DRAG 7
-#define TOUCH_SCREEN_TIME_MS_FOT_LONG_TOUCH 300
+#define TOUCH_SCREEN_TIME_MS_FOR_LONG_TOUCH 300
 
 // BUTTONS
-
 #define BUTTON_UP       0x01
 #define BUTTON_SELECT   0x02
 #define BUTTON_DOWN     0x03
@@ -163,6 +160,8 @@
 
 #define SOFTWARE_BUTTONS_BAR_SIZE 0
 //#define LEGACY_GET_ICONS
+
+#define DEBUG_SERIAL_PORT Serial
 /*
     ############################################################################################
     #                                                                                          #

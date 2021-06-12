@@ -23,10 +23,10 @@
 
 #define ON_TIME_CHANGE_EVERY_MS 1000
 
-//#define HARDWARE_BUTTONS_ENABLED              // Conf of controls with hardware btns    
+#define HARDWARE_BUTTONS_ENABLED              // Conf of controls with hardware btns    
 
-//#define DRIVER_CONTROLS_TOTALBUTTONS 1
-//#define DRIVER_CONTROLS_DELAY_BEFORE_LONG_PRESS 350
+#define DRIVER_CONTROLS_TOTALBUTTONS 3
+#define DRIVER_CONTROLS_DELAY_BEFORE_LONG_PRESS 350
 
 #define COLOR_SCREEN                     // Screen is colored
 
@@ -38,8 +38,6 @@
 //#define STARTING_APP_NUMM    0
 
 #define FONT_SIZE_DEFAULT   2
-
-//#define CPU_SLEEP_ENABLE
 
 //#define BATTERY_ENABLE
 //#define CLOCK_ENABLE
@@ -90,7 +88,7 @@
 #define DEFAULT_DELAY_TO_FADE_DISPLAY           10
 
 #undef POWERSAVE_ENABLE
-#define CPU_CONTROLL_ENABLE
+#undef CPU_CONTROLL_ENABLE
 #undef BATTERY_ENABLE
 
 /*
@@ -106,8 +104,11 @@
 // #define WAKEUP_DEBUG
 */
 
-#define DEBUG_SERIAL
+//#define DEBUG_SERIAL
+#define DEBUG_ON_SCREEN 
+#define CORE_SETUP_INIT
 
+#define DEBUG_SERIAL_PORT Serial2
 /*
     ############################################################################################
     #                                                                                          #

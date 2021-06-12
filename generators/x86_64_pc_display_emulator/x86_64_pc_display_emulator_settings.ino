@@ -12,7 +12,7 @@
 // ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! !
 
 //#define DEBUG_SERIAL
-//#define screenDebug
+//#define DEBUG_ON_SCREEN
 #define TERMINAL_DEBUG
 
 #define SCREEN_WIDTH            800     // Screen resolution width
@@ -36,7 +36,7 @@
 #define TOUCH_SCREEN_ENABLE
 
 #define TOUCH_SCREEN_DELTA_MOVE_FOR_DRAG 7
-#define TOUCH_SCREEN_TIME_MS_FOT_LONG_TOUCH 300
+#define TOUCH_SCREEN_TIME_MS_FOR_LONG_TOUCH 300
 
 #define COLOR_SCREEN                     // Screen is colored
 //#define noAnimation                   // Caurse of framebuffer type

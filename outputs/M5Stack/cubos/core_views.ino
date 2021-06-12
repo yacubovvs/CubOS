@@ -115,7 +115,7 @@ void core_views_statusBar_draw_time(bool draw){
     void core_views_softwareButtons_draw(uint16_t offset, uint8_t color_red, uint8_t color_green, uint8_t color_blue, uint8_t color_red_bg, uint8_t color_green_bg, uint8_t color_blue_bg){
         #ifdef SOFTWARE_BUTTONS_PORITION_RIGHT
             setDrawColor(color_red_bg, color_green_bg, color_blue_bg);
-            drawRect(SCREEN_WIDTH, offset + 1, SCREEN_WIDTH - SOFTWARE_BUTTONS_BAR_SIZE, SCREEN_HEIGHT, true);
+            drawRect(SCREEN_WIDTH-1, offset + 1, SCREEN_WIDTH - SOFTWARE_BUTTONS_BAR_SIZE, SCREEN_HEIGHT, true);
 
             setDrawColor(color_red, color_green, color_blue);
 
@@ -211,7 +211,7 @@ void core_views_statusBar_draw(){
     
     // BACKGROUND
     setDrawColor(STYLE_STATUSBAR_BACKGROUND_RED, STYLE_STATUSBAR_BACKGROUND_GREEN, STYLE_STATUSBAR_BACKGROUND_BLUE);
-    drawRect(0, 0, SCREEN_WIDTH, STYLE_STATUSBAR_HEIGHT, true);
+    drawRect(0, 0, SCREEN_WIDTH-1, STYLE_STATUSBAR_HEIGHT, true);
 
     // TIME
     #ifdef CLOCK_ENABLE
@@ -480,7 +480,7 @@ void drawMenuElement(bool draw, uint16_t x, uint16_t y, uint16_t width, uint16_t
     ############################################################################################
 */
 
-const unsigned char icon_arrow_top[] PROGMEM = {
+const unsigned char icon_arrow_up[] PROGMEM = {
     0x02,0x01,0x02,0x18,0x02,0x10,0x04,0xff,0xff,0xff,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x18,0x00,0x00,0x3C,0x00,0x00,0x7E,0x00,0x00,0xFF,0x00,0x01,0xFF,0x80,0x03,0xFF,0xC0,0x07,0xFF,0xE0,0x0F,0xFF,0xF0,0x1F,0xFF,0xF8,0x3F,0xFF,0xFC,0x7F,0xFF,0xFE,0xFF,0xFF,0xFF,
 };
 
@@ -501,30 +501,46 @@ const unsigned char icon_arrow_bottom[] PROGMEM = {
         0x02,0x01,0x02,0x10,0x02,0x10,0x04,0x00,0x00,0x00,0xC7,0xE3,0x83,0xC1,0x03,0xC1,0x01,0x80,0x01,0x80,0x01,0x80,0x01,0x80,0x01,0x81,0x83,0xC1,0xC3,0xC3,0xFF,0xFF,0xFF,0xFF,0xE3,0xC7,0xC1,0x83,0xC1,0x83,0xE3,0xC7,0x04,0xb4,0xb4,0xb4,0x38,0x1C,0x7C,0x3E,0xFC,0x3E,0xFE,0x7F,0xFE,0x7F,0xFE,0x7F,0xFE,0x7F,0xFE,0x7E,0x7C,0x3E,0x3C,0x3C,0x00,0x00,0x00,0x00,0x1C,0x38,0x3E,0x7C,0x3E,0x7C,0x1C,0x38,
     };
 #endif
-const unsigned char* getIcon(int icon){
 
-    switch (icon){
-        #ifdef BATTERY_ENABLE
-            case ICON_BATTERY_CHARGING:     return battery_charging;
-            case ICON_BATTERY_100:          return battery100;  
-            case ICON_BATTERY_90:           return battery90;  
-            case ICON_BATTERY_80:           return battery80;  
-            case ICON_BATTERY_70:           return battery70;  
-            case ICON_BATTERY_60:           return battery60;  
-            case ICON_BATTERY_50:           return battery50;  
-            case ICON_BATTERY_40:           return battery40;  
-            case ICON_BATTERY_30:           return battery30;  
-            case ICON_BATTERY_20:           return battery20;  
-            case ICON_BATTERY_10:           return battery10;  
-            case ICON_BATTERY_0:            return battery0;
-        #endif
-        #if defined(PEDOMETER_ENABLE) || defined(PEDOMETER_EMULATOR)
-            case ICON_LEG:                  return icon_leg;
-            case ICON_LEG_GREY:             return icon_leg_grey;
-        #endif
-        case ICON_ARROW_UP:             return icon_arrow_top;
-        case ICON_ARROW_DOWN:           return icon_arrow_bottom;
-        default: return {0};
+#ifdef LEGACY_GET_ICONS
+    const unsigned char* getIcon(int icon){
+
+        switch (icon){
+            #ifdef BATTERY_ENABLE
+                case ICON_BATTERY_CHARGING:     return battery_charging;
+                case ICON_BATTERY_100:          return battery100;  
+                case ICON_BATTERY_90:           return battery90;  
+                case ICON_BATTERY_80:           return battery80;  
+                case ICON_BATTERY_70:           return battery70;  
+                case ICON_BATTERY_60:           return battery60;  
+                case ICON_BATTERY_50:           return battery50;  
+                case ICON_BATTERY_40:           return battery40;  
+                case ICON_BATTERY_30:           return battery30;  
+                case ICON_BATTERY_20:           return battery20;  
+                case ICON_BATTERY_10:           return battery10;  
+                case ICON_BATTERY_0:            return battery0;
+            #endif
+            #if defined(PEDOMETER_ENABLE) || defined(PEDOMETER_EMULATOR)
+                case ICON_LEG:                  return icon_leg;
+                case ICON_LEG_GREY:             return icon_leg_grey;
+            #endif
+            case ICON_ARROW_UP:             return icon_arrow_up;
+            case ICON_ARROW_DOWN:           return icon_arrow_bottom;
+            default: return {0};
+        }
+    
     }
-  
-}
+
+#else
+    const unsigned char* getIcon_arrow__up(){
+        return icon_arrow_up;
+    }
+
+    const unsigned char* getIcon_arrow_bottom(){
+        return icon_arrow_bottom;
+    }
+
+    const unsigned char* getIcon_arrow_up(){
+        return icon_arrow_bottom;
+    }
+#endif

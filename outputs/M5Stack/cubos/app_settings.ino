@@ -228,11 +228,11 @@ int appNameClass::getPositionBySelectedNumber(unsigned char selectedNumber){
 void appNameClass::drawSettingTimeArrows(bool draw, int position){
     //drawRect(x0+delta, y0+delta, x1-delta, y1-delta);  
 
-    //drawImage(draw, icon_arrow_top, position + 3 - 16, SCREEN_HEIGHT/2 - 19 - 15 );
+    //drawImage(draw, icon_arrow_up, position + 3 - 16, SCREEN_HEIGHT/2 - 19 - 15 );
     //drawImage(draw, icon_arrow_bottom, position + 3 - 16, SCREEN_HEIGHT/2 + 20 + 15);
 
-    drawImage(draw, getIcon(ICON_ARROW_UP), position + 3 - 16, SCREEN_HEIGHT/2 - 19 - 15 );
-    drawImage(draw, getIcon(ICON_ARROW_DOWN), position + 3 - 16, SCREEN_HEIGHT/2 + 20 + 15);
+    drawImage(draw, getIcon_arrow_up(), position + 3 - 16, SCREEN_HEIGHT/2 - 19 - 15 );
+    drawImage(draw, getIcon_arrow_bottom(), position + 3 - 16, SCREEN_HEIGHT/2 + 20 + 15);
 }
 
 void appNameClass::drawSettingTimeSelect(bool draw, int position){

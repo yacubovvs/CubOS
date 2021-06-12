@@ -24,13 +24,14 @@ cp sdk/apps/app_clock.ino           outputs/M5Stack/cubos/
 cp sdk/apps/app_filemanager.ino     outputs/M5Stack/cubos/
 cp sdk/apps/app_internet.ino        outputs/M5Stack/cubos/
 cp sdk/apps/app_simplegame.ino      outputs/M5Stack/cubos/
-cp sdk/apps/app_z_menu_touch.ino    outputs/M5Stack/cubos/
+cp sdk/apps/app_z_menu.ino    outputs/M5Stack/cubos/
 #cp sdk/apps/app_pedometer.ino       outputs/M5Stack/cubos/
 
 # Drivers
-cp sdk/drivers/driver_display_m5Core2.ino               outputs/M5Stack/cubos/    
-//#cp sdk/drivers/driver_touchscreen_M5Core2.ino           outputs/M5Stack/cubos/    
-cp sdk/drivers/driver_cpu_M5Core2.ino                   outputs/M5Stack/cubos/    
+cp sdk/drivers/driver_display_m5stack.ino               outputs/M5Stack/cubos/    
+cp sdk/drivers/driver_setup_m5stack.ino                 outputs/M5Stack/cubos/    
+cp sdk/drivers/driver_controls_m5stack.ino                 outputs/M5Stack/cubos/    
+#cp sdk/drivers/driver_cpu_M5Stack.ino                   outputs/M5Stack/cubos/    
 
 # Core
 cp sdk/core/core_basic.ino              outputs/M5Stack/cubos/  

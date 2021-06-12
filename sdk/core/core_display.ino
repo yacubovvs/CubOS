@@ -791,6 +791,7 @@ void drawString_rightAlign(String dString, int x, int y){
 }
 
 void core_display_setup(){
+  driver_display_setup();
   #ifdef FRAMEBUFFER_ENABLE
     FRAMEBUFFER_reset();
   #endif

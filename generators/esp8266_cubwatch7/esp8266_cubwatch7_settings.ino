@@ -11,7 +11,7 @@
 // ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! !
 
 //#define DEBUG_SERIAL
-#define screenDebug
+#define DEBUG_ON_SCREEN
 
 #define SCREEN_WIDTH            240     // Screen resolution width
 #define SCREEN_HEIGHT           240     // Screen resolution height
