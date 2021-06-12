@@ -17,7 +17,7 @@ void driver_controls_setup(){
 void driver_controls_loop(){
     //M5.update();
     //debug(String(i) + " not pressed", 1000);
-    debug("Controls loop ", 1000);
+    //debug("Controls loop ", 1000);
 
     for (unsigned char i=0; i<DRIVER_CONTROLS_TOTALBUTTONS; i++){
         if (
@@ -25,7 +25,9 @@ void driver_controls_loop(){
             (i==1 && M5.BtnB.isPressed())||
             (i==2 && M5.BtnC.isPressed())
         ){
-        set_core_powersave_lastUserAction();
+        #ifdef POWERSAVE_ENABLE
+            set_core_powersave_lastUserAction();
+        #endif
         
         last_user_activity = _millis();
         if(driver_control_pressed[i]==false){
@@ -50,6 +52,7 @@ void driver_controls_loop(){
             driver_control_time_pressed[i]=0;
             driver_control_DOUBLE_PRESS_lastPress[i]=0;
             onButtonEvent(EVENT_BUTTON_LONG_PRESS, i);
+            //debug("Long press " + String(i), 100);
             driver_control_IS_LONG_PRESS[i]=true;
             } 
         }
