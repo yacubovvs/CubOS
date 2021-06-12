@@ -7,13 +7,10 @@
 */
 
 // TOUCH
-
-
 #define TOUCH_SCREEN_DELTA_MOVE_FOR_DRAG 7
-#define TOUCH_SCREEN_TIME_MS_FOT_LONG_TOUCH 300
+#define TOUCH_SCREEN_TIME_MS_FOR_LONG_TOUCH 300
 
 // BUTTONS
-
 #define BUTTON_UP       0x01
 #define BUTTON_SELECT   0x02
 #define BUTTON_DOWN     0x03
@@ -60,6 +57,12 @@
 #define WAKE_UP_REASON_ULP                  0x05
 #define WAKE_UP_REASON_NOT_DEEP_SLEEP       0x06
 
+// SOFTWARE_BUTTONS
+#define SOFTWARE_BAR_BUTTON_UP              0x0001
+#define SOFTWARE_BAR_BUTTON_SELECT          0x0002
+#define SOFTWARE_BAR_BUTTON_DOWN            0x0003
+#define SOFTWARE_BAR_BUTTON_BACK            0x0004
+
 /*
  ############################################################################
                                  SLEEP TYPES -                               
@@ -92,6 +95,14 @@
 */
 
 #define COREVIEWS_NO_ICON_ELEMENT_HEIGHT 40
+
+#define SOFTWARE_BUTTONS_COLOR_RED          255
+#define SOFTWARE_BUTTONS_COLOR_GREEN        255
+#define SOFTWARE_BUTTONS_COLOR_BLUE         255
+
+#define SOFTWARE_BUTTONS_COLOR_RED_BG       59
+#define SOFTWARE_BUTTONS_COLOR_GREEN_BG     35
+#define SOFTWARE_BUTTONS_COLOR_BLUE_BG      71
 
 /*
 ############################################################################
@@ -147,13 +158,19 @@
 
 //#define DEBUG_SERIAL
 
+#define SOFTWARE_BUTTONS_BAR_SIZE 0
+//#define LEGACY_GET_ICONS
+
+#define DEBUG_SERIAL_PORT Serial
 /*
     ############################################################################################
     #                                                                                          #
     #                                    DEFAULT SETTINGS +                                    #
     #                                                                                          #
     ############################################################################################
-*//*
+*/
+
+/*
     ############################################################################################
     #                                                                                          #
     #                                   M5STICK SETTINGS +                                     #
@@ -214,10 +231,10 @@
 
 #define TOUCH_SCREEN_ENABLE
 
-//#define FRAMEBUFFER_ENABLE
-//#define FRAMEBUFFER_TWIN_FULL
-//#define FRAMEBUFFER_BYTE_PER_PIXEL 2
-//#define FRAMEBUFFER_PSRAM
+#define FRAMEBUFFER_ENABLE
+#define FRAMEBUFFER_TWIN_FULL
+#define FRAMEBUFFER_BYTE_PER_PIXEL 2
+#define FRAMEBUFFER_PSRAM
 
 //#define SCREEN_INVERT_COLORS
 //#define SCREEN_CHANGE_BLUE_RED
@@ -269,24 +286,42 @@
     #                                   M5STICK SETTINGS -                                     #
     #                                                                                          #
     ############################################################################################
+*//*
+    ############################################################################################
+    #                                                                                          #
+    #                                      FRAME BUFFER +                                      #
+    #                                                                                          #
+    ############################################################################################
 */
-#include <Arduino.h>
+// For some divices as M5Stack Core2, framebuffer should be inited before start any code
+
+#ifdef FRAMEBUFFER_ENABLE
+
+  #ifdef FRAMEBUFFER_TWIN_FULL
+
+    #define FRAMEBUFFER_SIZE SCREEN_WIDTH * SCREEN_HEIGHT * FRAMEBUFFER_BYTE_PER_PIXEL
+    //#define FRAMEBUFFER_SIZE SCREEN_WIDTH * SCREEN_HEIGHT
+
+    #if FRAMEBUFFER_BYTE_PER_PIXEL==2
+      #define FRAMEBUFFER_TYPE uint16_t
+    #endif
+
+    #if FRAMEBUFFER_BYTE_PER_PIXEL==1
+      #define FRAMEBUFFER_TYPE uint8_t
+    #endif
+
+    FRAMEBUFFER_TYPE * FRAMEBUFFER_currentFrame;
+    FRAMEBUFFER_TYPE * FRAMEBUFFER_newFrame;
+    bool FRAMEBUFFER_pixelChangedchanged[SCREEN_WIDTH*SCREEN_HEIGHT + 1];
+
+  #endif
+#endif
 
 /*
     ############################################################################################
-    #                                     PREDEFINED +                                         #
-    ############################################################################################
-*/
-
-void core_views_statusBar_draw();
-void setBackgroundColor(unsigned char r, unsigned char g, unsigned char b);
-void drawRect(int x0, int y0, int x1, int y1, bool fill);
-void setDrawColor(unsigned char red, unsigned char green, unsigned char blue);
-void fillScreen(unsigned char red, unsigned char green, unsigned char blue);
-
-/*
-    ############################################################################################
-    #                                     PREDEFINED -                                         #
+    #                                                                                          #
+    #                                      FRAME BUFFER -                                      #
+    #                                                                                          #
     ############################################################################################
 */
 
@@ -298,6 +333,14 @@ void fillScreen(unsigned char red, unsigned char green, unsigned char blue);
     #                                                                                          #
     ############################################################################################
 */
+
+// PREDEFINITION
+void core_views_statusBar_draw();
+#ifdef SOFTWARE_BUTTONS_ENABLE
+  void core_views_softwareButtons_draw();
+#endif
+class Application;
+Application *getApp(unsigned char i);
 
 
 /////////////////////////////////////
@@ -314,6 +357,10 @@ class Application{
     bool preventSleep         = false;
     bool preventInAppSleep    = false;
 
+    #ifdef SOFTWARE_BUTTONS_ENABLE
+      bool showSoftWareButtons = true;
+    #endif
+
     virtual void onLoop()     = 0;
     virtual void onDestroy()  = 0;
     virtual void onEvent(unsigned char event, int val1, int val2) = 0;
@@ -322,6 +369,9 @@ class Application{
       this->preventSleep = false;
       this->preventInAppSleep = false;
       if(this->showStatusBar) core_views_statusBar_draw();
+      #ifdef SOFTWARE_BUTTONS_ENABLE
+        if(this->showSoftWareButtons) core_views_softwareButtons_draw();
+      #endif
     }
 
     Application(){};
@@ -336,9 +386,28 @@ Application* currentApp;
     ############################################################################################
 */
 
-void setup(){ 
+void setup(){   
+
+  #ifdef FRAMEBUFFER_ENABLE
+
+    #ifdef FRAMEBUFFER_TWIN_FULL
+
+      #ifdef FRAMEBUFFER_PSRAM
+        FRAMEBUFFER_currentFrame  = (FRAMEBUFFER_TYPE *)ps_malloc(FRAMEBUFFER_SIZE);
+        FRAMEBUFFER_newFrame      = (FRAMEBUFFER_TYPE *)ps_malloc(FRAMEBUFFER_SIZE);
+      #else
+        FRAMEBUFFER_currentFrame  = (FRAMEBUFFER_TYPE *)malloc(FRAMEBUFFER_SIZE);
+        FRAMEBUFFER_newFrame      = (FRAMEBUFFER_TYPE *)malloc(FRAMEBUFFER_SIZE);
+      #endif
+    #endif
+  #endif
+
+  #ifdef CORE_SETUP_INIT
+    core_setup_driver();
+  #endif
+
   #ifdef DEBUG_SERIAL
-      Serial.begin(115200);
+      DEBUG_SERIAL_PORT.begin(115200);
       delay(100);
       debug("Serial debug started", 10);
   #endif
@@ -368,8 +437,6 @@ void setup(){
     #endif
   #endif
   //debug("**** Main app start", 10);
-
-  driver_display_setup();
   core_display_setup();
   
   #ifdef RTC_ENABLE
@@ -490,7 +557,7 @@ void debug(String string, int delaytime){
       delay(delaytime);
     #endif
 
-    #ifdef screenDebug
+    #ifdef DEBUG_ON_SCREEN
       setDrawColor(255, 255, 255);
       drawString(string, 5, STYLE_STATUSBAR_HEIGHT + 10, 2);
       delay(delaytime);

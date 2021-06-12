@@ -1,4 +1,3 @@
-#include <Arduino.h>
 
 uint16_t get_uint16Color(unsigned char red, unsigned char green, unsigned char blue){
   #ifdef SCREEN_INVERT_COLORS
@@ -98,17 +97,6 @@ void setDrawColor(uint16_t color){
 
   #ifdef FRAMEBUFFER_TWIN_FULL
 
-    #define FRAMEBUFFER_SIZE SCREEN_WIDTH * SCREEN_HEIGHT * FRAMEBUFFER_BYTE_PER_PIXEL
-    //#define FRAMEBUFFER_SIZE SCREEN_WIDTH * SCREEN_HEIGHT
-
-    #if FRAMEBUFFER_BYTE_PER_PIXEL==2
-      #define FRAMEBUFFER_TYPE uint16_t
-    #endif
-
-    #if FRAMEBUFFER_BYTE_PER_PIXEL==1
-      #define FRAMEBUFFER_TYPE uint8_t
-    #endif
-
     bool FRAMEBUFFER_isChanged = false;
 
     void setFRAMEBUFFER_isChanged(bool v){
@@ -118,11 +106,6 @@ void setDrawColor(uint16_t color){
     bool getFRAMEBUFFER_isChanged(){
       return FRAMEBUFFER_isChanged;
     }
-
-    FRAMEBUFFER_TYPE * FRAMEBUFFER_currentFrame;
-    FRAMEBUFFER_TYPE * FRAMEBUFFER_newFrame;
-    bool FRAMEBUFFER_pixelChangedchanged[SCREEN_WIDTH*SCREEN_HEIGHT + 1];
-
 
     void FRAMEBUFFER_fill(uint16_t fillColor){
       for(int x=0; x<SCREEN_WIDTH; x++){
@@ -137,15 +120,6 @@ void setDrawColor(uint16_t color){
     }
 
     void FRAMEBUFFER_reset(){
-      
-      #ifdef FRAMEBUFFER_PSRAM
-        FRAMEBUFFER_currentFrame  = (FRAMEBUFFER_TYPE *)ps_malloc(FRAMEBUFFER_SIZE);
-        FRAMEBUFFER_newFrame      = (FRAMEBUFFER_TYPE *)ps_malloc(FRAMEBUFFER_SIZE);
-      #else
-        FRAMEBUFFER_currentFrame  = (FRAMEBUFFER_TYPE *)malloc(FRAMEBUFFER_SIZE);
-        FRAMEBUFFER_newFrame      = (FRAMEBUFFER_TYPE *)malloc(FRAMEBUFFER_SIZE);
-      #endif
-      
       FRAMEBUFFER_fill(0);
     }
 
@@ -792,6 +766,7 @@ void drawString_rightAlign(String dString, int x, int y){
 }
 
 void core_display_setup(){
+  driver_display_setup();
   #ifdef FRAMEBUFFER_ENABLE
     FRAMEBUFFER_reset();
   #endif
@@ -976,6 +951,43 @@ void drawRect(int x0, int y0, int x1, int y1, bool fill){
   }
 }
 
+// The Bresenham algorithm
+void drawCircle(int x0, int y0, int radius, bool fill){
+	int x = 0;
+	int y = radius;
+	int delta = 1 - 2 * radius;
+	int error = 0;
+	while(y >= 0) {
+    if(fill){
+      drawLine(x0 + x, y0 + y, x0 + x, y0);
+      drawLine(x0 + x, y0 - y, x0 + x, y0);
+      drawLine(x0 - x, y0 + y, x0 - x, y0);
+      drawLine(x0 - x, y0 - y, x0 - x, y0);
+    }else{
+      drawPixel(x0 + x, y0 + y);
+      drawPixel(x0 + x, y0 - y);
+      drawPixel(x0 - x, y0 + y);
+      drawPixel(x0 - x, y0 - y);
+    }
+
+		error = 2 * (delta + y) - 1;
+		if(delta < 0 && error <= 0) {
+			++x;
+			delta += 2 * x + 1;
+			continue;
+		}
+		error = 2 * (delta - x) - 1;
+		if(delta > 0 && error > 0) {
+			--y;
+			delta += 1 - 2 * y;
+			continue;
+		}
+		++x;
+		delta += 2 * (x - y);
+		--y;
+	}
+}
+
 
 void drawCircle(int x0, int y0, int radius){
   drawCircle(x0, y0, radius, false);
@@ -1004,10 +1016,6 @@ void drawArc_fade(int x0, int y0, int radius, int drawFromAngle, int drawToAngle
   }
 }
 */
-
-void drawArc(int x0, int y0, int radius, int drawFromAngle, int drawToAngle, uint16_t width){
-  drawArc(x0, y0, radius, drawFromAngle, drawToAngle, width, false);
-}
 
 void drawArc(int x0, int y0, int radius, int drawFromAngle, int drawToAngle, uint16_t width, bool drawFading){
   double start_angle = DEG_TO_RAD*drawFromAngle;
@@ -1059,41 +1067,8 @@ void drawArc(int x0, int y0, int radius, int drawFromAngle, int drawToAngle, uin
   }
 }
 
-// The Bresenham algorithm
-void drawCircle(int x0, int y0, int radius, bool fill){
-	int x = 0;
-	int y = radius;
-	int delta = 1 - 2 * radius;
-	int error = 0;
-	while(y >= 0) {
-    if(fill){
-      drawLine(x0 + x, y0 + y, x0 + x, y0);
-      drawLine(x0 + x, y0 - y, x0 + x, y0);
-      drawLine(x0 - x, y0 + y, x0 - x, y0);
-      drawLine(x0 - x, y0 - y, x0 - x, y0);
-    }else{
-      drawPixel(x0 + x, y0 + y);
-      drawPixel(x0 + x, y0 - y);
-      drawPixel(x0 - x, y0 + y);
-      drawPixel(x0 - x, y0 - y);
-    }
-
-		error = 2 * (delta + y) - 1;
-		if(delta < 0 && error <= 0) {
-			++x;
-			delta += 2 * x + 1;
-			continue;
-		}
-		error = 2 * (delta - x) - 1;
-		if(delta > 0 && error > 0) {
-			--y;
-			delta += 1 - 2 * y;
-			continue;
-		}
-		++x;
-		delta += 2 * (x - y);
-		--y;
-	}
+void drawArc(int x0, int y0, int radius, int drawFromAngle, int drawToAngle, uint16_t width){
+  drawArc(x0, y0, radius, drawFromAngle, drawToAngle, width, false);
 }
 
 // System function

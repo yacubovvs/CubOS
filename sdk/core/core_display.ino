@@ -97,17 +97,6 @@ void setDrawColor(uint16_t color){
 
   #ifdef FRAMEBUFFER_TWIN_FULL
 
-    #define FRAMEBUFFER_SIZE SCREEN_WIDTH * SCREEN_HEIGHT * FRAMEBUFFER_BYTE_PER_PIXEL
-    //#define FRAMEBUFFER_SIZE SCREEN_WIDTH * SCREEN_HEIGHT
-
-    #if FRAMEBUFFER_BYTE_PER_PIXEL==2
-      #define FRAMEBUFFER_TYPE uint16_t
-    #endif
-
-    #if FRAMEBUFFER_BYTE_PER_PIXEL==1
-      #define FRAMEBUFFER_TYPE uint8_t
-    #endif
-
     bool FRAMEBUFFER_isChanged = false;
 
     void setFRAMEBUFFER_isChanged(bool v){
@@ -117,11 +106,6 @@ void setDrawColor(uint16_t color){
     bool getFRAMEBUFFER_isChanged(){
       return FRAMEBUFFER_isChanged;
     }
-
-    FRAMEBUFFER_TYPE * FRAMEBUFFER_currentFrame;
-    FRAMEBUFFER_TYPE * FRAMEBUFFER_newFrame;
-    bool FRAMEBUFFER_pixelChangedchanged[SCREEN_WIDTH*SCREEN_HEIGHT + 1];
-
 
     void FRAMEBUFFER_fill(uint16_t fillColor){
       for(int x=0; x<SCREEN_WIDTH; x++){
@@ -136,15 +120,6 @@ void setDrawColor(uint16_t color){
     }
 
     void FRAMEBUFFER_reset(){
-      
-      #ifdef FRAMEBUFFER_PSRAM
-        FRAMEBUFFER_currentFrame  = (FRAMEBUFFER_TYPE *)ps_malloc(FRAMEBUFFER_SIZE);
-        FRAMEBUFFER_newFrame      = (FRAMEBUFFER_TYPE *)ps_malloc(FRAMEBUFFER_SIZE);
-      #else
-        FRAMEBUFFER_currentFrame  = (FRAMEBUFFER_TYPE *)malloc(FRAMEBUFFER_SIZE);
-        FRAMEBUFFER_newFrame      = (FRAMEBUFFER_TYPE *)malloc(FRAMEBUFFER_SIZE);
-      #endif
-      
       FRAMEBUFFER_fill(0);
     }
 

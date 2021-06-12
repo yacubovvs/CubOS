@@ -1,7 +1,12 @@
 #define appNameClass    MainMenuApp      // App name without spaces
 #define appName         "Main menu"      // App name with spaces 
 
-#define ACTIVE_SCREEN_WIDTH             SCREEN_WIDTH
+#ifdef SOFTWARE_BUTTONS_PORITION_RIGHT
+  #define ACTIVE_SCREEN_WIDTH             (SCREEN_WIDTH - SOFTWARE_BUTTONS_BAR_SIZE)
+#else
+  #define ACTIVE_SCREEN_WIDTH             (SCREEN_WIDTH)
+#endif
+
 #define ACTIVE_SCREEN_HEIGHT            (SCREEN_HEIGHT - STYLE_STATUSBAR_HEIGHT)
 #define SINGLE_ELEMENT_MIN_WIDTH        100
 #define SINGLE_ELEMENT_MIN_HEIGHT       80
@@ -13,11 +18,21 @@
 #define SINGLE_ELEMENT_REAL_HEIGHT      ((int)(ACTIVE_SCREEN_HEIGHT/SINGLE_ELEMENTS_IN_Y))
 
 #define PAGES_LIST_POSITION             (SCREEN_HEIGHT)
+#if ((ACTIVE_SCREEN_WIDTH/SINGLE_ELEMENT_MIN_WIDTH)) < 1
+  #define SINGLE_ELEMENTS_IN_X 1
+  #define SINGLE_ELEMENTS_IN_X_MACRO 1
+#endif
+
+#if ((ACTIVE_SCREEN_HEIGHT/SINGLE_ELEMENT_MIN_HEIGHT)) < 1
+  #define SINGLE_ELEMENTS_IN_Y 1
+  #define SINGLE_ELEMENTS_IN_Y_MACRO 1
+#endif
+
+#if ( ((SINGLE_ELEMENTS_IN_X_MACRO)==1) && ((SINGLE_ELEMENTS_IN_Y_MACRO)==1))
+  #define SINGLE_ELEMENT_ON_SCREEN
+#endif
 
 #define APPS_ON_SINGLE_PAGE             (SINGLE_ELEMENTS_IN_X * SINGLE_ELEMENTS_IN_Y)
-
-
-
 
 #ifdef  APP_MENU_APPLICATIONS_0
   #define APP_MENU_APPLICATIONS_QUANTITY 1
@@ -177,11 +192,11 @@ void appNameClass::drawIcons(bool draw){
   DRAW_LIMITS_setEnable(true);
   DRAW_LIMIT_reset();
   DRAW_LIMITS_setEnable(STYLE_STATUSBAR_HEIGHT, -1, -1, -1);
-  
+
 	for(unsigned char app_num=0; app_num<APP_MENU_APPLICATIONS_QUANTITY; app_num++){
 
 		unsigned char x_position = app_num%SINGLE_ELEMENTS_IN_X;
-		unsigned char y_position = app_num/SINGLE_ELEMENTS_IN_Y;
+		unsigned char y_position = app_num/SINGLE_ELEMENTS_IN_X;
 
 		int x0 = x_position*SINGLE_ELEMENT_REAL_WIDTH;
 		int y0 = y_position*SINGLE_ELEMENT_REAL_HEIGHT + STYLE_STATUSBAR_HEIGHT+1;
@@ -230,7 +245,7 @@ void appNameClass::onEvent(unsigned char event, int val1, int val2){
 
     }else if(event==EVENT_ON_TOUCH_RELEASED){
       #ifdef TOUCH_SCREEN_ENABLE
-        #ifdef PLATFORM_PC_emulator
+        #ifdef PLATFORM_PC_EMULATOR
           this->drawIcons(false);
           float position = ((float)this->scroll_y)/((float)SINGLE_ELEMENT_REAL_HEIGHT);
           this->scroll_y = round(position) * SINGLE_ELEMENT_REAL_HEIGHT;
