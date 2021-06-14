@@ -26,6 +26,7 @@ cp sdk/apps/app_internet.ino        outputs/m5stick_c/cubos/
 cp sdk/apps/app_simplegame.ino      outputs/m5stick_c/cubos/
 cp sdk/apps/app_z_menu.ino          outputs/m5stick_c/cubos/
 cp sdk/apps/app_pedometer.ino       outputs/m5stick_c/cubos/
+cp sdk/apps/app_ble_tester.ino      outputs/m5stick_c/cubos/
 
 # Drivers
 cp sdk/drivers/driver_battery_m5stickC.ino          outputs/m5stick_c/cubos/     

@@ -11,6 +11,8 @@
 #define APP_MENU_APPLICATIONS_2             PedometerApp
 #define APP_MENU_APPLICATIONS_3             BatteryApp
 #define APP_MENU_APPLICATIONS_4             I2CScannerApp
+#define APP_MENU_APPLICATIONS_5             BleTester
+
 
 //#define APP_MENU_APPLICATIONS_5             TestApplicationApp
 

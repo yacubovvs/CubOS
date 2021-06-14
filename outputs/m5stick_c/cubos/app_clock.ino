@@ -1,6 +1,12 @@
 #define appNameClass    ClockApp          // App name without spaces
 #define appName         "Clock"              // App name with spaces 
 
+#ifdef PLATFORM_PC_EMULATOR
+    long get_pedometer_steps(){
+        return 12315;
+    }
+#endif
+
 class appNameClass: public Application{
     public:
         bool isfullScreen         = true;
@@ -37,7 +43,7 @@ class appNameClass: public Application{
             bool last_battery_charging  = "";
         #endif
 
-        #ifdef PEDOMETER_ENABLE
+        #if defined(PEDOMETER_ENABLE) || defined(PEDOMETER_EMULATOR)
             unsigned int last_pedometer   = 0;
         #endif
 
@@ -218,8 +224,8 @@ void appNameClass::draw_current_time(bool draw){
         #define PEDOMETER_LABEL_POSITION_Y (SCREEN_HEIGHT - 18)
         #define PEDOMETER_LABEL_POSITION_X_OFFSET (0)
         #define PEDOMETER_LABEL_POSITION_PADDING (3)
-        #ifdef PEDOMETER_ENABLE
-
+        #if defined(PEDOMETER_ENABLE) || defined(PEDOMETER_EMULATOR)
+            
             if(draw) this->last_pedometer = get_pedometer_steps();
             String pedometer_toPrint = String(this->last_pedometer);
 
@@ -227,43 +233,25 @@ void appNameClass::draw_current_time(bool draw){
             int pedometer_label_width_05 = (PEDOMETER_LABEL_POSITION_PADDING*2 + 16 + pedometer_toPrint.length()*FONT_CHAR_WIDTH)/2;
             
             // 16 - leg icon width
-            drawImage(draw, getIcon(ICON_LEG_GREY), 
+            drawImage(draw, getIcon_legs_grey(), 
                 SCREEN_WIDTH/2 + pedometer_label_width_05 - 16 + PEDOMETER_LABEL_POSITION_X_OFFSET, 
                 PEDOMETER_LABEL_POSITION_Y + PEDOMETER_LABEL_POSITION_PADDING - 9
             );
 
-            /*
-            drawImage(draw, getIcon(ICON_LEG_GREY), 
-                SCREEN_WIDTH/2 + PEDOMETER_LABEL_POSITION_X_OFFSET, 
-                PEDOMETER_LABEL_POSITION_Y + PEDOMETER_LABEL_POSITION_PADDING - 9
-            );
-            */
-
             if(draw){
                 
-                //setDrawColor_ContrastColor();
                 setDrawColor(192,192,192);
                 drawString(pedometer_toPrint, 
                     SCREEN_WIDTH/2 - pedometer_label_width_05 + PEDOMETER_LABEL_POSITION_X_OFFSET, 
                     PEDOMETER_LABEL_POSITION_Y + 1, 1);
 
-                /*
-                drawString(pedometer_toPrint, 
-                    SCREEN_WIDTH/2 - pedometer_toPrint.length()*FONT_CHAR_WIDTH - PEDOMETER_LABEL_POSITION_PADDING + PEDOMETER_LABEL_POSITION_X_OFFSET, 
-                    PEDOMETER_LABEL_POSITION_Y + 1, 1);
-                    */
             }else{
                 setDrawColor_BackGroundColor();  
-                /*
                 clearString(pedometer_toPrint, 
-                    SCREEN_WIDTH/2 - pedometer_toPrint.length()*FONT_CHAR_WIDTH - PEDOMETER_LABEL_POSITION_PADDING + PEDOMETER_LABEL_POSITION_X_OFFSET, 
-                    PEDOMETER_LABEL_POSITION_Y + 1, 1);
-                */
-
-               clearString(pedometer_toPrint, 
                     SCREEN_WIDTH/2 - pedometer_label_width_05 + PEDOMETER_LABEL_POSITION_X_OFFSET, 
                     PEDOMETER_LABEL_POSITION_Y + 1, 1);
             }
+            
         #endif
             
     #else

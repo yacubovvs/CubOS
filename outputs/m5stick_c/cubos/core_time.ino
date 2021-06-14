@@ -1,3 +1,4 @@
+
 void core_time_onNewDate(){ 
     // Calling once in a day
     // Clearing all counting data for a day
@@ -20,10 +21,7 @@ long getCurrentSystemTime(){
 #ifdef RTC_ENABLE
     RTC_DATA_ATTR unsigned char lastDay = 0;
     unsigned long driver_RTC_lastTimeRefresh = 0;
-
-    void core_time_driver_RTC_refresh(){
-        core_time_driver_RTC_refresh(false);
-    }
+    
     void core_time_driver_RTC_refresh(bool hard){
         if(hard || (millis() - driver_RTC_lastTimeRefresh>=UPDATE_RTC_EVERY)){
             driver_RTC_refresh(hard);
@@ -32,6 +30,10 @@ long getCurrentSystemTime(){
                 lastDay = core_time_getDate();
             }
         }
+    }
+
+    void core_time_driver_RTC_refresh(){
+        core_time_driver_RTC_refresh(false);
     }
 #endif
 

@@ -532,6 +532,14 @@ const unsigned char icon_arrow_bottom[] PROGMEM = {
     }
 
 #else
+    const unsigned char* getIcon_legs_white(){
+        return icon_leg;
+    }
+
+    const unsigned char* getIcon_legs_grey(){
+        return icon_leg_grey;
+    }
+
     const unsigned char* getIcon_arrow__up(){
         return icon_arrow_up;
     }
