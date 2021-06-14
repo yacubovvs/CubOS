@@ -93,6 +93,7 @@
 #define CPU_CONTROLL_ENABLE
 #undef BATTERY_ENABLE
 
+#define FONT_SIZE_DEFAULT 1
 /*
 #define PEDOMETER_STEP_DETECTION_DELAY          20000 // Wake up to check accelerometer
 //#define PEDOMETER_STEP_DETECTION_DELAY          1000 // Wake up to check accelerometer

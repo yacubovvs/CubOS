@@ -10,6 +10,7 @@ uint16_t get_uint16Color(unsigned char red, unsigned char green, unsigned char b
     return ( (blue*31/255) <<11)|( (green*31/255) <<6)|( (red*31/255) <<0);
   #else
     return ( (red*31/255) <<11)|( (green*31/255) <<6)|( (blue*31/255) <<0);
+    //return ( (red*31/255) <<11)|( (green*31/255) <<6)|( (blue*31/255) <<0);
   #endif
 }
 
@@ -780,6 +781,9 @@ void core_display_loop(){
     #ifdef FRAMEBUFFER_TWIN_FULL
       if(getFRAMEBUFFER_isChanged()){
 
+        //setDrawColor(255,255,255);
+        //drawRect(100,100,150, 150, true);
+        
         //long drawMillis = millis();
 
         for(int y=0; y<SCREEN_HEIGHT; y++){
@@ -789,6 +793,9 @@ void core_display_loop(){
               uint16_t newColor = FRAMEBUFFER_new_getPixel(position);
               if(FRAMEBUFFER_current_getPixel(position)!=newColor){
                 //if(getDrawColor()!=newColor) setDrawColor(newColor);
+
+                //if(x==0 && y==0) debug("0,0 color: " + String(newColor));
+                //display_driver_setPixel(x, y, newColor);
                 display_driver_setPixel(x, y, newColor);
                 //if(x>=SCREEN_WIDTH) debug("XMORE!");
                 //if(y>=SCREEN_HEIGHT) debug("YMORE!");
