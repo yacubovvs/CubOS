@@ -15,7 +15,8 @@ void display_driver_setPixel(int x, int y){
 	M5.Lcd.drawPixel(x, y, current_drawColor);
 }
 
-void display_driver_setPixel(int x, int y, uint16_t color){
+void display_driver_setPixel(int x, int y, int color){
+  //driver_display_setDrawColor(color);
   M5.Lcd.drawPixel(x, y, color);
 }
 

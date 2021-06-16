@@ -233,7 +233,7 @@ void appNameClass::draw_current_time(bool draw){
             int pedometer_label_width_05 = (PEDOMETER_LABEL_POSITION_PADDING*2 + 16 + pedometer_toPrint.length()*FONT_CHAR_WIDTH)/2;
             
             // 16 - leg icon width
-            drawImage(draw, getIcon(ICON_LEG_GREY), 
+            drawImage(draw, getIcon_legs_grey(), 
                 SCREEN_WIDTH/2 + pedometer_label_width_05 - 16 + PEDOMETER_LABEL_POSITION_X_OFFSET, 
                 PEDOMETER_LABEL_POSITION_Y + PEDOMETER_LABEL_POSITION_PADDING - 9
             );

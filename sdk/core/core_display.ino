@@ -785,21 +785,14 @@ void core_display_loop(){
         //drawRect(100,100,150, 150, true);
         
         //long drawMillis = millis();
-
+        
         for(int y=0; y<SCREEN_HEIGHT; y++){
           for(int x=0; x<SCREEN_WIDTH; x++){
             if(FRAMEBUFFER_pixelChangedchanged[x + (SCREEN_WIDTH-1)*y]==true){
               uint16_t position = y * (SCREEN_WIDTH-1) + x;
               uint16_t newColor = FRAMEBUFFER_new_getPixel(position);
               if(FRAMEBUFFER_current_getPixel(position)!=newColor){
-                //if(getDrawColor()!=newColor) setDrawColor(newColor);
-
-                //if(x==0 && y==0) debug("0,0 color: " + String(newColor));
-                //display_driver_setPixel(x, y, newColor);
                 display_driver_setPixel(x, y, newColor);
-                //if(x>=SCREEN_WIDTH) debug("XMORE!");
-                //if(y>=SCREEN_HEIGHT) debug("YMORE!");
-
                 FRAMEBUFFER_current_setPixel(position, newColor);
                 FRAMEBUFFER_pixelChangedchanged[x + (SCREEN_WIDTH-1)*y] = false;
               }
@@ -807,15 +800,11 @@ void core_display_loop(){
           }
         }
 
-        //int timeToDraw = millis() - drawMillis;
         /*
-        if(fs_ms_max==0) fs_ms_max=1;
-        else if(fs_ms_max<timeToDraw){
-          fs_ms_max = timeToDraw;
-          log_d("Framebuffer drawing %d", fs_ms_max);
-        }*/
-
-        //log_d("Framebuffer drawing %d", timeToDraw);
+        debug("! last " + String((int)FRAMEBUFFER_current_getPixel(239,239)));
+        FRAMEBUFFER_pixelChangedchanged[239 + (SCREEN_WIDTH-1)*239] = true;
+        FRAMEBUFFER_current_setPixel(239,239, 65535);
+        */
         
       }
       setFRAMEBUFFER_isChanged(false);

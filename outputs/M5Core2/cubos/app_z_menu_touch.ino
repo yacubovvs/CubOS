@@ -183,8 +183,10 @@ const unsigned char appNameClass::icon[] PROGMEM = {
 };
 
 void appNameClass::onCreate(){
+    setBackgroundColor(0, 0, 0); 
     this->drawIcons(true);
-    
+    //setDrawColor(255,255,255);
+    //drawRect(210, 20, 239, 239, true);
 }
 
 void appNameClass::drawIcons(bool draw){
