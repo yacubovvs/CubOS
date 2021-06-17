@@ -1,6 +1,12 @@
 #define appNameClass    ClockApp          // App name without spaces
 #define appName         "Clock"              // App name with spaces 
 
+#ifdef PLATFORM_PC_EMULATOR
+    long get_pedometer_steps(){
+        return 12315;
+    }
+#endif
+
 class appNameClass: public Application{
     public:
         bool isfullScreen         = true;
@@ -23,15 +29,47 @@ class appNameClass: public Application{
         };
         const static unsigned char icon[] PROGMEM;
 
-        void draw_current_time();
+        void draw_current_time(bool draw);
+        String timeString;
+
+        unsigned char last_seconds  = 0;
+        String last_hours           = "";
+        String last_minutes         = "";
+
+        String last_date            = "";
+
+        #ifdef BATTERY_ENABLE
+            unsigned char last_battery  = 0;
+            bool last_battery_charging  = "";
+        #endif
+
+        #if defined(PEDOMETER_ENABLE) || defined(PEDOMETER_EMULATOR)
+            unsigned int last_pedometer   = 0;
+        #endif
+
+        void drawSecondsCircle(bool draw, unsigned char second);
       
 };
 
+#define SECONDS_CIRCLE_X        (SCREEN_WIDTH/2)
+#define SECONDS_CIRCLE_Y        (SCREEN_HEIGHT/2 - 10)
+#define SECONDS_CIRCLE_RADIUS   (SCREEN_WIDTH/2-2)
+#define BATTERY_LABEL_Y_POSITION (STYLE_STATUSBAR_HEIGHT/2 + 2)
+
 void appNameClass::onCreate(){
-    /*
-        Write you code onCreate here
-    */
-    this->draw_current_time();
+    DRAW_LIMITS_setEnable(true);
+    DRAW_LIMIT_reset();
+    
+    setBackgroundColor(0,0,0);
+    setContrastColor(255, 255, 255);
+
+    setDrawColor(48, 48, 48);
+    drawCircle(SECONDS_CIRCLE_X, SECONDS_CIRCLE_Y, SECONDS_CIRCLE_RADIUS-1, true);
+
+    this->last_seconds = core_time_getSeconds_byte();
+    for(unsigned char isecond=0; isecond<=this->last_seconds; isecond++) this->drawSecondsCircle(true, isecond);
+    this->draw_current_time(true);
+
 }
 
 void appNameClass::onLoop(){
@@ -50,34 +88,191 @@ void appNameClass::onEvent(unsigned char event, int val1, int val2){
     
     if(event==EVENT_BUTTON_PRESSED){
         // Write you code on [val1] button pressed here
-        if(val1==BUTTON_BACK){
-            startApp(-1);
-        }
+        #if DRIVER_CONTROLS_TOTALBUTTONS > 3
+            if(val1==BUTTON_BACK){
+                startApp(-1);
+            }
+        #endif
+        
     }else if(event==EVENT_BUTTON_RELEASED){
         // Write you code on [val1] button released here
     }else if(event==EVENT_BUTTON_LONG_PRESS){
         // Write you code on [val1] button long press here
+        if(val1==BUTTON_SELECT){
+
+            #if DRIVER_CONTROLS_TOTALBUTTONS == 1
+                startApp(-1);
+            #elif DRIVER_CONTROLS_TOTALBUTTONS == 2
+                startApp(-1);
+            #else
+            #endif
+        }
     }else if(event==EVENT_ON_TIME_CHANGED){
         // Write you code on system time changed
-        this->draw_current_time();
+        this->draw_current_time(false);
+        this->draw_current_time(true);
     }else if(event==EVENT_ON_GOING_TO_SLEEP){
-        String timeString = core_time_getHourMinuteSecondsTime();
-        setDrawColor(0, 0, 0);
-        clearString(timeString, 2, 90, 5);
+        this->draw_current_time(false);
     }else if(event==EVENT_ON_WAKE_UP){
-        this->draw_current_time();
+        this->draw_current_time(true);
+    }else if(event==EVENT_ON_TOUCH_DOUBLE_PRESS){
+        if(val1==BUTTON_SELECT){
+            startApp(-1);
+        }
     }
-
-     
     
 }
 
-void appNameClass::draw_current_time(){
-    String timeString = core_time_getHourMinuteSecondsTime();
+/*
+#define NARROW_CLOCK_STRING1 18
+#define NARROW_CLOCK_STRING2 73
+#define NARROW_CLOCK_STRING3 125
+*/
+
+void appNameClass::drawSecondsCircle(bool draw, unsigned char second){
+    if(draw)setGradientColor(255, 85, 0, 46, 255, 0, 60, second);
+    else setDrawColor_BackGroundColor();
+
+    int grad = 6*second;
+ 
+    drawArc(SECONDS_CIRCLE_X, SECONDS_CIRCLE_Y, SECONDS_CIRCLE_RADIUS, -90 + grad, -90 + grad + 6, 8, true);
+}
+
+void appNameClass::draw_current_time(bool draw){
+    #define CLOCK_FONT      2
+    #define CLOCK_MARGIN    3
+    #define STRINGS_OFFSET  2
+
+    //this->preventSleep         = true;
+    //this->preventInAppSleep    = true;
+
+    #ifdef NARROW_SCREEN
+        // Draw
+        if(draw){
+            // SECONDS CIRCLE
+            this->timeString = core_time_getHourMinuteSecondsTime();
+            unsigned char seconds_draw;
+            if(core_time_getSeconds_byte()>this->last_seconds) seconds_draw = core_time_getSeconds_byte() - this->last_seconds;
+            else seconds_draw = 1;
+            
+            this->last_seconds = core_time_getSeconds_byte();
+            for(char i_predrawSeconds=0; i_predrawSeconds<seconds_draw; i_predrawSeconds++) this->drawSecondsCircle(draw, this->last_seconds-i_predrawSeconds);
+
+            setDrawColor_ContrastColor();
+
+            this->last_hours    = core_time_getHours_String();
+            this->last_minutes  = core_time_getMinutes_String();
+
+            drawString_centered(core_time_getHours_String(), SCREEN_WIDTH/2, STRINGS_OFFSET + SECONDS_CIRCLE_Y-CLOCK_FONT*FONT_CHAR_HEIGHT - CLOCK_MARGIN, CLOCK_FONT);
+            drawString_centered(core_time_getMinutes_String(), SCREEN_WIDTH/2, STRINGS_OFFSET + SECONDS_CIRCLE_Y + CLOCK_MARGIN, CLOCK_FONT);
+            
+        }else{
+            if(this->last_seconds>core_time_getSeconds_byte()){
+                // if munutes changed
+                setDrawColor_BackGroundColor();  
+                for(int isecond=0; isecond<60; isecond++){
+                    drawSecondsCircle(draw, isecond);
+                }
+
+                setDrawColor(48, 48, 48);
+                drawCircle(SECONDS_CIRCLE_X, SECONDS_CIRCLE_Y, SECONDS_CIRCLE_RADIUS-1, true);
+                
+                clearString_centered(last_hours, SCREEN_WIDTH/2, STRINGS_OFFSET + SECONDS_CIRCLE_Y-CLOCK_FONT*FONT_CHAR_HEIGHT - CLOCK_MARGIN, CLOCK_FONT);
+                clearString_centered(last_minutes, SCREEN_WIDTH/2, STRINGS_OFFSET + SECONDS_CIRCLE_Y + CLOCK_MARGIN, CLOCK_FONT);
+            }
+
+        }
+
+
+        // BATTERY
+        #ifdef BATTERY_ENABLE
+            if(draw){        
+                last_battery            = driver_battery_getPercent();
+                last_battery_charging   = driver_battery_isCharging();
+            }
+
+            #define BATTERY_LABEL_ICON_OFFSET (-4)
+
+            // (battery icon 32x16 px) 
+            drawBatteryIcon(SCREEN_WIDTH/2 + 3 + BATTERY_LABEL_ICON_OFFSET, BATTERY_LABEL_Y_POSITION - 8 + 1, last_battery, last_battery_charging, draw);
+            String battery_percent_toPrint = String(last_battery) + "%";
+
+            if(draw){
+                setDrawColor_ContrastColor();
+                drawString(battery_percent_toPrint, SCREEN_WIDTH/2 - battery_percent_toPrint.length()*FONT_CHAR_WIDTH - 3 + BATTERY_LABEL_ICON_OFFSET, BATTERY_LABEL_Y_POSITION - FONT_CHAR_HEIGHT/2 + 1, 1);
+            }else{
+                setDrawColor_BackGroundColor();  
+                clearString(battery_percent_toPrint, SCREEN_WIDTH/2 - battery_percent_toPrint.length()*FONT_CHAR_WIDTH - 3 + BATTERY_LABEL_ICON_OFFSET, BATTERY_LABEL_Y_POSITION - FONT_CHAR_HEIGHT/2 + 1, 1);
+            } 
+        #endif
+
+        // DATE
+        #define DATE_LABEL_POSITION_Y (SCREEN_HEIGHT - 38)
+        
+        if(draw){
+            this->last_date = core_time_getDateFull();
+            //setDrawColor_ContrastColor();
+            setDrawColor(192,192,192);
+            drawString_centered(last_date, SCREEN_WIDTH/2, DATE_LABEL_POSITION_Y, 1);
+        }else{
+            setDrawColor_BackGroundColor();  
+            clearString_centered(last_date, SCREEN_WIDTH/2, DATE_LABEL_POSITION_Y, 1);
+        }
+        
+
+        // PEDOMETER
+        #define PEDOMETER_LABEL_POSITION_Y (SCREEN_HEIGHT - 18)
+        #define PEDOMETER_LABEL_POSITION_X_OFFSET (0)
+        #define PEDOMETER_LABEL_POSITION_PADDING (3)
+        #if defined(PEDOMETER_ENABLE) || defined(PEDOMETER_EMULATOR)
+            
+            if(draw) this->last_pedometer = get_pedometer_steps();
+            String pedometer_toPrint = String(this->last_pedometer);
+
+            // 16 - leg icon width
+            int pedometer_label_width_05 = (PEDOMETER_LABEL_POSITION_PADDING*2 + 16 + pedometer_toPrint.length()*FONT_CHAR_WIDTH)/2;
+            
+            // 16 - leg icon width
+            drawImage(draw, getIcon_legs_grey(), 
+                SCREEN_WIDTH/2 + pedometer_label_width_05 - 16 + PEDOMETER_LABEL_POSITION_X_OFFSET, 
+                PEDOMETER_LABEL_POSITION_Y + PEDOMETER_LABEL_POSITION_PADDING - 9
+            );
+
+            if(draw){
+                
+                setDrawColor(192,192,192);
+                drawString(pedometer_toPrint, 
+                    SCREEN_WIDTH/2 - pedometer_label_width_05 + PEDOMETER_LABEL_POSITION_X_OFFSET, 
+                    PEDOMETER_LABEL_POSITION_Y + 1, 1);
+
+            }else{
+                setDrawColor_BackGroundColor();  
+                clearString(pedometer_toPrint, 
+                    SCREEN_WIDTH/2 - pedometer_label_width_05 + PEDOMETER_LABEL_POSITION_X_OFFSET, 
+                    PEDOMETER_LABEL_POSITION_Y + 1, 1);
+            }
+            
+        #endif
+            
+    #else
+        if(draw){
+            setDrawColor_ContrastColor();
+            drawString(this->timeString, 2, 90, 5);
+        }else{
+
+            setDrawColor_BackGroundColor();
+            clearString(this->timeString, 2, 90, 5);
+            
+        }
+    #endif
+
+    /*
+    this->timeString = core_time_getHourMinuteSecondsTime();
     setDrawColor(0, 0, 0);
-    clearString(timeString, 2, 90, 5);
+    clearString(this->timeString, 2, 90, 5);
     setDrawColor(255, 255, 255);
-    drawString(timeString, 2, 90, 5);
+    drawString(this->timeString, 2, 90, 5);
+    */
 }
 
 const unsigned char appNameClass::icon[] PROGMEM = {
@@ -104,4 +299,6 @@ const unsigned char appNameClass::icon[] PROGMEM = {
     0x00,0x01,0x80,0x00,0x00,0x06,0x00,0x00,0x00,0x18,0x00,0x00,0x00,0x60,0x00,0x00,0x01,0x80,0x00,0x00,0x01,0x80,0x00,0x00,0x01,0x80,0x00,
     0x00,0x01,0x80,0x00,0x00,0x01,0x80,0x00,0x00,0x01,0x80,0x00,0x00,0x01,0x80,0x00,0x00,0x01,0x80,0x00,0x00,0x01,0x80,0x00,0x00,0x01,0x80,
     0x00,0x00,0x01,0x80,0x00,0x00,0x01,0x80,0x00,0x00,0x01,0x80,0x00,0x00,0x01,0x80,0x00,0x00,0x01,0x80,0x00,
+
+   
 };

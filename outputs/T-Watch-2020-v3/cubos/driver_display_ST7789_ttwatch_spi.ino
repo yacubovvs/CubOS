@@ -5,15 +5,11 @@ TTGOClass *ttgo;
 
 uint16_t current_drawColor;
 
-uint16_t get_uint16Color(unsigned char red, unsigned char green, unsigned char blue){
-  return ((red*31/255) <<11)|( (green*31/255) <<6)|( (blue*31/255) <<0);
-}
-
-void setDrawColor(unsigned char red, unsigned char green, unsigned char blue){
+void driver_display_setDrawColor(unsigned char red, unsigned char green, unsigned char blue){
   current_drawColor = get_uint16Color(red, green, blue);
 }
 
-void setDrawColor(uint16_t color){
+void driver_display_setDrawColor(uint16_t color){
   current_drawColor = color;
 }
 
@@ -34,11 +30,15 @@ void powerOff_displayDriver(){}
 void powerOn_displayDriver(){}
 void driver_display_loop(){}
 
-void fillScreen(unsigned char red, unsigned char green, unsigned char blue){
-  ttgo->tft->fillScreen(get_uint16Color(red, green, blue));
+void deriver_displayfillScreen(unsigned char red, unsigned char green, unsigned char blue){
+  uint16_t fillColor = get_uint16Color(red, green, blue);
+  ttgo->tft->fillScreen(fillColor);
+  #ifdef FRAMEBUFFER_ENABLE
+    FRAMEBUFFER_fill(fillColor);
+  #endif
 }
 
-void setPixel(int x, int y){
+void display_driver_setPixel(int x, int y){
   #if defined(SCREEN_ROTATION_90)
     ttgo->tft->drawPixel(SCREEN_WIDTH-x, SCREEN_HEIGHT-y, current_drawColor);
   #elif defined(SCREEN_ROTATION_180)
@@ -50,7 +50,7 @@ void setPixel(int x, int y){
   #endif
 }
 
-void setPixel(int x, int y, uint16_t color){
+void display_driver_setPixel(int x, int y, uint16_t color){
   #if defined(SCREEN_ROTATION_90)
     ttgo->tft->drawPixel(SCREEN_WIDTH-x, SCREEN_HEIGHT-y, color);
   #elif defined(SCREEN_ROTATION_180)
