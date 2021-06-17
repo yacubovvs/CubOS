@@ -19,6 +19,10 @@
 uint16_t current_drawColor;
 unsigned char driver_display_screenBrightness = 0;
 
+uint16_t getDrawColor(){
+  return current_drawColor;
+}
+
 #include <iostream>
 
 #if defined(_WIN32) || defined(_WIN64)
@@ -162,6 +166,24 @@ void powerOn_displayDriver(){
   //debug("Display poweron");
 }
 
+void driver_display_setDrawColor(uint16_t color){
+  current_drawColor = color;
+
+  unsigned char r = (color & 0xF800) >> 11; //  5bit
+  unsigned char g = (color & 0x07E0) >> 5;  //  6bit
+  unsigned char b = color & 0x001F;         //  5bit
+
+  r = (r * 255) / 31;
+  g = (g * 255) / 63;
+  b = (b * 255) / 31;
+  sendMessageToDisplay("C " + String(r) + " " + String(g) + " " + String(b) + "\n");
+}
+
+void driver_display_setDrawColor(unsigned char red_new, unsigned char green_new, unsigned char blue_new){
+  current_drawColor = get_uint16Color(red_new, green_new, blue_new);
+  sendMessageToDisplay("C " + String(red_new) + " " + String(green_new) + " " + String(blue_new) + "\n");
+}
+
 void driver_display_loop(){
   if(driver_display_needToUpdateScreen){
     sendMessageToDisplay("U\n");
@@ -183,22 +205,9 @@ void display_driver_setPixel(int x, int y){
   #endif
 }
 
-void driver_display_setDrawColor(uint16_t color){
-  current_drawColor = color;
-
-  unsigned char r = (color & 0xF800) >> 11; //  5bit
-  unsigned char g = (color & 0x07E0) >> 5;  //  6bit
-  unsigned char b = color & 0x001F;         //  5bit
-
-  r = (r * 255) / 31;
-  g = (g * 255) / 63;
-  b = (b * 255) / 31;
-  sendMessageToDisplay("C " + String(r) + " " + String(g) + " " + String(b) + "\n");
-}
-
-void driver_display_setDrawColor(unsigned char red_new, unsigned char green_new, unsigned char blue_new){
-  current_drawColor = get_uint16Color(red_new, green_new, blue_new);
-  sendMessageToDisplay("C " + String(red_new) + " " + String(green_new) + " " + String(blue_new) + "\n");
+void display_driver_setPixel(int x, int y, uint16_t newColor){
+  driver_display_setDrawColor(newColor);
+  display_driver_setPixel(x, y);
 }
 
 void deriver_displayfillScreen(unsigned char red, unsigned char green, unsigned char blue){

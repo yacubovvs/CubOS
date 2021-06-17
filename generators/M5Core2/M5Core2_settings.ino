@@ -59,7 +59,7 @@
 
 #define TOUCH_SCREEN_ENABLE
 
-#define FRAMEBUFFER_ENABLE
+//#define FRAMEBUFFER_ENABLE
 #define FRAMEBUFFER_TWIN_FULL
 #define FRAMEBUFFER_BYTE_PER_PIXEL 2
 #define FRAMEBUFFER_PSRAM
@@ -107,8 +107,13 @@
 // #define WAKEUP_DEBUG
 */
 
-#define DEBUG_SERIAL
+//#define FRAMEBUFFER_ENABLE
+#define FRAMEBUFFER_TWIN_FULL
+#define FRAMEBUFFER_BYTE_PER_PIXEL 2
+#define FRAMEBUFFER_PSRAM
 
+#define DEBUG_SERIAL
+#undef CONFIG_SPIRAM_SUPPORT
 /*
     ############################################################################################
     #                                                                                          #

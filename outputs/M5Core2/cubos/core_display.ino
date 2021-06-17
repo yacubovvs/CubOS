@@ -1,4 +1,27 @@
 
+#ifdef FRAMEBUFFER_ENABLE
+
+  #ifdef FRAMEBUFFER_TWIN_FULL
+
+    #define FRAMEBUFFER_SIZE SCREEN_WIDTH * SCREEN_HEIGHT * FRAMEBUFFER_BYTE_PER_PIXEL
+    //#define FRAMEBUFFER_SIZE SCREEN_WIDTH * SCREEN_HEIGHT
+
+    #if FRAMEBUFFER_BYTE_PER_PIXEL==2
+      #define FRAMEBUFFER_TYPE uint16_t
+    #endif
+
+    #if FRAMEBUFFER_BYTE_PER_PIXEL==1
+      #define FRAMEBUFFER_TYPE uint8_t
+    #endif
+
+    FRAMEBUFFER_TYPE * FRAMEBUFFER_currentFrame;
+    FRAMEBUFFER_TYPE * FRAMEBUFFER_newFrame;
+    bool FRAMEBUFFER_pixelChangedchanged[SCREEN_WIDTH*SCREEN_HEIGHT + 1];
+
+  #endif
+#endif
+
+
 uint16_t get_uint16Color(unsigned char red, unsigned char green, unsigned char blue){
   #ifdef SCREEN_INVERT_COLORS
     red = 255 - red;
@@ -134,7 +157,7 @@ void setDrawColor(uint16_t color){
       FRAMEBUFFER_currentFrame[position] = FRAMEBUFFER_16bitColor_to_framebufferColor(color);
     }
 
-    void FRAMEBUFFER_current_setPixel(uint16_t position, uint16_t color){
+    void FRAMEBUFFER_current_setPixel(long position, uint16_t color){
       FRAMEBUFFER_currentFrame[position] = FRAMEBUFFER_16bitColor_to_framebufferColor(color);
     }
 
@@ -184,7 +207,7 @@ void setDrawColor(uint16_t color){
       return FRAMEBUFFER_framebufferColor_to_16bitColor(FRAMEBUFFER_newFrame[position]);
     }
 
-    uint16_t FRAMEBUFFER_new_getPixel(uint16_t position){
+    uint16_t FRAMEBUFFER_new_getPixel(long position){
       return FRAMEBUFFER_framebufferColor_to_16bitColor(FRAMEBUFFER_newFrame[position]);
     }
 
@@ -193,7 +216,7 @@ void setDrawColor(uint16_t color){
       return FRAMEBUFFER_framebufferColor_to_16bitColor(FRAMEBUFFER_currentFrame[position]);
     }
 
-    uint16_t FRAMEBUFFER_current_getPixel(uint16_t position){
+    uint16_t FRAMEBUFFER_current_getPixel(long position){
       return FRAMEBUFFER_framebufferColor_to_16bitColor(FRAMEBUFFER_currentFrame[position]);
     }
 
@@ -767,6 +790,20 @@ void drawString_rightAlign(String dString, int x, int y){
 }
 
 void core_display_setup(){
+  #ifdef FRAMEBUFFER_ENABLE
+
+    #ifdef FRAMEBUFFER_TWIN_FULL
+
+      #ifdef FRAMEBUFFER_PSRAM
+        FRAMEBUFFER_currentFrame  = (FRAMEBUFFER_TYPE *)ps_malloc(FRAMEBUFFER_SIZE);
+        FRAMEBUFFER_newFrame      = (FRAMEBUFFER_TYPE *)ps_malloc(FRAMEBUFFER_SIZE);
+      #else
+        FRAMEBUFFER_currentFrame  = (FRAMEBUFFER_TYPE *)malloc(FRAMEBUFFER_SIZE);
+        FRAMEBUFFER_newFrame      = (FRAMEBUFFER_TYPE *)malloc(FRAMEBUFFER_SIZE);
+      #endif
+    #endif
+  #endif
+
   driver_display_setup();
   #ifdef FRAMEBUFFER_ENABLE
     FRAMEBUFFER_reset();
@@ -780,17 +817,14 @@ void core_display_loop(){
   #ifdef FRAMEBUFFER_ENABLE
     #ifdef FRAMEBUFFER_TWIN_FULL
       if(getFRAMEBUFFER_isChanged()){
+        bool shown = false;
 
-        //setDrawColor(255,255,255);
-        //drawRect(100,100,150, 150, true);
-        
-        //long drawMillis = millis();
-        
         for(int y=0; y<SCREEN_HEIGHT; y++){
           for(int x=0; x<SCREEN_WIDTH; x++){
             if(FRAMEBUFFER_pixelChangedchanged[x + (SCREEN_WIDTH-1)*y]==true){
-              uint16_t position = y * (SCREEN_WIDTH-1) + x;
+              long position = y * (SCREEN_WIDTH-1) + x;  
               uint16_t newColor = FRAMEBUFFER_new_getPixel(position);
+            
               if(FRAMEBUFFER_current_getPixel(position)!=newColor){
                 display_driver_setPixel(x, y, newColor);
                 FRAMEBUFFER_current_setPixel(position, newColor);
@@ -800,10 +834,8 @@ void core_display_loop(){
           }
         }
 
-        debug("! last " + String((int)FRAMEBUFFER_current_getPixel(239,239)));
-        FRAMEBUFFER_pixelChangedchanged[239 + (SCREEN_WIDTH-1)*239] = true;
-        FRAMEBUFFER_current_setPixel(239,239, 65535);
-        
+        //FRAMEBUFFER_pixelChangedchanged[239 + (SCREEN_WIDTH-1)*239] = true;
+        //FRAMEBUFFER_new_setPixel(239,239, 65535);
       }
       setFRAMEBUFFER_isChanged(false);
     #endif
@@ -822,7 +854,7 @@ void drawPixel(int x, int y){
     #ifdef FRAMEBUFFER_TWIN_FULL
       FRAMEBUFFER_new_setPixel(x, y, getDrawColor());
 
-      uint16_t position = x + (SCREEN_WIDTH-1)*y;
+      long position = x + (SCREEN_WIDTH-1)*y;
       if(position>=0 && position<=SCREEN_HEIGHT*SCREEN_WIDTH) FRAMEBUFFER_pixelChangedchanged[position] = true;
 
       if(!getFRAMEBUFFER_isChanged()) setFRAMEBUFFER_isChanged(true);

@@ -15,8 +15,8 @@
 //#define DEBUG_ON_SCREEN
 #define TERMINAL_DEBUG
 
-#define SCREEN_WIDTH            800     // Screen resolution width
-#define SCREEN_HEIGHT           480     // Screen resolution height
+#define SCREEN_WIDTH            240     // Screen resolution width
+#define SCREEN_HEIGHT           240     // Screen resolution height
 
 #define FONT_CHAR_WIDTH         6     // Font letter size width
 #define FONT_CHAR_HEIGHT        8     // Font letter size height
@@ -76,14 +76,20 @@
 #define PEDOMETER_EMULATOR
 #define FONT_SIZE_DEFAULT   1
 
+/*
 #define SOFTWARE_BUTTONS_ENABLE
 #define SOFTWARE_BUTTONS_PORITION_RIGHT
 
 #define SOFTWARE_BUTTONS_BAR_SIZE 30
 #define SOFTWARE_BUTTONS_PADDING 50
+*/
 
-#define SOFTWARE_KEYBOARD_ENABLE
+//#define SOFTWARE_KEYBOARD_ENABLE
 
+//#define FRAMEBUFFER_ENABLE
+//#define FRAMEBUFFER_TWIN_FULL
+//#define FRAMEBUFFER_BYTE_PER_PIXEL 2
+//#define FRAMEBUFFER_PSRAM
 
 //#define NARROW_SCREEN
 /*

@@ -7,13 +7,10 @@
 */
 
 // TOUCH
-
-
 #define TOUCH_SCREEN_DELTA_MOVE_FOR_DRAG 7
-#define TOUCH_SCREEN_TIME_MS_FOT_LONG_TOUCH 300
+#define TOUCH_SCREEN_TIME_MS_FOR_LONG_TOUCH 300
 
 // BUTTONS
-
 #define BUTTON_UP       0x01
 #define BUTTON_SELECT   0x02
 #define BUTTON_DOWN     0x03
@@ -162,7 +159,9 @@
 //#define DEBUG_SERIAL
 
 #define SOFTWARE_BUTTONS_BAR_SIZE 0
+//#define LEGACY_GET_ICONS
 
+#define DEBUG_SERIAL_PORT Serial
 /*
     ############################################################################################
     #                                                                                          #
@@ -187,11 +186,11 @@
 // ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! !
 
 //#define DEBUG_SERIAL
-//#define screenDebug
+//#define DEBUG_ON_SCREEN
 #define TERMINAL_DEBUG
 
-#define SCREEN_WIDTH            800     // Screen resolution width
-#define SCREEN_HEIGHT           480     // Screen resolution height
+#define SCREEN_WIDTH            240     // Screen resolution width
+#define SCREEN_HEIGHT           240     // Screen resolution height
 
 #define FONT_CHAR_WIDTH         6     // Font letter size width
 #define FONT_CHAR_HEIGHT        8     // Font letter size height
@@ -211,7 +210,7 @@
 #define TOUCH_SCREEN_ENABLE
 
 #define TOUCH_SCREEN_DELTA_MOVE_FOR_DRAG 7
-#define TOUCH_SCREEN_TIME_MS_FOT_LONG_TOUCH 300
+#define TOUCH_SCREEN_TIME_MS_FOR_LONG_TOUCH 300
 
 #define COLOR_SCREEN                     // Screen is colored
 //#define noAnimation                   // Caurse of framebuffer type
@@ -251,14 +250,20 @@
 #define PEDOMETER_EMULATOR
 #define FONT_SIZE_DEFAULT   1
 
+/*
 #define SOFTWARE_BUTTONS_ENABLE
 #define SOFTWARE_BUTTONS_PORITION_RIGHT
 
 #define SOFTWARE_BUTTONS_BAR_SIZE 30
 #define SOFTWARE_BUTTONS_PADDING 50
+*/
 
-#define SOFTWARE_KEYBOARD_ENABLE
+//#define SOFTWARE_KEYBOARD_ENABLE
 
+//#define FRAMEBUFFER_ENABLE
+//#define FRAMEBUFFER_TWIN_FULL
+//#define FRAMEBUFFER_BYTE_PER_PIXEL 2
+//#define FRAMEBUFFER_PSRAM
 
 //#define NARROW_SCREEN
 /*
@@ -371,7 +376,6 @@ int main()
 }
 
 void core_battery_loop();
-void core_views_statusBar_draw();
 void setBackgroundColor(unsigned char r, unsigned char g, unsigned char b);
 void drawRect(int x0, int y0, int x1, int y1, bool fill);
 void setDrawColor(unsigned char red, unsigned char green, unsigned char blue);
@@ -419,6 +423,10 @@ void core_views_softwareButtons_draw(uint16_t offset, uint8_t color_red, uint8_t
 
 uint16_t current_drawColor;
 unsigned char driver_display_screenBrightness = 0;
+
+uint16_t getDrawColor(){
+  return current_drawColor;
+}
 
 #include <iostream>
 
@@ -563,6 +571,24 @@ void powerOn_displayDriver(){
   //debug("Display poweron");
 }
 
+void driver_display_setDrawColor(uint16_t color){
+  current_drawColor = color;
+
+  unsigned char r = (color & 0xF800) >> 11; //  5bit
+  unsigned char g = (color & 0x07E0) >> 5;  //  6bit
+  unsigned char b = color & 0x001F;         //  5bit
+
+  r = (r * 255) / 31;
+  g = (g * 255) / 63;
+  b = (b * 255) / 31;
+  sendMessageToDisplay("C " + String(r) + " " + String(g) + " " + String(b) + "\n");
+}
+
+void driver_display_setDrawColor(unsigned char red_new, unsigned char green_new, unsigned char blue_new){
+  current_drawColor = get_uint16Color(red_new, green_new, blue_new);
+  sendMessageToDisplay("C " + String(red_new) + " " + String(green_new) + " " + String(blue_new) + "\n");
+}
+
 void driver_display_loop(){
   if(driver_display_needToUpdateScreen){
     sendMessageToDisplay("U\n");
@@ -584,22 +610,9 @@ void display_driver_setPixel(int x, int y){
   #endif
 }
 
-void driver_display_setDrawColor(uint16_t color){
-  current_drawColor = color;
-
-  unsigned char r = (color & 0xF800) >> 11; //  5bit
-  unsigned char g = (color & 0x07E0) >> 5;  //  6bit
-  unsigned char b = color & 0x001F;         //  5bit
-
-  r = (r * 255) / 31;
-  g = (g * 255) / 63;
-  b = (b * 255) / 31;
-  sendMessageToDisplay("C " + String(r) + " " + String(g) + " " + String(b) + "\n");
-}
-
-void driver_display_setDrawColor(unsigned char red_new, unsigned char green_new, unsigned char blue_new){
-  current_drawColor = get_uint16Color(red_new, green_new, blue_new);
-  sendMessageToDisplay("C " + String(red_new) + " " + String(green_new) + " " + String(blue_new) + "\n");
+void display_driver_setPixel(int x, int y, uint16_t newColor){
+  driver_display_setDrawColor(newColor);
+  display_driver_setPixel(x, y);
 }
 
 void deriver_displayfillScreen(unsigned char red, unsigned char green, unsigned char blue){
@@ -898,7 +911,6 @@ void driver_RTC_setAlarmBySeconds(unsigned char seconds){
 
 
 
-
 /*
     ############################################################################################
     #                                                                                          #
@@ -906,6 +918,14 @@ void driver_RTC_setAlarmBySeconds(unsigned char seconds){
     #                                                                                          #
     ############################################################################################
 */
+
+// PREDEFINITION
+void core_views_statusBar_draw();
+#ifdef SOFTWARE_BUTTONS_ENABLE
+  void core_views_softwareButtons_draw();
+#endif
+class Application;
+Application *getApp(unsigned char i);
 
 
 /////////////////////////////////////
@@ -951,9 +971,13 @@ Application* currentApp;
     ############################################################################################
 */
 
-void setup(){ 
+void setup(){   
+  #ifdef CORE_SETUP_INIT
+    core_setup_driver();
+  #endif
+
   #ifdef DEBUG_SERIAL
-      Serial.begin(115200);
+      DEBUG_SERIAL_PORT.begin(115200);
       delay(100);
       debug("Serial debug started", 10);
   #endif
@@ -983,8 +1007,6 @@ void setup(){
     #endif
   #endif
   //debug("**** Main app start", 10);
-
-  driver_display_setup();
   core_display_setup();
   
   #ifdef RTC_ENABLE
@@ -1105,7 +1127,7 @@ void debug(String string, int delaytime){
       delay(delaytime);
     #endif
 
-    #ifdef screenDebug
+    #ifdef DEBUG_ON_SCREEN
       setDrawColor(255, 255, 255);
       drawString(string, 5, STYLE_STATUSBAR_HEIGHT + 10, 2);
       delay(delaytime);
@@ -1451,6 +1473,29 @@ String getHexStringFromByte(unsigned char b){
 
 
 
+#ifdef FRAMEBUFFER_ENABLE
+
+  #ifdef FRAMEBUFFER_TWIN_FULL
+
+    #define FRAMEBUFFER_SIZE SCREEN_WIDTH * SCREEN_HEIGHT * FRAMEBUFFER_BYTE_PER_PIXEL
+    //#define FRAMEBUFFER_SIZE SCREEN_WIDTH * SCREEN_HEIGHT
+
+    #if FRAMEBUFFER_BYTE_PER_PIXEL==2
+      #define FRAMEBUFFER_TYPE uint16_t
+    #endif
+
+    #if FRAMEBUFFER_BYTE_PER_PIXEL==1
+      #define FRAMEBUFFER_TYPE uint8_t
+    #endif
+
+    FRAMEBUFFER_TYPE * FRAMEBUFFER_currentFrame;
+    FRAMEBUFFER_TYPE * FRAMEBUFFER_newFrame;
+    bool FRAMEBUFFER_pixelChangedchanged[SCREEN_WIDTH*SCREEN_HEIGHT + 1];
+
+  #endif
+#endif
+
+
 uint16_t get_uint16Color(unsigned char red, unsigned char green, unsigned char blue){
   #ifdef SCREEN_INVERT_COLORS
     red = 255 - red;
@@ -1462,6 +1507,7 @@ uint16_t get_uint16Color(unsigned char red, unsigned char green, unsigned char b
     return ( (blue*31/255) <<11)|( (green*31/255) <<6)|( (red*31/255) <<0);
   #else
     return ( (red*31/255) <<11)|( (green*31/255) <<6)|( (blue*31/255) <<0);
+    //return ( (red*31/255) <<11)|( (green*31/255) <<6)|( (blue*31/255) <<0);
   #endif
 }
 
@@ -1549,17 +1595,6 @@ void setDrawColor(uint16_t color){
 
   #ifdef FRAMEBUFFER_TWIN_FULL
 
-    #define FRAMEBUFFER_SIZE SCREEN_WIDTH * SCREEN_HEIGHT * FRAMEBUFFER_BYTE_PER_PIXEL
-    //#define FRAMEBUFFER_SIZE SCREEN_WIDTH * SCREEN_HEIGHT
-
-    #if FRAMEBUFFER_BYTE_PER_PIXEL==2
-      #define FRAMEBUFFER_TYPE uint16_t
-    #endif
-
-    #if FRAMEBUFFER_BYTE_PER_PIXEL==1
-      #define FRAMEBUFFER_TYPE uint8_t
-    #endif
-
     bool FRAMEBUFFER_isChanged = false;
 
     void setFRAMEBUFFER_isChanged(bool v){
@@ -1568,50 +1603,6 @@ void setDrawColor(uint16_t color){
 
     bool getFRAMEBUFFER_isChanged(){
       return FRAMEBUFFER_isChanged;
-    }
-
-    FRAMEBUFFER_TYPE * FRAMEBUFFER_currentFrame;
-    FRAMEBUFFER_TYPE * FRAMEBUFFER_newFrame;
-    bool FRAMEBUFFER_pixelChangedchanged[SCREEN_WIDTH*SCREEN_HEIGHT + 1];
-
-
-    void FRAMEBUFFER_fill(uint16_t fillColor){
-      for(int x=0; x<SCREEN_WIDTH; x++){
-        for(int y=0; y<SCREEN_HEIGHT; y++){
-          long position = y * SCREEN_WIDTH + x;
-
-          FRAMEBUFFER_pixelChangedchanged[x + SCREEN_WIDTH*y] = false;
-          FRAMEBUFFER_new_setPixel(x, y, 0);
-          FRAMEBUFFER_current_setPixel(x, y, 0);
-        }
-      }
-    }
-
-    void FRAMEBUFFER_reset(){
-      
-      #ifdef FRAMEBUFFER_PSRAM
-        FRAMEBUFFER_currentFrame  = (FRAMEBUFFER_TYPE *)ps_malloc(FRAMEBUFFER_SIZE);
-        FRAMEBUFFER_newFrame      = (FRAMEBUFFER_TYPE *)ps_malloc(FRAMEBUFFER_SIZE);
-      #else
-        FRAMEBUFFER_currentFrame  = (FRAMEBUFFER_TYPE *)malloc(FRAMEBUFFER_SIZE);
-        FRAMEBUFFER_newFrame      = (FRAMEBUFFER_TYPE *)malloc(FRAMEBUFFER_SIZE);
-      #endif
-      
-      FRAMEBUFFER_fill(0);
-    }
-
-    void FRAMEBUFFER_new_setPixel(uint16_t x, uint16_t y, uint16_t color){
-      long position = y * (SCREEN_WIDTH-1) + x;
-      FRAMEBUFFER_newFrame[position] = FRAMEBUFFER_16bitColor_to_framebufferColor(color);
-    }
-
-    void FRAMEBUFFER_current_setPixel(uint16_t x, uint16_t y, uint16_t color){
-      long position = y * (SCREEN_WIDTH-1) + x;
-      FRAMEBUFFER_currentFrame[position] = FRAMEBUFFER_16bitColor_to_framebufferColor(color);
-    }
-
-    void FRAMEBUFFER_current_setPixel(uint16_t position, uint16_t color){
-      FRAMEBUFFER_currentFrame[position] = FRAMEBUFFER_16bitColor_to_framebufferColor(color);
     }
 
     FRAMEBUFFER_TYPE FRAMEBUFFER_16bitColor_to_framebufferColor(uint16_t color){
@@ -1655,12 +1646,26 @@ void setDrawColor(uint16_t color){
       
     }
 
+    void FRAMEBUFFER_new_setPixel(uint16_t x, uint16_t y, uint16_t color){
+      long position = y * (SCREEN_WIDTH-1) + x;
+      FRAMEBUFFER_newFrame[position] = FRAMEBUFFER_16bitColor_to_framebufferColor(color);
+    }
+
+    void FRAMEBUFFER_current_setPixel(uint16_t x, uint16_t y, uint16_t color){
+      long position = y * (SCREEN_WIDTH-1) + x;
+      FRAMEBUFFER_currentFrame[position] = FRAMEBUFFER_16bitColor_to_framebufferColor(color);
+    }
+
+    void FRAMEBUFFER_current_setPixel(long position, uint16_t color){
+      FRAMEBUFFER_currentFrame[position] = FRAMEBUFFER_16bitColor_to_framebufferColor(color);
+    }
+
     uint16_t FRAMEBUFFER_new_getPixel(uint16_t x, uint16_t y){
       long position = y * (SCREEN_WIDTH-1) + x;
       return FRAMEBUFFER_framebufferColor_to_16bitColor(FRAMEBUFFER_newFrame[position]);
     }
 
-    uint16_t FRAMEBUFFER_new_getPixel(uint16_t position){
+    uint16_t FRAMEBUFFER_new_getPixel(long position){
       return FRAMEBUFFER_framebufferColor_to_16bitColor(FRAMEBUFFER_newFrame[position]);
     }
 
@@ -1669,10 +1674,25 @@ void setDrawColor(uint16_t color){
       return FRAMEBUFFER_framebufferColor_to_16bitColor(FRAMEBUFFER_currentFrame[position]);
     }
 
-    uint16_t FRAMEBUFFER_current_getPixel(uint16_t position){
+    uint16_t FRAMEBUFFER_current_getPixel(long position){
       return FRAMEBUFFER_framebufferColor_to_16bitColor(FRAMEBUFFER_currentFrame[position]);
     }
 
+    void FRAMEBUFFER_fill(uint16_t fillColor){
+      for(int x=0; x<SCREEN_WIDTH; x++){
+        for(int y=0; y<SCREEN_HEIGHT; y++){
+          long position = y * SCREEN_WIDTH + x;
+
+          FRAMEBUFFER_pixelChangedchanged[x + SCREEN_WIDTH*y] = false;
+          FRAMEBUFFER_new_setPixel(x, y, 0);
+          FRAMEBUFFER_current_setPixel(x, y, 0);
+        }
+      }
+    }
+
+    void FRAMEBUFFER_reset(){
+      FRAMEBUFFER_fill(0);
+    }
   #endif
 
 #endif
@@ -2244,6 +2264,21 @@ void drawString_rightAlign(String dString, int x, int y){
 
 void core_display_setup(){
   #ifdef FRAMEBUFFER_ENABLE
+
+    #ifdef FRAMEBUFFER_TWIN_FULL
+
+      #ifdef FRAMEBUFFER_PSRAM
+        FRAMEBUFFER_currentFrame  = (FRAMEBUFFER_TYPE *)ps_malloc(FRAMEBUFFER_SIZE);
+        FRAMEBUFFER_newFrame      = (FRAMEBUFFER_TYPE *)ps_malloc(FRAMEBUFFER_SIZE);
+      #else
+        FRAMEBUFFER_currentFrame  = (FRAMEBUFFER_TYPE *)malloc(FRAMEBUFFER_SIZE);
+        FRAMEBUFFER_newFrame      = (FRAMEBUFFER_TYPE *)malloc(FRAMEBUFFER_SIZE);
+      #endif
+    #endif
+  #endif
+
+  driver_display_setup();
+  #ifdef FRAMEBUFFER_ENABLE
     FRAMEBUFFER_reset();
   #endif
 }
@@ -2255,20 +2290,16 @@ void core_display_loop(){
   #ifdef FRAMEBUFFER_ENABLE
     #ifdef FRAMEBUFFER_TWIN_FULL
       if(getFRAMEBUFFER_isChanged()){
-
-        //long drawMillis = millis();
+        bool shown = false;
 
         for(int y=0; y<SCREEN_HEIGHT; y++){
           for(int x=0; x<SCREEN_WIDTH; x++){
             if(FRAMEBUFFER_pixelChangedchanged[x + (SCREEN_WIDTH-1)*y]==true){
-              uint16_t position = y * (SCREEN_WIDTH-1) + x;
+              long position = y * (SCREEN_WIDTH-1) + x;  
               uint16_t newColor = FRAMEBUFFER_new_getPixel(position);
+            
               if(FRAMEBUFFER_current_getPixel(position)!=newColor){
-                //if(getDrawColor()!=newColor) setDrawColor(newColor);
                 display_driver_setPixel(x, y, newColor);
-                //if(x>=SCREEN_WIDTH) debug("XMORE!");
-                //if(y>=SCREEN_HEIGHT) debug("YMORE!");
-
                 FRAMEBUFFER_current_setPixel(position, newColor);
                 FRAMEBUFFER_pixelChangedchanged[x + (SCREEN_WIDTH-1)*y] = false;
               }
@@ -2276,16 +2307,8 @@ void core_display_loop(){
           }
         }
 
-        //int timeToDraw = millis() - drawMillis;
-        /*
-        if(fs_ms_max==0) fs_ms_max=1;
-        else if(fs_ms_max<timeToDraw){
-          fs_ms_max = timeToDraw;
-          log_d("Framebuffer drawing %d", fs_ms_max);
-        }*/
-
-        //log_d("Framebuffer drawing %d", timeToDraw);
-        
+        //FRAMEBUFFER_pixelChangedchanged[239 + (SCREEN_WIDTH-1)*239] = true;
+        //FRAMEBUFFER_new_setPixel(239,239, 65535);
       }
       setFRAMEBUFFER_isChanged(false);
     #endif
@@ -2304,7 +2327,7 @@ void drawPixel(int x, int y){
     #ifdef FRAMEBUFFER_TWIN_FULL
       FRAMEBUFFER_new_setPixel(x, y, getDrawColor());
 
-      uint16_t position = x + (SCREEN_WIDTH-1)*y;
+      long position = x + (SCREEN_WIDTH-1)*y;
       if(position>=0 && position<=SCREEN_HEIGHT*SCREEN_WIDTH) FRAMEBUFFER_pixelChangedchanged[position] = true;
 
       if(!getFRAMEBUFFER_isChanged()) setFRAMEBUFFER_isChanged(true);
@@ -3231,7 +3254,7 @@ void core_views_statusBar_draw_time(bool draw){
     void core_views_softwareButtons_draw(uint16_t offset, uint8_t color_red, uint8_t color_green, uint8_t color_blue, uint8_t color_red_bg, uint8_t color_green_bg, uint8_t color_blue_bg){
         #ifdef SOFTWARE_BUTTONS_PORITION_RIGHT
             setDrawColor(color_red_bg, color_green_bg, color_blue_bg);
-            drawRect(SCREEN_WIDTH, offset + 1, SCREEN_WIDTH - SOFTWARE_BUTTONS_BAR_SIZE, SCREEN_HEIGHT, true);
+            drawRect(SCREEN_WIDTH-1, offset + 1, SCREEN_WIDTH - SOFTWARE_BUTTONS_BAR_SIZE, SCREEN_HEIGHT, true);
 
             setDrawColor(color_red, color_green, color_blue);
 
@@ -3280,19 +3303,19 @@ void core_views_statusBar_draw_time(bool draw){
             #ifdef SOFTWARE_BUTTONS_PORITION_RIGHT
                 if(x>=SCREEN_WIDTH-SOFTWARE_BUTTONS_BAR_SIZE){
 
-                    if ( abs(SOFTWARE_BUTTON1_Y-y)<=SOFTWARE_BUTTONS_BAR_SIZE*2 ){
+                    if ( abs(SOFTWARE_BUTTON1_Y-y)<=SOFTWARE_BUTTONS_BAR_SIZE ){
                         return SOFTWARE_BAR_BUTTON_UP;
                     }
 
-                    if ( abs(SOFTWARE_BUTTON2_Y-y)<=SOFTWARE_BUTTONS_BAR_SIZE*2 ){
+                    if ( abs(SOFTWARE_BUTTON2_Y-y)<=SOFTWARE_BUTTONS_BAR_SIZE ){
                         return SOFTWARE_BAR_BUTTON_SELECT;
                     }
 
-                    if ( abs(SOFTWARE_BUTTON3_Y-y)<=SOFTWARE_BUTTONS_BAR_SIZE*2 ){
+                    if ( abs(SOFTWARE_BUTTON3_Y-y)<=SOFTWARE_BUTTONS_BAR_SIZE ){
                         return SOFTWARE_BAR_BUTTON_DOWN;
                     }
 
-                    if ( abs(SOFTWARE_BUTTON4_Y-y)<=SOFTWARE_BUTTONS_BAR_SIZE*2 ){
+                    if ( abs(SOFTWARE_BUTTON4_Y-y)<=SOFTWARE_BUTTONS_BAR_SIZE ){
                         return SOFTWARE_BAR_BUTTON_BACK;
                     }
 
@@ -3327,7 +3350,7 @@ void core_views_statusBar_draw(){
     
     // BACKGROUND
     setDrawColor(STYLE_STATUSBAR_BACKGROUND_RED, STYLE_STATUSBAR_BACKGROUND_GREEN, STYLE_STATUSBAR_BACKGROUND_BLUE);
-    drawRect(0, 0, SCREEN_WIDTH, STYLE_STATUSBAR_HEIGHT, true);
+    drawRect(0, 0, SCREEN_WIDTH-1, STYLE_STATUSBAR_HEIGHT, true);
 
     // TIME
     #ifdef CLOCK_ENABLE
@@ -3596,7 +3619,7 @@ void drawMenuElement(bool draw, uint16_t x, uint16_t y, uint16_t width, uint16_t
     ############################################################################################
 */
 
-const unsigned char icon_arrow_top[] PROGMEM = {
+const unsigned char icon_arrow_up[] PROGMEM = {
     0x02,0x01,0x02,0x18,0x02,0x10,0x04,0xff,0xff,0xff,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x18,0x00,0x00,0x3C,0x00,0x00,0x7E,0x00,0x00,0xFF,0x00,0x01,0xFF,0x80,0x03,0xFF,0xC0,0x07,0xFF,0xE0,0x0F,0xFF,0xF0,0x1F,0xFF,0xF8,0x3F,0xFF,0xFC,0x7F,0xFF,0xFE,0xFF,0xFF,0xFF,
 };
 
@@ -3617,33 +3640,55 @@ const unsigned char icon_arrow_bottom[] PROGMEM = {
         0x02,0x01,0x02,0x10,0x02,0x10,0x04,0x00,0x00,0x00,0xC7,0xE3,0x83,0xC1,0x03,0xC1,0x01,0x80,0x01,0x80,0x01,0x80,0x01,0x80,0x01,0x81,0x83,0xC1,0xC3,0xC3,0xFF,0xFF,0xFF,0xFF,0xE3,0xC7,0xC1,0x83,0xC1,0x83,0xE3,0xC7,0x04,0xb4,0xb4,0xb4,0x38,0x1C,0x7C,0x3E,0xFC,0x3E,0xFE,0x7F,0xFE,0x7F,0xFE,0x7F,0xFE,0x7F,0xFE,0x7E,0x7C,0x3E,0x3C,0x3C,0x00,0x00,0x00,0x00,0x1C,0x38,0x3E,0x7C,0x3E,0x7C,0x1C,0x38,
     };
 #endif
-const unsigned char* getIcon(int icon){
 
-    switch (icon){
-        #ifdef BATTERY_ENABLE
-            case ICON_BATTERY_CHARGING:     return battery_charging;
-            case ICON_BATTERY_100:          return battery100;  
-            case ICON_BATTERY_90:           return battery90;  
-            case ICON_BATTERY_80:           return battery80;  
-            case ICON_BATTERY_70:           return battery70;  
-            case ICON_BATTERY_60:           return battery60;  
-            case ICON_BATTERY_50:           return battery50;  
-            case ICON_BATTERY_40:           return battery40;  
-            case ICON_BATTERY_30:           return battery30;  
-            case ICON_BATTERY_20:           return battery20;  
-            case ICON_BATTERY_10:           return battery10;  
-            case ICON_BATTERY_0:            return battery0;
-        #endif
-        #if defined(PEDOMETER_ENABLE) || defined(PEDOMETER_EMULATOR)
-            case ICON_LEG:                  return icon_leg;
-            case ICON_LEG_GREY:             return icon_leg_grey;
-        #endif
-        case ICON_ARROW_UP:             return icon_arrow_top;
-        case ICON_ARROW_DOWN:           return icon_arrow_bottom;
-        default: return {0};
+#ifdef LEGACY_GET_ICONS
+    const unsigned char* getIcon(int icon){
+
+        switch (icon){
+            #ifdef BATTERY_ENABLE
+                case ICON_BATTERY_CHARGING:     return battery_charging;
+                case ICON_BATTERY_100:          return battery100;  
+                case ICON_BATTERY_90:           return battery90;  
+                case ICON_BATTERY_80:           return battery80;  
+                case ICON_BATTERY_70:           return battery70;  
+                case ICON_BATTERY_60:           return battery60;  
+                case ICON_BATTERY_50:           return battery50;  
+                case ICON_BATTERY_40:           return battery40;  
+                case ICON_BATTERY_30:           return battery30;  
+                case ICON_BATTERY_20:           return battery20;  
+                case ICON_BATTERY_10:           return battery10;  
+                case ICON_BATTERY_0:            return battery0;
+            #endif
+            #if defined(PEDOMETER_ENABLE) || defined(PEDOMETER_EMULATOR)
+                case ICON_LEG:                  return icon_leg;
+                case ICON_LEG_GREY:             return icon_leg_grey;
+            #endif
+            case ICON_ARROW_UP:             return icon_arrow_up;
+            case ICON_ARROW_DOWN:           return icon_arrow_bottom;
+            default: return {0};
+        }
+    
     }
-  
-}
+
+#else
+    #if defined(PEDOMETER_ENABLE) || defined(PEDOMETER_EMULATOR)
+        const unsigned char* getIcon_legs_white(){
+            return icon_leg;
+        }
+
+        const unsigned char* getIcon_legs_grey(){
+            return icon_leg_grey;
+        }
+    #endif
+
+    const unsigned char* getIcon_arrow_bottom(){
+        return icon_arrow_bottom;
+    }
+
+    const unsigned char* getIcon_arrow_up(){
+        return icon_arrow_up;
+    }
+#endif
 
 
 
@@ -3682,7 +3727,7 @@ const unsigned char* getIcon(int icon){
     }
 #endif
 
-#define CORE_TOUCH_DEBUG
+//#define CORE_TOUCH_DEBUG
 //#define TOUCH_SCREEN_ENABLE
 
 #ifdef TOUCH_SCREEN_ENABLE
@@ -3747,7 +3792,7 @@ const unsigned char* getIcon(int icon){
             #endif
             currentApp->onEvent(EVENT_ON_TOUCH_RELEASED, getTOUCH_SCREEN_X(), getTOUCH_SCREEN_Y());
 
-            if(!TOUCH_SCREEN_isDragging && millis()-TOUCH_SCREEN_touch_start_ms<TOUCH_SCREEN_TIME_MS_FOT_LONG_TOUCH){
+            if(!TOUCH_SCREEN_isDragging && millis()-TOUCH_SCREEN_touch_start_ms<TOUCH_SCREEN_TIME_MS_FOR_LONG_TOUCH){
                 
                 #if defined(SOFTWARE_BUTTONS_ENABLE) || defined(SOFTWARE_KEYBOARD_ENABLE)
                     if(core_view_isSoftwareButtons_clicked(getTOUCH_SCREEN_X(), getTOUCH_SCREEN_Y())){
@@ -3796,7 +3841,7 @@ const unsigned char* getIcon(int icon){
                     debug("Touch drag");
                 #endif
                 currentApp->onEvent(EVENT_ON_TOUCH_DRAG, dx, dy);
-            }else if(!TOUCH_SCREEN_isLongPressed && millis()-TOUCH_SCREEN_touch_start_ms>TOUCH_SCREEN_TIME_MS_FOT_LONG_TOUCH){
+            }else if(!TOUCH_SCREEN_isLongPressed && millis()-TOUCH_SCREEN_touch_start_ms>TOUCH_SCREEN_TIME_MS_FOR_LONG_TOUCH){
                 TOUCH_SCREEN_isLongPressed = true;
 
                 #ifdef CORE_TOUCH_DEBUG
@@ -4302,11 +4347,11 @@ int appNameClass::getPositionBySelectedNumber(unsigned char selectedNumber){
 void appNameClass::drawSettingTimeArrows(bool draw, int position){
     //drawRect(x0+delta, y0+delta, x1-delta, y1-delta);  
 
-    //drawImage(draw, icon_arrow_top, position + 3 - 16, SCREEN_HEIGHT/2 - 19 - 15 );
+    //drawImage(draw, icon_arrow_up, position + 3 - 16, SCREEN_HEIGHT/2 - 19 - 15 );
     //drawImage(draw, icon_arrow_bottom, position + 3 - 16, SCREEN_HEIGHT/2 + 20 + 15);
 
-    drawImage(draw, getIcon(ICON_ARROW_UP), position + 3 - 16, SCREEN_HEIGHT/2 - 19 - 15 );
-    drawImage(draw, getIcon(ICON_ARROW_DOWN), position + 3 - 16, SCREEN_HEIGHT/2 + 20 + 15);
+    drawImage(draw, getIcon_arrow_up(), position + 3 - 16, SCREEN_HEIGHT/2 - 19 - 15 );
+    drawImage(draw, getIcon_arrow_bottom(), position + 3 - 16, SCREEN_HEIGHT/2 + 20 + 15);
 }
 
 void appNameClass::drawSettingTimeSelect(bool draw, int position){
@@ -5829,7 +5874,7 @@ void appNameClass::draw_current_time(bool draw){
             int pedometer_label_width_05 = (PEDOMETER_LABEL_POSITION_PADDING*2 + 16 + pedometer_toPrint.length()*FONT_CHAR_WIDTH)/2;
             
             // 16 - leg icon width
-            drawImage(draw, getIcon(ICON_LEG_GREY), 
+            drawImage(draw, getIcon_legs_grey(), 
                 SCREEN_WIDTH/2 + pedometer_label_width_05 - 16 + PEDOMETER_LABEL_POSITION_X_OFFSET, 
                 PEDOMETER_LABEL_POSITION_Y + PEDOMETER_LABEL_POSITION_PADDING - 9
             );
@@ -6658,8 +6703,10 @@ const unsigned char appNameClass::icon[] PROGMEM = {
 };
 
 void appNameClass::onCreate(){
+    setBackgroundColor(0, 0, 0); 
     this->drawIcons(true);
-    
+    //setDrawColor(255,255,255);
+    //drawRect(210, 20, 239, 239, true);
 }
 
 void appNameClass::drawIcons(bool draw){
@@ -6667,11 +6714,11 @@ void appNameClass::drawIcons(bool draw){
   DRAW_LIMITS_setEnable(true);
   DRAW_LIMIT_reset();
   DRAW_LIMITS_setEnable(STYLE_STATUSBAR_HEIGHT, -1, -1, -1);
-  
+
 	for(unsigned char app_num=0; app_num<APP_MENU_APPLICATIONS_QUANTITY; app_num++){
 
 		unsigned char x_position = app_num%SINGLE_ELEMENTS_IN_X;
-		unsigned char y_position = app_num/SINGLE_ELEMENTS_IN_Y;
+		unsigned char y_position = app_num/SINGLE_ELEMENTS_IN_X;
 
 		int x0 = x_position*SINGLE_ELEMENT_REAL_WIDTH;
 		int y0 = y_position*SINGLE_ELEMENT_REAL_HEIGHT + STYLE_STATUSBAR_HEIGHT+1;

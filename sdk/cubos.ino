@@ -1,42 +1,3 @@
-/*
-    ############################################################################################
-    #                                                                                          #
-    #                                      FRAME BUFFER +                                      #
-    #                                                                                          #
-    ############################################################################################
-*/
-// For some divices as M5Stack Core2, framebuffer should be inited before start any code
-
-#ifdef FRAMEBUFFER_ENABLE
-
-  #ifdef FRAMEBUFFER_TWIN_FULL
-
-    #define FRAMEBUFFER_SIZE SCREEN_WIDTH * SCREEN_HEIGHT * FRAMEBUFFER_BYTE_PER_PIXEL
-    //#define FRAMEBUFFER_SIZE SCREEN_WIDTH * SCREEN_HEIGHT
-
-    #if FRAMEBUFFER_BYTE_PER_PIXEL==2
-      #define FRAMEBUFFER_TYPE uint16_t
-    #endif
-
-    #if FRAMEBUFFER_BYTE_PER_PIXEL==1
-      #define FRAMEBUFFER_TYPE uint8_t
-    #endif
-
-    FRAMEBUFFER_TYPE * FRAMEBUFFER_currentFrame;
-    FRAMEBUFFER_TYPE * FRAMEBUFFER_newFrame;
-    bool FRAMEBUFFER_pixelChangedchanged[SCREEN_WIDTH*SCREEN_HEIGHT + 1];
-
-  #endif
-#endif
-
-/*
-    ############################################################################################
-    #                                                                                          #
-    #                                      FRAME BUFFER -                                      #
-    #                                                                                          #
-    ############################################################################################
-*/
-
 
 /*
     ############################################################################################
@@ -99,21 +60,6 @@ Application* currentApp;
 */
 
 void setup(){   
-
-  #ifdef FRAMEBUFFER_ENABLE
-
-    #ifdef FRAMEBUFFER_TWIN_FULL
-
-      #ifdef FRAMEBUFFER_PSRAM
-        FRAMEBUFFER_currentFrame  = (FRAMEBUFFER_TYPE *)ps_malloc(FRAMEBUFFER_SIZE);
-        FRAMEBUFFER_newFrame      = (FRAMEBUFFER_TYPE *)ps_malloc(FRAMEBUFFER_SIZE);
-      #else
-        FRAMEBUFFER_currentFrame  = (FRAMEBUFFER_TYPE *)malloc(FRAMEBUFFER_SIZE);
-        FRAMEBUFFER_newFrame      = (FRAMEBUFFER_TYPE *)malloc(FRAMEBUFFER_SIZE);
-      #endif
-    #endif
-  #endif
-
   #ifdef CORE_SETUP_INIT
     core_setup_driver();
   #endif
