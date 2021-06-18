@@ -44,7 +44,7 @@
 //#define toDefaultApp_onLeftLongPress
 
 #define STARTING_APP_NUMM   -1    // for Mainmenu (default app)
-//#define STARTING_APP_NUMM   2     // for App number 7
+#define STARTING_APP_NUMM   11     // for App number 7
 
 #undef CPU_SLEEP_ENABLE
 #undef POWERSAVE_ENABLE
@@ -84,7 +84,7 @@
 #define SOFTWARE_BUTTONS_PADDING 50
 */
 
-//#define SOFTWARE_KEYBOARD_ENABLE
+#define SOFTWARE_KEYBOARD_ENABLE
 
 //#define FRAMEBUFFER_ENABLE
 //#define FRAMEBUFFER_TWIN_FULL
