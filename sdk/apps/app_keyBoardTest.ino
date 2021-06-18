@@ -28,6 +28,7 @@ void appNameClass::onCreate(){
     /*
         Write you code on App create here
     */
+   core_software_keyboard_show();
 }
 
 void appNameClass::onLoop(){
