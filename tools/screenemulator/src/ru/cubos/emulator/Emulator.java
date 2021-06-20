@@ -37,8 +37,8 @@ public class Emulator extends JFrame {
         imageWrapper.addMouseMotionListener(new MouseMotionListener() {
             @Override
             public void mouseDragged(MouseEvent mouseEvent) {
-                touchX = addLeaderZeroes(mouseEvent.getX());
-                touchY = addLeaderZeroes(mouseEvent.getY());
+                touchX = addLeaderZeroes(getTouchX(mouseEvent));
+                touchY = addLeaderZeroes(getTouchY(mouseEvent));
             }
 
             @Override
@@ -57,16 +57,9 @@ public class Emulator extends JFrame {
             public void mousePressed(MouseEvent mouseEvent) {
                 //System.out.println("Mouse press start");
 
-                touchX = addLeaderZeroes(mouseEvent.getX());
-                touchY = addLeaderZeroes(mouseEvent.getY());
+                touchX = addLeaderZeroes(getTouchX(mouseEvent));
+                touchY = addLeaderZeroes(getTouchY(mouseEvent));
                 isTouched = "1";
-                /*
-                touches++;
-                if(touches<5){
-                    presses[touches*2] = mouseEvent.getX();
-                    presses[touches*2+1] = mouseEvent.getY();
-                    //System.out.println("Touch start " + presses[touches*2] + "; " + presses[touches*2+1]);
-                }*/
             }
 
             @Override
@@ -85,6 +78,40 @@ public class Emulator extends JFrame {
 
             }
         });
+    }
+
+    float screen_koef = (float) 0.0;
+
+    float x_koef;
+    float y_koef;
+    void updateScreenKoef(){
+        x_koef = (float)this.imageWrapper.getWidth()/(float)this.getScreenWidth();
+        y_koef = (float)this.imageWrapper.getHeight()/(float)this.getScreenHeight();
+        //System.out.println("x_koef " + x_koef);
+        //System.out.println("y_koef " + y_koef);
+
+        screen_koef = Math.min(x_koef, y_koef);
+    }
+
+    private int getTouchX(MouseEvent mouseEvent){
+        updateScreenKoef();
+        int touch_x = mouseEvent.getX();
+        touch_x = this.getScreenWidth()/2 - (int)(((float)(this.imageWrapper.getWidth()/2 - mouseEvent.getX()))/screen_koef);
+        //System.out.println("Touch event x: " + (int)(((float)(this.getWidth()/2 - mouseEvent.getX()))/screen_koef));
+        if(touch_x>this.getScreenWidth()) touch_x = this.getScreenWidth();
+        if(touch_x<0) touch_x = 0;
+
+        //System.out.println("Touch event x: " + touch_x);
+        return touch_x;
+    }
+    private int getTouchY(MouseEvent mouseEvent){
+        updateScreenKoef();
+        int touch_y = mouseEvent.getY();
+        touch_y = this.getScreenHeight()/2 - (int)(((float)(this.imageWrapper.getHeight()/2 - mouseEvent.getY()))/screen_koef);
+        if(touch_y>this.getScreenHeight()) touch_y = this.getScreenHeight();
+        if(touch_y<0) touch_y = 0;
+        //System.out.println("Touch event y: " + touch_y);
+        return touch_y;
     }
 
     public String addLeaderZeroes(int value){

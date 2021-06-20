@@ -3727,135 +3727,6 @@ const unsigned char icon_arrow_bottom[] PROGMEM = {
     }
 #endif
 
-//#define CORE_TOUCH_DEBUG
-//#define TOUCH_SCREEN_ENABLE
-
-#ifdef TOUCH_SCREEN_ENABLE
-    bool TOUCH_SCREEN_last_isTouching   = false;
-    bool TOUCH_SCREEN_isDragging        = false;
-    bool TOUCH_SCREEN_isLongPressed     = false;
-
-    int TOUCH_SCREEN_last_x = 0;
-    int TOUCH_SCREEN_last_y = 0;
-
-    int TOUCH_SCREEN_touch_start_x = 0;
-    int TOUCH_SCREEN_touch_start_y = 0;
-
-    int getTOUCH_SCREEN_touch_start_x(){
-        return TOUCH_SCREEN_touch_start_x;
-    }
-    int getTOUCH_SCREEN_touch_start_y(){
-        return TOUCH_SCREEN_touch_start_y;
-    }
-
-    long TOUCH_SCREEN_touch_start_ms = 0;
-
-    long getTOUCH_SCREEN_touch_start_ms(){
-        return TOUCH_SCREEN_touch_start_ms;
-    }
-
-    void loop_touchScreenCore(){
-        loop_touchScreenDriver();
-        
-        /*
-        #define EVENT_ON_TOUCH_START            0x06
-        #define EVENT_ON_TOUCH_RELEASED         0x07
-        #define EVENT_ON_TOUCH_CLICK            0x08
-        #define EVENT_ON_TOUCH_LONG_PRESS       0x09
-        #define EVENT_ON_TOUCH_DRAG             0x0A
-        #define EVENT_ON_TOUCH_DOUBLE_CLICK     0x0B
-        */
-
-        if(!TOUCH_SCREEN_last_isTouching && getTOUCH_SCREEN_isTouching()){
-
-            TOUCH_SCREEN_last_isTouching = true;
-            TOUCH_SCREEN_last_x = getTOUCH_SCREEN_X();
-            TOUCH_SCREEN_last_y = getTOUCH_SCREEN_Y();
-            TOUCH_SCREEN_touch_start_x = TOUCH_SCREEN_last_x;
-            TOUCH_SCREEN_touch_start_y = TOUCH_SCREEN_last_y;
-            TOUCH_SCREEN_isDragging = false;
-            TOUCH_SCREEN_isLongPressed = false;
-            TOUCH_SCREEN_touch_start_ms = millis();
-
-            #ifdef CORE_TOUCH_DEBUG
-                debug("Touch start");
-            #endif
-
-            currentApp->onEvent(EVENT_ON_TOUCH_START, TOUCH_SCREEN_last_x, TOUCH_SCREEN_last_y);
-
-        }else if(TOUCH_SCREEN_last_isTouching && !getTOUCH_SCREEN_isTouching()){
-
-            TOUCH_SCREEN_last_isTouching = false;
-
-            #ifdef CORE_TOUCH_DEBUG
-                debug("Touch released");
-            #endif
-            currentApp->onEvent(EVENT_ON_TOUCH_RELEASED, getTOUCH_SCREEN_X(), getTOUCH_SCREEN_Y());
-
-            if(!TOUCH_SCREEN_isDragging && millis()-TOUCH_SCREEN_touch_start_ms<TOUCH_SCREEN_TIME_MS_FOR_LONG_TOUCH){
-                
-                #if defined(SOFTWARE_BUTTONS_ENABLE) || defined(SOFTWARE_KEYBOARD_ENABLE)
-                    if(core_view_isSoftwareButtons_clicked(getTOUCH_SCREEN_X(), getTOUCH_SCREEN_Y())){
-                        #ifdef CORE_TOUCH_DEBUG
-                            debug("Touch click on software button");
-                        #endif    
-                    }else{
-                        #ifdef CORE_TOUCH_DEBUG
-                            debug("Touch click");
-                        #endif    
-                        currentApp->onEvent(EVENT_ON_TOUCH_CLICK, getTOUCH_SCREEN_X(), getTOUCH_SCREEN_Y());
-                    }
-                #else
-                    #ifdef CORE_TOUCH_DEBUG
-                        debug("Touch click");
-                    #endif    
-                    currentApp->onEvent(EVENT_ON_TOUCH_CLICK, getTOUCH_SCREEN_X(), getTOUCH_SCREEN_Y());
-                #endif
-                
-            }else{
-                TOUCH_SCREEN_isDragging = false;
-                TOUCH_SCREEN_isLongPressed = false;
-            }
-            
-
-        }else if(TOUCH_SCREEN_last_isTouching && getTOUCH_SCREEN_isTouching()){
-
-            int dx;
-            int dy;
-
-            if(!TOUCH_SCREEN_isDragging){
-                dx = getTOUCH_SCREEN_X() - TOUCH_SCREEN_touch_start_x;
-                dy = getTOUCH_SCREEN_Y() - TOUCH_SCREEN_touch_start_y;
-            }else{
-                dx = getTOUCH_SCREEN_X() - TOUCH_SCREEN_last_x;
-                dy = getTOUCH_SCREEN_Y() - TOUCH_SCREEN_last_y;
-            }
-
-            //TOUCH_SCREEN_DELTA_MOVE_FOR_DRAG
-            if( (TOUCH_SCREEN_isDragging) || abs(dx)>TOUCH_SCREEN_DELTA_MOVE_FOR_DRAG || abs(dy)>TOUCH_SCREEN_DELTA_MOVE_FOR_DRAG){
-                TOUCH_SCREEN_isDragging = true;
-                TOUCH_SCREEN_last_x = getTOUCH_SCREEN_X();
-                TOUCH_SCREEN_last_y = getTOUCH_SCREEN_Y();
-
-                #ifdef CORE_TOUCH_DEBUG
-                    debug("Touch drag");
-                #endif
-                currentApp->onEvent(EVENT_ON_TOUCH_DRAG, dx, dy);
-            }else if(!TOUCH_SCREEN_isLongPressed && millis()-TOUCH_SCREEN_touch_start_ms>TOUCH_SCREEN_TIME_MS_FOR_LONG_TOUCH){
-                TOUCH_SCREEN_isLongPressed = true;
-
-                #ifdef CORE_TOUCH_DEBUG
-                    debug("Touch long press");
-                #endif
-                currentApp->onEvent(EVENT_ON_TOUCH_LONG_PRESS, getTOUCH_SCREEN_X(), getTOUCH_SCREEN_Y());
-            }
-            
-        } 
-    }
-
-#endif
-
-
 
 #define SOFTWARE_KEYBOARD_ENABLE
 
@@ -3874,9 +3745,10 @@ const unsigned char icon_arrow_bottom[] PROGMEM = {
 #define SOFTWARE_KEYBOARD_TYPES_SCPECSYMBOLS_3      0x05
 #define SOFTWARE_KEYBOARD_TYPES_SCPECSYMBOLS_4      0x06
 
-unsigned char software_keyboard_type = SOFTWARE_KEYBOARD_TYPES_TEXT;
-
 #ifdef SOFTWARE_KEYBOARD_ENABLE
+    unsigned char software_keyboard_type = SOFTWARE_KEYBOARD_TYPES_TEXT;
+    int core_software_keyboard_lastActiveBtn = -1;
+
     #ifndef SOFTWARE_KEYBOARD_HEIGHT
         #define SOFTWARE_KEYBOARD_HEIGHT (SCREEN_HEIGHT - STYLE_STATUSBAR_HEIGHT  - FONT_CHAR_HEIGHT*FONT_SIZE_DEFAULT*3 - 1)
     #endif
@@ -3894,13 +3766,47 @@ unsigned char software_keyboard_type = SOFTWARE_KEYBOARD_TYPES_TEXT;
         #define SOFTWARE_KEYBOARD_KEYS_BETWEEN_LINES_MARGIN (SOFTWARE_KEYBOARD_KEYS_FONST_SIZE*FONT_CHAR_HEIGHT*5/3)
     #endif
 
+    #if SOFTWARE_KEYBOARD_SIZE == SOFTWARE_KEYBOARD_SIZES_MOBILE
+        #define SOFTWARE_KEYBOARD_TOTAL_BTNS 12
+    #endif
+
+    struct BtnCoords{
+        int x1=-1;
+        int x2=-1;
+        int y1=-1;
+        int y2=-1;
+        int x_center=-1;
+        int y_center=-1;
+    };
+
+    BtnCoords core_software_getBtnsCoords(int btnNum){
+        BtnCoords coords;
+        #if SOFTWARE_KEYBOARD_SIZE == SOFTWARE_KEYBOARD_SIZES_MOBILE
+            
+            int keyBoardRealHeight = SOFTWARE_KEYBOARD_HEIGHT - SOFTWARE_KEYBOARD_HEIGHT%4;
+
+            unsigned char y_button_num = btnNum/3;
+            unsigned char x_button_num = btnNum%3;
+
+            coords.x_center = x_button_num*SOFTWARE_KEYBOARD_WIDTH/3 + SOFTWARE_KEYBOARD_WIDTH/6;
+            coords.y_center = (SCREEN_HEIGHT - keyBoardRealHeight) + y_button_num*SOFTWARE_KEYBOARD_HEIGHT/4 + SOFTWARE_KEYBOARD_HEIGHT/8; 
+            
+            coords.x1 = SOFTWARE_KEYBOARD_WIDTH/3 + SOFTWARE_KEYBOARD_WIDTH*(x_button_num-1)/3;
+            coords.x2 = SOFTWARE_KEYBOARD_WIDTH/3 + SOFTWARE_KEYBOARD_WIDTH*x_button_num/3;
+            coords.y1 = SCREEN_HEIGHT - keyBoardRealHeight/4 - keyBoardRealHeight*(3-y_button_num)/4;
+            coords.y2 = SCREEN_HEIGHT - keyBoardRealHeight/4 - keyBoardRealHeight*((3-y_button_num)-1)/4;
+
+        #endif
+        return coords;
+    }
+
     bool core_software_keyboard_isVisible = false;
 
     bool get_core_software_keyboard_isVisible(){
         return core_software_keyboard_isVisible;
     }
 
-    unsigned char software_keyboard_get_levels_in_keyboard(unsigned char keyboard_type, unsigned char button){
+    unsigned char software_keyboard_get_label_levels_in_keyboard(unsigned char keyboard_type, unsigned char button){
         #if SOFTWARE_KEYBOARD_SIZE == SOFTWARE_KEYBOARD_SIZES_MOBILE
             switch(keyboard_type){
                 case SOFTWARE_KEYBOARD_TYPES_TEXT:
@@ -3989,58 +3895,64 @@ unsigned char software_keyboard_type = SOFTWARE_KEYBOARD_TYPES_TEXT;
         #endif
     }
 
+    int core_software_keyboard_getPressedButton(){
+        #if SOFTWARE_KEYBOARD_SIZE == SOFTWARE_KEYBOARD_SIZES_MOBILE
+        #endif
+        return -1;
+    }
+
+    void core_software_keyboard_drawButton(bool draw, int btnNum, bool isActive){
+        BtnCoords coords = core_software_getBtnsCoords(btnNum);
+        if(coords.x_center==-1||coords.y_center == -1) return;
+
+        if(isActive) setDrawColor(64, 64, 64);
+        else setDrawColor(128, 128, 128);
+        
+        drawRect(coords.x1, coords.y1, coords.x2, coords.y2, true);
+        
+        if(isActive) setDrawColor(32, 32, 32);
+        else setDrawColor(64, 64, 64);
+
+        drawRect(coords.x1, coords.y1, coords.x2, coords.y2, false);
+
+        if(software_keyboard_get_label_levels_in_keyboard(software_keyboard_type, btnNum)==1){
+            // For 1 string
+            if(isActive) setDrawColor(172, 172, 172);
+            else setDrawColor(64, 64, 64);
+            //setDrawColor(64, 64, 64);
+            drawString_centered(
+                software_keyboard_get_button_label(software_keyboard_type, btnNum, 0), 
+                coords.x_center, 
+                coords.y_center - SOFTWARE_KEYBOARD_KEYS_FONST_SIZE*FONT_CHAR_HEIGHT/2,
+                SOFTWARE_KEYBOARD_KEYS_FONST_SIZE
+            );
+        }else{
+            // for 2 strings
+            if(isActive) setDrawColor(128, 128, 128);
+            else setDrawColor(64, 64, 64);
+            //setDrawColor(64, 64, 64);
+            drawString_centered(
+                software_keyboard_get_button_label(software_keyboard_type, btnNum, 0), 
+                coords.x_center, 
+                coords.y_center - SOFTWARE_KEYBOARD_KEYS_FONST_SIZE*FONT_CHAR_HEIGHT/2  - SOFTWARE_KEYBOARD_KEYS_BETWEEN_LINES_MARGIN/2,
+                SOFTWARE_KEYBOARD_KEYS_FONST_SIZE
+            );
+
+            if(isActive) setDrawColor(216, 216, 216);
+            else setDrawColor(0, 0, 0);
+            //setDrawColor(0, 0, 0);
+            drawString_centered(
+                software_keyboard_get_button_label(software_keyboard_type, btnNum, 1), 
+                coords.x_center, 
+                coords.y_center - SOFTWARE_KEYBOARD_KEYS_FONST_SIZE*FONT_CHAR_HEIGHT/2 + SOFTWARE_KEYBOARD_KEYS_BETWEEN_LINES_MARGIN/2,
+                SOFTWARE_KEYBOARD_KEYS_FONST_SIZE
+            );   
+        }
+    }
+
     void core_software_keyboard_draw(bool draw){
-
-        //For small screens as 240x230
-
-        setDrawColor(128, 128, 128);
-        int keyBoardRealHeight = SOFTWARE_KEYBOARD_HEIGHT - SOFTWARE_KEYBOARD_HEIGHT%4;
-        drawRect(0, SCREEN_HEIGHT, SOFTWARE_KEYBOARD_WIDTH, SCREEN_HEIGHT - keyBoardRealHeight, true);
-
-        // Buttons lines
-        setDrawColor(64, 64, 64);
-        for(int y_buttons = SCREEN_HEIGHT - keyBoardRealHeight/4; y_buttons > SCREEN_HEIGHT - keyBoardRealHeight; y_buttons-=keyBoardRealHeight/4){
-            drawLine(0, y_buttons, SOFTWARE_KEYBOARD_WIDTH, y_buttons);
-        }
-
-        for(int x_buttons = SOFTWARE_KEYBOARD_WIDTH/3; x_buttons < SCREEN_WIDTH - SOFTWARE_KEYBOARD_WIDTH/3; x_buttons+=SOFTWARE_KEYBOARD_WIDTH/3){
-            drawLine(x_buttons, SCREEN_HEIGHT, x_buttons, SCREEN_HEIGHT - keyBoardRealHeight);
-        }
-
-        // Labels
-        unsigned char button_num=0;
-        setDrawColor(64, 64, 64);
-        for(int y_buttons = 0; y_buttons < 4; y_buttons++){
-            for(int x_buttons = 0; x_buttons < 3; x_buttons++){
-                if(software_keyboard_get_levels_in_keyboard(software_keyboard_type, button_num)==1){
-                    // For 1 string
-                    drawString_centered(
-                        software_keyboard_get_button_label(software_keyboard_type, button_num, 0), 
-                        x_buttons*SOFTWARE_KEYBOARD_WIDTH/3 + SOFTWARE_KEYBOARD_WIDTH/6, 
-                        (SCREEN_HEIGHT - keyBoardRealHeight) + y_buttons*SOFTWARE_KEYBOARD_HEIGHT/4 + SOFTWARE_KEYBOARD_HEIGHT/8 - SOFTWARE_KEYBOARD_KEYS_FONST_SIZE*FONT_CHAR_HEIGHT/2,
-                        SOFTWARE_KEYBOARD_KEYS_FONST_SIZE
-                    );
-                }else{
-                    // for 2 strings
-                    setDrawColor(64, 64, 64);
-                    drawString_centered(
-                        software_keyboard_get_button_label(software_keyboard_type, button_num, 0), 
-                        x_buttons*SOFTWARE_KEYBOARD_WIDTH/3 + SOFTWARE_KEYBOARD_WIDTH/6, 
-                        (SCREEN_HEIGHT - keyBoardRealHeight) + y_buttons*SOFTWARE_KEYBOARD_HEIGHT/4 + SOFTWARE_KEYBOARD_HEIGHT/8 - SOFTWARE_KEYBOARD_KEYS_FONST_SIZE*FONT_CHAR_HEIGHT/2  - SOFTWARE_KEYBOARD_KEYS_BETWEEN_LINES_MARGIN/2,
-                        SOFTWARE_KEYBOARD_KEYS_FONST_SIZE
-                    );
-
-                    setDrawColor(0, 0, 0);
-                    drawString_centered(
-                        software_keyboard_get_button_label(software_keyboard_type, button_num, 1), 
-                        x_buttons*SOFTWARE_KEYBOARD_WIDTH/3 + SOFTWARE_KEYBOARD_WIDTH/6, 
-                        (SCREEN_HEIGHT - keyBoardRealHeight) + y_buttons*SOFTWARE_KEYBOARD_HEIGHT/4 + SOFTWARE_KEYBOARD_HEIGHT/8 - SOFTWARE_KEYBOARD_KEYS_FONST_SIZE*FONT_CHAR_HEIGHT/2 + SOFTWARE_KEYBOARD_KEYS_BETWEEN_LINES_MARGIN/2,
-                        SOFTWARE_KEYBOARD_KEYS_FONST_SIZE
-                    );   
-                }
-
-                button_num ++;
-            }
+        for(int btnNum=0; btnNum<SOFTWARE_KEYBOARD_TOTAL_BTNS; btnNum++){
+            core_software_keyboard_drawButton(draw, btnNum, false);
         }
     }
 
@@ -4054,7 +3966,197 @@ unsigned char software_keyboard_type = SOFTWARE_KEYBOARD_TYPES_TEXT;
         core_software_keyboard_draw(false);
     }
 
+    bool core_software_keyboard_isTouchInBtn(int btnNum, int touch_x, int touch_y){
+        BtnCoords coords = core_software_getBtnsCoords(btnNum);
+        if(
+            touch_x>coords.x1 && 
+            touch_x<coords.x2 &&
+            touch_y>coords.y1 && 
+            touch_y<coords.y2 &&
+            true
+        ) return true;
+        else return false;
+    }
+
+    int core_software_keyboard_getTouchingButton(int touch_x, int touch_y){
+        for(int btnNum=0; btnNum<SOFTWARE_KEYBOARD_TOTAL_BTNS; btnNum++){
+            if(core_software_keyboard_isTouchInBtn(btnNum, touch_x, touch_y)) return btnNum; 
+        }
+        return -1;
+    }
+
+    void core_software_keyboard_onEvent(unsigned char event, int val1, int val2){
+        if(!core_software_keyboard_isVisible) return; 
+        
+        if(event==EVENT_ON_TOUCH_START){
+            //debug("On keyboard touch start " + String(val1) + " " + String(val2));
+            int touch_btn = core_software_keyboard_getTouchingButton(val1, val2);
+            if(touch_btn!=-1){
+                //debug("Touching " + String(touch_btn) + "!");
+                core_software_keyboard_lastActiveBtn = touch_btn;
+                core_software_keyboard_drawButton(true, touch_btn, true);
+            }
+        }else if(event==EVENT_ON_TOUCH_CLICK){    
+
+        }else if(event==EVENT_ON_TOUCH_RELEASED){
+            if(core_software_keyboard_lastActiveBtn!=-1) core_software_keyboard_drawButton(true, core_software_keyboard_lastActiveBtn, false);
+        }else if(event==EVENT_ON_TOUCH_DRAG){
+
+        }
+    }
+
 #endif
+
+//#define CORE_TOUCH_DEBUG
+//#define TOUCH_SCREEN_ENABLE
+
+#ifdef TOUCH_SCREEN_ENABLE
+    bool TOUCH_SCREEN_last_isTouching   = false;
+    bool TOUCH_SCREEN_isDragging        = false;
+    bool TOUCH_SCREEN_isLongPressed     = false;
+
+    int TOUCH_SCREEN_last_x = 0;
+    int TOUCH_SCREEN_last_y = 0;
+
+    int TOUCH_SCREEN_touch_start_x = 0;
+    int TOUCH_SCREEN_touch_start_y = 0;
+
+    int getTOUCH_SCREEN_touch_start_x(){
+        return TOUCH_SCREEN_touch_start_x;
+    }
+    int getTOUCH_SCREEN_touch_start_y(){
+        return TOUCH_SCREEN_touch_start_y;
+    }
+
+    long TOUCH_SCREEN_touch_start_ms = 0;
+
+    long getTOUCH_SCREEN_touch_start_ms(){
+        return TOUCH_SCREEN_touch_start_ms;
+    }
+
+    void loop_touchScreenCore(){
+        loop_touchScreenDriver();
+        
+        /*
+        #define EVENT_ON_TOUCH_START            0x06
+        #define EVENT_ON_TOUCH_RELEASED         0x07
+        #define EVENT_ON_TOUCH_CLICK            0x08
+        #define EVENT_ON_TOUCH_LONG_PRESS       0x09
+        #define EVENT_ON_TOUCH_DRAG             0x0A
+        #define EVENT_ON_TOUCH_DOUBLE_CLICK     0x0B
+        */
+
+        if(!TOUCH_SCREEN_last_isTouching && getTOUCH_SCREEN_isTouching()){
+
+            TOUCH_SCREEN_last_isTouching = true;
+            TOUCH_SCREEN_last_x = getTOUCH_SCREEN_X();
+            TOUCH_SCREEN_last_y = getTOUCH_SCREEN_Y();
+            TOUCH_SCREEN_touch_start_x = TOUCH_SCREEN_last_x;
+            TOUCH_SCREEN_touch_start_y = TOUCH_SCREEN_last_y;
+            TOUCH_SCREEN_isDragging = false;
+            TOUCH_SCREEN_isLongPressed = false;
+            TOUCH_SCREEN_touch_start_ms = millis();
+
+            #ifdef CORE_TOUCH_DEBUG
+                debug("Touch start");
+            #endif
+
+            
+            currentApp->onEvent(EVENT_ON_TOUCH_START, TOUCH_SCREEN_last_x, TOUCH_SCREEN_last_y);
+            #ifdef SOFTWARE_KEYBOARD_ENABLE
+                core_software_keyboard_onEvent(EVENT_ON_TOUCH_START, TOUCH_SCREEN_last_x, TOUCH_SCREEN_last_y);
+            #endif
+        }else if(TOUCH_SCREEN_last_isTouching && !getTOUCH_SCREEN_isTouching()){
+
+            TOUCH_SCREEN_last_isTouching = false;
+
+            #ifdef CORE_TOUCH_DEBUG
+                debug("Touch released");
+            #endif
+            
+            currentApp->onEvent(EVENT_ON_TOUCH_RELEASED, getTOUCH_SCREEN_X(), getTOUCH_SCREEN_Y());
+            #ifdef SOFTWARE_KEYBOARD_ENABLE
+                core_software_keyboard_onEvent(EVENT_ON_TOUCH_RELEASED, getTOUCH_SCREEN_X(), getTOUCH_SCREEN_Y());
+            #endif
+
+            if(!TOUCH_SCREEN_isDragging && millis()-TOUCH_SCREEN_touch_start_ms<TOUCH_SCREEN_TIME_MS_FOR_LONG_TOUCH){
+                
+                #if defined(SOFTWARE_BUTTONS_ENABLE) || defined(SOFTWARE_KEYBOARD_ENABLE)
+                    if(core_view_isSoftwareButtons_clicked(getTOUCH_SCREEN_X(), getTOUCH_SCREEN_Y())){
+                        #ifdef CORE_TOUCH_DEBUG
+                            debug("Touch click on software button");
+                        #endif    
+                    }else{
+                        #ifdef CORE_TOUCH_DEBUG
+                            debug("Touch click");
+                        #endif    
+                        currentApp->onEvent(EVENT_ON_TOUCH_CLICK, getTOUCH_SCREEN_X(), getTOUCH_SCREEN_Y());
+                        #ifdef SOFTWARE_KEYBOARD_ENABLE
+                            core_software_keyboard_onEvent(EVENT_ON_TOUCH_CLICK, getTOUCH_SCREEN_X(), getTOUCH_SCREEN_Y());
+                        #endif
+                    }
+                #else
+                    #ifdef CORE_TOUCH_DEBUG
+                        debug("Touch click");
+                    #endif    
+                    currentApp->onEvent(EVENT_ON_TOUCH_CLICK, getTOUCH_SCREEN_X(), getTOUCH_SCREEN_Y());
+                    #ifdef SOFTWARE_KEYBOARD_ENABLE
+                        core_software_keyboard_onEvent(EVENT_ON_TOUCH_CLICK, getTOUCH_SCREEN_X(), getTOUCH_SCREEN_Y());
+                    #endif
+                #endif
+                
+            }else{
+                TOUCH_SCREEN_isDragging = false;
+                TOUCH_SCREEN_isLongPressed = false;
+            }
+            
+
+        }else if(TOUCH_SCREEN_last_isTouching && getTOUCH_SCREEN_isTouching()){
+
+            int dx;
+            int dy;
+
+            if(!TOUCH_SCREEN_isDragging){
+                dx = getTOUCH_SCREEN_X() - TOUCH_SCREEN_touch_start_x;
+                dy = getTOUCH_SCREEN_Y() - TOUCH_SCREEN_touch_start_y;
+            }else{
+                dx = getTOUCH_SCREEN_X() - TOUCH_SCREEN_last_x;
+                dy = getTOUCH_SCREEN_Y() - TOUCH_SCREEN_last_y;
+            }
+
+            //TOUCH_SCREEN_DELTA_MOVE_FOR_DRAG
+            if( (TOUCH_SCREEN_isDragging) || abs(dx)>TOUCH_SCREEN_DELTA_MOVE_FOR_DRAG || abs(dy)>TOUCH_SCREEN_DELTA_MOVE_FOR_DRAG){
+                TOUCH_SCREEN_isDragging = true;
+                TOUCH_SCREEN_last_x = getTOUCH_SCREEN_X();
+                TOUCH_SCREEN_last_y = getTOUCH_SCREEN_Y();
+
+                #ifdef CORE_TOUCH_DEBUG
+                    debug("Touch drag");
+                #endif
+                
+                currentApp->onEvent(EVENT_ON_TOUCH_DRAG, dx, dy);
+                #ifdef SOFTWARE_KEYBOARD_ENABLE
+                    core_software_keyboard_onEvent(EVENT_ON_TOUCH_DRAG, dx, dy);
+                #endif
+
+            }else if(!TOUCH_SCREEN_isLongPressed && millis()-TOUCH_SCREEN_touch_start_ms>TOUCH_SCREEN_TIME_MS_FOR_LONG_TOUCH){
+                TOUCH_SCREEN_isLongPressed = true;
+
+                #ifdef CORE_TOUCH_DEBUG
+                    debug("Touch long press");
+                #endif
+                
+                currentApp->onEvent(EVENT_ON_TOUCH_LONG_PRESS, getTOUCH_SCREEN_X(), getTOUCH_SCREEN_Y());
+                #ifdef SOFTWARE_KEYBOARD_ENABLE
+                    core_software_keyboard_onEvent(EVENT_ON_TOUCH_LONG_PRESS, getTOUCH_SCREEN_X(), getTOUCH_SCREEN_Y());
+                #endif
+            }
+            
+        } 
+    }
+
+#endif
+
 
 #define appNameClass    AlarmApp          // App name without spaces
 #define appName         "Alarm"              // App name with spaces 
