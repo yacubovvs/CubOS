@@ -182,8 +182,8 @@
 //      FOR ESP8266 USE NONOSSDK 2.2.2 +
 // ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! !
 
-#define SCREEN_WIDTH            120     // Screen resolution width
-#define SCREEN_HEIGHT           140     // Screen resolution height
+#define SCREEN_WIDTH            320     // Screen resolution width
+#define SCREEN_HEIGHT           240     // Screen resolution height
 
 #define FONT_CHAR_WIDTH         6     // Font letter size width
 #define FONT_CHAR_HEIGHT        8     // Font letter size height
@@ -231,11 +231,6 @@
 
 #define TOUCH_SCREEN_ENABLE
 
-#define FRAMEBUFFER_ENABLE
-#define FRAMEBUFFER_TWIN_FULL
-#define FRAMEBUFFER_BYTE_PER_PIXEL 2
-#define FRAMEBUFFER_PSRAM
-
 //#define SCREEN_INVERT_COLORS
 //#define SCREEN_CHANGE_BLUE_RED
 
@@ -278,6 +273,11 @@
 //#define PEDOMETER_DEBUG
 // #define WAKEUP_DEBUG
 */
+
+//#define FRAMEBUFFER_ENABLE
+#define FRAMEBUFFER_TWIN_FULL
+#define FRAMEBUFFER_BYTE_PER_PIXEL 2
+#define FRAMEBUFFER_PSRAM
 
 #define DEBUG_SERIAL
 #undef CONFIG_SPIRAM_SUPPORT
@@ -436,8 +436,11 @@ void setup(){
 
 bool isInSleep = false;
 void loop(){
+  long t = millis();
   core_display_loop();
   driver_display_loop();
+  t = millis() - t;
+  if(t!=0)debug("FPS: " + String(1000/t));
 
   #ifdef CPU_CONTROLL_ENABLE
     core_cpu_loop();
@@ -587,7 +590,6 @@ void debug(String string, int delaytime){
 #define APP_MENU_APPLICATIONS_8             TestApplicationApp
 #define APP_MENU_APPLICATIONS_9             TestApplicationApp
 #define APP_MENU_APPLICATIONS_10            TestApplicationApp
-#define APP_MENU_APPLICATIONS_11            TestApplicationApp
 
 //#define APP_MENU_APPLICATIONS_2             PedometerApp
 //#define APP_MENU_APPLICATIONS_2             BatteryApp

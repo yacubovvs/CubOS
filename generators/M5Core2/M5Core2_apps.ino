@@ -17,7 +17,6 @@
 #define APP_MENU_APPLICATIONS_8             TestApplicationApp
 #define APP_MENU_APPLICATIONS_9             TestApplicationApp
 #define APP_MENU_APPLICATIONS_10            TestApplicationApp
-#define APP_MENU_APPLICATIONS_11            TestApplicationApp
 
 //#define APP_MENU_APPLICATIONS_2             PedometerApp
 //#define APP_MENU_APPLICATIONS_2             BatteryApp

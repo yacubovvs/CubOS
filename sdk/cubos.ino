@@ -147,8 +147,11 @@ void setup(){
 
 bool isInSleep = false;
 void loop(){
+  long t = millis();
   core_display_loop();
   driver_display_loop();
+  t = millis() - t;
+  if(t!=0)debug("FPS: " + String(1000/t));
 
   #ifdef CPU_CONTROLL_ENABLE
     core_cpu_loop();
