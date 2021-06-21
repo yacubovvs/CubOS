@@ -25,6 +25,7 @@ cp sdk/apps/app_filemanager.ino     outputs/m5stick_c/cubos/
 cp sdk/apps/app_internet.ino        outputs/m5stick_c/cubos/
 cp sdk/apps/app_simplegame.ino      outputs/m5stick_c/cubos/
 cp sdk/apps/app_z_menu.ino          outputs/m5stick_c/cubos/
+cp sdk/apps/app_pedometer_test.ino  outputs/m5stick_c/cubos/
 cp sdk/apps/app_pedometer.ino       outputs/m5stick_c/cubos/
 cp sdk/apps/app_ble_tester.ino      outputs/m5stick_c/cubos/
 

@@ -25,7 +25,7 @@ cp sdk/apps/app_filemanager.ino     outputs/Atmega_SSD1953_800/cubos/
 cp sdk/apps/app_internet.ino        outputs/Atmega_SSD1953_800/cubos/
 cp sdk/apps/app_simplegame.ino      outputs/Atmega_SSD1953_800/cubos/
 cp sdk/apps/app_z_menu_touch.ino    outputs/Atmega_SSD1953_800/cubos/
-#cp sdk/apps/app_pedometer.ino       outputs/Atmega_SSD1953_800/cubos/
+#cp sdk/apps/app_pedometer_test.ino       outputs/Atmega_SSD1953_800/cubos/
 
 # Drivers
 cp sdk/drivers/driver_display_Atmega_SSD1953_800.ino               outputs/Atmega_SSD1953_800/cubos/    

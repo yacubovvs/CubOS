@@ -205,11 +205,9 @@
 
 //#define toDefaultApp_onLeftLongPress
 
-#define STARTING_APP_NUMM   -1    // for Mainmenu (default app)
-//#define STARTING_APP_NUMM    1 // Settings
-//#define STARTING_APP_NUMM    3 // Battery
-#define STARTING_APP_NUMM    5 // Clock
-//#define STARTING_APP_NUMM    2 // Pedometer
+#define STARTING_APP_NUMM   -1      // for Mainmenu (default app)
+#define STARTING_APP_NUMM    2      // Pedometer
+//#define STARTING_APP_NUMM    0    // Clock
 
 #define FONT_SIZE_DEFAULT   1
 
@@ -251,46 +249,7 @@
     #                                   M5STICK SETTINGS -                                     #
     #                                                                                          #
     ############################################################################################
-*//*
-    ############################################################################################
-    #                                                                                          #
-    #                                      FRAME BUFFER +                                      #
-    #                                                                                          #
-    ############################################################################################
 */
-// For some divices as M5Stack Core2, framebuffer should be inited before start any code
-
-#ifdef FRAMEBUFFER_ENABLE
-
-  #ifdef FRAMEBUFFER_TWIN_FULL
-
-    #define FRAMEBUFFER_SIZE SCREEN_WIDTH * SCREEN_HEIGHT * FRAMEBUFFER_BYTE_PER_PIXEL
-    //#define FRAMEBUFFER_SIZE SCREEN_WIDTH * SCREEN_HEIGHT
-
-    #if FRAMEBUFFER_BYTE_PER_PIXEL==2
-      #define FRAMEBUFFER_TYPE uint16_t
-    #endif
-
-    #if FRAMEBUFFER_BYTE_PER_PIXEL==1
-      #define FRAMEBUFFER_TYPE uint8_t
-    #endif
-
-    FRAMEBUFFER_TYPE * FRAMEBUFFER_currentFrame;
-    FRAMEBUFFER_TYPE * FRAMEBUFFER_newFrame;
-    bool FRAMEBUFFER_pixelChangedchanged[SCREEN_WIDTH*SCREEN_HEIGHT + 1];
-
-  #endif
-#endif
-
-/*
-    ############################################################################################
-    #                                                                                          #
-    #                                      FRAME BUFFER -                                      #
-    #                                                                                          #
-    ############################################################################################
-*/
-
-
 /*
     ############################################################################################
     #                                                                                          #
@@ -352,21 +311,6 @@ Application* currentApp;
 */
 
 void setup(){   
-
-  #ifdef FRAMEBUFFER_ENABLE
-
-    #ifdef FRAMEBUFFER_TWIN_FULL
-
-      #ifdef FRAMEBUFFER_PSRAM
-        FRAMEBUFFER_currentFrame  = (FRAMEBUFFER_TYPE *)ps_malloc(FRAMEBUFFER_SIZE);
-        FRAMEBUFFER_newFrame      = (FRAMEBUFFER_TYPE *)ps_malloc(FRAMEBUFFER_SIZE);
-      #else
-        FRAMEBUFFER_currentFrame  = (FRAMEBUFFER_TYPE *)malloc(FRAMEBUFFER_SIZE);
-        FRAMEBUFFER_newFrame      = (FRAMEBUFFER_TYPE *)malloc(FRAMEBUFFER_SIZE);
-      #endif
-    #endif
-  #endif
-
   #ifdef CORE_SETUP_INIT
     core_setup_driver();
   #endif
@@ -454,8 +398,11 @@ void setup(){
 
 bool isInSleep = false;
 void loop(){
+  long t = millis();
   core_display_loop();
   driver_display_loop();
+  t = millis() - t;
+  if(t!=0)debug("FPS: " + String(1000/t));
 
   #ifdef CPU_CONTROLL_ENABLE
     core_cpu_loop();
@@ -597,9 +544,10 @@ void debug(String string, int delaytime){
 #define APP_MENU_APPLICATIONS_0             ClockApp
 #define APP_MENU_APPLICATIONS_1             SettingsApp
 #define APP_MENU_APPLICATIONS_2             PedometerApp
-#define APP_MENU_APPLICATIONS_3             BatteryApp
-#define APP_MENU_APPLICATIONS_4             I2CScannerApp
-#define APP_MENU_APPLICATIONS_5             BleTester
+#define APP_MENU_APPLICATIONS_3             PedometerAppTest
+#define APP_MENU_APPLICATIONS_4             BatteryApp
+#define APP_MENU_APPLICATIONS_5             I2CScannerApp
+#define APP_MENU_APPLICATIONS_6             BleTester
 
 
 //#define APP_MENU_APPLICATIONS_5             TestApplicationApp

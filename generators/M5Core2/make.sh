@@ -26,7 +26,7 @@ cp sdk/apps/app_filemanager.ino     outputs/M5Core2/cubos/
 cp sdk/apps/app_internet.ino        outputs/M5Core2/cubos/
 cp sdk/apps/app_simplegame.ino      outputs/M5Core2/cubos/
 cp sdk/apps/app_z_menu_touch.ino    outputs/M5Core2/cubos/
-#cp sdk/apps/app_pedometer.ino       outputs/M5Core2/cubos/
+#cp sdk/apps/app_pedometer_test.ino       outputs/M5Core2/cubos/
 
 # Drivers
 cp sdk/drivers/driver_display_m5Core2.ino               outputs/M5Core2/cubos/    

@@ -16,8 +16,8 @@
 
     FRAMEBUFFER_TYPE * FRAMEBUFFER_currentFrame;
     FRAMEBUFFER_TYPE * FRAMEBUFFER_newFrame;
-    bool FRAMEBUFFER_pixelChanged_x[SCREEN_WIDTH-1];
-    bool FRAMEBUFFER_pixelChanged_y[SCREEN_WIDTH-1];
+    bool FRAMEBUFFER_pixelChanged_x[SCREEN_WIDTH];
+    bool FRAMEBUFFER_pixelChanged_y[SCREEN_HEIGHT];
     bool FRAMEBUFFER_pixelChanged[SCREEN_WIDTH*SCREEN_HEIGHT + 1];
 
   #endif
@@ -207,9 +207,6 @@ void setDrawColor(uint16_t color){
     }
 
     void FRAMEBUFFER_fill(uint16_t fillColor){
-      for(int x=0; x<SCREEN_WIDTH; x++){ FRAMEBUFFER_pixelChanged_x[x] = false;}
-      for(int y=0; y<SCREEN_HEIGHT; y++){ FRAMEBUFFER_pixelChanged_y[y] = false;}
-
       for(int x=0; x<SCREEN_WIDTH; x++){
         for(int y=0; y<SCREEN_HEIGHT; y++){
           long position = y * SCREEN_WIDTH + x;

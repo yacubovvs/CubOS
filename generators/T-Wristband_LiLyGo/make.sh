@@ -25,7 +25,7 @@ cp sdk/apps/app_filemanager.ino     outputs/T-Wristband_LiLyGo/cubos/
 cp sdk/apps/app_internet.ino        outputs/T-Wristband_LiLyGo/cubos/
 cp sdk/apps/app_simplegame.ino      outputs/T-Wristband_LiLyGo/cubos/
 cp sdk/apps/app_z_menu.ino          outputs/T-Wristband_LiLyGo/cubos/
-cp sdk/apps/app_pedometer.ino       outputs/T-Wristband_LiLyGo/cubos/
+cp sdk/apps/app_pedometer_test.ino       outputs/T-Wristband_LiLyGo/cubos/
 
 # Drivers
 cp sdk/drivers/driver_battery_T-Wristband_LiLyGo.ino                outputs/T-Wristband_LiLyGo/cubos/     

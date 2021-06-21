@@ -1,10 +1,25 @@
 #ifdef PEDOMETER_ENABLE
-    RTC_DATA_ATTR long pedometer_steps = 0;
-    long get_pedometer_steps(){ return pedometer_steps;}
-    void set_pedometer_steps(long steps){pedometer_steps = steps;}
+    //RTC_DATA_ATTR long pedometer_steps = 0;
+    #define PEDOMETER_DAY_VALUE_TYPE uint16_t
+    #define PEDOMETER_DAYS_HISTORY 7
+
+    //#define PEDOMETER_DAY_VALUE_TYPE long
+    uint16_t pedometer_steps_min_limit = 10000;
+    
+    RTC_DATA_ATTR PEDOMETER_DAY_VALUE_TYPE pedometer_steps[PEDOMETER_DAYS_HISTORY] = {5000,7000,5000,7000,5000,7000,2000};
+
+    PEDOMETER_DAY_VALUE_TYPE get_pedometer_steps(unsigned char day){ return pedometer_steps[day];}
+    PEDOMETER_DAY_VALUE_TYPE get_pedometer_steps(){ return get_pedometer_steps(0);}
+    uint16_t get_pedometer_steps_min_limit(){return pedometer_steps_min_limit;}
+    void set_pedometer_steps_min_limit(uint16_t limit){pedometer_steps_min_limit = limit;}
+    void set_pedometer_steps(unsigned char day, PEDOMETER_DAY_VALUE_TYPE steps){pedometer_steps[0] = steps;}
+    void set_pedometer_steps(PEDOMETER_DAY_VALUE_TYPE steps){set_pedometer_steps(0, steps);}
 
     void core_pedometer_newDate(){
-        set_pedometer_steps(0);
+        for(unsigned char i=PEDOMETER_DAYS_HISTORY-1; i>0; i++){
+            pedometer_steps[i] = pedometer_steps[i-1];
+        }
+        set_pedometer_steps(0, 0);
     }
 
     #ifndef PEDOMETER_STEPS_IN_SEC
@@ -252,7 +267,7 @@
                     debug("Is walking", 10);
                     //if(!inBackground) digitalWrite(10,0);
                 #endif
-                pedometer_steps += (PEDOMETER_STEPS_IN_SEC*( (float)(PEDOMETER_STEP_DETECTION_DELAY + PEDOMETER_STEP_DETECTION_PERIOD_MS)))/1000;
+                pedometer_steps[0] += (PEDOMETER_DAY_VALUE_TYPE)((PEDOMETER_STEPS_IN_SEC*( (float)(PEDOMETER_STEP_DETECTION_DELAY + PEDOMETER_STEP_DETECTION_PERIOD_MS)))/1000);
             }else{
                 #ifdef PEDOMETER_DEBUG
                     debug("Is not walking", 10);

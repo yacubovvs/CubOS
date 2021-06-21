@@ -13,7 +13,7 @@
 #define APP_MENU_APPLICATIONS_4             TestApplicationApp
 #define APP_MENU_APPLICATIONS_5             FileManagerApp
 
-//#define APP_MENU_APPLICATIONS_2             PedometerApp
+//#define APP_MENU_APPLICATIONS_2             PedometerAppTest
 //#define APP_MENU_APPLICATIONS_2             BatteryApp
 
 /*

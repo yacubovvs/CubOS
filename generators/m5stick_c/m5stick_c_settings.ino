@@ -33,11 +33,9 @@
 
 //#define toDefaultApp_onLeftLongPress
 
-#define STARTING_APP_NUMM   -1    // for Mainmenu (default app)
-//#define STARTING_APP_NUMM    1 // Settings
-//#define STARTING_APP_NUMM    3 // Battery
-#define STARTING_APP_NUMM    5 // Clock
-//#define STARTING_APP_NUMM    2 // Pedometer
+#define STARTING_APP_NUMM   -1      // for Mainmenu (default app)
+#define STARTING_APP_NUMM    2      // Pedometer
+//#define STARTING_APP_NUMM    0    // Clock
 
 #define FONT_SIZE_DEFAULT   1
 
