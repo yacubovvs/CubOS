@@ -3748,6 +3748,8 @@ const unsigned char icon_arrow_bottom[] PROGMEM = {
 #ifdef SOFTWARE_KEYBOARD_ENABLE
     unsigned char software_keyboard_type = SOFTWARE_KEYBOARD_TYPES_TEXT;
     int core_software_keyboard_lastActiveBtn = -1;
+    bool core_software_keyboard_shift_pressed = false;
+    bool core_software_keyboard_caps_pressed = false;
 
     #ifndef SOFTWARE_KEYBOARD_HEIGHT
         #define SOFTWARE_KEYBOARD_HEIGHT (SCREEN_HEIGHT - STYLE_STATUSBAR_HEIGHT  - FONT_CHAR_HEIGHT*FONT_SIZE_DEFAULT*3 - 1)
@@ -3812,7 +3814,7 @@ const unsigned char icon_arrow_bottom[] PROGMEM = {
                 case SOFTWARE_KEYBOARD_TYPES_TEXT:
                     switch(button){
                         case 9:
-                        case 11:
+                        //case 11:
                             return 1;
                     }
                     return 2;
@@ -3859,20 +3861,37 @@ const unsigned char icon_arrow_bottom[] PROGMEM = {
                                 case 8: return "9";
                                 case 9: return "%&?";
                                 case 10: return "0";
-                                case 11: return "Shift";
+                                case 11: return "Capslock";
                             }
                         case 1:
-                            switch(button){
-                                case 0: return "123";
-                                case 1: return "abc";
-                                case 2: return "def";
-                                case 3: return "ghi";
-                                case 4: return "jkl";
-                                case 5: return "mno";
-                                case 6: return "pqrs";
-                                case 7: return "tnv";
-                                case 8: return "wxyz";
-                                case 10: return "_";
+                            if(core_software_keyboard_shift_pressed){
+                                switch(button){
+                                    case 0: return "123";
+                                    case 1: return "ABC";
+                                    case 2: return "DEF";
+                                    case 3: return "GHI";
+                                    case 4: return "JKL";
+                                    case 5: return "MNO";
+                                    case 6: return "PQRS";
+                                    case 7: return "TNV";
+                                    case 8: return "WXYZ";
+                                    case 10: return "_";
+                                    case 11: return "Shift";
+                                }
+                            }else{
+                                switch(button){
+                                    case 0: return "123";
+                                    case 1: return "abc";
+                                    case 2: return "def";
+                                    case 3: return "ghi";
+                                    case 4: return "jkl";
+                                    case 5: return "mno";
+                                    case 6: return "pqrs";
+                                    case 7: return "tnv";
+                                    case 8: return "wxyz";
+                                    case 10: return "_";
+                                    case 11: return "Shift";
+                                }
                             }
                     }
                     return "";
@@ -3991,6 +4010,27 @@ const unsigned char icon_arrow_bottom[] PROGMEM = {
         if(event==EVENT_ON_TOUCH_START){
             //debug("On keyboard touch start " + String(val1) + " " + String(val2));
             int touch_btn = core_software_keyboard_getTouchingButton(val1, val2);
+
+            #if SOFTWARE_KEYBOARD_SIZE == SOFTWARE_KEYBOARD_SIZES_MOBILE
+                if(software_keyboard_type == SOFTWARE_KEYBOARD_TYPES_TEXT && touch_btn==11){
+                    if(core_software_keyboard_shift_pressed){
+                        if(core_software_keyboard_caps_pressed){
+                            core_software_keyboard_shift_pressed = false;
+                            core_software_keyboard_caps_pressed = false;
+                            core_software_keyboard_draw(true);
+                        }else{
+                            core_software_keyboard_caps_pressed = true;
+                            //core_software_keyboard_draw(true);
+                            core_software_keyboard_drawButton(true, 11, true);
+                        }
+                    }else{
+                        core_software_keyboard_shift_pressed = true;
+                        core_software_keyboard_draw(true);
+                        core_software_keyboard_lastActiveBtn = touch_btn;
+                        core_software_keyboard_drawButton(true, touch_btn, true);
+                    }
+                }else 
+            #endif
             if(touch_btn!=-1){
                 //debug("Touching " + String(touch_btn) + "!");
                 core_software_keyboard_lastActiveBtn = touch_btn;
@@ -3999,7 +4039,10 @@ const unsigned char icon_arrow_bottom[] PROGMEM = {
         }else if(event==EVENT_ON_TOUCH_CLICK){    
 
         }else if(event==EVENT_ON_TOUCH_RELEASED){
-            if(core_software_keyboard_lastActiveBtn!=-1) core_software_keyboard_drawButton(true, core_software_keyboard_lastActiveBtn, false);
+            if(core_software_keyboard_lastActiveBtn!=-1){
+                core_software_keyboard_drawButton(true, core_software_keyboard_lastActiveBtn, false);
+                core_software_keyboard_lastActiveBtn=-1;
+            }
         }else if(event==EVENT_ON_TOUCH_DRAG){
 
         }
