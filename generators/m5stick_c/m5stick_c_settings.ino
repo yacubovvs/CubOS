@@ -55,7 +55,7 @@
 
 #define STYLE_STATUSBAR_HEIGHT  20
 
-#define MAIN_MENU_SMOOTH_ANIMATION
+#define SMOOTH_ANIMATION
 #define NARROW_SCREEN
 
 #define FRAMEBUFFER_ENABLE
@@ -70,6 +70,7 @@
 //#undef DISPLAY_BACKLIGHT_CONTROL_ENABLE
 //#undef DISPLAY_BACKLIGHT_FADE_CONTROL_ENABLE
 
+#define DEFAULT_DELAY_TO_FADE_DISPLAY 15
 #define PEDOMETER_ENABLE
 /*
     ############################################################################################

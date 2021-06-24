@@ -7,7 +7,7 @@
 #define PEDOMETER_PAGES_SLEEP_STATISTICS        0x03
 
 #define PEDOMETER_PAGE_MARGIN 5
-#define PEDOMETER_CHART_HEIGHT ((SCREEN_HEIGHT - PEDOMETER_PAGE_MARGIN*2 - STYLE_STATUSBAR_HEIGHT)/2)
+#define PEDOMETER_CHART_HEIGHT ((SCREEN_HEIGHT - PEDOMETER_PAGE_MARGIN*2 - STYLE_STATUSBAR_HEIGHT)/3)
 #define PEDOMETER_CHART_WIDTH ((SCREEN_WIDTH - PEDOMETER_PAGE_MARGIN*2))
 #define PEDOMETER_CHART_COLUMNS 7
 #define PEDOMETER_CHART_COLUMN_MARGINS_PX 3
@@ -33,10 +33,25 @@ class appNameClass: public Application{
               default: return (unsigned char*)""; }
         };
         const static unsigned char icon[] PROGMEM;
-        void drawPage(unsigned char page);      
+        void drawPage(bool draw, unsigned char page);   
+        unsigned char current_page = PEDOMETER_PAGES_PEDOMETER;
+        unsigned char getNextPage();
+        unsigned char getPreviousPage();
 };
 
-void appNameClass::drawPage(unsigned char page){
+unsigned char  appNameClass::getNextPage(){
+    char page = current_page + 1;
+    if(page>0x03) return 0x00;
+    return page;
+}
+
+unsigned char  appNameClass::getPreviousPage(){
+    char page = current_page - 1;
+    if(page<0x00) return 0x03;
+    return page;
+}
+
+void appNameClass::drawPage(bool draw, unsigned char page){
 
     /*
         PEDOMETER_PAGES_PEDOMETER
@@ -47,14 +62,38 @@ void appNameClass::drawPage(unsigned char page){
 
     if(page==PEDOMETER_PAGES_PEDOMETER){
         for(unsigned char i=0; i<PEDOMETER_CHART_COLUMNS; i++){
-            setDrawColor(0, 128 + 127*(int)i/7, 0);
+            if(draw){setDrawColor(0, 255 - 127*(int)i/7, 0);
+            }else{setDrawColor_BackGroundColor();} 
+            
+            #define Y1_CHART (STYLE_STATUSBAR_HEIGHT + PEDOMETER_PAGE_MARGIN + PEDOMETER_CHART_HEIGHT)
+            #define Y2_CHART (STYLE_STATUSBAR_HEIGHT + PEDOMETER_PAGE_MARGIN)
+            #define X1_CHART (PEDOMETER_PAGE_MARGIN + (PEDOMETER_CHART_COLUMN_WIDTH + PEDOMETER_CHART_COLUMN_MARGINS_PX)*i)
+            #define X2_CHART (X1_CHART + PEDOMETER_CHART_COLUMN_WIDTH - 1)
+
+            #define X_SRINGS PEDOMETER_PAGE_MARGIN
+            #define Y_SRINGS (Y1_CHART + FONT_CHAR_HEIGHT*FONT_SIZE_DEFAULT*7*i/5 + FONT_CHAR_HEIGHT*FONT_SIZE_DEFAULT)
+            drawRect(X1_CHART, Y1_CHART, X2_CHART, Y2_CHART, true);
+
+            setDrawColor_ContrastColor();
+            drawString(String(i), X_SRINGS, Y_SRINGS);
+        }
+    }if(page==PEDOMETER_PAGES_PEDOMETR_STATISTICS){
+
+    }if(page==PEDOMETER_PAGES_SLEEP_MONITOR){
+        for(unsigned char i=0; i<PEDOMETER_CHART_COLUMNS; i++){
+            if(draw){setDrawColor(0, 0, 255 - 127*(int)i/7);
+            }else{setDrawColor_BackGroundColor();} 
+            
             #define Y1_CHART (STYLE_STATUSBAR_HEIGHT + PEDOMETER_PAGE_MARGIN + PEDOMETER_CHART_HEIGHT)
             #define Y2_CHART (STYLE_STATUSBAR_HEIGHT + PEDOMETER_PAGE_MARGIN)
             #define X1_CHART (PEDOMETER_PAGE_MARGIN + (PEDOMETER_CHART_COLUMN_WIDTH + PEDOMETER_CHART_COLUMN_MARGINS_PX)*i)
             #define X2_CHART (X1_CHART + PEDOMETER_CHART_COLUMN_WIDTH - 1)
             drawRect(X1_CHART, Y1_CHART, X2_CHART, Y2_CHART, true);
         }
+    }if(page==PEDOMETER_PAGES_SLEEP_STATISTICS){
+
     }
+
 }
 
 void appNameClass::onCreate(){
@@ -62,7 +101,7 @@ void appNameClass::onCreate(){
         Write you code on App create here
     */
     this->preventSleep         = true;
-    this->preventInAppSleep    = true;
+    //this->preventInAppSleep    = true;
 
     DRAW_LIMITS_setEnable(true);
     DRAW_LIMIT_reset();
@@ -72,13 +111,11 @@ void appNameClass::onCreate(){
     setContrastColor(255, 255, 255);
     setDrawColor_ContrastColor();
     
-    drawPage(PEDOMETER_PAGES_PEDOMETER);
+    this->drawPage(true, current_page);
+    
 }
 
-void appNameClass::onLoop(){
-    /*
-        Write you code onLoop here
-    */
+void appNameClass::onLoop(){    
 }
 
 void appNameClass::onDestroy(){
@@ -109,6 +146,10 @@ void appNameClass::onEvent(unsigned char event, int val1, int val2){
             }else if(event==EVENT_BUTTON_SHORT_PRESS){
             }else if(event==EVENT_BUTTON_SHORT_SINGLE_PRESS){
                 if(val1==BUTTON_SELECT){
+                    this->drawPage(false, this->current_page);
+                    this->current_page = getNextPage();
+                    this->drawPage(true, this->current_page);
+                    //debug("Page: " + String(this->current_page));
                 }else if(val1==BUTTON_BACK){
                 }
             }else if(event==EVENT_ON_TOUCH_DOUBLE_PRESS){
