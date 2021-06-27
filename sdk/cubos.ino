@@ -50,6 +50,7 @@ class Application{
     Application(){};
 };
 
+bool currentAppSetted = false;
 Application* currentApp;
 /*
     ############################################################################################
@@ -105,6 +106,7 @@ void setup(){
     currentApp = getApp(STARTING_APP_NUMM);
     core_display_loop();
     driver_display_loop();
+    currentAppSetted = true;
   #endif
 
   #ifdef BATTERY_ENABLE
@@ -141,6 +143,7 @@ void setup(){
   
   #ifndef FORCE_DISPLAY_UPDATE_ON_START
     currentApp = getApp(STARTING_APP_NUMM);
+    currentAppSetted = true;
   #endif
   
 }

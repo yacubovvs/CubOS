@@ -3,15 +3,22 @@
 
     //#define PEDOMETER_DAY_VALUE_TYPE long
     uint16_t pedometer_steps_min_limit = PEDOMETER_DAY_STEP_LIMMIT_DEFAULT;
+    uint16_t pedometer_sleep_min_limit = PEDOMETER_DAY_SLEEP_LIMMIT_DEFAULT; // in minutes
     
     RTC_DATA_ATTR PEDOMETER_DAY_VALUE_TYPE pedometer_steps[PEDOMETER_DAYS_HISTORY] = {10001,5002,2003,1004,7005,8006,4007};
+    RTC_DATA_ATTR PEDOMETER_DAY_VALUE_TYPE pedometer_sleep[PEDOMETER_DAYS_HISTORY] = {420,180,600,300,200,520,418};
 
     PEDOMETER_DAY_VALUE_TYPE get_pedometer_steps(unsigned char day){ return pedometer_steps[day];}
     PEDOMETER_DAY_VALUE_TYPE get_pedometer_steps(){ return get_pedometer_steps(0);}
+    uint16_t get_pedometer_sleep(unsigned char day){ return pedometer_sleep[day];}
+    uint16_t get_pedometer_sleep(){ return get_pedometer_sleep(0);}
     uint16_t get_pedometer_steps_min_limit(){return pedometer_steps_min_limit;}
+    uint16_t get_pedometer_sleep_min_limit(){return pedometer_sleep_min_limit;} //in minutes
     void set_pedometer_steps_min_limit(uint16_t limit){pedometer_steps_min_limit = limit;}
+    void set_pedometer_sleep_min_limit(uint16_t limit){pedometer_sleep_min_limit = limit;} //in minutes
     void set_pedometer_steps(unsigned char day, PEDOMETER_DAY_VALUE_TYPE steps){pedometer_steps[0] = steps;}
-    void set_pedometer_steps(PEDOMETER_DAY_VALUE_TYPE steps){set_pedometer_steps(0, steps);}
+    void set_pedometer_sleep(unsigned char day, uint16_t sleep){pedometer_sleep[0] = sleep;}
+    void set_pedometer_steps(uint16_t sleep){set_pedometer_sleep(0, sleep);}
 
     void core_pedometer_newDate(){
         for(unsigned char i=PEDOMETER_DAYS_HISTORY-1; i>0; i--){

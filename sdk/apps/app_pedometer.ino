@@ -13,6 +13,10 @@
 #define PEDOMETER_CHART_COLUMN_MARGINS_PX 3
 #define PEDOMETER_CHART_COLUMN_WIDTH ((PEDOMETER_CHART_WIDTH - PEDOMETER_CHART_COLUMN_MARGINS_PX*PEDOMETER_CHART_COLUMNS)/PEDOMETER_CHART_COLUMNS)
 
+#define APP_BACKGROUND_RED      0
+#define APP_BACKGROUND_GREEN    0
+#define APP_BACKGROUND_BLUE     0
+
 class appNameClass: public Application{
     public:
         virtual void onLoop() override;
@@ -21,7 +25,7 @@ class appNameClass: public Application{
 
         void onCreate();
         appNameClass(){ 
-            fillScreen(0, 0, 0);  // filling background
+            fillScreen(APP_BACKGROUND_RED, APP_BACKGROUND_GREEN, APP_BACKGROUND_BLUE);  // filling background
             super_onCreate();           // Drawind statusbar and etc if needed
             onCreate(); 
         };
@@ -91,23 +95,38 @@ void appNameClass::drawPage(bool draw, unsigned char page){
     }if(page==PEDOMETER_PAGES_PEDOMETR_STATISTICS){
 
     }if(page==PEDOMETER_PAGES_SLEEP_MONITOR){
+        uint16_t pedometer_sleep_hours_max=0;
         for(unsigned char i=0; i<PEDOMETER_CHART_COLUMNS; i++){
-            if(draw){setDrawColor(0, 0, 255 - 127*(int)i/7);
+            if(get_pedometer_sleep(i)>pedometer_sleep_hours_max) pedometer_sleep_hours_max = get_pedometer_sleep(i);
+        }
+
+        for(unsigned char i=0; i<PEDOMETER_CHART_COLUMNS; i++){
+            if(draw){
+                if(get_pedometer_sleep(i)<get_pedometer_sleep_min_limit()){
+                    setDrawColor(255 - 127*(int)i/7, 0, 0);
+                }else{
+                    setDrawColor(0, 0, 255 - 127*(int)i/7);
+                }
+                
             }else{setDrawColor_BackGroundColor();} 
             
             #define Y1_CHART (STYLE_STATUSBAR_HEIGHT + PEDOMETER_PAGE_MARGIN + PEDOMETER_CHART_HEIGHT)
-            #define Y2_CHART (STYLE_STATUSBAR_HEIGHT + PEDOMETER_PAGE_MARGIN)
+            #define Y2_CHART (STYLE_STATUSBAR_HEIGHT + PEDOMETER_PAGE_MARGIN + PEDOMETER_CHART_HEIGHT - PEDOMETER_CHART_HEIGHT*get_pedometer_sleep(i)/pedometer_sleep_hours_max)
             #define X1_CHART (PEDOMETER_PAGE_MARGIN + (PEDOMETER_CHART_COLUMN_WIDTH + PEDOMETER_CHART_COLUMN_MARGINS_PX)*i)
             #define X2_CHART (X1_CHART + PEDOMETER_CHART_COLUMN_WIDTH - 1)
+
+            #define X_SRINGS PEDOMETER_PAGE_MARGIN
+            #define Y_SRINGS (Y1_CHART + FONT_CHAR_HEIGHT*FONT_SIZE_DEFAULT*7*(i+1)/5)
             drawRect(X1_CHART, Y1_CHART, X2_CHART, Y2_CHART, true);
 
             if(draw){
                 setDrawColor_ContrastColor();
-                drawString(String(i), X_SRINGS, Y_SRINGS);
+                drawString(String(get_pedometer_sleep(i)) + " sleep m.", X_SRINGS, Y_SRINGS);
             }else{
                 setDrawColor_BackGroundColor();
-                clearString(String(i), X_SRINGS, Y_SRINGS);
+                clearString(String(get_pedometer_sleep(i)) + " sleep m.", X_SRINGS, Y_SRINGS);
             }
+            
         }
     }if(page==PEDOMETER_PAGES_SLEEP_STATISTICS){
 
@@ -175,6 +194,7 @@ void appNameClass::onEvent(unsigned char event, int val1, int val2){
                 #if (DRIVER_CONTROLS_TOTALBUTTONS == 1)
                     if(val1==BUTTON_SELECT){
                         startApp(-1);
+                        return;
                     }
                 #else
                 #endif
@@ -205,7 +225,18 @@ void appNameClass::onEvent(unsigned char event, int val1, int val2){
         #endif
     
     #endif
+
+    else if(event==EVENT_ON_DATE_CHANGED){
+        setDrawColor_BackGroundColor();
+        drawRect(0, STYLE_STATUSBAR_HEIGHT, SCREEN_WIDTH, SCREEN_HEIGHT, true);
+        this->drawPage(true, this->current_page);
+    }else if(event==EVENT_ON_HOUR_CHANGED){
+
+    }else if(event==EVENT_ON_MINUTE_CHANGED){
+        
+    }
     
+
 }
 
 const unsigned char appNameClass::icon[] PROGMEM = {

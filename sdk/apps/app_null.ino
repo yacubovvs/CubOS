@@ -1,6 +1,10 @@
 #define appNameClass    NullApp         // App name without spaces
 #define appName         "App null"              // App name with spaces 
 
+#define APP_BACKGROUND_RED      0
+#define APP_BACKGROUND_GREEN    0
+#define APP_BACKGROUND_BLUE     0
+
 class appNameClass: public Application{
     public:
         virtual void onLoop() override;
@@ -9,7 +13,7 @@ class appNameClass: public Application{
 
         void onCreate();
         appNameClass(){ 
-            fillScreen(0, 0, 0);  // filling background
+            fillScreen(APP_BACKGROUND_RED, APP_BACKGROUND_GREEN, APP_BACKGROUND_BLUE);  // filling background
             super_onCreate();           // Drawind statusbar and etc if needed
             onCreate(); 
         };
@@ -113,6 +117,11 @@ void appNameClass::onEvent(unsigned char event, int val1, int val2){
         #endif
     
     #endif
+
+    else if(event==EVENT_ON_DATE_CHANGED){
+    }else if(event==EVENT_ON_HOUR_CHANGED{
+    }else if(event==EVENT_ON_MINUTE_CHANGED){
+    }
     
 }
 

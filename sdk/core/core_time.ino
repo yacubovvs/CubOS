@@ -6,17 +6,17 @@ void core_time_onNewDate(){
         core_pedometer_newDate();
     #endif
 
-    //currentApp->onEvent(EVENT_ON_DATE_CHANGED, 0, 0);
+    if(currentAppSetted) currentApp->onEvent(EVENT_ON_DATE_CHANGED, 0, 0);
 }
 
 void core_time_onNewMinute(){
-    debug("EVENT_ON_MINUTE_CHANGED!", 10);
-    //currentApp->onEvent(EVENT_ON_MINUTE_CHANGED, 0, 0);
+    //debug("EVENT_ON_MINUTE_CHANGED!", 10);
+    if(currentAppSetted) currentApp->onEvent(EVENT_ON_MINUTE_CHANGED, 0, 0);
 }
 
 void core_time_onNewHour(){
-    debug("EVENT_ON_HOUR_CHANGED!", 10);
-    //currentApp->onEvent(EVENT_ON_HOUR_CHANGED, 0, 0);
+    //debug("EVENT_ON_HOUR_CHANGED!", 10);
+    if(currentAppSetted) currentApp->onEvent(EVENT_ON_HOUR_CHANGED, 0, 0);
 }
 
 long getCurrentSystemTime(){

@@ -152,6 +152,7 @@
 #define PEDOMETER_DAY_VALUE_TYPE                        uint16_t
 #define PEDOMETER_DAYS_HISTORY                          7
 #define PEDOMETER_DAY_STEP_LIMMIT_DEFAULT               7000
+#define PEDOMETER_DAY_SLEEP_LIMMIT_DEFAULT              7*60 //minutes
 
 #define WAKEUP_FOR_BACKGROUND_WORK_STANDBY PEDOMETER_STEP_DETECTION_DELAY
 #define WAKEUP_FOR_BACKGROUND_WORK_IDLE 1000
@@ -308,6 +309,7 @@ class Application{
     Application(){};
 };
 
+bool currentAppSetted = false;
 Application* currentApp;
 /*
     ############################################################################################
@@ -363,6 +365,7 @@ void setup(){
     currentApp = getApp(STARTING_APP_NUMM);
     core_display_loop();
     driver_display_loop();
+    currentAppSetted = true;
   #endif
 
   #ifdef BATTERY_ENABLE
@@ -399,6 +402,7 @@ void setup(){
   
   #ifndef FORCE_DISPLAY_UPDATE_ON_START
     currentApp = getApp(STARTING_APP_NUMM);
+    currentAppSetted = true;
   #endif
   
 }
