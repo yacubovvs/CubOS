@@ -1,12 +1,10 @@
 #ifdef PEDOMETER_ENABLE
     //RTC_DATA_ATTR long pedometer_steps = 0;
-    #define PEDOMETER_DAY_VALUE_TYPE uint16_t
-    #define PEDOMETER_DAYS_HISTORY 7
 
     //#define PEDOMETER_DAY_VALUE_TYPE long
-    uint16_t pedometer_steps_min_limit = 10000;
+    uint16_t pedometer_steps_min_limit = PEDOMETER_DAY_STEP_LIMMIT_DEFAULT;
     
-    RTC_DATA_ATTR PEDOMETER_DAY_VALUE_TYPE pedometer_steps[PEDOMETER_DAYS_HISTORY] = {5000,7000,5000,7000,5000,7000,2000};
+    RTC_DATA_ATTR PEDOMETER_DAY_VALUE_TYPE pedometer_steps[PEDOMETER_DAYS_HISTORY] = {10001,5002,2003,1004,7005,8006,4007};
 
     PEDOMETER_DAY_VALUE_TYPE get_pedometer_steps(unsigned char day){ return pedometer_steps[day];}
     PEDOMETER_DAY_VALUE_TYPE get_pedometer_steps(){ return get_pedometer_steps(0);}
@@ -16,9 +14,10 @@
     void set_pedometer_steps(PEDOMETER_DAY_VALUE_TYPE steps){set_pedometer_steps(0, steps);}
 
     void core_pedometer_newDate(){
-        for(unsigned char i=PEDOMETER_DAYS_HISTORY-1; i>0; i++){
+        for(unsigned char i=PEDOMETER_DAYS_HISTORY-1; i>0; i--){
             pedometer_steps[i] = pedometer_steps[i-1];
         }
+        debug("new date");
         set_pedometer_steps(0, 0);
     }
 

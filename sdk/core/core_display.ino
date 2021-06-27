@@ -757,6 +757,10 @@ void clearString(String dString, int x, int y, unsigned char fontSize){
   clearString(element_value, x, y, fontSize);
 }
 
+void clearString(String dString, int x, int y){
+  clearString(dString, x, y, FONT_SIZE_DEFAULT);
+}
+
 void drawString_centered(char * dString, int x, int y){
   drawString(dString, x - strlen(dString)*FONT_CHAR_WIDTH/2, y);  
 }

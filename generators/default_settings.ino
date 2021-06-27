@@ -33,7 +33,6 @@
 #define EVENT_BUTTON_SHORT_PRESS            0x03
 #define EVENT_BUTTON_SHORT_SINGLE_PRESS     0x04
 #define EVENT_BUTTON_DOUBLE_PRESS           0x05
-#define EVENT_ON_TIME_CHANGED               0x06
 #define EVENT_ON_GOING_TO_SLEEP             0x07
 #define EVENT_ON_WAKE_UP                    0x08
 
@@ -48,6 +47,10 @@
 #define EVENT_ON_TOUCH_SWIPE_FROM_TOP       0x11
 #define EVENT_ON_TOUCH_SWIPE_FROM_BOTTOM    0x12
 
+#define EVENT_ON_TIME_CHANGED               0x06
+#define EVENT_ON_MINUTE_CHANGED             0x14
+#define EVENT_ON_HOUR_CHANGED               0x15
+#define EVENT_ON_DATE_CHANGED               0x13
 
 // WAKEUP REASONS
 #define WAKE_UP_REASON_EXTERNAL_RTC_IO      0x01
@@ -146,6 +149,9 @@
 #define PEDOMETER_STEP_DETECTION_PERIOD_MS              1000
 #define PEDOMETER_MESURES_IN_STEP_DETECTION_PERIOD      5
 #define PEDOMETER_ENABLE_ON_START                       true
+#define PEDOMETER_DAY_VALUE_TYPE                        uint16_t
+#define PEDOMETER_DAYS_HISTORY                          7
+#define PEDOMETER_DAY_STEP_LIMMIT_DEFAULT               7000
 
 #define WAKEUP_FOR_BACKGROUND_WORK_STANDBY PEDOMETER_STEP_DETECTION_DELAY
 #define WAKEUP_FOR_BACKGROUND_WORK_IDLE 1000

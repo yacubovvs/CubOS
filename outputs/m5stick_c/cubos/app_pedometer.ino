@@ -53,29 +53,40 @@ unsigned char  appNameClass::getPreviousPage(){
 
 void appNameClass::drawPage(bool draw, unsigned char page){
 
-    /*
-        PEDOMETER_PAGES_PEDOMETER
-        PEDOMETER_PAGES_PEDOMETR_STATISTICS
-        PEDOMETER_PAGES_SLEEP_MONITOR
-        PEDOMETER_PAGES_SLEEP_STATISTICS
-    */
-
     if(page==PEDOMETER_PAGES_PEDOMETER){
+
+        PEDOMETER_DAY_VALUE_TYPE pedometer_steps_max=0;
         for(unsigned char i=0; i<PEDOMETER_CHART_COLUMNS; i++){
-            if(draw){setDrawColor(0, 255 - 127*(int)i/7, 0);
+            if(get_pedometer_steps(i)>pedometer_steps_max) pedometer_steps_max = get_pedometer_steps(i);
+        }
+
+        for(unsigned char i=0; i<PEDOMETER_CHART_COLUMNS; i++){
+            if(draw){
+                if(get_pedometer_steps(i)<get_pedometer_steps_min_limit()){
+                    setDrawColor(255 - 127*(int)i/7, 0, 0);
+                }else{
+                    setDrawColor(0, 255 - 127*(int)i/7, 0);
+                }
+                
             }else{setDrawColor_BackGroundColor();} 
             
             #define Y1_CHART (STYLE_STATUSBAR_HEIGHT + PEDOMETER_PAGE_MARGIN + PEDOMETER_CHART_HEIGHT)
-            #define Y2_CHART (STYLE_STATUSBAR_HEIGHT + PEDOMETER_PAGE_MARGIN)
+            #define Y2_CHART (STYLE_STATUSBAR_HEIGHT + PEDOMETER_PAGE_MARGIN + PEDOMETER_CHART_HEIGHT - PEDOMETER_CHART_HEIGHT*get_pedometer_steps(i)/pedometer_steps_max)
             #define X1_CHART (PEDOMETER_PAGE_MARGIN + (PEDOMETER_CHART_COLUMN_WIDTH + PEDOMETER_CHART_COLUMN_MARGINS_PX)*i)
             #define X2_CHART (X1_CHART + PEDOMETER_CHART_COLUMN_WIDTH - 1)
 
             #define X_SRINGS PEDOMETER_PAGE_MARGIN
-            #define Y_SRINGS (Y1_CHART + FONT_CHAR_HEIGHT*FONT_SIZE_DEFAULT*7*i/5 + FONT_CHAR_HEIGHT*FONT_SIZE_DEFAULT)
+            #define Y_SRINGS (Y1_CHART + FONT_CHAR_HEIGHT*FONT_SIZE_DEFAULT*7*(i+1)/5)
             drawRect(X1_CHART, Y1_CHART, X2_CHART, Y2_CHART, true);
 
-            setDrawColor_ContrastColor();
-            drawString(String(i), X_SRINGS, Y_SRINGS);
+            if(draw){
+                setDrawColor_ContrastColor();
+                drawString(String(get_pedometer_steps(i)) + " steps", X_SRINGS, Y_SRINGS);
+            }else{
+                setDrawColor_BackGroundColor();
+                clearString(String(get_pedometer_steps(i)) + " steps", X_SRINGS, Y_SRINGS);
+            }
+            
         }
     }if(page==PEDOMETER_PAGES_PEDOMETR_STATISTICS){
 
@@ -89,6 +100,14 @@ void appNameClass::drawPage(bool draw, unsigned char page){
             #define X1_CHART (PEDOMETER_PAGE_MARGIN + (PEDOMETER_CHART_COLUMN_WIDTH + PEDOMETER_CHART_COLUMN_MARGINS_PX)*i)
             #define X2_CHART (X1_CHART + PEDOMETER_CHART_COLUMN_WIDTH - 1)
             drawRect(X1_CHART, Y1_CHART, X2_CHART, Y2_CHART, true);
+
+            if(draw){
+                setDrawColor_ContrastColor();
+                drawString(String(i), X_SRINGS, Y_SRINGS);
+            }else{
+                setDrawColor_BackGroundColor();
+                clearString(String(i), X_SRINGS, Y_SRINGS);
+            }
         }
     }if(page==PEDOMETER_PAGES_SLEEP_STATISTICS){
 
