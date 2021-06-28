@@ -117,7 +117,7 @@ unsigned char core_time_getSeconds_byte();
 void driver_accelerometer_setup();
 void driver_accelerometer_loop();
 void core_pedometer_setup();
-long get_pedometer_steps();
+long get_pedometer_days_steps();
 void core_pedometer_newDate();
 void core_views_softwareButtons_draw();
 void core_views_softwareButtons_draw(uint16_t offset, uint8_t color_red, uint8_t color_green, uint8_t color_blue);

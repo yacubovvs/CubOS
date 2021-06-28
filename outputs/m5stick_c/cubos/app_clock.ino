@@ -2,7 +2,7 @@
 #define appName         "Clock"              // App name with spaces 
 
 #ifdef PLATFORM_PC_EMULATOR
-    long get_pedometer_steps(){
+    long get_pedometer_days_steps(){
         return 12315;
     }
 #endif
@@ -226,7 +226,7 @@ void appNameClass::draw_current_time(bool draw){
         #define PEDOMETER_LABEL_POSITION_PADDING (3)
         #if defined(PEDOMETER_ENABLE) || defined(PEDOMETER_EMULATOR)
             
-            if(draw) this->last_pedometer = get_pedometer_steps();
+            if(draw) this->last_pedometer = get_pedometer_days_steps();
             String pedometer_toPrint = String(this->last_pedometer);
 
             // 16 - leg icon width
