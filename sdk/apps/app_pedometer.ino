@@ -13,6 +13,10 @@
 #define PEDOMETER_CHART_COLUMN_MARGINS_PX 3
 #define PEDOMETER_CHART_COLUMN_WIDTH ((PEDOMETER_CHART_WIDTH - PEDOMETER_CHART_COLUMN_MARGINS_PX*PEDOMETER_CHART_COLUMNS)/PEDOMETER_CHART_COLUMNS)
 
+#define PEDOMETER_DAYCHART_COLUMNS 24
+#define PEDOMETER_DAYCHART_COLUMN_MARGINS_PX 0
+#define PEDOMETER_DAYCHART_COLUMN_WIDTH ((PEDOMETER_CHART_WIDTH - PEDOMETER_DAYCHART_COLUMN_MARGINS_PX*PEDOMETER_DAYCHART_COLUMNS)/PEDOMETER_DAYCHART_COLUMNS)
+
 #define APP_BACKGROUND_RED      0
 #define APP_BACKGROUND_GREEN    0
 #define APP_BACKGROUND_BLUE     0
@@ -93,7 +97,30 @@ void appNameClass::drawPage(bool draw, unsigned char page){
             
         }
     }if(page==PEDOMETER_PAGES_PEDOMETR_STATISTICS){
+        uint16_t pedometer_days_activity_max=0;
+        for(unsigned char i=0; i<PEDOMETER_DAYCHART_COLUMNS; i++){
+            if(get_pedometer_hours_steps(i)>pedometer_days_activity_max) pedometer_days_activity_max = get_pedometer_hours_steps(i);
+        }
 
+        for(unsigned char i=0; i<PEDOMETER_DAYCHART_COLUMNS; i++){
+            if(draw){
+                setDrawColor(0, 255, 0);
+            }else{
+                setDrawColor_BackGroundColor();
+            } 
+
+            debug("Column width: " + String(PEDOMETER_DAYCHART_COLUMN_WIDTH));
+            
+            #define Y1_CHART (STYLE_STATUSBAR_HEIGHT + PEDOMETER_PAGE_MARGIN + PEDOMETER_CHART_HEIGHT)
+            #define Y2_CHART (STYLE_STATUSBAR_HEIGHT + PEDOMETER_PAGE_MARGIN + PEDOMETER_CHART_HEIGHT - PEDOMETER_CHART_HEIGHT*get_pedometer_hours_steps(i)/pedometer_days_activity_max)
+            #define X1_CHART (PEDOMETER_PAGE_MARGIN + (PEDOMETER_DAYCHART_COLUMN_WIDTH + PEDOMETER_DAYCHART_COLUMN_MARGINS_PX)*i)
+            #define X2_CHART (X1_CHART + PEDOMETER_DAYCHART_COLUMN_WIDTH - 1)
+
+            #define X_SRINGS PEDOMETER_PAGE_MARGIN
+            #define Y_SRINGS (Y1_CHART + FONT_CHAR_HEIGHT*FONT_SIZE_DEFAULT*7*(i+1)/5)
+            drawRect(X1_CHART, Y1_CHART, X2_CHART, Y2_CHART, true);
+            
+        }
     }if(page==PEDOMETER_PAGES_SLEEP_MONITOR){
         uint16_t pedometer_days_sleep_hours_max=0;
         for(unsigned char i=0; i<PEDOMETER_CHART_COLUMNS; i++){
