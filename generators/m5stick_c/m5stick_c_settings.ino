@@ -34,7 +34,7 @@
 //#define toDefaultApp_onLeftLongPress
 
 #define STARTING_APP_NUMM   -1      // for Mainmenu (default app)
-#define STARTING_APP_NUMM    2      // Pedometer
+//#define STARTING_APP_NUMM    2      // Pedometer
 //#define STARTING_APP_NUMM    0    // Clock
 
 #define FONT_SIZE_DEFAULT   1
@@ -72,6 +72,7 @@
 
 #define DEFAULT_DELAY_TO_FADE_DISPLAY 15
 #define PEDOMETER_ENABLE
+#define PEDOMETER_DEBUG
 /*
     ############################################################################################
     #                                                                                          #
