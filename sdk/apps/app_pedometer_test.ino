@@ -81,8 +81,12 @@ void appNameClass::onLoop(){
         drawStringOnScreen(" ");
         drawStringOnScreen("Delta: ");
         drawStringOnScreen(String(get_analysis_delta_value()));
-        drawStringOnScreen("Central weight: ");
-        drawStringOnScreen(String(get_analysis_central_weight_value()));
+        //drawStringOnScreen("Central weight: ");
+        //drawStringOnScreen(String(get_analysis_central_weight_value()));
+        drawStringOnScreen("");
+        drawStringOnScreen("Max value: ");
+        drawStringOnScreen(String(get_analysis_max_value()));
+        
     #endif
     
     

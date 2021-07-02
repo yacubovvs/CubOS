@@ -31,12 +31,27 @@
     void set_pedometer_days_sleep(unsigned char day, uint16_t sleep){pedometer_days_sleep[0] = sleep;}
     void set_pedometer_days_steps(uint16_t sleep){set_pedometer_days_sleep(0, sleep);}
 
+    RTC_DATA_ATTR uint32_t pedometr_mesurings_in_a_day = 0;
+    long getPedometr_mesurings_in_a_day(){
+        return pedometr_mesurings_in_a_day;
+    }
+
+
     void core_pedometer_newDate(){
         for(unsigned char i=PEDOMETER_DAYS_HISTORY-1; i>0; i--){
             pedometer_days_steps[i] = pedometer_days_steps[i-1];
+            pedometer_days_sleep[i] = pedometer_days_sleep[i-1];
         }
-        debug("new date");
+        //debug("new date");
         set_pedometer_days_steps(0, 0);
+        set_pedometer_days_sleep(0, 0);
+        //get_pedometer_hours_sleep = 0;
+
+        for(unsigned char i=0; i<24; i++){
+            pedometer_hours_steps[i] = 0;
+            pedometer_hours_sleep[i] = 0;
+        }
+        
     }
 
     #ifndef pedometer_days_steps_IN_SEC
@@ -188,9 +203,14 @@
 
     #define ABS(x) ((x)>0?(x):-(x))
 
+    #define CORE_PEDOMETER_SLEEP_COUNTING_SPOINTS   5
+    #define CORE_PEDOMETER_SLEEP_MIN_ACCELL_100     3
+    RTC_DATA_ATTR unsigned char analyse_sleep_delta_accels = 0;
+
     bool core_pedometer_analyse_steps_mesure(bool inBackground){
 
         // # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
+        pedometr_mesurings_in_a_day++;
 
         #ifdef PEDOMETER_DEBUG
             analysis_max_value = -1;
@@ -284,10 +304,30 @@
                     debug("Is walking", 10);
                     //if(!inBackground) digitalWrite(10,0);
                 #endif
-                pedometer_days_steps[0] += (PEDOMETER_DAY_VALUE_TYPE)((pedometer_days_steps_IN_SEC*( (float)(PEDOMETER_STEP_DETECTION_DELAY + PEDOMETER_STEP_DETECTION_PERIOD_MS)))/1000);
+                unsigned char hours_to_add = (PEDOMETER_DAY_VALUE_TYPE)((pedometer_days_steps_IN_SEC*( (float)(PEDOMETER_STEP_DETECTION_DELAY + PEDOMETER_STEP_DETECTION_PERIOD_MS)))/1000);
+                pedometer_hours_steps[core_time_getHours_byte()] += hours_to_add;
+                pedometer_days_steps[0] += hours_to_add;
+
+                // reset sleep counting
+                analyse_sleep_delta_accels = 0;
+
             }else{
+                //pedometer_hours_sleep[i] =
                 #ifdef PEDOMETER_DEBUG
                     debug("Is not walking", 10);
+                    unsigned char analysis_delta_value_byte = (unsigned char)(analysis_delta_value*100.0);
+                    
+                    if(analysis_delta_value_byte<=CORE_PEDOMETER_SLEEP_MIN_ACCELL_100){
+                        debug("Sleeping analyse - " + String(analyse_sleep_delta_accels));
+                        analyse_sleep_delta_accels++;
+                        if(analyse_sleep_delta_accels>=CORE_PEDOMETER_SLEEP_COUNTING_SPOINTS){
+                            debug("!!! IS SLEEPING");
+                        }
+                    }else{
+                        // reset sleep counting
+                        analyse_sleep_delta_accels = 0;
+                    }
+
                     //if(!inBackground) digitalWrite(10,1);
                 #endif
                 
