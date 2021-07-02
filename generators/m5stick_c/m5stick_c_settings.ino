@@ -34,8 +34,8 @@
 //#define toDefaultApp_onLeftLongPress
 
 #define STARTING_APP_NUMM   -1      // for Mainmenu (default app)
-#define STARTING_APP_NUMM    3      // Pedometer
-//#define STARTING_APP_NUMM    0    // Clock
+//#define STARTING_APP_NUMM    3      // Pedometer
+#define STARTING_APP_NUMM    0    // Clock
 
 #define FONT_SIZE_DEFAULT   1
 
@@ -73,9 +73,20 @@
 #define PEDOMETER_STEP_DETECTION_DELAY                  1000
 #define PEDOMETER_STEP_DETECTION_PERIOD_MS              1000
 
-#define DEFAULT_DELAY_TO_FADE_DISPLAY 15
+#define PEDOMETER_STEP_DETECTION_DELAY_SEC_MIN          10
+#define PEDOMETER_STEP_DETECTION_DELAY_SEC_STEP         10
+#define PEDOMETER_STEP_DETECTION_DELAY_SEC_MAX          60 // MAX (255 - PEDOMETER_STEP_DETECTION_PERIOD_MS/1000) and multiple 60 seconds
+
+#define DEFAULT_DELAY_TO_FADE_DISPLAY       5
+#define DEFAULT_TIME_TO_POWEROFF_DISPLAY    5
 #define PEDOMETER_ENABLE
-#define PEDOMETER_DEBUG
+//#define PEDOMETER_DEBUG
+
+#define PEDOMETER_DELTA_VALUE_MIN           0.47f
+#define PEDOMETER_CENTRALWIGHT_VALUE_MIN    0.17f
+
+#define CORE_PEDOMETER_SLEEP_COUNTING_SPOINTS   3 // mesures for sleep detection 
+#define CORE_PEDOMETER_SLEEP_MIN_ACCELL_100     3 // acceletometer sensitivity/100*G for sleep detection
 /*
     ############################################################################################
     #                                                                                          #

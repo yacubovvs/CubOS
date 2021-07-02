@@ -70,11 +70,16 @@ void appNameClass::onLoop(){
     #ifdef ACCELEROMETER_ENABLE
         drawStringOnScreen("Steps: ");
         drawStringOnScreen(String(get_pedometer_days_steps()));
-        drawStringOnScreen("");
+        drawStringOnScreen("Sleep: ");
+        drawStringOnScreen(String(get_pedometer_days_sleep()));
+        drawStringOnScreen("Mesures: ");
+        drawStringOnScreen(String(getPedometr_mesurings_in_a_day()));
+        //drawStringOnScreen("");
+        
         
 
-        drawStringOnScreen("Accerometer: ");
-        drawStringOnScreen(String(driver_accelerometer_get_accel_total()));
+        //drawStringOnScreen("Accerometer: ");
+        //drawStringOnScreen(String(driver_accelerometer_get_accel_total()));
     #endif
 
     #ifdef PEDOMETER_DEBUG
@@ -84,8 +89,8 @@ void appNameClass::onLoop(){
         //drawStringOnScreen("Central weight: ");
         //drawStringOnScreen(String(get_analysis_central_weight_value()));
         drawStringOnScreen("");
-        drawStringOnScreen("Max value: ");
-        drawStringOnScreen(String(get_analysis_max_value()));
+        drawStringOnScreen("Mesure delay: ");
+        drawStringOnScreen(String(get_corePedometer_currentsleep_between_mesures()));
         
     #endif
     

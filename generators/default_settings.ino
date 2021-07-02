@@ -169,6 +169,13 @@
 //#define LEGACY_GET_ICONS
 
 #define DEBUG_SERIAL_PORT Serial
+
+#define PEDOMETER_STEP_DETECTION_DELAY_SEC_MIN          10
+#define PEDOMETER_STEP_DETECTION_DELAY_SEC_STEP         10
+#define PEDOMETER_STEP_DETECTION_DELAY_SEC_MAX          60 // MAX (255 - PEDOMETER_STEP_DETECTION_PERIOD_MS/1000) and multiple 60 seconds
+
+#define CORE_PEDOMETER_SLEEP_COUNTING_SPOINTS   3 // mesures for sleep detection 
+#define CORE_PEDOMETER_SLEEP_MIN_ACCELL_100     3 // acceletometer sensitivity/100*G for sleep detection
 /*
     ############################################################################################
     #                                                                                          #
