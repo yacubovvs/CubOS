@@ -1,4 +1,28 @@
-#include <Arduino.h>
+
+#ifdef FRAMEBUFFER_ENABLE
+
+  #ifdef FRAMEBUFFER_TWIN_FULL
+
+    #define FRAMEBUFFER_SIZE SCREEN_WIDTH * SCREEN_HEIGHT * FRAMEBUFFER_BYTE_PER_PIXEL
+    //#define FRAMEBUFFER_SIZE SCREEN_WIDTH * SCREEN_HEIGHT
+
+    #if FRAMEBUFFER_BYTE_PER_PIXEL==2
+      #define FRAMEBUFFER_TYPE uint16_t
+    #endif
+
+    #if FRAMEBUFFER_BYTE_PER_PIXEL==1
+      #define FRAMEBUFFER_TYPE uint8_t
+    #endif
+
+    FRAMEBUFFER_TYPE * FRAMEBUFFER_currentFrame;
+    FRAMEBUFFER_TYPE * FRAMEBUFFER_newFrame;
+    bool FRAMEBUFFER_pixelChanged_x[SCREEN_WIDTH];
+    bool FRAMEBUFFER_pixelChanged_y[SCREEN_HEIGHT];
+    bool FRAMEBUFFER_pixelChanged[SCREEN_WIDTH*SCREEN_HEIGHT + 1];
+
+  #endif
+#endif
+
 
 uint16_t get_uint16Color(unsigned char red, unsigned char green, unsigned char blue){
   #ifdef SCREEN_INVERT_COLORS
@@ -11,6 +35,7 @@ uint16_t get_uint16Color(unsigned char red, unsigned char green, unsigned char b
     return ( (blue*31/255) <<11)|( (green*31/255) <<6)|( (red*31/255) <<0);
   #else
     return ( (red*31/255) <<11)|( (green*31/255) <<6)|( (blue*31/255) <<0);
+    //return ( (red*31/255) <<11)|( (green*31/255) <<6)|( (blue*31/255) <<0);
   #endif
 }
 
@@ -98,17 +123,6 @@ void setDrawColor(uint16_t color){
 
   #ifdef FRAMEBUFFER_TWIN_FULL
 
-    #define FRAMEBUFFER_SIZE SCREEN_WIDTH * SCREEN_HEIGHT * FRAMEBUFFER_BYTE_PER_PIXEL
-    //#define FRAMEBUFFER_SIZE SCREEN_WIDTH * SCREEN_HEIGHT
-
-    #if FRAMEBUFFER_BYTE_PER_PIXEL==2
-      #define FRAMEBUFFER_TYPE uint16_t
-    #endif
-
-    #if FRAMEBUFFER_BYTE_PER_PIXEL==1
-      #define FRAMEBUFFER_TYPE uint8_t
-    #endif
-
     bool FRAMEBUFFER_isChanged = false;
 
     void setFRAMEBUFFER_isChanged(bool v){
@@ -117,50 +131,6 @@ void setDrawColor(uint16_t color){
 
     bool getFRAMEBUFFER_isChanged(){
       return FRAMEBUFFER_isChanged;
-    }
-
-    FRAMEBUFFER_TYPE * FRAMEBUFFER_currentFrame;
-    FRAMEBUFFER_TYPE * FRAMEBUFFER_newFrame;
-    bool FRAMEBUFFER_pixelChangedchanged[SCREEN_WIDTH*SCREEN_HEIGHT + 1];
-
-
-    void FRAMEBUFFER_fill(uint16_t fillColor){
-      for(int x=0; x<SCREEN_WIDTH; x++){
-        for(int y=0; y<SCREEN_HEIGHT; y++){
-          long position = y * SCREEN_WIDTH + x;
-
-          FRAMEBUFFER_pixelChangedchanged[x + SCREEN_WIDTH*y] = false;
-          FRAMEBUFFER_new_setPixel(x, y, 0);
-          FRAMEBUFFER_current_setPixel(x, y, 0);
-        }
-      }
-    }
-
-    void FRAMEBUFFER_reset(){
-      
-      #ifdef FRAMEBUFFER_PSRAM
-        FRAMEBUFFER_currentFrame  = (FRAMEBUFFER_TYPE *)ps_malloc(FRAMEBUFFER_SIZE);
-        FRAMEBUFFER_newFrame      = (FRAMEBUFFER_TYPE *)ps_malloc(FRAMEBUFFER_SIZE);
-      #else
-        FRAMEBUFFER_currentFrame  = (FRAMEBUFFER_TYPE *)malloc(FRAMEBUFFER_SIZE);
-        FRAMEBUFFER_newFrame      = (FRAMEBUFFER_TYPE *)malloc(FRAMEBUFFER_SIZE);
-      #endif
-      
-      FRAMEBUFFER_fill(0);
-    }
-
-    void FRAMEBUFFER_new_setPixel(uint16_t x, uint16_t y, uint16_t color){
-      long position = y * (SCREEN_WIDTH-1) + x;
-      FRAMEBUFFER_newFrame[position] = FRAMEBUFFER_16bitColor_to_framebufferColor(color);
-    }
-
-    void FRAMEBUFFER_current_setPixel(uint16_t x, uint16_t y, uint16_t color){
-      long position = y * (SCREEN_WIDTH-1) + x;
-      FRAMEBUFFER_currentFrame[position] = FRAMEBUFFER_16bitColor_to_framebufferColor(color);
-    }
-
-    void FRAMEBUFFER_current_setPixel(uint16_t position, uint16_t color){
-      FRAMEBUFFER_currentFrame[position] = FRAMEBUFFER_16bitColor_to_framebufferColor(color);
     }
 
     FRAMEBUFFER_TYPE FRAMEBUFFER_16bitColor_to_framebufferColor(uint16_t color){
@@ -204,12 +174,26 @@ void setDrawColor(uint16_t color){
       
     }
 
+    void FRAMEBUFFER_new_setPixel(uint16_t x, uint16_t y, uint16_t color){
+      long position = y * (SCREEN_WIDTH-1) + x;
+      FRAMEBUFFER_newFrame[position] = FRAMEBUFFER_16bitColor_to_framebufferColor(color);
+    }
+
+    void FRAMEBUFFER_current_setPixel(uint16_t x, uint16_t y, uint16_t color){
+      long position = y * (SCREEN_WIDTH-1) + x;
+      FRAMEBUFFER_currentFrame[position] = FRAMEBUFFER_16bitColor_to_framebufferColor(color);
+    }
+
+    void FRAMEBUFFER_current_setPixel(long position, uint16_t color){
+      FRAMEBUFFER_currentFrame[position] = FRAMEBUFFER_16bitColor_to_framebufferColor(color);
+    }
+
     uint16_t FRAMEBUFFER_new_getPixel(uint16_t x, uint16_t y){
       long position = y * (SCREEN_WIDTH-1) + x;
       return FRAMEBUFFER_framebufferColor_to_16bitColor(FRAMEBUFFER_newFrame[position]);
     }
 
-    uint16_t FRAMEBUFFER_new_getPixel(uint16_t position){
+    uint16_t FRAMEBUFFER_new_getPixel(long position){
       return FRAMEBUFFER_framebufferColor_to_16bitColor(FRAMEBUFFER_newFrame[position]);
     }
 
@@ -218,10 +202,24 @@ void setDrawColor(uint16_t color){
       return FRAMEBUFFER_framebufferColor_to_16bitColor(FRAMEBUFFER_currentFrame[position]);
     }
 
-    uint16_t FRAMEBUFFER_current_getPixel(uint16_t position){
+    uint16_t FRAMEBUFFER_current_getPixel(long position){
       return FRAMEBUFFER_framebufferColor_to_16bitColor(FRAMEBUFFER_currentFrame[position]);
     }
 
+    void FRAMEBUFFER_fill(uint16_t fillColor){
+      for(int x=0; x<SCREEN_WIDTH; x++){
+        for(int y=0; y<SCREEN_HEIGHT; y++){
+          long position = y * SCREEN_WIDTH + x;
+          FRAMEBUFFER_pixelChanged[x + SCREEN_WIDTH*y] = false;
+          FRAMEBUFFER_new_setPixel(x, y, 0);
+          FRAMEBUFFER_current_setPixel(x, y, 0);
+        }
+      }
+    }
+
+    void FRAMEBUFFER_reset(){
+      FRAMEBUFFER_fill(0);
+    }
   #endif
 
 #endif
@@ -759,6 +757,10 @@ void clearString(String dString, int x, int y, unsigned char fontSize){
   clearString(element_value, x, y, fontSize);
 }
 
+void clearString(String dString, int x, int y){
+  clearString(dString, x, y, FONT_SIZE_DEFAULT);
+}
+
 void drawString_centered(char * dString, int x, int y){
   drawString(dString, x - strlen(dString)*FONT_CHAR_WIDTH/2, y);  
 }
@@ -793,6 +795,21 @@ void drawString_rightAlign(String dString, int x, int y){
 
 void core_display_setup(){
   #ifdef FRAMEBUFFER_ENABLE
+
+    #ifdef FRAMEBUFFER_TWIN_FULL
+
+      #ifdef FRAMEBUFFER_PSRAM
+        FRAMEBUFFER_currentFrame  = (FRAMEBUFFER_TYPE *)ps_malloc(FRAMEBUFFER_SIZE);
+        FRAMEBUFFER_newFrame      = (FRAMEBUFFER_TYPE *)ps_malloc(FRAMEBUFFER_SIZE);
+      #else
+        FRAMEBUFFER_currentFrame  = (FRAMEBUFFER_TYPE *)malloc(FRAMEBUFFER_SIZE);
+        FRAMEBUFFER_newFrame      = (FRAMEBUFFER_TYPE *)malloc(FRAMEBUFFER_SIZE);
+      #endif
+    #endif
+  #endif
+
+  driver_display_setup();
+  #ifdef FRAMEBUFFER_ENABLE
     FRAMEBUFFER_reset();
   #endif
 }
@@ -804,37 +821,31 @@ void core_display_loop(){
   #ifdef FRAMEBUFFER_ENABLE
     #ifdef FRAMEBUFFER_TWIN_FULL
       if(getFRAMEBUFFER_isChanged()){
-
-        //long drawMillis = millis();
+        bool shown = false;
 
         for(int y=0; y<SCREEN_HEIGHT; y++){
-          for(int x=0; x<SCREEN_WIDTH; x++){
-            if(FRAMEBUFFER_pixelChangedchanged[x + (SCREEN_WIDTH-1)*y]==true){
-              uint16_t position = y * (SCREEN_WIDTH-1) + x;
-              uint16_t newColor = FRAMEBUFFER_new_getPixel(position);
-              if(FRAMEBUFFER_current_getPixel(position)!=newColor){
-                //if(getDrawColor()!=newColor) setDrawColor(newColor);
-                display_driver_setPixel(x, y, newColor);
-                //if(x>=SCREEN_WIDTH) debug("XMORE!");
-                //if(y>=SCREEN_HEIGHT) debug("YMORE!");
-
-                FRAMEBUFFER_current_setPixel(position, newColor);
-                FRAMEBUFFER_pixelChangedchanged[x + (SCREEN_WIDTH-1)*y] = false;
+          if(FRAMEBUFFER_pixelChanged_y[y]){
+            for(int x=0; x<SCREEN_WIDTH; x++){
+              if(FRAMEBUFFER_pixelChanged_x[x]){
+                long position = y * (SCREEN_WIDTH-1) + x;  
+                if(FRAMEBUFFER_pixelChanged[position]==true){
+                  uint16_t newColor = FRAMEBUFFER_new_getPixel(position);
+                  if(FRAMEBUFFER_current_getPixel(position)!=newColor){
+                    display_driver_setPixel(x, y, newColor);
+                    FRAMEBUFFER_current_setPixel(position, newColor);
+                    FRAMEBUFFER_pixelChanged[position] = false;
+                  }
+                }
               }
             }
           }
         }
 
-        //int timeToDraw = millis() - drawMillis;
-        /*
-        if(fs_ms_max==0) fs_ms_max=1;
-        else if(fs_ms_max<timeToDraw){
-          fs_ms_max = timeToDraw;
-          log_d("Framebuffer drawing %d", fs_ms_max);
-        }*/
+        for(int x=0; x<SCREEN_WIDTH; x++){ FRAMEBUFFER_pixelChanged_x[x] = false;}
+        for(int y=0; y<SCREEN_HEIGHT; y++){ FRAMEBUFFER_pixelChanged_y[y] = false;}
 
-        //log_d("Framebuffer drawing %d", timeToDraw);
-        
+        //FRAMEBUFFER_pixelChanged[239 + (SCREEN_WIDTH-1)*239] = true;
+        //FRAMEBUFFER_new_setPixel(239,239, 65535);
       }
       setFRAMEBUFFER_isChanged(false);
     #endif
@@ -853,8 +864,11 @@ void drawPixel(int x, int y){
     #ifdef FRAMEBUFFER_TWIN_FULL
       FRAMEBUFFER_new_setPixel(x, y, getDrawColor());
 
-      uint16_t position = x + (SCREEN_WIDTH-1)*y;
-      if(position>=0 && position<=SCREEN_HEIGHT*SCREEN_WIDTH) FRAMEBUFFER_pixelChangedchanged[position] = true;
+      long position = x + (SCREEN_WIDTH-1)*y;
+      if(position>=0 && position<=SCREEN_HEIGHT*SCREEN_WIDTH) FRAMEBUFFER_pixelChanged[position] = true;
+
+      FRAMEBUFFER_pixelChanged_x[x] = true;
+      FRAMEBUFFER_pixelChanged_y[y] = true;
 
       if(!getFRAMEBUFFER_isChanged()) setFRAMEBUFFER_isChanged(true);
       
@@ -976,6 +990,43 @@ void drawRect(int x0, int y0, int x1, int y1, bool fill){
   }
 }
 
+// The Bresenham algorithm
+void drawCircle(int x0, int y0, int radius, bool fill){
+	int x = 0;
+	int y = radius;
+	int delta = 1 - 2 * radius;
+	int error = 0;
+	while(y >= 0) {
+    if(fill){
+      drawLine(x0 + x, y0 + y, x0 + x, y0);
+      drawLine(x0 + x, y0 - y, x0 + x, y0);
+      drawLine(x0 - x, y0 + y, x0 - x, y0);
+      drawLine(x0 - x, y0 - y, x0 - x, y0);
+    }else{
+      drawPixel(x0 + x, y0 + y);
+      drawPixel(x0 + x, y0 - y);
+      drawPixel(x0 - x, y0 + y);
+      drawPixel(x0 - x, y0 - y);
+    }
+
+		error = 2 * (delta + y) - 1;
+		if(delta < 0 && error <= 0) {
+			++x;
+			delta += 2 * x + 1;
+			continue;
+		}
+		error = 2 * (delta - x) - 1;
+		if(delta > 0 && error > 0) {
+			--y;
+			delta += 1 - 2 * y;
+			continue;
+		}
+		++x;
+		delta += 2 * (x - y);
+		--y;
+	}
+}
+
 
 void drawCircle(int x0, int y0, int radius){
   drawCircle(x0, y0, radius, false);
@@ -1004,10 +1055,6 @@ void drawArc_fade(int x0, int y0, int radius, int drawFromAngle, int drawToAngle
   }
 }
 */
-
-void drawArc(int x0, int y0, int radius, int drawFromAngle, int drawToAngle, uint16_t width){
-  drawArc(x0, y0, radius, drawFromAngle, drawToAngle, width, false);
-}
 
 void drawArc(int x0, int y0, int radius, int drawFromAngle, int drawToAngle, uint16_t width, bool drawFading){
   double start_angle = DEG_TO_RAD*drawFromAngle;
@@ -1059,41 +1106,8 @@ void drawArc(int x0, int y0, int radius, int drawFromAngle, int drawToAngle, uin
   }
 }
 
-// The Bresenham algorithm
-void drawCircle(int x0, int y0, int radius, bool fill){
-	int x = 0;
-	int y = radius;
-	int delta = 1 - 2 * radius;
-	int error = 0;
-	while(y >= 0) {
-    if(fill){
-      drawLine(x0 + x, y0 + y, x0 + x, y0);
-      drawLine(x0 + x, y0 - y, x0 + x, y0);
-      drawLine(x0 - x, y0 + y, x0 - x, y0);
-      drawLine(x0 - x, y0 - y, x0 - x, y0);
-    }else{
-      drawPixel(x0 + x, y0 + y);
-      drawPixel(x0 + x, y0 - y);
-      drawPixel(x0 - x, y0 + y);
-      drawPixel(x0 - x, y0 - y);
-    }
-
-		error = 2 * (delta + y) - 1;
-		if(delta < 0 && error <= 0) {
-			++x;
-			delta += 2 * x + 1;
-			continue;
-		}
-		error = 2 * (delta - x) - 1;
-		if(delta > 0 && error > 0) {
-			--y;
-			delta += 1 - 2 * y;
-			continue;
-		}
-		++x;
-		delta += 2 * (x - y);
-		--y;
-	}
+void drawArc(int x0, int y0, int radius, int drawFromAngle, int drawToAngle, uint16_t width){
+  drawArc(x0, y0, radius, drawFromAngle, drawToAngle, width, false);
 }
 
 // System function

@@ -8,13 +8,13 @@
     RTC_DATA_ATTR uint16_t pedometer_days_steps_min_limit = PEDOMETER_DAY_STEP_LIMMIT_DEFAULT;
     RTC_DATA_ATTR uint16_t pedometer_days_sleep_min_limit = PEDOMETER_DAY_SLEEP_LIMMIT_DEFAULT; // in minutes
     
-    RTC_DATA_ATTR PEDOMETER_DAY_VALUE_TYPE pedometer_days_steps[PEDOMETER_DAYS_HISTORY] = {10001,5002,2003,1004,7005,8006,4007};
-    RTC_DATA_ATTR uint16_t pedometer_days_sleep[PEDOMETER_DAYS_HISTORY] = {420,180,600,300,200,520,418};
+    RTC_DATA_ATTR PEDOMETER_DAY_VALUE_TYPE pedometer_days_steps[PEDOMETER_DAYS_HISTORY] = {0,0,0,0,0,0,0};
+    RTC_DATA_ATTR uint16_t pedometer_days_sleep[PEDOMETER_DAYS_HISTORY] = {0,0,0,0,0,0,0};
 
     // Steps in every hour
-    RTC_DATA_ATTR uint16_t pedometer_hours_steps[24] = {200, 50, 0, 0, 0, 0, 0, 0, 300, 500, 1000, 400, 200, 300, 200, 300, 1000, 1500, 1700, 1500, 1200, 600, 300, 240};
+    RTC_DATA_ATTR uint16_t pedometer_hours_steps[24] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
     // Sleep minutes in every hour
-    RTC_DATA_ATTR uint8_t pedometer_hours_sleep[24] = {0, 7, 50, 60, 60, 55, 45, 60, 10, 0, 0, 4, 0, 0, 15, 35, 0, 0, 0, 0, 0, 0, 0, 15};
+    RTC_DATA_ATTR uint8_t pedometer_hours_sleep[24] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
 
     PEDOMETER_DAY_VALUE_TYPE get_pedometer_days_steps(unsigned char day){ return pedometer_days_steps[day];}
     PEDOMETER_DAY_VALUE_TYPE get_pedometer_days_steps(){ return get_pedometer_days_steps(0);}
@@ -23,6 +23,8 @@
     uint8_t get_pedometer_hours_sleep(unsigned char hour){ return pedometer_hours_sleep[hour];}
     uint16_t get_pedometer_days_sleep(unsigned char day){ return pedometer_days_sleep[day];}
     uint16_t get_pedometer_days_sleep(){ return get_pedometer_days_sleep(0);}
+    float get_pedometer_days_sleep_hours(){ return get_pedometer_days_sleep_hours(0);}
+    float get_pedometer_days_sleep_hours(unsigned char day){ return (((float)(((int)pedometer_days_sleep[day])*100/60))/100.0);}
     uint16_t get_pedometer_days_steps_min_limit(){return pedometer_days_steps_min_limit;}
     uint16_t get_pedometer_days_sleep_min_limit(){return pedometer_days_sleep_min_limit;} //in minutes
 
@@ -30,9 +32,10 @@
     void set_pedometer_hours_sleep(unsigned char hour, uint8_t sleep_minutes){ pedometer_hours_sleep[hour] = sleep_minutes;}
     void set_pedometer_days_steps_min_limit(uint16_t limit){pedometer_days_steps_min_limit = limit;}
     void set_pedometer_days_sleep_min_limit(uint16_t limit){pedometer_days_sleep_min_limit = limit;} //in minutes
-    void set_pedometer_days_steps(unsigned char day, PEDOMETER_DAY_VALUE_TYPE steps){pedometer_days_steps[0] = steps;}
-    void set_pedometer_days_sleep(unsigned char day, uint16_t sleep){pedometer_days_sleep[0] = sleep;}
-    void set_pedometer_days_steps(uint16_t sleep){set_pedometer_days_sleep(0, sleep);}
+    void set_pedometer_days_steps(unsigned char day, PEDOMETER_DAY_VALUE_TYPE steps){pedometer_days_steps[day] = steps;}
+    void set_pedometer_days_sleep(unsigned char day, uint16_t sleep){pedometer_days_sleep[day] = sleep;}
+    void set_pedometer_days_sleep(uint16_t sleep){set_pedometer_days_sleep(0, sleep);}
+    void set_pedometer_days_steps(uint16_t steps){set_pedometer_days_steps(0, steps);}
 
     RTC_DATA_ATTR uint32_t pedometr_mesurings_in_a_day = 0;
 
@@ -92,12 +95,12 @@
 
             if(core_pedometer_current_step_detection!=-1){
                 #ifdef PEDOMETER_DEBUG
-                    //debug("Pedometer - Not first mesure!", 10);
+                    debug("Pedometer - Not first mesure!", 10);
                 #endif
                 core_pedometer_mesure_loop(inBackGroung);
             }else{
                 #ifdef PEDOMETER_DEBUG 
-                    //debug("Pedometer - check time!", 10);
+                    debug("Pedometer - check time!", 10);
                 #endif
                 
                 if(getCurrentSystemTime()<lastTimeWalkingDetection) lastTimeWalkingDetection = getCurrentSystemTime();
@@ -109,10 +112,7 @@
                         #ifdef ACCELEROMETER_ENABLE
                             driver_accelerometer_setup();
                             #ifdef WAKEUP_DEBUG
-                                debug("Accelerometer is setted up " + String(millis()), 10);;
-                            #endif
-                            #ifdef PEDOMETER_DEBUG
-                                debug("Accelerometer is setted up", 10);
+                                debug("Accelerometer is setted up " + String(millis()), 10);
                             #endif
                         #endif
                     }
@@ -124,7 +124,7 @@
                     core_pedometer_mesure_loop(inBackGroung);
                 }else{
                     #ifdef PEDOMETER_DEBUG
-                        //debug("!!!!! Time not come", 10);
+                        debug("!!!!! Time not come", 10);
                     #endif
                 }
             }
@@ -205,12 +205,11 @@
         float get_analysis_central_weight_value(){  return analysis_central_weight_value;}
         float get_analysis_central_value(){         return analysis_central_value;}
         int get_analysis_axis_crossings(){          return analysis_axis_crossings;}
-
-        unsigned char get_corePedometer_currentsleep_between_mesures(){
-            return corePedometer_currentsleep_between_mesures;
-        }
     #endif
 
+    unsigned char get_corePedometer_currentsleep_between_mesures(){
+        return corePedometer_currentsleep_between_mesures;
+    }
     #define ABS(x) ((x)>0?(x):-(x))
 
     bool core_pedometer_analyse_steps_mesure(bool inBackground){

@@ -48,6 +48,7 @@ class appNameClass: public Application{
         #endif
 
         void drawSecondsCircle(bool draw, unsigned char second);
+        void drawStepsCircle(bool draw);
       
 };
 
@@ -69,6 +70,7 @@ void appNameClass::onCreate(){
     this->last_seconds = core_time_getSeconds_byte();
     for(unsigned char isecond=0; isecond<=this->last_seconds; isecond++) this->drawSecondsCircle(true, isecond);
     this->draw_current_time(true);
+    this->drawStepsCircle(true);
 
 }
 
@@ -129,13 +131,29 @@ void appNameClass::onEvent(unsigned char event, int val1, int val2){
 #define NARROW_CLOCK_STRING3 125
 */
 
+void appNameClass::drawStepsCircle(bool draw){
+    if(draw){
+        //int grad_i = (long)360 * (long)6800 / (long)10000;
+        int grad_i = (long)360 * (long)get_pedometer_days_steps() / (long)get_pedometer_days_steps_min_limit();
+        for(int grad=0; grad<=grad_i; grad++){
+            
+            setGradientColor(46, 255, 0, 255, 85, 0, 360, grad);
+            drawArc(SECONDS_CIRCLE_X, SECONDS_CIRCLE_Y, SECONDS_CIRCLE_RADIUS-4, -90 + grad, -90 + grad + 2, 8, true);
+        }
+    }else{
+        setDrawColor_BackGroundColor();
+        int grad = 360;
+        drawArc(SECONDS_CIRCLE_X, SECONDS_CIRCLE_Y, SECONDS_CIRCLE_RADIUS-4, -90 + 0, -90 + grad + 8, 8, true);
+    }
+}
+
 void appNameClass::drawSecondsCircle(bool draw, unsigned char second){
-    if(draw)setGradientColor(255, 85, 0, 46, 255, 0, 60, second);
+    if(draw) setDrawColor(0, 0, 255);
     else setDrawColor_BackGroundColor();
 
     int grad = 6*second;
  
-    drawArc(SECONDS_CIRCLE_X, SECONDS_CIRCLE_Y, SECONDS_CIRCLE_RADIUS, -90 + grad, -90 + grad + 6, 8, true);
+    drawArc(SECONDS_CIRCLE_X, SECONDS_CIRCLE_Y, SECONDS_CIRCLE_RADIUS, -90 + grad, -90 + grad + 6, 4, true);
 }
 
 void appNameClass::draw_current_time(bool draw){

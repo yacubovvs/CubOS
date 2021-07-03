@@ -63,7 +63,7 @@
                                 debug("Deep sleep");
                                 delay(25);
                             #endif
-                            core_cpu_sleep(STAND_BY_SLEEP_TYPE, WAKEUP_FOR_BACKGROUND_WORK_STANDBY);
+                            core_cpu_sleep(STAND_BY_SLEEP_TYPE, get_corePedometer_currentsleep_between_mesures()*1000);
                         }
                     #endif
                 }else{
@@ -107,7 +107,7 @@
                             debug("Deep sleep");
                             delay(25);
                         #endif
-                        core_cpu_sleep(STAND_BY_SLEEP_TYPE, WAKEUP_FOR_BACKGROUND_WORK_STANDBY);
+                        core_cpu_sleep(STAND_BY_SLEEP_TYPE, get_corePedometer_currentsleep_between_mesures()*1000);
                     }
                 #endif
             }

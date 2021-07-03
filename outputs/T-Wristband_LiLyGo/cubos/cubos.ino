@@ -7,13 +7,10 @@
 */
 
 // TOUCH
-
-
 #define TOUCH_SCREEN_DELTA_MOVE_FOR_DRAG 7
-#define TOUCH_SCREEN_TIME_MS_FOT_LONG_TOUCH 300
+#define TOUCH_SCREEN_TIME_MS_FOR_LONG_TOUCH 300
 
 // BUTTONS
-
 #define BUTTON_UP       0x01
 #define BUTTON_SELECT   0x02
 #define BUTTON_DOWN     0x03
@@ -36,7 +33,6 @@
 #define EVENT_BUTTON_SHORT_PRESS            0x03
 #define EVENT_BUTTON_SHORT_SINGLE_PRESS     0x04
 #define EVENT_BUTTON_DOUBLE_PRESS           0x05
-#define EVENT_ON_TIME_CHANGED               0x06
 #define EVENT_ON_GOING_TO_SLEEP             0x07
 #define EVENT_ON_WAKE_UP                    0x08
 
@@ -51,6 +47,10 @@
 #define EVENT_ON_TOUCH_SWIPE_FROM_TOP       0x11
 #define EVENT_ON_TOUCH_SWIPE_FROM_BOTTOM    0x12
 
+#define EVENT_ON_TIME_CHANGED               0x06
+#define EVENT_ON_MINUTE_CHANGED             0x14
+#define EVENT_ON_HOUR_CHANGED               0x15
+#define EVENT_ON_DATE_CHANGED               0x13
 
 // WAKEUP REASONS
 #define WAKE_UP_REASON_EXTERNAL_RTC_IO      0x01
@@ -59,6 +59,12 @@
 #define WAKE_UP_REASON_TPOUCHPAD            0x04
 #define WAKE_UP_REASON_ULP                  0x05
 #define WAKE_UP_REASON_NOT_DEEP_SLEEP       0x06
+
+// SOFTWARE_BUTTONS
+#define SOFTWARE_BAR_BUTTON_UP              0x0001
+#define SOFTWARE_BAR_BUTTON_SELECT          0x0002
+#define SOFTWARE_BAR_BUTTON_DOWN            0x0003
+#define SOFTWARE_BAR_BUTTON_BACK            0x0004
 
 /*
  ############################################################################
@@ -93,6 +99,14 @@
 
 #define COREVIEWS_NO_ICON_ELEMENT_HEIGHT 40
 
+#define SOFTWARE_BUTTONS_COLOR_RED          255
+#define SOFTWARE_BUTTONS_COLOR_GREEN        255
+#define SOFTWARE_BUTTONS_COLOR_BLUE         255
+
+#define SOFTWARE_BUTTONS_COLOR_RED_BG       59
+#define SOFTWARE_BUTTONS_COLOR_GREEN_BG     35
+#define SOFTWARE_BUTTONS_COLOR_BLUE_BG      71
+
 /*
 ############################################################################
 #                                 STYLES -                                 #
@@ -112,7 +126,7 @@
 #define CONTROLS_DELAY_TO_DOUBLE_CLICK_MS DRIVER_CONTROLS_DELAY_BEFORE_LONG_PRESS
 
 #define SMOOTH_ANIMATION_COEFFICIENT    5
-// #define MAIN_MENU_SMOOTH_ANIMATION
+// #define SMOOTH_ANIMATION
 // #define NARROW_SCREEN
 
 #define UPDATE_BATTERY_EVERY_MS 3000
@@ -130,13 +144,16 @@
 //#define PEDOMETER_ENABLE
 
 //#define PEDOMETER_STEP_DETECTION_DELAY                30000
-#define PEDOMETER_STEP_DETECTION_DELAY                  15000
+
 //#define PEDOMETER_STEP_DETECTION_DELAY                  1000
 #define PEDOMETER_STEP_DETECTION_PERIOD_MS              1000
 #define PEDOMETER_MESURES_IN_STEP_DETECTION_PERIOD      5
 #define PEDOMETER_ENABLE_ON_START                       true
+#define PEDOMETER_DAY_VALUE_TYPE                        uint16_t
+#define PEDOMETER_DAYS_HISTORY                          7
+#define PEDOMETER_DAY_STEP_LIMMIT_DEFAULT               7000
+#define PEDOMETER_DAY_SLEEP_LIMMIT_DEFAULT              7*60 //minutes
 
-#define WAKEUP_FOR_BACKGROUND_WORK_STANDBY PEDOMETER_STEP_DETECTION_DELAY
 #define WAKEUP_FOR_BACKGROUND_WORK_IDLE 1000
 
 //#define PEDOMETER_DEBUG // Just for teste
@@ -147,13 +164,26 @@
 
 //#define DEBUG_SERIAL
 
+#define SOFTWARE_BUTTONS_BAR_SIZE 0
+//#define LEGACY_GET_ICONS
+
+#define DEBUG_SERIAL_PORT Serial
+
+#define PEDOMETER_STEP_DETECTION_DELAY_SEC_MIN          10
+#define PEDOMETER_STEP_DETECTION_DELAY_SEC_STEP         10
+#define PEDOMETER_STEP_DETECTION_DELAY_SEC_MAX          60 // MAX (255 - PEDOMETER_STEP_DETECTION_PERIOD_MS/1000) and multiple 60 seconds
+
+#define CORE_PEDOMETER_SLEEP_COUNTING_SPOINTS   3 // mesures for sleep detection 
+#define CORE_PEDOMETER_SLEEP_MIN_ACCELL_100     3 // acceletometer sensitivity/100*G for sleep detection
 /*
     ############################################################################################
     #                                                                                          #
     #                                    DEFAULT SETTINGS +                                    #
     #                                                                                          #
     ############################################################################################
-*//*
+*/
+
+/*
     ############################################################################################
     #                                                                                          #
     #                                   M5STICK SETTINGS +                                     #
@@ -208,7 +238,7 @@
 
 #define STYLE_STATUSBAR_HEIGHT  20
 
-#define MAIN_MENU_SMOOTH_ANIMATION
+#define SMOOTH_ANIMATION
 #define NARROW_SCREEN
 
 #define FRAMEBUFFER_ENABLE
@@ -245,9 +275,13 @@
 #define PEDOMETER_DELTA_VALUE_MIN           0.47f
 #define PEDOMETER_CENTRALWIGHT_VALUE_MIN    0.17f
 
+#define PEDOMETER_STEP_DETECTION_DELAY_SEC_MIN          10
+#define PEDOMETER_STEP_DETECTION_DELAY_SEC_STEP         10
+#define PEDOMETER_STEP_DETECTION_DELAY_SEC_MAX          60 // MAX (255 - PEDOMETER_STEP_DETECTION_PERIOD_MS/1000) and multiple 60 seconds
+
 //#define DEBUG_SERIAL
 //#define PEDOMETER_DEBUG
-// #define WAKEUP_DEBUG
+//#define WAKEUP_DEBUG
 
 /*
     ############################################################################################
@@ -256,27 +290,6 @@
     #                                                                                          #
     ############################################################################################
 */
-#include <Arduino.h>
-
-/*
-    ############################################################################################
-    #                                     PREDEFINED +                                         #
-    ############################################################################################
-*/
-
-void core_views_statusBar_draw();
-void setBackgroundColor(unsigned char r, unsigned char g, unsigned char b);
-void drawRect(int x0, int y0, int x1, int y1, bool fill);
-void setDrawColor(unsigned char red, unsigned char green, unsigned char blue);
-void fillScreen(unsigned char red, unsigned char green, unsigned char blue);
-
-/*
-    ############################################################################################
-    #                                     PREDEFINED -                                         #
-    ############################################################################################
-*/
-
-
 /*
     ############################################################################################
     #                                                                                          #
@@ -284,6 +297,14 @@ void fillScreen(unsigned char red, unsigned char green, unsigned char blue);
     #                                                                                          #
     ############################################################################################
 */
+
+// PREDEFINITION
+void core_views_statusBar_draw();
+#ifdef SOFTWARE_BUTTONS_ENABLE
+  void core_views_softwareButtons_draw();
+#endif
+class Application;
+Application *getApp(unsigned char i);
 
 
 /////////////////////////////////////
@@ -300,6 +321,10 @@ class Application{
     bool preventSleep         = false;
     bool preventInAppSleep    = false;
 
+    #ifdef SOFTWARE_BUTTONS_ENABLE
+      bool showSoftWareButtons = true;
+    #endif
+
     virtual void onLoop()     = 0;
     virtual void onDestroy()  = 0;
     virtual void onEvent(unsigned char event, int val1, int val2) = 0;
@@ -308,11 +333,15 @@ class Application{
       this->preventSleep = false;
       this->preventInAppSleep = false;
       if(this->showStatusBar) core_views_statusBar_draw();
+      #ifdef SOFTWARE_BUTTONS_ENABLE
+        if(this->showSoftWareButtons) core_views_softwareButtons_draw();
+      #endif
     }
 
     Application(){};
 };
 
+bool currentAppSetted = false;
 Application* currentApp;
 /*
     ############################################################################################
@@ -322,9 +351,13 @@ Application* currentApp;
     ############################################################################################
 */
 
-void setup(){ 
+void setup(){   
+  #ifdef CORE_SETUP_INIT
+    core_setup_driver();
+  #endif
+
   #ifdef DEBUG_SERIAL
-      Serial.begin(115200);
+      DEBUG_SERIAL_PORT.begin(115200);
       delay(100);
       debug("Serial debug started", 10);
   #endif
@@ -345,7 +378,7 @@ void setup(){
         #ifdef WAKEUP_DEBUG
           debug("Going to sleep again "  + String(millis()), 10);
         #endif
-        core_cpu_sleep(STAND_BY_SLEEP_TYPE, WAKEUP_FOR_BACKGROUND_WORK_STANDBY);
+        core_cpu_sleep(STAND_BY_SLEEP_TYPE, get_corePedometer_currentsleep_between_mesures()*1000);
       }else{
         #ifdef WAKEUP_DEBUG
           debug("Not background start", 10);
@@ -354,8 +387,6 @@ void setup(){
     #endif
   #endif
   //debug("**** Main app start", 10);
-
-  driver_display_setup();
   core_display_setup();
   
   #ifdef RTC_ENABLE
@@ -366,6 +397,7 @@ void setup(){
     currentApp = getApp(STARTING_APP_NUMM);
     core_display_loop();
     driver_display_loop();
+    currentAppSetted = true;
   #endif
 
   #ifdef BATTERY_ENABLE
@@ -402,14 +434,18 @@ void setup(){
   
   #ifndef FORCE_DISPLAY_UPDATE_ON_START
     currentApp = getApp(STARTING_APP_NUMM);
+    currentAppSetted = true;
   #endif
   
 }
 
 bool isInSleep = false;
 void loop(){
+  //long t = millis();
   core_display_loop();
   driver_display_loop();
+  //t = millis() - t;
+  //if(t!=0)debug("FPS: " + String(1000/t));
 
   #ifdef CPU_CONTROLL_ENABLE
     core_cpu_loop();
@@ -476,7 +512,7 @@ void debug(String string, int delaytime){
       delay(delaytime);
     #endif
 
-    #ifdef screenDebug
+    #ifdef DEBUG_ON_SCREEN
       setDrawColor(255, 255, 255);
       drawString(string, 5, STYLE_STATUSBAR_HEIGHT + 10, 2);
       delay(delaytime);
@@ -551,8 +587,9 @@ void debug(String string, int delaytime){
 #define APP_MENU_APPLICATIONS_0             ClockApp
 #define APP_MENU_APPLICATIONS_1             SettingsApp
 #define APP_MENU_APPLICATIONS_2             PedometerApp
-#define APP_MENU_APPLICATIONS_3             BatteryApp
-#define APP_MENU_APPLICATIONS_4             I2CScannerApp
+#define APP_MENU_APPLICATIONS_3             PedometerAppTest
+#define APP_MENU_APPLICATIONS_4             BatteryApp
+#define APP_MENU_APPLICATIONS_5             I2CScannerApp
 
 /*
     # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #

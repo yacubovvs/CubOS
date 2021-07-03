@@ -90,9 +90,13 @@
 #define PEDOMETER_DELTA_VALUE_MIN           0.47f
 #define PEDOMETER_CENTRALWIGHT_VALUE_MIN    0.17f
 
+#define PEDOMETER_STEP_DETECTION_DELAY_SEC_MIN          10
+#define PEDOMETER_STEP_DETECTION_DELAY_SEC_STEP         10
+#define PEDOMETER_STEP_DETECTION_DELAY_SEC_MAX          60 // MAX (255 - PEDOMETER_STEP_DETECTION_PERIOD_MS/1000) and multiple 60 seconds
+
 //#define DEBUG_SERIAL
 //#define PEDOMETER_DEBUG
-// #define WAKEUP_DEBUG
+//#define WAKEUP_DEBUG
 
 /*
     ############################################################################################

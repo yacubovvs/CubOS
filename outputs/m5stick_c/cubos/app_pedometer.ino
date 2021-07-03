@@ -111,10 +111,10 @@ void appNameClass::drawPage(bool draw, unsigned char page){
 
             //drawString("Day mesures:",                                  PEDOMETER_PAGE_MARGIN,      Y_TITLE + PEDOMETER_CHART_HEIGHT + FONT_SIZE_DEFAULT*FONT_CHAR_HEIGHT*2/3 +     FONT_SIZE_DEFAULT*FONT_CHAR_HEIGHT*3/2*1);
             //drawString(String(getPedometr_mesurings_in_a_day()),        PEDOMETER_PAGE_MARGIN,      Y_TITLE + PEDOMETER_CHART_HEIGHT + FONT_SIZE_DEFAULT*FONT_CHAR_HEIGHT*2/3 +     FONT_SIZE_DEFAULT*FONT_CHAR_HEIGHT*3/2*2);
-            drawString("Total steps:",                                  PEDOMETER_PAGE_MARGIN,      Y_TITLE + PEDOMETER_CHART_HEIGHT + FONT_SIZE_DEFAULT*FONT_CHAR_HEIGHT*2/3 +     FONT_SIZE_DEFAULT*FONT_CHAR_HEIGHT*3/2*3);
-            drawString(String(get_pedometer_days_steps()),              PEDOMETER_PAGE_MARGIN,      Y_TITLE + PEDOMETER_CHART_HEIGHT + FONT_SIZE_DEFAULT*FONT_CHAR_HEIGHT*2/3 +     FONT_SIZE_DEFAULT*FONT_CHAR_HEIGHT*3/2*4);
-            drawString("Target:",                                       PEDOMETER_PAGE_MARGIN,      Y_TITLE + PEDOMETER_CHART_HEIGHT + FONT_SIZE_DEFAULT*FONT_CHAR_HEIGHT*2/3 +     FONT_SIZE_DEFAULT*FONT_CHAR_HEIGHT*3/2*5);
-            drawString(String(get_pedometer_days_steps_min_limit()),    PEDOMETER_PAGE_MARGIN,      Y_TITLE + PEDOMETER_CHART_HEIGHT + FONT_SIZE_DEFAULT*FONT_CHAR_HEIGHT*2/3 +     FONT_SIZE_DEFAULT*FONT_CHAR_HEIGHT*3/2*6);
+            drawString("Total steps:",                                  PEDOMETER_PAGE_MARGIN,      Y_TITLE + PEDOMETER_CHART_HEIGHT + FONT_SIZE_DEFAULT*FONT_CHAR_HEIGHT*2/3 +     FONT_SIZE_DEFAULT*FONT_CHAR_HEIGHT*3/2*1);
+            drawString(String(get_pedometer_days_steps()),              PEDOMETER_PAGE_MARGIN,      Y_TITLE + PEDOMETER_CHART_HEIGHT + FONT_SIZE_DEFAULT*FONT_CHAR_HEIGHT*2/3 +     FONT_SIZE_DEFAULT*FONT_CHAR_HEIGHT*3/2*2);
+            drawString("Target:",                                       PEDOMETER_PAGE_MARGIN,      Y_TITLE + PEDOMETER_CHART_HEIGHT + FONT_SIZE_DEFAULT*FONT_CHAR_HEIGHT*2/3 +     FONT_SIZE_DEFAULT*FONT_CHAR_HEIGHT*3/2*3);
+            drawString(String(get_pedometer_days_steps_min_limit()),    PEDOMETER_PAGE_MARGIN,      Y_TITLE + PEDOMETER_CHART_HEIGHT + FONT_SIZE_DEFAULT*FONT_CHAR_HEIGHT*2/3 +     FONT_SIZE_DEFAULT*FONT_CHAR_HEIGHT*3/2*4);
             
         }else{
             setDrawColor_BackGroundColor();
@@ -122,10 +122,10 @@ void appNameClass::drawPage(bool draw, unsigned char page){
 
             //clearString("Day mesures:",                                  PEDOMETER_PAGE_MARGIN,      Y_TITLE + PEDOMETER_CHART_HEIGHT + FONT_SIZE_DEFAULT*FONT_CHAR_HEIGHT*2/3 +     FONT_SIZE_DEFAULT*FONT_CHAR_HEIGHT*3/2*1);
             //clearString(String(getPedometr_mesurings_in_a_day()),        PEDOMETER_PAGE_MARGIN,      Y_TITLE + PEDOMETER_CHART_HEIGHT + FONT_SIZE_DEFAULT*FONT_CHAR_HEIGHT*2/3 +     FONT_SIZE_DEFAULT*FONT_CHAR_HEIGHT*3/2*2);
-            clearString("Total steps:",                                  PEDOMETER_PAGE_MARGIN,      Y_TITLE + PEDOMETER_CHART_HEIGHT + FONT_SIZE_DEFAULT*FONT_CHAR_HEIGHT*2/3 +     FONT_SIZE_DEFAULT*FONT_CHAR_HEIGHT*3/2*3);
-            clearString(String(get_pedometer_days_steps()),              PEDOMETER_PAGE_MARGIN,      Y_TITLE + PEDOMETER_CHART_HEIGHT + FONT_SIZE_DEFAULT*FONT_CHAR_HEIGHT*2/3 +     FONT_SIZE_DEFAULT*FONT_CHAR_HEIGHT*3/2*4);
-            clearString("Target:",                                       PEDOMETER_PAGE_MARGIN,      Y_TITLE + PEDOMETER_CHART_HEIGHT + FONT_SIZE_DEFAULT*FONT_CHAR_HEIGHT*2/3 +     FONT_SIZE_DEFAULT*FONT_CHAR_HEIGHT*3/2*5);
-            clearString(String(get_pedometer_days_steps_min_limit()),    PEDOMETER_PAGE_MARGIN,      Y_TITLE + PEDOMETER_CHART_HEIGHT + FONT_SIZE_DEFAULT*FONT_CHAR_HEIGHT*2/3 +     FONT_SIZE_DEFAULT*FONT_CHAR_HEIGHT*3/2*6);
+            clearString("Total steps:",                                  PEDOMETER_PAGE_MARGIN,      Y_TITLE + PEDOMETER_CHART_HEIGHT + FONT_SIZE_DEFAULT*FONT_CHAR_HEIGHT*2/3 +     FONT_SIZE_DEFAULT*FONT_CHAR_HEIGHT*3/2*1);
+            clearString(String(get_pedometer_days_steps()),              PEDOMETER_PAGE_MARGIN,      Y_TITLE + PEDOMETER_CHART_HEIGHT + FONT_SIZE_DEFAULT*FONT_CHAR_HEIGHT*2/3 +     FONT_SIZE_DEFAULT*FONT_CHAR_HEIGHT*3/2*2);
+            clearString("Target:",                                       PEDOMETER_PAGE_MARGIN,      Y_TITLE + PEDOMETER_CHART_HEIGHT + FONT_SIZE_DEFAULT*FONT_CHAR_HEIGHT*2/3 +     FONT_SIZE_DEFAULT*FONT_CHAR_HEIGHT*3/2*3);
+            clearString(String(get_pedometer_days_steps_min_limit()),    PEDOMETER_PAGE_MARGIN,      Y_TITLE + PEDOMETER_CHART_HEIGHT + FONT_SIZE_DEFAULT*FONT_CHAR_HEIGHT*2/3 +     FONT_SIZE_DEFAULT*FONT_CHAR_HEIGHT*3/2*4);
         }
 
         for(unsigned char i=0; i<PEDOMETER_DAYCHART_COLUMNS; i++){
@@ -196,10 +196,10 @@ void appNameClass::drawPage(bool draw, unsigned char page){
 
             //drawString("Day mesures:",                                  PEDOMETER_PAGE_MARGIN,      Y_TITLE + PEDOMETER_CHART_HEIGHT + FONT_SIZE_DEFAULT*FONT_CHAR_HEIGHT*2/3 +     FONT_SIZE_DEFAULT*FONT_CHAR_HEIGHT*3/2*1);
             //drawString(String(getPedometr_mesurings_in_a_day()),        PEDOMETER_PAGE_MARGIN,      Y_TITLE + PEDOMETER_CHART_HEIGHT + FONT_SIZE_DEFAULT*FONT_CHAR_HEIGHT*2/3 +     FONT_SIZE_DEFAULT*FONT_CHAR_HEIGHT*3/2*2);
-            drawString("Sleep hours:",                                  PEDOMETER_PAGE_MARGIN,      Y_TITLE + PEDOMETER_CHART_HEIGHT + FONT_SIZE_DEFAULT*FONT_CHAR_HEIGHT*2/3 +     FONT_SIZE_DEFAULT*FONT_CHAR_HEIGHT*3/2*3);
-            drawString(String(get_pedometer_days_sleep()),              PEDOMETER_PAGE_MARGIN,      Y_TITLE + PEDOMETER_CHART_HEIGHT + FONT_SIZE_DEFAULT*FONT_CHAR_HEIGHT*2/3 +     FONT_SIZE_DEFAULT*FONT_CHAR_HEIGHT*3/2*4);
-            drawString("Target:",                                       PEDOMETER_PAGE_MARGIN,      Y_TITLE + PEDOMETER_CHART_HEIGHT + FONT_SIZE_DEFAULT*FONT_CHAR_HEIGHT*2/3 +     FONT_SIZE_DEFAULT*FONT_CHAR_HEIGHT*3/2*5);
-            drawString(String(get_pedometer_days_sleep_min_limit()),    PEDOMETER_PAGE_MARGIN,      Y_TITLE + PEDOMETER_CHART_HEIGHT + FONT_SIZE_DEFAULT*FONT_CHAR_HEIGHT*2/3 +     FONT_SIZE_DEFAULT*FONT_CHAR_HEIGHT*3/2*6);
+            drawString("Sleep hours:",                                  PEDOMETER_PAGE_MARGIN,      Y_TITLE + PEDOMETER_CHART_HEIGHT + FONT_SIZE_DEFAULT*FONT_CHAR_HEIGHT*2/3 +     FONT_SIZE_DEFAULT*FONT_CHAR_HEIGHT*3/2*1);
+            drawString(String(get_pedometer_days_sleep_hours()),        PEDOMETER_PAGE_MARGIN,      Y_TITLE + PEDOMETER_CHART_HEIGHT + FONT_SIZE_DEFAULT*FONT_CHAR_HEIGHT*2/3 +     FONT_SIZE_DEFAULT*FONT_CHAR_HEIGHT*3/2*2);
+            drawString("Target:",                                       PEDOMETER_PAGE_MARGIN,      Y_TITLE + PEDOMETER_CHART_HEIGHT + FONT_SIZE_DEFAULT*FONT_CHAR_HEIGHT*2/3 +     FONT_SIZE_DEFAULT*FONT_CHAR_HEIGHT*3/2*3);
+            drawString(String(get_pedometer_days_sleep_min_limit()),    PEDOMETER_PAGE_MARGIN,      Y_TITLE + PEDOMETER_CHART_HEIGHT + FONT_SIZE_DEFAULT*FONT_CHAR_HEIGHT*2/3 +     FONT_SIZE_DEFAULT*FONT_CHAR_HEIGHT*3/2*4);
             
         }else{
             setDrawColor_BackGroundColor();
@@ -207,10 +207,10 @@ void appNameClass::drawPage(bool draw, unsigned char page){
 
             //clearString("Day mesures:",                                  PEDOMETER_PAGE_MARGIN,      Y_TITLE + PEDOMETER_CHART_HEIGHT + FONT_SIZE_DEFAULT*FONT_CHAR_HEIGHT*2/3 +     FONT_SIZE_DEFAULT*FONT_CHAR_HEIGHT*3/2*1);
             //clearString(String(getPedometr_mesurings_in_a_day()),        PEDOMETER_PAGE_MARGIN,      Y_TITLE + PEDOMETER_CHART_HEIGHT + FONT_SIZE_DEFAULT*FONT_CHAR_HEIGHT*2/3 +     FONT_SIZE_DEFAULT*FONT_CHAR_HEIGHT*3/2*2);
-            clearString("Sleep hours:",                                  PEDOMETER_PAGE_MARGIN,      Y_TITLE + PEDOMETER_CHART_HEIGHT + FONT_SIZE_DEFAULT*FONT_CHAR_HEIGHT*2/3 +     FONT_SIZE_DEFAULT*FONT_CHAR_HEIGHT*3/2*3);
-            clearString(String(get_pedometer_days_sleep()),              PEDOMETER_PAGE_MARGIN,      Y_TITLE + PEDOMETER_CHART_HEIGHT + FONT_SIZE_DEFAULT*FONT_CHAR_HEIGHT*2/3 +     FONT_SIZE_DEFAULT*FONT_CHAR_HEIGHT*3/2*4);
-            clearString("Target:",                                       PEDOMETER_PAGE_MARGIN,      Y_TITLE + PEDOMETER_CHART_HEIGHT + FONT_SIZE_DEFAULT*FONT_CHAR_HEIGHT*2/3 +     FONT_SIZE_DEFAULT*FONT_CHAR_HEIGHT*3/2*5);
-            clearString(String(get_pedometer_days_sleep_min_limit()),    PEDOMETER_PAGE_MARGIN,      Y_TITLE + PEDOMETER_CHART_HEIGHT + FONT_SIZE_DEFAULT*FONT_CHAR_HEIGHT*2/3 +     FONT_SIZE_DEFAULT*FONT_CHAR_HEIGHT*3/2*6);
+            clearString("Sleep hours:",                                  PEDOMETER_PAGE_MARGIN,      Y_TITLE + PEDOMETER_CHART_HEIGHT + FONT_SIZE_DEFAULT*FONT_CHAR_HEIGHT*2/3 +     FONT_SIZE_DEFAULT*FONT_CHAR_HEIGHT*3/2*1);
+            clearString(String(get_pedometer_days_sleep_hours()),        PEDOMETER_PAGE_MARGIN,      Y_TITLE + PEDOMETER_CHART_HEIGHT + FONT_SIZE_DEFAULT*FONT_CHAR_HEIGHT*2/3 +     FONT_SIZE_DEFAULT*FONT_CHAR_HEIGHT*3/2*2);
+            clearString("Target:",                                       PEDOMETER_PAGE_MARGIN,      Y_TITLE + PEDOMETER_CHART_HEIGHT + FONT_SIZE_DEFAULT*FONT_CHAR_HEIGHT*2/3 +     FONT_SIZE_DEFAULT*FONT_CHAR_HEIGHT*3/2*3);
+            clearString(String(get_pedometer_days_sleep_min_limit()),    PEDOMETER_PAGE_MARGIN,      Y_TITLE + PEDOMETER_CHART_HEIGHT + FONT_SIZE_DEFAULT*FONT_CHAR_HEIGHT*2/3 +     FONT_SIZE_DEFAULT*FONT_CHAR_HEIGHT*3/2*4);
         }
 
         for(unsigned char i=0; i<PEDOMETER_DAYCHART_COLUMNS; i++){
@@ -240,7 +240,7 @@ void appNameClass::onCreate(){
     /*
         Write you code on App create here
     */
-    this->preventSleep         = true;
+    //this->preventSleep         = true;
     //this->preventInAppSleep    = true;
 
     DRAW_LIMITS_setEnable(true);

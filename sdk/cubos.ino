@@ -87,7 +87,7 @@ void setup(){
         #ifdef WAKEUP_DEBUG
           debug("Going to sleep again "  + String(millis()), 10);
         #endif
-        core_cpu_sleep(STAND_BY_SLEEP_TYPE, WAKEUP_FOR_BACKGROUND_WORK_STANDBY);
+        core_cpu_sleep(STAND_BY_SLEEP_TYPE, get_corePedometer_currentsleep_between_mesures()*1000);
       }else{
         #ifdef WAKEUP_DEBUG
           debug("Not background start", 10);
