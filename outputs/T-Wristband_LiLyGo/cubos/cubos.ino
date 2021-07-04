@@ -151,7 +151,7 @@
 #define PEDOMETER_ENABLE_ON_START                       true
 #define PEDOMETER_DAY_VALUE_TYPE                        uint16_t
 #define PEDOMETER_DAYS_HISTORY                          7
-#define PEDOMETER_DAY_STEP_LIMMIT_DEFAULT               7000
+#define PEDOMETER_DAY_STEP_LIMMIT_DEFAULT               10000
 #define PEDOMETER_DAY_SLEEP_LIMMIT_DEFAULT              7*60 //minutes
 
 #define WAKEUP_FOR_BACKGROUND_WORK_IDLE 1000
@@ -267,10 +267,11 @@
 
 #define PEDOMETER_STEP_DETECTION_DELAY          20000 // Wake up to check accelerometer
 //#define PEDOMETER_STEP_DETECTION_DELAY          1000 // Wake up to check accelerometer
-#define DEFAULT_TIME_TO_POWEROFF_DISPLAY        5
+#define DEFAULT_TIME_TO_POWEROFF_DISPLAY        7
 #define DEFAULT_DELAY_TO_FADE_DISPLAY           0
 #define PEDOMETER_STEP_DETECTION_PERIOD_MS              1000
 #define PEDOMETER_MESURES_IN_STEP_DETECTION_PERIOD      7
+#define PEDOMETER_DAY_STEP_LIMMIT_DEFAULT               10000
 
 #define PEDOMETER_DELTA_VALUE_MIN           0.47f
 #define PEDOMETER_CENTRALWIGHT_VALUE_MIN    0.17f
@@ -278,6 +279,9 @@
 #define PEDOMETER_STEP_DETECTION_DELAY_SEC_MIN          10
 #define PEDOMETER_STEP_DETECTION_DELAY_SEC_STEP         10
 #define PEDOMETER_STEP_DETECTION_DELAY_SEC_MAX          60 // MAX (255 - PEDOMETER_STEP_DETECTION_PERIOD_MS/1000) and multiple 60 seconds
+
+#define CORE_PEDOMETER_SLEEP_COUNTING_SPOINTS   5 // mesures for sleep detection 
+#define CORE_PEDOMETER_SLEEP_MIN_ACCELL_100     3 // acceletometer sensitivity/100*G for sleep detection
 
 //#define DEBUG_SERIAL
 //#define PEDOMETER_DEBUG

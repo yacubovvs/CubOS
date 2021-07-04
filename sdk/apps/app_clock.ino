@@ -135,6 +135,7 @@ void appNameClass::drawStepsCircle(bool draw){
     if(draw){
         //int grad_i = (long)360 * (long)6800 / (long)10000;
         int grad_i = (long)360 * (long)get_pedometer_days_steps() / (long)get_pedometer_days_steps_min_limit();
+        if(grad_i>360) grad_i = 360;
         for(int grad=0; grad<=grad_i; grad++){
             
             setGradientColor(46, 255, 0, 255, 85, 0, 360, grad);

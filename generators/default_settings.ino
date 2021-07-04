@@ -151,7 +151,7 @@
 #define PEDOMETER_ENABLE_ON_START                       true
 #define PEDOMETER_DAY_VALUE_TYPE                        uint16_t
 #define PEDOMETER_DAYS_HISTORY                          7
-#define PEDOMETER_DAY_STEP_LIMMIT_DEFAULT               7000
+#define PEDOMETER_DAY_STEP_LIMMIT_DEFAULT               10000
 #define PEDOMETER_DAY_SLEEP_LIMMIT_DEFAULT              7*60 //minutes
 
 #define WAKEUP_FOR_BACKGROUND_WORK_IDLE 1000
