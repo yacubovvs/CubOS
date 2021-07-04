@@ -1,2 +1,8 @@
 2021-06-10
     Added software buttons for big touch screens
+
+2021-07-04
+    Added counting of sleep hours
+    Added new dinamic counting of sleep and steps
+    Modified watch surface application
+    Added Activity application
