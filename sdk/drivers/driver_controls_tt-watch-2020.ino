@@ -35,7 +35,7 @@ void driver_controls_setup(){
 
 void driver_controls_loop(){
   //debug("driver_controls_loop");
-  for (unsigned char i=0; i<DRIVER_CONTROLS_TOTALBUTTONS; i++){
+  //for (unsigned char i=0; i<DRIVER_CONTROLS_TOTALBUTTONS; i++){
     //if ((driver_control_isPositive[i]==true) ? (!digitalRead(driver_control_buttonsPins[i])) : (digitalRead(driver_control_buttonsPins[i]))){
     if(!digitalRead(AXP202_INT)){
 
@@ -44,7 +44,6 @@ void driver_controls_loop(){
       #endif
       
       last_user_activity = _millis();
-      if(driver_control_pressed[i]==false){
         // press start
         driver_control_pressed[i]=true;
         driver_control_time_pressed[i] = _millis();
@@ -83,8 +82,7 @@ void driver_controls_loop(){
           driver_control_DOUBLE_PRESS_lastPress[i] = millis();
         }
           
-      }
-      
+      driver_control_DOUBLE_PRESS_lastPress[i] = millis();
     }
 
     if(driver_control_DOUBLE_PRESS_lastPress[i]!=0 && _millis() - driver_control_DOUBLE_PRESS_lastPress[i]>CONTROLS_DELAY_TO_DOUBLE_CLICK_MS){
@@ -106,8 +104,8 @@ void driver_controls_loop(){
       //debug("Not double press1 ! [1]: " + String(driver_control_DOUBLE_PRESS_lastPress[i]) + "\n [2]: " + String(_millis() - driver_control_DOUBLE_PRESS_lastPress[i]) + "\n [3]: " + String(CONTROLS_DELAY_TO_DOUBLE_CLICK_MS));
     }
 
-    driver_control_DOUBLE_PRESS_lastPress[i] = millis();
-  }
+    
+  //}
   
   
 }

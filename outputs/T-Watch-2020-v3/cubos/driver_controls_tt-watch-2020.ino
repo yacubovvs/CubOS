@@ -60,7 +60,6 @@ void driver_controls_loop(){
         #ifdef CRIVER_CONTROLL_DEBUG
           debug("EVENT_BUTTON_RELEASED");
         #endif
-        driver_control_DOUBLE_PRESS_lastPress[i] = millis();
         
         if(driver_control_IS_LONG_PRESS[i]==false && driver_control_DOUBLE_PRESS_doublePressed[i]==false){
           onButtonEvent(EVENT_BUTTON_SHORT_PRESS, i);
@@ -68,7 +67,6 @@ void driver_controls_loop(){
             debug("EVENT_BUTTON_SHOTRPRESS");
           #endif
         }
-        
         
         driver_control_IS_LONG_PRESS[i]=false;
 
@@ -107,7 +105,10 @@ void driver_controls_loop(){
     }else{
       //debug("Not double press1 ! [1]: " + String(driver_control_DOUBLE_PRESS_lastPress[i]) + "\n [2]: " + String(_millis() - driver_control_DOUBLE_PRESS_lastPress[i]) + "\n [3]: " + String(CONTROLS_DELAY_TO_DOUBLE_CLICK_MS));
     }
+
+    driver_control_DOUBLE_PRESS_lastPress[i] = millis();
   }
+  
   
 }
 
