@@ -226,11 +226,11 @@
 //#define toDefaultApp_onLeftLongPress
 
 #define STARTING_APP_NUMM   -1    // for Mainmenu (default app)
-//#define STARTING_APP_NUMM   11     // for App number 7
+#define STARTING_APP_NUMM   10
 
 //#define CPU_SLEEP_ENABLE
 
-#undef BATTERY_ENABLE
+#define BATTERY_ENABLE
 #undef POWERSAVE_ENABLE
 #define CPU_CONTROLL_ENABLE
 
@@ -246,13 +246,14 @@
 #undef DISPLAY_BACKLIGHT_CONTROL_ENABLE
 #undef DISPLAY_BACKLIGHT_FADE_CONTROL_ENABLE
 
-#define STYLE_STATUSBAR_HEIGHT  40 
+#define STYLE_STATUSBAR_HEIGHT  30 
 #define DRIVER_CONTROLS_TOTALBUTTONS 1
 #define CORE_SETUP_INIT
 
 #define DRIVER_CONTROLS_DELAY_BEFORE_LONG_PRESS     400
 #define CONTROLS_DELAY_TO_DOUBLE_CLICK_MS           400
 
+#define FONT_SIZE_DEFAULT 1
 /*
     ############################################################################################
     #                                                                                          #

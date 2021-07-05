@@ -1,6 +1,6 @@
 #include <LilyGoWatch.h>
 
-#define CRIVER_CONTROLL_DEBUG
+//#define DRIVER_CONTROLL_DEBUG
 #define _millis() millis()
 //#define TP_PWR_PIN          25
 
@@ -35,25 +35,25 @@ void driver_controls_loop(){
     #endif
     
     onButtonEvent(EVENT_BUTTON_PRESSED, 0);
-    #ifdef CRIVER_CONTROLL_DEBUG
+    #ifdef DRIVER_CONTROLL_DEBUG
       debug("EVENT_BUTTON_PRESSED");
     #endif
     
     if(_millis() - last_user_buttons_activity<CONTROLS_DELAY_TO_DOUBLE_CLICK_MS){
       onButtonEvent(EVENT_ON_TOUCH_DOUBLE_PRESS, 0, _millis() - last_user_activity);
       isDoubleOrSinglePressed = true;
-      #ifdef CRIVER_CONTROLL_DEBUG
+      #ifdef DRIVER_CONTROLL_DEBUG
         debug("EVENT_ON_TOUCH_DOUBLE_PRESS " + String(_millis() - last_user_buttons_activity));
       #endif
     }
 
     onButtonEvent(EVENT_BUTTON_SHORT_PRESS, 0);
-    #ifdef CRIVER_CONTROLL_DEBUG
+    #ifdef DRIVER_CONTROLL_DEBUG
       debug("EVENT_BUTTON_SHORT_PRESS");
     #endif
 
     onButtonEvent(EVENT_BUTTON_RELEASED, 0);
-    #ifdef CRIVER_CONTROLL_DEBUG
+    #ifdef DRIVER_CONTROLL_DEBUG
       debug("EVENT_BUTTON_RELEASED");
     #endif
     
@@ -64,7 +64,7 @@ void driver_controls_loop(){
   if(isDoubleOrSinglePressed==false && _millis() - last_user_buttons_activity>=CONTROLS_DELAY_TO_DOUBLE_CLICK_MS){
     onButtonEvent(EVENT_BUTTON_SHORT_SINGLE_PRESS, 0);
     isDoubleOrSinglePressed=true;
-    #ifdef CRIVER_CONTROLL_DEBUG
+    #ifdef DRIVER_CONTROLL_DEBUG
       debug("EVENT_BUTTON_SHORT_SINGLE_PRESS " + String(_millis() - last_user_buttons_activity));
     #endif
     
