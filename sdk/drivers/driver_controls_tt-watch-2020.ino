@@ -6,18 +6,14 @@
 
 
 unsigned long last_user_activity = _millis();
+unsigned long last_user_buttons_activity = _millis();
 
-unsigned char    driver_control_buttonsPins[]               = {AXP202_INT};
-bool driver_control_isPositive[]                            = {false};
 unsigned char buttons_purpose[]                             = {BUTTON_POWER};
 
-// Do not change:
-bool driver_control_pressed[]                               = {false};
 unsigned long driver_control_time_pressed[]                 = {0};
 unsigned long driver_control_DOUBLE_PRESS_lastPress[]       = {0};
 unsigned long driver_control_DOUBLE_PRESS_doublePressed[]   = {false};
 unsigned long driver_control_IS_LONG_PRESS[]                = {false};
-
 
 TTGOClass *watch_controlls;
 
@@ -27,87 +23,53 @@ void driver_controls_setup(){
   last_user_activity = _millis();
 }
 
-/*
-#define EVENT_BUTTON_PRESSED            0x00
-#define EVENT_BUTTON_RELEASED           0x01
-#define EVENT_BUTTON_LONG_PRESS         0x02
-*/
+bool isDoubleOrSinglePressed = true;
 
 void driver_controls_loop(){
-  //debug("driver_controls_loop");
-  //for (unsigned char i=0; i<DRIVER_CONTROLS_TOTALBUTTONS; i++){
-    //if ((driver_control_isPositive[i]==true) ? (!digitalRead(driver_control_buttonsPins[i])) : (digitalRead(driver_control_buttonsPins[i]))){
-    if(!digitalRead(AXP202_INT)){
+  if (!digitalRead(AXP202_INT)){
+    isDoubleOrSinglePressed = false;
+    watch_controlls->power->clearIRQ();
 
-      #ifdef POWERSAVE_ENABLE
-        set_core_powersave_lastUserAction();
-      #endif
-      
-      last_user_activity = _millis();
-        // press start
-        driver_control_pressed[i]=true;
-        driver_control_time_pressed[i] = _millis();
-        onButtonEvent(EVENT_BUTTON_PRESSED, i);
-        #ifdef CRIVER_CONTROLL_DEBUG
-          debug("EVENT_BUTTON_PRESSED");
-        #endif
-
-        watch_controlls->power->clearIRQ();
-
-        driver_control_pressed[i]=false;
-        onButtonEvent(EVENT_BUTTON_RELEASED, i);
-        #ifdef CRIVER_CONTROLL_DEBUG
-          debug("EVENT_BUTTON_RELEASED");
-        #endif
-        
-        if(driver_control_IS_LONG_PRESS[i]==false && driver_control_DOUBLE_PRESS_doublePressed[i]==false){
-          onButtonEvent(EVENT_BUTTON_SHORT_PRESS, i);
-          #ifdef CRIVER_CONTROLL_DEBUG
-            debug("EVENT_BUTTON_SHOTRPRESS");
-          #endif
-        }
-        
-        driver_control_IS_LONG_PRESS[i]=false;
-
-
-        if(driver_control_DOUBLE_PRESS_lastPress[i]!=0){
-          if(_millis() - driver_control_DOUBLE_PRESS_lastPress[i]<CONTROLS_DELAY_TO_DOUBLE_CLICK_MS){
-            driver_control_DOUBLE_PRESS_doublePressed[i] = true;
-            onButtonEvent(EVENT_ON_TOUCH_DOUBLE_PRESS, i, _millis() - driver_control_DOUBLE_PRESS_lastPress[i]);
-            #ifdef CRIVER_CONTROLL_DEBUG
-              debug("EVENT_BUTTON_DOUBLE_PRESS");
-            #endif
-          }
-        }else{
-          driver_control_DOUBLE_PRESS_lastPress[i] = millis();
-        }
-          
-      driver_control_DOUBLE_PRESS_lastPress[i] = millis();
-    }
-
-    if(driver_control_DOUBLE_PRESS_lastPress[i]!=0 && _millis() - driver_control_DOUBLE_PRESS_lastPress[i]>CONTROLS_DELAY_TO_DOUBLE_CLICK_MS){
-      if(driver_control_DOUBLE_PRESS_doublePressed[i] == false){
-        if(driver_control_pressed[i]==false){
-          onButtonEvent(EVENT_BUTTON_SHORT_SINGLE_PRESS, i);
-          #ifdef CRIVER_CONTROLL_DEBUG
-            debug("EVENT_BUTTON_SHORT_SINGLE_PRESS");
-          #endif
-        }else{
-          //debug("Not double press3 ! [1]: " + String(driver_control_DOUBLE_PRESS_lastPress[i]) + "\n [2]: " + String(_millis() - driver_control_DOUBLE_PRESS_lastPress[i]) + "\n [3]: " + String(CONTROLS_DELAY_TO_DOUBLE_CLICK_MS));
-        }
-      }else{
-        driver_control_DOUBLE_PRESS_doublePressed[i] = false;
-        //debug("Not double press2 ! [1]: " + String(driver_control_DOUBLE_PRESS_lastPress[i]) + "\n [2]: " + String(_millis() - driver_control_DOUBLE_PRESS_lastPress[i]) + "\n [3]: " + String(CONTROLS_DELAY_TO_DOUBLE_CLICK_MS));
-      }
-      driver_control_DOUBLE_PRESS_lastPress[i]=0;
-    }else{
-      //debug("Not double press1 ! [1]: " + String(driver_control_DOUBLE_PRESS_lastPress[i]) + "\n [2]: " + String(_millis() - driver_control_DOUBLE_PRESS_lastPress[i]) + "\n [3]: " + String(CONTROLS_DELAY_TO_DOUBLE_CLICK_MS));
-    }
-
+    #ifdef POWERSAVE_ENABLE
+      set_core_powersave_lastUserAction();
+    #endif
     
-  //}
-  
-  
+    onButtonEvent(EVENT_BUTTON_PRESSED, 0);
+    #ifdef CRIVER_CONTROLL_DEBUG
+      debug("EVENT_BUTTON_PRESSED");
+    #endif
+    
+    if(_millis() - last_user_buttons_activity<CONTROLS_DELAY_TO_DOUBLE_CLICK_MS){
+      onButtonEvent(EVENT_ON_TOUCH_DOUBLE_PRESS, 0, _millis() - last_user_activity);
+      isDoubleOrSinglePressed = true;
+      #ifdef CRIVER_CONTROLL_DEBUG
+        debug("EVENT_ON_TOUCH_DOUBLE_PRESS " + String(_millis() - last_user_buttons_activity));
+      #endif
+    }
+
+    onButtonEvent(EVENT_BUTTON_SHORT_PRESS, 0);
+    #ifdef CRIVER_CONTROLL_DEBUG
+      debug("EVENT_BUTTON_SHORT_PRESS");
+    #endif
+
+    onButtonEvent(EVENT_BUTTON_RELEASED, 0);
+    #ifdef CRIVER_CONTROLL_DEBUG
+      debug("EVENT_BUTTON_RELEASED");
+    #endif
+    
+    last_user_buttons_activity = _millis();
+    last_user_activity = _millis();
+  }
+
+  if(isDoubleOrSinglePressed==false && _millis() - last_user_buttons_activity>=CONTROLS_DELAY_TO_DOUBLE_CLICK_MS){
+    onButtonEvent(EVENT_BUTTON_SHORT_SINGLE_PRESS, 0);
+    isDoubleOrSinglePressed=true;
+    #ifdef CRIVER_CONTROLL_DEBUG
+      debug("EVENT_BUTTON_SHORT_SINGLE_PRESS " + String(_millis() - last_user_buttons_activity));
+    #endif
+    
+  }
+
 }
 
 unsigned long driver_control_get_last_user_avtivity(){

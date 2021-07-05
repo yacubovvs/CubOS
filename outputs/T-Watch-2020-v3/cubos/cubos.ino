@@ -250,8 +250,8 @@
 #define DRIVER_CONTROLS_TOTALBUTTONS 1
 #define CORE_SETUP_INIT
 
-#define DRIVER_CONTROLS_DELAY_BEFORE_LONG_PRESS     100
-#define CONTROLS_DELAY_TO_DOUBLE_CLICK_MS           100
+#define DRIVER_CONTROLS_DELAY_BEFORE_LONG_PRESS     400
+#define CONTROLS_DELAY_TO_DOUBLE_CLICK_MS           400
 
 /*
     ############################################################################################
