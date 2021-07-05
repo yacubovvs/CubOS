@@ -1,4 +1,3 @@
-#define LILYGO_WATCH_2020_V3 
 #include <LilyGoWatch.h>
 
 TTGOClass *ttgo;
@@ -19,8 +18,8 @@ uint16_t getDrawColor(){
 
 void driver_display_setup(){
     ttgo = TTGOClass::getWatch();
-    ttgo->begin();
-    ttgo->openBL();
+    //ttgo->begin();
+    //ttgo->openBL();
     //ttgo->tft->fillScreen(BLACK);
 }
 

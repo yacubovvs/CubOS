@@ -1,7 +1,7 @@
 /* 
 * /
 #define DRIVER_CONTROLS_TOTALBUTTONS 1
-#define MAIN_MENU_SMOOTH_ANIMATION
+#define SMOOTH_ANIMATION
 #define NARROW_SCREEN
 // */
 
@@ -361,7 +361,7 @@ void appNameClass::drawIcons(bool draw){
     #ifdef NARROW_SCREEN
         int app_num = app_settings_selectedAppIndex;
         
-        #ifdef MAIN_MENU_SMOOTH_ANIMATION
+        #ifdef SMOOTH_ANIMATION
             if(this->scroll_x!=0){
                 this->preventInAppSleep=true;
                 if(this->scroll_x<0){
@@ -501,7 +501,7 @@ void appNameClass::drawIcons(bool draw){
 }
 
 void appNameClass::onLoop(){
-    #ifdef MAIN_MENU_SMOOTH_ANIMATION
+    #ifdef SMOOTH_ANIMATION
         if(this->scroll_x!=0){
             this->drawIcons(false);
             if(this->scroll_x!=0){
@@ -636,7 +636,7 @@ void appNameClass::onDestroy(){
 void appNameClass::pressPrevious(){
     if(currentSubMenu==APP_SETTINGS_SUBMENU_MAIN){
         this->updateActiveAppIndex(app_settings_selectedAppIndex-1);
-        #ifdef MAIN_MENU_SMOOTH_ANIMATION
+        #ifdef SMOOTH_ANIMATION
           this->scroll_x -= SCREEN_WIDTH;
         #endif
     } 
@@ -645,7 +645,7 @@ void appNameClass::pressPrevious(){
 void appNameClass::pressNext(){
     //if(currentSubMenu==APP_SETTINGS_SUBMENU_MAIN){
     this->drawIcons(false);
-    #ifdef MAIN_MENU_SMOOTH_ANIMATION
+    #ifdef SMOOTH_ANIMATION
         this->scroll_x += SCREEN_WIDTH;
     #endif
     

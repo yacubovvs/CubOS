@@ -10,8 +10,8 @@
 
 #define LILYGO_WATCH_2020_V3 
 
-//#define DEBUG_SERIAL
-#define DEBUG_ON_SCREEN
+#define DEBUG_SERIAL
+//#define DEBUG_ON_SCREEN
 
 #define SCREEN_WIDTH            240     // Screen resolution width
 #define SCREEN_HEIGHT           240     // Screen resolution height
@@ -32,6 +32,7 @@
 
 //#define HARDWARE_BUTTONS_ENABLED              // Conf of controls with hardware btns    
 #define TOUCH_SCREEN_ENABLE
+//#define PEDOMETER_ENABLE
 
 #define COLOR_SCREEN                     // Screen is colored
 #define noAnimation                     
@@ -43,15 +44,9 @@
 
 //#define CPU_SLEEP_ENABLE
 
-
-#define BUTTON_UP       0x01
-#define BUTTON_SELECT   0x02
-#define BUTTON_DOWN     0x03
-#define BUTTON_BACK     0x04
-
-
 #undef BATTERY_ENABLE
 #undef POWERSAVE_ENABLE
+#define CPU_CONTROLL_ENABLE
 
 //#define CLOCK_ENABLE
 //#define USE_PRIMITIVE_HARDWARE_DRAW_ACCELERATION
@@ -66,6 +61,8 @@
 #undef DISPLAY_BACKLIGHT_FADE_CONTROL_ENABLE
 
 #define STYLE_STATUSBAR_HEIGHT  40 
+#define DRIVER_CONTROLS_TOTALBUTTONS 1
+#define CORE_SETUP_INIT
 
 /*
     ############################################################################################

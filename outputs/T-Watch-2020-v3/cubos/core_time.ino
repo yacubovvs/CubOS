@@ -6,7 +6,17 @@ void core_time_onNewDate(){
         core_pedometer_newDate();
     #endif
 
-    //debug("New day!", 10);
+    if(currentAppSetted) currentApp->onEvent(EVENT_ON_DATE_CHANGED, 0, 0);
+}
+
+void core_time_onNewMinute(){
+    //debug("EVENT_ON_MINUTE_CHANGED!", 10);
+    if(currentAppSetted) currentApp->onEvent(EVENT_ON_MINUTE_CHANGED, 0, 0);
+}
+
+void core_time_onNewHour(){
+    //debug("EVENT_ON_HOUR_CHANGED!", 10);
+    if(currentAppSetted) currentApp->onEvent(EVENT_ON_HOUR_CHANGED, 0, 0);
 }
 
 long getCurrentSystemTime(){
@@ -20,6 +30,9 @@ long getCurrentSystemTime(){
 
 #ifdef RTC_ENABLE
     RTC_DATA_ATTR unsigned char lastDay = 0;
+    RTC_DATA_ATTR unsigned char lastHour = 0;
+    RTC_DATA_ATTR unsigned char lastMinute = 0;
+    
     unsigned long driver_RTC_lastTimeRefresh = 0;
     
     void core_time_driver_RTC_refresh(bool hard){
@@ -28,6 +41,16 @@ long getCurrentSystemTime(){
             if(core_time_getDate()!=lastDay){
                 core_time_onNewDate();
                 lastDay = core_time_getDate();
+            }
+
+            if(core_time_getMinutes_byte()!=lastMinute){
+                core_time_onNewMinute();
+                lastMinute = core_time_getMinutes_byte();
+            }
+
+            if(core_time_getHours_byte()!=lastHour){
+                core_time_onNewHour();
+                lastHour = core_time_getHours_byte();
             }
         }
     }

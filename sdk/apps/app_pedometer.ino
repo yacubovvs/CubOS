@@ -60,180 +60,180 @@ unsigned char  appNameClass::getPreviousPage(){
 }
 
 void appNameClass::drawPage(bool draw, unsigned char page){
+    #ifdef PEDOMETER_ENABLE
+        if(page==PEDOMETER_PAGES_PEDOMETER){
 
-    if(page==PEDOMETER_PAGES_PEDOMETER){
+            PEDOMETER_DAY_VALUE_TYPE pedometer_days_steps_max=0;
+            for(unsigned char i=0; i<PEDOMETER_CHART_COLUMNS; i++){
+                if(get_pedometer_days_steps(i)>pedometer_days_steps_max) pedometer_days_steps_max = get_pedometer_days_steps(i);
+            }
 
-        PEDOMETER_DAY_VALUE_TYPE pedometer_days_steps_max=0;
-        for(unsigned char i=0; i<PEDOMETER_CHART_COLUMNS; i++){
-            if(get_pedometer_days_steps(i)>pedometer_days_steps_max) pedometer_days_steps_max = get_pedometer_days_steps(i);
-        }
+            for(unsigned char i=0; i<PEDOMETER_CHART_COLUMNS; i++){
+                if(draw){
+                    if(get_pedometer_days_steps(i)<get_pedometer_days_steps_min_limit()){
+                        setDrawColor(255 - 127*(int)i/7, 0, 0);
+                    }else{
+                        setDrawColor(0, 255 - 127*(int)i/7, 0);
+                    }
+                    
+                }else{setDrawColor_BackGroundColor();} 
+                
+                #define Y1_CHART (STYLE_STATUSBAR_HEIGHT + PEDOMETER_PAGE_MARGIN + PEDOMETER_CHART_HEIGHT)
+                #define Y2_CHART (STYLE_STATUSBAR_HEIGHT + PEDOMETER_PAGE_MARGIN + PEDOMETER_CHART_HEIGHT - (pedometer_days_steps_max==0?0:(PEDOMETER_CHART_HEIGHT*get_pedometer_days_steps(i)/pedometer_days_steps_max)) )
+                #define X1_CHART (PEDOMETER_PAGE_MARGIN + (PEDOMETER_CHART_COLUMN_WIDTH + PEDOMETER_CHART_COLUMN_MARGINS_PX)*i)
+                #define X2_CHART (X1_CHART + PEDOMETER_CHART_COLUMN_WIDTH - 1)
 
-        for(unsigned char i=0; i<PEDOMETER_CHART_COLUMNS; i++){
-            if(draw){
-                if(get_pedometer_days_steps(i)<get_pedometer_days_steps_min_limit()){
-                    setDrawColor(255 - 127*(int)i/7, 0, 0);
+                #define X_SRINGS PEDOMETER_PAGE_MARGIN
+                #define Y_SRINGS (Y1_CHART + FONT_CHAR_HEIGHT*FONT_SIZE_DEFAULT*7*(i+1)/5)
+                drawRect(X1_CHART, Y1_CHART, X2_CHART, Y2_CHART, true);
+
+                if(draw){
+                    setDrawColor_ContrastColor();
+                    drawString(String(get_pedometer_days_steps(i)) + " steps", X_SRINGS, Y_SRINGS);
                 }else{
-                    setDrawColor(0, 255 - 127*(int)i/7, 0);
+                    setDrawColor_BackGroundColor();
+                    clearString(String(get_pedometer_days_steps(i)) + " steps", X_SRINGS, Y_SRINGS);
                 }
                 
-            }else{setDrawColor_BackGroundColor();} 
-            
-            #define Y1_CHART (STYLE_STATUSBAR_HEIGHT + PEDOMETER_PAGE_MARGIN + PEDOMETER_CHART_HEIGHT)
-            #define Y2_CHART (STYLE_STATUSBAR_HEIGHT + PEDOMETER_PAGE_MARGIN + PEDOMETER_CHART_HEIGHT - (pedometer_days_steps_max==0?0:(PEDOMETER_CHART_HEIGHT*get_pedometer_days_steps(i)/pedometer_days_steps_max)) )
-            #define X1_CHART (PEDOMETER_PAGE_MARGIN + (PEDOMETER_CHART_COLUMN_WIDTH + PEDOMETER_CHART_COLUMN_MARGINS_PX)*i)
-            #define X2_CHART (X1_CHART + PEDOMETER_CHART_COLUMN_WIDTH - 1)
+            }
+        }if(page==PEDOMETER_PAGES_PEDOMETR_STATISTICS){
+            uint16_t pedometer_days_activity_max=0;
+            for(unsigned char i=0; i<PEDOMETER_DAYCHART_COLUMNS; i++){
+                if(get_pedometer_hours_steps(i)>pedometer_days_activity_max) pedometer_days_activity_max = get_pedometer_hours_steps(i);
+            }
 
-            #define X_SRINGS PEDOMETER_PAGE_MARGIN
-            #define Y_SRINGS (Y1_CHART + FONT_CHAR_HEIGHT*FONT_SIZE_DEFAULT*7*(i+1)/5)
-            drawRect(X1_CHART, Y1_CHART, X2_CHART, Y2_CHART, true);
+            #define X_TITLE SCREEN_WIDTH/2
+            #define Y_TITLE STYLE_STATUSBAR_HEIGHT + PEDOMETER_PAGE_MARGIN
 
             if(draw){
                 setDrawColor_ContrastColor();
-                drawString(String(get_pedometer_days_steps(i)) + " steps", X_SRINGS, Y_SRINGS);
+                drawString_centered("Day activity", X_TITLE, Y_TITLE);
+
+                //drawString("Day mesures:",                                  PEDOMETER_PAGE_MARGIN,      Y_TITLE + PEDOMETER_CHART_HEIGHT + FONT_SIZE_DEFAULT*FONT_CHAR_HEIGHT*2/3 +     FONT_SIZE_DEFAULT*FONT_CHAR_HEIGHT*3/2*1);
+                //drawString(String(getPedometr_mesurings_in_a_day()),        PEDOMETER_PAGE_MARGIN,      Y_TITLE + PEDOMETER_CHART_HEIGHT + FONT_SIZE_DEFAULT*FONT_CHAR_HEIGHT*2/3 +     FONT_SIZE_DEFAULT*FONT_CHAR_HEIGHT*3/2*2);
+                drawString("Total steps:",                                  PEDOMETER_PAGE_MARGIN,      Y_TITLE + PEDOMETER_CHART_HEIGHT + FONT_SIZE_DEFAULT*FONT_CHAR_HEIGHT*2/3 +     FONT_SIZE_DEFAULT*FONT_CHAR_HEIGHT*3/2*1);
+                drawString(String(get_pedometer_days_steps()),              PEDOMETER_PAGE_MARGIN,      Y_TITLE + PEDOMETER_CHART_HEIGHT + FONT_SIZE_DEFAULT*FONT_CHAR_HEIGHT*2/3 +     FONT_SIZE_DEFAULT*FONT_CHAR_HEIGHT*3/2*2);
+                drawString("Target:",                                       PEDOMETER_PAGE_MARGIN,      Y_TITLE + PEDOMETER_CHART_HEIGHT + FONT_SIZE_DEFAULT*FONT_CHAR_HEIGHT*2/3 +     FONT_SIZE_DEFAULT*FONT_CHAR_HEIGHT*3/2*3);
+                drawString(String(get_pedometer_days_steps_min_limit()),    PEDOMETER_PAGE_MARGIN,      Y_TITLE + PEDOMETER_CHART_HEIGHT + FONT_SIZE_DEFAULT*FONT_CHAR_HEIGHT*2/3 +     FONT_SIZE_DEFAULT*FONT_CHAR_HEIGHT*3/2*4);
+                
             }else{
                 setDrawColor_BackGroundColor();
-                clearString(String(get_pedometer_days_steps(i)) + " steps", X_SRINGS, Y_SRINGS);
+                clearString_centered("Day activity", X_TITLE, Y_TITLE);
+
+                //clearString("Day mesures:",                                  PEDOMETER_PAGE_MARGIN,      Y_TITLE + PEDOMETER_CHART_HEIGHT + FONT_SIZE_DEFAULT*FONT_CHAR_HEIGHT*2/3 +     FONT_SIZE_DEFAULT*FONT_CHAR_HEIGHT*3/2*1);
+                //clearString(String(getPedometr_mesurings_in_a_day()),        PEDOMETER_PAGE_MARGIN,      Y_TITLE + PEDOMETER_CHART_HEIGHT + FONT_SIZE_DEFAULT*FONT_CHAR_HEIGHT*2/3 +     FONT_SIZE_DEFAULT*FONT_CHAR_HEIGHT*3/2*2);
+                clearString("Total steps:",                                  PEDOMETER_PAGE_MARGIN,      Y_TITLE + PEDOMETER_CHART_HEIGHT + FONT_SIZE_DEFAULT*FONT_CHAR_HEIGHT*2/3 +     FONT_SIZE_DEFAULT*FONT_CHAR_HEIGHT*3/2*1);
+                clearString(String(get_pedometer_days_steps()),              PEDOMETER_PAGE_MARGIN,      Y_TITLE + PEDOMETER_CHART_HEIGHT + FONT_SIZE_DEFAULT*FONT_CHAR_HEIGHT*2/3 +     FONT_SIZE_DEFAULT*FONT_CHAR_HEIGHT*3/2*2);
+                clearString("Target:",                                       PEDOMETER_PAGE_MARGIN,      Y_TITLE + PEDOMETER_CHART_HEIGHT + FONT_SIZE_DEFAULT*FONT_CHAR_HEIGHT*2/3 +     FONT_SIZE_DEFAULT*FONT_CHAR_HEIGHT*3/2*3);
+                clearString(String(get_pedometer_days_steps_min_limit()),    PEDOMETER_PAGE_MARGIN,      Y_TITLE + PEDOMETER_CHART_HEIGHT + FONT_SIZE_DEFAULT*FONT_CHAR_HEIGHT*2/3 +     FONT_SIZE_DEFAULT*FONT_CHAR_HEIGHT*3/2*4);
             }
-            
-        }
-    }if(page==PEDOMETER_PAGES_PEDOMETR_STATISTICS){
-        uint16_t pedometer_days_activity_max=0;
-        for(unsigned char i=0; i<PEDOMETER_DAYCHART_COLUMNS; i++){
-            if(get_pedometer_hours_steps(i)>pedometer_days_activity_max) pedometer_days_activity_max = get_pedometer_hours_steps(i);
-        }
 
-        #define X_TITLE SCREEN_WIDTH/2
-        #define Y_TITLE STYLE_STATUSBAR_HEIGHT + PEDOMETER_PAGE_MARGIN
-
-        if(draw){
-            setDrawColor_ContrastColor();
-            drawString_centered("Day activity", X_TITLE, Y_TITLE);
-
-            //drawString("Day mesures:",                                  PEDOMETER_PAGE_MARGIN,      Y_TITLE + PEDOMETER_CHART_HEIGHT + FONT_SIZE_DEFAULT*FONT_CHAR_HEIGHT*2/3 +     FONT_SIZE_DEFAULT*FONT_CHAR_HEIGHT*3/2*1);
-            //drawString(String(getPedometr_mesurings_in_a_day()),        PEDOMETER_PAGE_MARGIN,      Y_TITLE + PEDOMETER_CHART_HEIGHT + FONT_SIZE_DEFAULT*FONT_CHAR_HEIGHT*2/3 +     FONT_SIZE_DEFAULT*FONT_CHAR_HEIGHT*3/2*2);
-            drawString("Total steps:",                                  PEDOMETER_PAGE_MARGIN,      Y_TITLE + PEDOMETER_CHART_HEIGHT + FONT_SIZE_DEFAULT*FONT_CHAR_HEIGHT*2/3 +     FONT_SIZE_DEFAULT*FONT_CHAR_HEIGHT*3/2*1);
-            drawString(String(get_pedometer_days_steps()),              PEDOMETER_PAGE_MARGIN,      Y_TITLE + PEDOMETER_CHART_HEIGHT + FONT_SIZE_DEFAULT*FONT_CHAR_HEIGHT*2/3 +     FONT_SIZE_DEFAULT*FONT_CHAR_HEIGHT*3/2*2);
-            drawString("Target:",                                       PEDOMETER_PAGE_MARGIN,      Y_TITLE + PEDOMETER_CHART_HEIGHT + FONT_SIZE_DEFAULT*FONT_CHAR_HEIGHT*2/3 +     FONT_SIZE_DEFAULT*FONT_CHAR_HEIGHT*3/2*3);
-            drawString(String(get_pedometer_days_steps_min_limit()),    PEDOMETER_PAGE_MARGIN,      Y_TITLE + PEDOMETER_CHART_HEIGHT + FONT_SIZE_DEFAULT*FONT_CHAR_HEIGHT*2/3 +     FONT_SIZE_DEFAULT*FONT_CHAR_HEIGHT*3/2*4);
-            
-        }else{
-            setDrawColor_BackGroundColor();
-            clearString_centered("Day activity", X_TITLE, Y_TITLE);
-
-            //clearString("Day mesures:",                                  PEDOMETER_PAGE_MARGIN,      Y_TITLE + PEDOMETER_CHART_HEIGHT + FONT_SIZE_DEFAULT*FONT_CHAR_HEIGHT*2/3 +     FONT_SIZE_DEFAULT*FONT_CHAR_HEIGHT*3/2*1);
-            //clearString(String(getPedometr_mesurings_in_a_day()),        PEDOMETER_PAGE_MARGIN,      Y_TITLE + PEDOMETER_CHART_HEIGHT + FONT_SIZE_DEFAULT*FONT_CHAR_HEIGHT*2/3 +     FONT_SIZE_DEFAULT*FONT_CHAR_HEIGHT*3/2*2);
-            clearString("Total steps:",                                  PEDOMETER_PAGE_MARGIN,      Y_TITLE + PEDOMETER_CHART_HEIGHT + FONT_SIZE_DEFAULT*FONT_CHAR_HEIGHT*2/3 +     FONT_SIZE_DEFAULT*FONT_CHAR_HEIGHT*3/2*1);
-            clearString(String(get_pedometer_days_steps()),              PEDOMETER_PAGE_MARGIN,      Y_TITLE + PEDOMETER_CHART_HEIGHT + FONT_SIZE_DEFAULT*FONT_CHAR_HEIGHT*2/3 +     FONT_SIZE_DEFAULT*FONT_CHAR_HEIGHT*3/2*2);
-            clearString("Target:",                                       PEDOMETER_PAGE_MARGIN,      Y_TITLE + PEDOMETER_CHART_HEIGHT + FONT_SIZE_DEFAULT*FONT_CHAR_HEIGHT*2/3 +     FONT_SIZE_DEFAULT*FONT_CHAR_HEIGHT*3/2*3);
-            clearString(String(get_pedometer_days_steps_min_limit()),    PEDOMETER_PAGE_MARGIN,      Y_TITLE + PEDOMETER_CHART_HEIGHT + FONT_SIZE_DEFAULT*FONT_CHAR_HEIGHT*2/3 +     FONT_SIZE_DEFAULT*FONT_CHAR_HEIGHT*3/2*4);
-        }
-
-        for(unsigned char i=0; i<PEDOMETER_DAYCHART_COLUMNS; i++){
-            if(draw){
-                setDrawColor(0, 255, 0);
-            }else{
-                setDrawColor_BackGroundColor();
-            } 
-
-            //debug("Column width: " + String(PEDOMETER_DAYCHART_COLUMN_WIDTH));
-            
-            #define Y1_CHART (FONT_SIZE_DEFAULT*FONT_CHAR_HEIGHT*3/2 + STYLE_STATUSBAR_HEIGHT + PEDOMETER_PAGE_MARGIN + PEDOMETER_CHART_HEIGHT)
-            #define Y2_CHART (FONT_SIZE_DEFAULT*FONT_CHAR_HEIGHT*3/2 + STYLE_STATUSBAR_HEIGHT + PEDOMETER_PAGE_MARGIN + PEDOMETER_CHART_HEIGHT - (pedometer_days_activity_max==0?0:(PEDOMETER_CHART_HEIGHT*get_pedometer_hours_steps(i)/pedometer_days_activity_max)))
-            #define X1_CHART (PEDOMETER_PAGE_MARGIN + (PEDOMETER_DAYCHART_COLUMN_WIDTH + PEDOMETER_DAYCHART_COLUMN_MARGINS_PX)*i)
-            #define X2_CHART (X1_CHART + PEDOMETER_DAYCHART_COLUMN_WIDTH - 1)
-
-            #define X_SRINGS PEDOMETER_PAGE_MARGIN
-            #define Y_SRINGS (Y1_CHART + FONT_CHAR_HEIGHT*FONT_SIZE_DEFAULT*7*(i+1)/5)
-            drawRect(X1_CHART, Y1_CHART, X2_CHART, Y2_CHART, true);
-            
-        }
-    }if(page==PEDOMETER_PAGES_SLEEP_MONITOR){
-        uint16_t pedometer_days_sleep_hours_max=0;
-        for(unsigned char i=0; i<PEDOMETER_CHART_COLUMNS; i++){
-            if(get_pedometer_days_sleep(i)>pedometer_days_sleep_hours_max) pedometer_days_sleep_hours_max = get_pedometer_days_sleep(i);
-        }
-
-        for(unsigned char i=0; i<PEDOMETER_CHART_COLUMNS; i++){
-            if(draw){
-                if(get_pedometer_days_sleep(i)<get_pedometer_days_sleep_min_limit()){
-                    setDrawColor(255 - 127*(int)i/7, 0, 0);
+            for(unsigned char i=0; i<PEDOMETER_DAYCHART_COLUMNS; i++){
+                if(draw){
+                    setDrawColor(0, 255, 0);
                 }else{
-                    setDrawColor(0, 0, 255 - 127*(int)i/7);
+                    setDrawColor_BackGroundColor();
+                } 
+
+                //debug("Column width: " + String(PEDOMETER_DAYCHART_COLUMN_WIDTH));
+                
+                #define Y1_CHART (FONT_SIZE_DEFAULT*FONT_CHAR_HEIGHT*3/2 + STYLE_STATUSBAR_HEIGHT + PEDOMETER_PAGE_MARGIN + PEDOMETER_CHART_HEIGHT)
+                #define Y2_CHART (FONT_SIZE_DEFAULT*FONT_CHAR_HEIGHT*3/2 + STYLE_STATUSBAR_HEIGHT + PEDOMETER_PAGE_MARGIN + PEDOMETER_CHART_HEIGHT - (pedometer_days_activity_max==0?0:(PEDOMETER_CHART_HEIGHT*get_pedometer_hours_steps(i)/pedometer_days_activity_max)))
+                #define X1_CHART (PEDOMETER_PAGE_MARGIN + (PEDOMETER_DAYCHART_COLUMN_WIDTH + PEDOMETER_DAYCHART_COLUMN_MARGINS_PX)*i)
+                #define X2_CHART (X1_CHART + PEDOMETER_DAYCHART_COLUMN_WIDTH - 1)
+
+                #define X_SRINGS PEDOMETER_PAGE_MARGIN
+                #define Y_SRINGS (Y1_CHART + FONT_CHAR_HEIGHT*FONT_SIZE_DEFAULT*7*(i+1)/5)
+                drawRect(X1_CHART, Y1_CHART, X2_CHART, Y2_CHART, true);
+                
+            }
+        }if(page==PEDOMETER_PAGES_SLEEP_MONITOR){
+            uint16_t pedometer_days_sleep_hours_max=0;
+            for(unsigned char i=0; i<PEDOMETER_CHART_COLUMNS; i++){
+                if(get_pedometer_days_sleep(i)>pedometer_days_sleep_hours_max) pedometer_days_sleep_hours_max = get_pedometer_days_sleep(i);
+            }
+
+            for(unsigned char i=0; i<PEDOMETER_CHART_COLUMNS; i++){
+                if(draw){
+                    if(get_pedometer_days_sleep(i)<get_pedometer_days_sleep_min_limit()){
+                        setDrawColor(255 - 127*(int)i/7, 0, 0);
+                    }else{
+                        setDrawColor(0, 0, 255 - 127*(int)i/7);
+                    }
+                    
+                }else{setDrawColor_BackGroundColor();} 
+                
+                #define Y1_CHART (STYLE_STATUSBAR_HEIGHT + PEDOMETER_PAGE_MARGIN + PEDOMETER_CHART_HEIGHT)
+                #define Y2_CHART (STYLE_STATUSBAR_HEIGHT + PEDOMETER_PAGE_MARGIN + PEDOMETER_CHART_HEIGHT - (pedometer_days_sleep_hours_max==0?0:(PEDOMETER_CHART_HEIGHT*get_pedometer_days_sleep(i)/pedometer_days_sleep_hours_max) ))
+                #define X1_CHART (PEDOMETER_PAGE_MARGIN + (PEDOMETER_CHART_COLUMN_WIDTH + PEDOMETER_CHART_COLUMN_MARGINS_PX)*i)
+                #define X2_CHART (X1_CHART + PEDOMETER_CHART_COLUMN_WIDTH - 1)
+
+                #define X_SRINGS PEDOMETER_PAGE_MARGIN
+                #define Y_SRINGS (Y1_CHART + FONT_CHAR_HEIGHT*FONT_SIZE_DEFAULT*7*(i+1)/5)
+                drawRect(X1_CHART, Y1_CHART, X2_CHART, Y2_CHART, true);
+
+                if(draw){
+                    setDrawColor_ContrastColor();
+                    drawString(String(get_pedometer_days_sleep(i)) + " sleep m.", X_SRINGS, Y_SRINGS);
+                }else{
+                    setDrawColor_BackGroundColor();
+                    clearString(String(get_pedometer_days_sleep(i)) + " sleep m.", X_SRINGS, Y_SRINGS);
                 }
                 
-            }else{setDrawColor_BackGroundColor();} 
-            
-            #define Y1_CHART (STYLE_STATUSBAR_HEIGHT + PEDOMETER_PAGE_MARGIN + PEDOMETER_CHART_HEIGHT)
-            #define Y2_CHART (STYLE_STATUSBAR_HEIGHT + PEDOMETER_PAGE_MARGIN + PEDOMETER_CHART_HEIGHT - (pedometer_days_sleep_hours_max==0?0:(PEDOMETER_CHART_HEIGHT*get_pedometer_days_sleep(i)/pedometer_days_sleep_hours_max) ))
-            #define X1_CHART (PEDOMETER_PAGE_MARGIN + (PEDOMETER_CHART_COLUMN_WIDTH + PEDOMETER_CHART_COLUMN_MARGINS_PX)*i)
-            #define X2_CHART (X1_CHART + PEDOMETER_CHART_COLUMN_WIDTH - 1)
+            }
+        }if(page==PEDOMETER_PAGES_SLEEP_STATISTICS){
+            uint16_t pedometer_days_activity_max=0;
+            for(unsigned char i=0; i<PEDOMETER_DAYCHART_COLUMNS; i++){
+                if(get_pedometer_hours_sleep(i)>pedometer_days_activity_max) pedometer_days_activity_max = get_pedometer_hours_sleep(i);
+            }
 
-            #define X_SRINGS PEDOMETER_PAGE_MARGIN
-            #define Y_SRINGS (Y1_CHART + FONT_CHAR_HEIGHT*FONT_SIZE_DEFAULT*7*(i+1)/5)
-            drawRect(X1_CHART, Y1_CHART, X2_CHART, Y2_CHART, true);
+            #define X_TITLE SCREEN_WIDTH/2
+            #define Y_TITLE STYLE_STATUSBAR_HEIGHT + PEDOMETER_PAGE_MARGIN
 
             if(draw){
                 setDrawColor_ContrastColor();
-                drawString(String(get_pedometer_days_sleep(i)) + " sleep m.", X_SRINGS, Y_SRINGS);
+                drawString_centered("Day activity", X_TITLE, Y_TITLE);
+
+                //drawString("Day mesures:",                                  PEDOMETER_PAGE_MARGIN,      Y_TITLE + PEDOMETER_CHART_HEIGHT + FONT_SIZE_DEFAULT*FONT_CHAR_HEIGHT*2/3 +     FONT_SIZE_DEFAULT*FONT_CHAR_HEIGHT*3/2*1);
+                //drawString(String(getPedometr_mesurings_in_a_day()),        PEDOMETER_PAGE_MARGIN,      Y_TITLE + PEDOMETER_CHART_HEIGHT + FONT_SIZE_DEFAULT*FONT_CHAR_HEIGHT*2/3 +     FONT_SIZE_DEFAULT*FONT_CHAR_HEIGHT*3/2*2);
+                drawString("Sleep hours:",                                  PEDOMETER_PAGE_MARGIN,      Y_TITLE + PEDOMETER_CHART_HEIGHT + FONT_SIZE_DEFAULT*FONT_CHAR_HEIGHT*2/3 +     FONT_SIZE_DEFAULT*FONT_CHAR_HEIGHT*3/2*1);
+                drawString(String(get_pedometer_days_sleep_hours()),        PEDOMETER_PAGE_MARGIN,      Y_TITLE + PEDOMETER_CHART_HEIGHT + FONT_SIZE_DEFAULT*FONT_CHAR_HEIGHT*2/3 +     FONT_SIZE_DEFAULT*FONT_CHAR_HEIGHT*3/2*2);
+                drawString("Target:",                                       PEDOMETER_PAGE_MARGIN,      Y_TITLE + PEDOMETER_CHART_HEIGHT + FONT_SIZE_DEFAULT*FONT_CHAR_HEIGHT*2/3 +     FONT_SIZE_DEFAULT*FONT_CHAR_HEIGHT*3/2*3);
+                drawString(String(get_pedometer_days_sleep_min_limit()),    PEDOMETER_PAGE_MARGIN,      Y_TITLE + PEDOMETER_CHART_HEIGHT + FONT_SIZE_DEFAULT*FONT_CHAR_HEIGHT*2/3 +     FONT_SIZE_DEFAULT*FONT_CHAR_HEIGHT*3/2*4);
+                
             }else{
                 setDrawColor_BackGroundColor();
-                clearString(String(get_pedometer_days_sleep(i)) + " sleep m.", X_SRINGS, Y_SRINGS);
+                clearString_centered("Day activity", X_TITLE, Y_TITLE);
+
+                //clearString("Day mesures:",                                  PEDOMETER_PAGE_MARGIN,      Y_TITLE + PEDOMETER_CHART_HEIGHT + FONT_SIZE_DEFAULT*FONT_CHAR_HEIGHT*2/3 +     FONT_SIZE_DEFAULT*FONT_CHAR_HEIGHT*3/2*1);
+                //clearString(String(getPedometr_mesurings_in_a_day()),        PEDOMETER_PAGE_MARGIN,      Y_TITLE + PEDOMETER_CHART_HEIGHT + FONT_SIZE_DEFAULT*FONT_CHAR_HEIGHT*2/3 +     FONT_SIZE_DEFAULT*FONT_CHAR_HEIGHT*3/2*2);
+                clearString("Sleep hours:",                                  PEDOMETER_PAGE_MARGIN,      Y_TITLE + PEDOMETER_CHART_HEIGHT + FONT_SIZE_DEFAULT*FONT_CHAR_HEIGHT*2/3 +     FONT_SIZE_DEFAULT*FONT_CHAR_HEIGHT*3/2*1);
+                clearString(String(get_pedometer_days_sleep_hours()),        PEDOMETER_PAGE_MARGIN,      Y_TITLE + PEDOMETER_CHART_HEIGHT + FONT_SIZE_DEFAULT*FONT_CHAR_HEIGHT*2/3 +     FONT_SIZE_DEFAULT*FONT_CHAR_HEIGHT*3/2*2);
+                clearString("Target:",                                       PEDOMETER_PAGE_MARGIN,      Y_TITLE + PEDOMETER_CHART_HEIGHT + FONT_SIZE_DEFAULT*FONT_CHAR_HEIGHT*2/3 +     FONT_SIZE_DEFAULT*FONT_CHAR_HEIGHT*3/2*3);
+                clearString(String(get_pedometer_days_sleep_min_limit()),    PEDOMETER_PAGE_MARGIN,      Y_TITLE + PEDOMETER_CHART_HEIGHT + FONT_SIZE_DEFAULT*FONT_CHAR_HEIGHT*2/3 +     FONT_SIZE_DEFAULT*FONT_CHAR_HEIGHT*3/2*4);
             }
-            
+
+            for(unsigned char i=0; i<PEDOMETER_DAYCHART_COLUMNS; i++){
+                if(draw){
+                    setDrawColor(0, 0, 255);
+                }else{
+                    setDrawColor_BackGroundColor();
+                } 
+
+                //debug("Column width: " + String(PEDOMETER_DAYCHART_COLUMN_WIDTH));
+                
+                #define Y1_CHART (FONT_SIZE_DEFAULT*FONT_CHAR_HEIGHT*3/2 + STYLE_STATUSBAR_HEIGHT + PEDOMETER_PAGE_MARGIN + PEDOMETER_CHART_HEIGHT)
+                #define Y2_CHART (FONT_SIZE_DEFAULT*FONT_CHAR_HEIGHT*3/2 + STYLE_STATUSBAR_HEIGHT + PEDOMETER_PAGE_MARGIN + PEDOMETER_CHART_HEIGHT - (pedometer_days_activity_max==0?0:(PEDOMETER_CHART_HEIGHT*get_pedometer_hours_sleep(i)/pedometer_days_activity_max) ))
+                #define X1_CHART (PEDOMETER_PAGE_MARGIN + (PEDOMETER_DAYCHART_COLUMN_WIDTH + PEDOMETER_DAYCHART_COLUMN_MARGINS_PX)*i)
+                #define X2_CHART (X1_CHART + PEDOMETER_DAYCHART_COLUMN_WIDTH - 1)
+
+                #define X_SRINGS PEDOMETER_PAGE_MARGIN
+                #define Y_SRINGS (Y1_CHART + FONT_CHAR_HEIGHT*FONT_SIZE_DEFAULT*7*(i+1)/5)
+                drawRect(X1_CHART, Y1_CHART, X2_CHART, Y2_CHART, true);
+                
+            }
         }
-    }if(page==PEDOMETER_PAGES_SLEEP_STATISTICS){
-        uint16_t pedometer_days_activity_max=0;
-        for(unsigned char i=0; i<PEDOMETER_DAYCHART_COLUMNS; i++){
-            if(get_pedometer_hours_sleep(i)>pedometer_days_activity_max) pedometer_days_activity_max = get_pedometer_hours_sleep(i);
-        }
-
-        #define X_TITLE SCREEN_WIDTH/2
-        #define Y_TITLE STYLE_STATUSBAR_HEIGHT + PEDOMETER_PAGE_MARGIN
-
-        if(draw){
-            setDrawColor_ContrastColor();
-            drawString_centered("Day activity", X_TITLE, Y_TITLE);
-
-            //drawString("Day mesures:",                                  PEDOMETER_PAGE_MARGIN,      Y_TITLE + PEDOMETER_CHART_HEIGHT + FONT_SIZE_DEFAULT*FONT_CHAR_HEIGHT*2/3 +     FONT_SIZE_DEFAULT*FONT_CHAR_HEIGHT*3/2*1);
-            //drawString(String(getPedometr_mesurings_in_a_day()),        PEDOMETER_PAGE_MARGIN,      Y_TITLE + PEDOMETER_CHART_HEIGHT + FONT_SIZE_DEFAULT*FONT_CHAR_HEIGHT*2/3 +     FONT_SIZE_DEFAULT*FONT_CHAR_HEIGHT*3/2*2);
-            drawString("Sleep hours:",                                  PEDOMETER_PAGE_MARGIN,      Y_TITLE + PEDOMETER_CHART_HEIGHT + FONT_SIZE_DEFAULT*FONT_CHAR_HEIGHT*2/3 +     FONT_SIZE_DEFAULT*FONT_CHAR_HEIGHT*3/2*1);
-            drawString(String(get_pedometer_days_sleep_hours()),        PEDOMETER_PAGE_MARGIN,      Y_TITLE + PEDOMETER_CHART_HEIGHT + FONT_SIZE_DEFAULT*FONT_CHAR_HEIGHT*2/3 +     FONT_SIZE_DEFAULT*FONT_CHAR_HEIGHT*3/2*2);
-            drawString("Target:",                                       PEDOMETER_PAGE_MARGIN,      Y_TITLE + PEDOMETER_CHART_HEIGHT + FONT_SIZE_DEFAULT*FONT_CHAR_HEIGHT*2/3 +     FONT_SIZE_DEFAULT*FONT_CHAR_HEIGHT*3/2*3);
-            drawString(String(get_pedometer_days_sleep_min_limit()),    PEDOMETER_PAGE_MARGIN,      Y_TITLE + PEDOMETER_CHART_HEIGHT + FONT_SIZE_DEFAULT*FONT_CHAR_HEIGHT*2/3 +     FONT_SIZE_DEFAULT*FONT_CHAR_HEIGHT*3/2*4);
-            
-        }else{
-            setDrawColor_BackGroundColor();
-            clearString_centered("Day activity", X_TITLE, Y_TITLE);
-
-            //clearString("Day mesures:",                                  PEDOMETER_PAGE_MARGIN,      Y_TITLE + PEDOMETER_CHART_HEIGHT + FONT_SIZE_DEFAULT*FONT_CHAR_HEIGHT*2/3 +     FONT_SIZE_DEFAULT*FONT_CHAR_HEIGHT*3/2*1);
-            //clearString(String(getPedometr_mesurings_in_a_day()),        PEDOMETER_PAGE_MARGIN,      Y_TITLE + PEDOMETER_CHART_HEIGHT + FONT_SIZE_DEFAULT*FONT_CHAR_HEIGHT*2/3 +     FONT_SIZE_DEFAULT*FONT_CHAR_HEIGHT*3/2*2);
-            clearString("Sleep hours:",                                  PEDOMETER_PAGE_MARGIN,      Y_TITLE + PEDOMETER_CHART_HEIGHT + FONT_SIZE_DEFAULT*FONT_CHAR_HEIGHT*2/3 +     FONT_SIZE_DEFAULT*FONT_CHAR_HEIGHT*3/2*1);
-            clearString(String(get_pedometer_days_sleep_hours()),        PEDOMETER_PAGE_MARGIN,      Y_TITLE + PEDOMETER_CHART_HEIGHT + FONT_SIZE_DEFAULT*FONT_CHAR_HEIGHT*2/3 +     FONT_SIZE_DEFAULT*FONT_CHAR_HEIGHT*3/2*2);
-            clearString("Target:",                                       PEDOMETER_PAGE_MARGIN,      Y_TITLE + PEDOMETER_CHART_HEIGHT + FONT_SIZE_DEFAULT*FONT_CHAR_HEIGHT*2/3 +     FONT_SIZE_DEFAULT*FONT_CHAR_HEIGHT*3/2*3);
-            clearString(String(get_pedometer_days_sleep_min_limit()),    PEDOMETER_PAGE_MARGIN,      Y_TITLE + PEDOMETER_CHART_HEIGHT + FONT_SIZE_DEFAULT*FONT_CHAR_HEIGHT*2/3 +     FONT_SIZE_DEFAULT*FONT_CHAR_HEIGHT*3/2*4);
-        }
-
-        for(unsigned char i=0; i<PEDOMETER_DAYCHART_COLUMNS; i++){
-            if(draw){
-                setDrawColor(0, 0, 255);
-            }else{
-                setDrawColor_BackGroundColor();
-            } 
-
-            //debug("Column width: " + String(PEDOMETER_DAYCHART_COLUMN_WIDTH));
-            
-            #define Y1_CHART (FONT_SIZE_DEFAULT*FONT_CHAR_HEIGHT*3/2 + STYLE_STATUSBAR_HEIGHT + PEDOMETER_PAGE_MARGIN + PEDOMETER_CHART_HEIGHT)
-            #define Y2_CHART (FONT_SIZE_DEFAULT*FONT_CHAR_HEIGHT*3/2 + STYLE_STATUSBAR_HEIGHT + PEDOMETER_PAGE_MARGIN + PEDOMETER_CHART_HEIGHT - (pedometer_days_activity_max==0?0:(PEDOMETER_CHART_HEIGHT*get_pedometer_hours_sleep(i)/pedometer_days_activity_max) ))
-            #define X1_CHART (PEDOMETER_PAGE_MARGIN + (PEDOMETER_DAYCHART_COLUMN_WIDTH + PEDOMETER_DAYCHART_COLUMN_MARGINS_PX)*i)
-            #define X2_CHART (X1_CHART + PEDOMETER_DAYCHART_COLUMN_WIDTH - 1)
-
-            #define X_SRINGS PEDOMETER_PAGE_MARGIN
-            #define Y_SRINGS (Y1_CHART + FONT_CHAR_HEIGHT*FONT_SIZE_DEFAULT*7*(i+1)/5)
-            drawRect(X1_CHART, Y1_CHART, X2_CHART, Y2_CHART, true);
-            
-        }
-    }
-
+    #endif
 }
 
 void appNameClass::onCreate(){

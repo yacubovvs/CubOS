@@ -30,7 +30,8 @@
 
 #define ON_TIME_CHANGE_EVERY_MS 1000
 
-//#define HARDWARE_BUTTONS_ENABLED              // Conf of controls with hardware btns    
+#define HARDWARE_BUTTONS_ENABLED              // Conf of controls with hardware btns    
+
 #define TOUCH_SCREEN_ENABLE
 
 #define COLOR_SCREEN                     // Screen is colored

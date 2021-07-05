@@ -52,8 +52,11 @@
                 debug("Touch start");
             #endif
 
+            
             currentApp->onEvent(EVENT_ON_TOUCH_START, TOUCH_SCREEN_last_x, TOUCH_SCREEN_last_y);
-
+            #ifdef SOFTWARE_KEYBOARD_ENABLE
+                core_software_keyboard_onEvent(EVENT_ON_TOUCH_START, TOUCH_SCREEN_last_x, TOUCH_SCREEN_last_y);
+            #endif
         }else if(TOUCH_SCREEN_last_isTouching && !getTOUCH_SCREEN_isTouching()){
 
             TOUCH_SCREEN_last_isTouching = false;
@@ -61,7 +64,11 @@
             #ifdef CORE_TOUCH_DEBUG
                 debug("Touch released");
             #endif
+            
             currentApp->onEvent(EVENT_ON_TOUCH_RELEASED, getTOUCH_SCREEN_X(), getTOUCH_SCREEN_Y());
+            #ifdef SOFTWARE_KEYBOARD_ENABLE
+                core_software_keyboard_onEvent(EVENT_ON_TOUCH_RELEASED, getTOUCH_SCREEN_X(), getTOUCH_SCREEN_Y());
+            #endif
 
             if(!TOUCH_SCREEN_isDragging && millis()-TOUCH_SCREEN_touch_start_ms<TOUCH_SCREEN_TIME_MS_FOR_LONG_TOUCH){
                 
@@ -75,12 +82,18 @@
                             debug("Touch click");
                         #endif    
                         currentApp->onEvent(EVENT_ON_TOUCH_CLICK, getTOUCH_SCREEN_X(), getTOUCH_SCREEN_Y());
+                        #ifdef SOFTWARE_KEYBOARD_ENABLE
+                            core_software_keyboard_onEvent(EVENT_ON_TOUCH_CLICK, getTOUCH_SCREEN_X(), getTOUCH_SCREEN_Y());
+                        #endif
                     }
                 #else
                     #ifdef CORE_TOUCH_DEBUG
                         debug("Touch click");
                     #endif    
                     currentApp->onEvent(EVENT_ON_TOUCH_CLICK, getTOUCH_SCREEN_X(), getTOUCH_SCREEN_Y());
+                    #ifdef SOFTWARE_KEYBOARD_ENABLE
+                        core_software_keyboard_onEvent(EVENT_ON_TOUCH_CLICK, getTOUCH_SCREEN_X(), getTOUCH_SCREEN_Y());
+                    #endif
                 #endif
                 
             }else{
@@ -111,14 +124,23 @@
                 #ifdef CORE_TOUCH_DEBUG
                     debug("Touch drag");
                 #endif
+                
                 currentApp->onEvent(EVENT_ON_TOUCH_DRAG, dx, dy);
+                #ifdef SOFTWARE_KEYBOARD_ENABLE
+                    core_software_keyboard_onEvent(EVENT_ON_TOUCH_DRAG, dx, dy);
+                #endif
+
             }else if(!TOUCH_SCREEN_isLongPressed && millis()-TOUCH_SCREEN_touch_start_ms>TOUCH_SCREEN_TIME_MS_FOR_LONG_TOUCH){
                 TOUCH_SCREEN_isLongPressed = true;
 
                 #ifdef CORE_TOUCH_DEBUG
                     debug("Touch long press");
                 #endif
+                
                 currentApp->onEvent(EVENT_ON_TOUCH_LONG_PRESS, getTOUCH_SCREEN_X(), getTOUCH_SCREEN_Y());
+                #ifdef SOFTWARE_KEYBOARD_ENABLE
+                    core_software_keyboard_onEvent(EVENT_ON_TOUCH_LONG_PRESS, getTOUCH_SCREEN_X(), getTOUCH_SCREEN_Y());
+                #endif
             }
             
         } 

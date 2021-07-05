@@ -79,6 +79,7 @@ void setup(){
           debug("Background start " + String(millis()), 10);
           //core_cpu_setup();
         #endif
+        core_cpu_setup();
         driver_controls_setup();
         #ifdef WAKEUP_DEBUG
           debug("Backgroung controls inited "  + String(millis()), 10);
@@ -114,7 +115,7 @@ void setup(){
   #endif
 
   #ifdef ESP8266
-      ESP.wdtDisable();
+    ESP.wdtDisable();
   #endif
 
   #ifdef CPU_CONTROLL_ENABLE

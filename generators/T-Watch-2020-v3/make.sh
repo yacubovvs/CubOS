@@ -25,13 +25,18 @@ cp sdk/apps/app_filemanager.ino     outputs/T-Watch-2020-v3/cubos/
 cp sdk/apps/app_internet.ino        outputs/T-Watch-2020-v3/cubos/
 cp sdk/apps/app_simplegame.ino      outputs/T-Watch-2020-v3/cubos/
 cp sdk/apps/app_touchTest.ino       outputs/T-Watch-2020-v3/cubos/
+cp sdk/apps/app_pedometer_test.ino  outputs/T-Watch-2020-v3/cubos/
+cp sdk/apps/app_pedometer.ino       outputs/T-Watch-2020-v3/cubos/
+cp sdk/apps/app_ble_tester.ino      outputs/T-Watch-2020-v3/cubos/
 cp sdk/apps/app_z_menu_touch.ino    outputs/T-Watch-2020-v3/cubos/
 
 # Drivers
 #cp sdk/drivers/driver_battery_m5stickC.ino                  outputs/T-Watch-2020-v3/cubos/     
+cp sdk/drivers/driver_setup_ttgo_watch2020v3.ino            outputs/T-Watch-2020-v3/cubos/
 cp sdk/drivers/driver_display_ST7789_ttwatch_spi.ino        outputs/T-Watch-2020-v3/cubos/
 cp sdk/drivers/driver_touchscreen_ttwatch.ino               outputs/T-Watch-2020-v3/cubos/     
-#cp sdk/drivers/driver_controls_watch7.ino                   outputs/T-Watch-2020-v3/cubos/     
+cp sdk/drivers/driver_controls_tt-watch-2020.ino            outputs/T-Watch-2020-v3/cubos/     
+cp sdk/drivers/driver_cpu_TTGO_watch2020_v3.ino             outputs/T-Watch-2020-v3/cubos/     
 #cp sdk/drivers/driver_rtc_ds3231.ino                        outputs/T-Watch-2020-v3/cubos/     
 #cp sdk/drivers/driver_cpu_m5StickS.ino                      outputs/T-Watch-2020-v3/cubos/     
 

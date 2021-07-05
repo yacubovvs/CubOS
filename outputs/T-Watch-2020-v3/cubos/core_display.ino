@@ -16,7 +16,9 @@
 
     FRAMEBUFFER_TYPE * FRAMEBUFFER_currentFrame;
     FRAMEBUFFER_TYPE * FRAMEBUFFER_newFrame;
-    bool FRAMEBUFFER_pixelChangedchanged[SCREEN_WIDTH*SCREEN_HEIGHT + 1];
+    bool FRAMEBUFFER_pixelChanged_x[SCREEN_WIDTH];
+    bool FRAMEBUFFER_pixelChanged_y[SCREEN_HEIGHT];
+    bool FRAMEBUFFER_pixelChanged[SCREEN_WIDTH*SCREEN_HEIGHT + 1];
 
   #endif
 #endif
@@ -208,8 +210,7 @@ void setDrawColor(uint16_t color){
       for(int x=0; x<SCREEN_WIDTH; x++){
         for(int y=0; y<SCREEN_HEIGHT; y++){
           long position = y * SCREEN_WIDTH + x;
-
-          FRAMEBUFFER_pixelChangedchanged[x + SCREEN_WIDTH*y] = false;
+          FRAMEBUFFER_pixelChanged[x + SCREEN_WIDTH*y] = false;
           FRAMEBUFFER_new_setPixel(x, y, 0);
           FRAMEBUFFER_current_setPixel(x, y, 0);
         }
@@ -756,6 +757,10 @@ void clearString(String dString, int x, int y, unsigned char fontSize){
   clearString(element_value, x, y, fontSize);
 }
 
+void clearString(String dString, int x, int y){
+  clearString(dString, x, y, FONT_SIZE_DEFAULT);
+}
+
 void drawString_centered(char * dString, int x, int y){
   drawString(dString, x - strlen(dString)*FONT_CHAR_WIDTH/2, y);  
 }
@@ -819,21 +824,27 @@ void core_display_loop(){
         bool shown = false;
 
         for(int y=0; y<SCREEN_HEIGHT; y++){
-          for(int x=0; x<SCREEN_WIDTH; x++){
-            if(FRAMEBUFFER_pixelChangedchanged[x + (SCREEN_WIDTH-1)*y]==true){
-              long position = y * (SCREEN_WIDTH-1) + x;  
-              uint16_t newColor = FRAMEBUFFER_new_getPixel(position);
-            
-              if(FRAMEBUFFER_current_getPixel(position)!=newColor){
-                display_driver_setPixel(x, y, newColor);
-                FRAMEBUFFER_current_setPixel(position, newColor);
-                FRAMEBUFFER_pixelChangedchanged[x + (SCREEN_WIDTH-1)*y] = false;
+          if(FRAMEBUFFER_pixelChanged_y[y]){
+            for(int x=0; x<SCREEN_WIDTH; x++){
+              if(FRAMEBUFFER_pixelChanged_x[x]){
+                long position = y * (SCREEN_WIDTH-1) + x;  
+                if(FRAMEBUFFER_pixelChanged[position]==true){
+                  uint16_t newColor = FRAMEBUFFER_new_getPixel(position);
+                  if(FRAMEBUFFER_current_getPixel(position)!=newColor){
+                    display_driver_setPixel(x, y, newColor);
+                    FRAMEBUFFER_current_setPixel(position, newColor);
+                    FRAMEBUFFER_pixelChanged[position] = false;
+                  }
+                }
               }
             }
           }
         }
 
-        //FRAMEBUFFER_pixelChangedchanged[239 + (SCREEN_WIDTH-1)*239] = true;
+        for(int x=0; x<SCREEN_WIDTH; x++){ FRAMEBUFFER_pixelChanged_x[x] = false;}
+        for(int y=0; y<SCREEN_HEIGHT; y++){ FRAMEBUFFER_pixelChanged_y[y] = false;}
+
+        //FRAMEBUFFER_pixelChanged[239 + (SCREEN_WIDTH-1)*239] = true;
         //FRAMEBUFFER_new_setPixel(239,239, 65535);
       }
       setFRAMEBUFFER_isChanged(false);
@@ -854,7 +865,10 @@ void drawPixel(int x, int y){
       FRAMEBUFFER_new_setPixel(x, y, getDrawColor());
 
       long position = x + (SCREEN_WIDTH-1)*y;
-      if(position>=0 && position<=SCREEN_HEIGHT*SCREEN_WIDTH) FRAMEBUFFER_pixelChangedchanged[position] = true;
+      if(position>=0 && position<=SCREEN_HEIGHT*SCREEN_WIDTH) FRAMEBUFFER_pixelChanged[position] = true;
+
+      FRAMEBUFFER_pixelChanged_x[x] = true;
+      FRAMEBUFFER_pixelChanged_y[y] = true;
 
       if(!getFRAMEBUFFER_isChanged()) setFRAMEBUFFER_isChanged(true);
       

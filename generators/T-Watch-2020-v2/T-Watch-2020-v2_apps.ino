@@ -18,6 +18,10 @@
 #define APP_MENU_APPLICATIONS_9             TestApplicationApp
 #define APP_MENU_APPLICATIONS_10            BatteryApp
 #define APP_MENU_APPLICATIONS_11            TouchTest
+#define APP_MENU_APPLICATIONS_12            PedometerApp
+#define APP_MENU_APPLICATIONS_13            PedometerAppTest
+#define APP_MENU_APPLICATIONS_14            BleTester
+
 
 /*
     # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
