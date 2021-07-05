@@ -195,8 +195,6 @@
 //      FOR ESP8266 USE NONOSSDK 2.2.2 +
 // ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! !
 
-#define DEBUG_SERIAL
-
 #define SCREEN_WIDTH            80     // Screen resolution width
 #define SCREEN_HEIGHT           160     // Screen resolution height
 
@@ -218,14 +216,14 @@
 
 //#define toDefaultApp_onLeftLongPress
 
-#define STARTING_APP_NUMM   -1      // for Mainmenu (default app)
-//#define STARTING_APP_NUMM    3      // Pedometer
-#define STARTING_APP_NUMM    0    // Clock
+#define STARTING_APP_NUMM   -1    // for Mainmenu (default app)
+//#define STARTING_APP_NUMM    1 // Settings
+//#define STARTING_APP_NUMM    2 // Pedometer
+#define STARTING_APP_NUMM    0
 
 #define FONT_SIZE_DEFAULT   1
 
 #define CPU_SLEEP_ENABLE
-#define ACCELEROMETER_ENABLE
 
 #define BATTERY_ENABLE
 #define CLOCK_ENABLE
@@ -247,31 +245,48 @@
 #define FRAMEBUFFER_TWIN_FULL
 #define FRAMEBUFFER_BYTE_PER_PIXEL 2
 
+//#define SCREEN_INVERT_COLORS
+#define SCREEN_CHANGE_BLUE_RED
+
+#define DRIVER_RTC_INTERRUPT_PIN    34
+
 #define IN_APP_SLEEP_TYPE       SLEEP_LIGHT
-//#define STAND_BY_SLEEP_TYPE     SLEEP_LIGHT
+//#define STAND_BY_SLEEP_TYPE     SLEEP_LIGHT_SCREEN_OFF
 #define STAND_BY_SLEEP_TYPE     SLEEP_DEEP
 
 #undef SMOOTH_BACKLIGHT_CONTROL_DELAY_CHANGE
-//#undef DISPLAY_BACKLIGHT_CONTROL_ENABLE
-//#undef DISPLAY_BACKLIGHT_FADE_CONTROL_ENABLE
+#undef DISPLAY_BACKLIGHT_CONTROL_ENABLE
 
-#define PEDOMETER_STEP_DETECTION_DELAY                  1000
+#define SMOOTH_ANIMATION_COEFFICIENT    4
+
+#define ACCELEROMETER_ENABLE
+//#define MAGNITOMETER_ENABLE
+#define PEDOMETER_ENABLE
+//#define PEDOMETER_DEBUG
+#undef DISPLAY_BACKLIGHT_FADE_CONTROL_ENABLE
+
+#define PEDOMETER_STEP_DETECTION_DELAY          20000 // Wake up to check accelerometer
+//#define PEDOMETER_STEP_DETECTION_DELAY          1000 // Wake up to check accelerometer
+#define DEFAULT_TIME_TO_POWEROFF_DISPLAY        7
+#define DEFAULT_DELAY_TO_FADE_DISPLAY           0
 #define PEDOMETER_STEP_DETECTION_PERIOD_MS              1000
+#define PEDOMETER_MESURES_IN_STEP_DETECTION_PERIOD      7
+#define PEDOMETER_DAY_STEP_LIMMIT_DEFAULT               10000
+
+#define PEDOMETER_DELTA_VALUE_MIN           0.47f
+#define PEDOMETER_CENTRALWIGHT_VALUE_MIN    0.17f
 
 #define PEDOMETER_STEP_DETECTION_DELAY_SEC_MIN          10
 #define PEDOMETER_STEP_DETECTION_DELAY_SEC_STEP         10
 #define PEDOMETER_STEP_DETECTION_DELAY_SEC_MAX          60 // MAX (255 - PEDOMETER_STEP_DETECTION_PERIOD_MS/1000) and multiple 60 seconds
 
-#define DEFAULT_DELAY_TO_FADE_DISPLAY       5
-#define DEFAULT_TIME_TO_POWEROFF_DISPLAY    5
-#define PEDOMETER_ENABLE
-//#define PEDOMETER_DEBUG
-
-#define PEDOMETER_DELTA_VALUE_MIN           0.47f
-#define PEDOMETER_CENTRALWIGHT_VALUE_MIN    0.17f
-
-#define CORE_PEDOMETER_SLEEP_COUNTING_SPOINTS   0 // mesures for sleep detection 
+#define CORE_PEDOMETER_SLEEP_COUNTING_SPOINTS   5 // mesures for sleep detection 
 #define CORE_PEDOMETER_SLEEP_MIN_ACCELL_100     3 // acceletometer sensitivity/100*G for sleep detection
+
+//#define DEBUG_SERIAL
+//#define PEDOMETER_DEBUG
+//#define WAKEUP_DEBUG
+
 /*
     ############################################################################################
     #                                                                                          #
@@ -579,12 +594,6 @@ void debug(String string, int delaytime){
 #define APP_MENU_APPLICATIONS_3             PedometerAppTest
 #define APP_MENU_APPLICATIONS_4             BatteryApp
 #define APP_MENU_APPLICATIONS_5             I2CScannerApp
-#define APP_MENU_APPLICATIONS_6             BleTester
-
-
-//#define APP_MENU_APPLICATIONS_5             TestApplicationApp
-
-
 
 /*
     # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
@@ -595,6 +604,7 @@ void debug(String string, int delaytime){
 */
 
 /*
+#define APP_MENU_APPLICATIONS_5             AppName
 #define APP_MENU_APPLICATIONS_6             AppName
 #define APP_MENU_APPLICATIONS_7             AppName
 #define APP_MENU_APPLICATIONS_8             AppName
