@@ -19,7 +19,7 @@ uint16_t getDrawColor(){
 void driver_display_setup(){
     ttgo = TTGOClass::getWatch();
     //ttgo->begin();
-    //ttgo->openBL();
+    ttgo->openBL();
     //ttgo->tft->fillScreen(BLACK);
 }
 

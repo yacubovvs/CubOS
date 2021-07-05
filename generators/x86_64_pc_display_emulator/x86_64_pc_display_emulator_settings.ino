@@ -39,7 +39,7 @@
 #define TOUCH_SCREEN_TIME_MS_FOR_LONG_TOUCH 300
 
 #define COLOR_SCREEN                     // Screen is colored
-//#define noAnimation                   // Caurse of framebuffer type
+//#define NO_ANIMATION                   // Caurse of framebuffer type
 
 //#define toDefaultApp_onLeftLongPress
 

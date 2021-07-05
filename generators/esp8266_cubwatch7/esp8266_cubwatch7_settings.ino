@@ -29,7 +29,7 @@
 //#define isTouchScreen                 // Conf of controls
 
 #define COLOR_SCREEN                     // Screen is colored
-#define noAnimation                     // Caurse of framebuffer type
+#define NO_ANIMATION                     // Caurse of framebuffer type
 
 //#define toDefaultApp_onLeftLongPress
 

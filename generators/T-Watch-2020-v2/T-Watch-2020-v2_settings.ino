@@ -35,7 +35,7 @@
 #define TOUCH_SCREEN_ENABLE
 
 #define COLOR_SCREEN                     // Screen is colored
-#define noAnimation                     
+#define NO_ANIMATION                     
 
 //#define toDefaultApp_onLeftLongPress
 

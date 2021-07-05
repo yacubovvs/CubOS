@@ -215,12 +215,13 @@
 
 #define ON_TIME_CHANGE_EVERY_MS 1000
 
-//#define HARDWARE_BUTTONS_ENABLED              // Conf of controls with hardware btns    
+#define DRIVER_CONTROLS_TOTALBUTTONS 1
+#define HARDWARE_BUTTONS_ENABLED              // Conf of controls with hardware btns    
 #define TOUCH_SCREEN_ENABLE
 //#define PEDOMETER_ENABLE
 
 #define COLOR_SCREEN                     // Screen is colored
-#define noAnimation                     
+//#define NO_ANIMATION                     
 
 //#define toDefaultApp_onLeftLongPress
 
@@ -248,6 +249,9 @@
 #define STYLE_STATUSBAR_HEIGHT  40 
 #define DRIVER_CONTROLS_TOTALBUTTONS 1
 #define CORE_SETUP_INIT
+
+#define DRIVER_CONTROLS_DELAY_BEFORE_LONG_PRESS     100
+#define CONTROLS_DELAY_TO_DOUBLE_CLICK_MS           100
 
 /*
     ############################################################################################

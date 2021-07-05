@@ -34,7 +34,7 @@ void driver_controls_setup(){
 */
 
 void driver_controls_loop(){
-  debug("driver_controls_loop");
+  //debug("driver_controls_loop");
   for (unsigned char i=0; i<DRIVER_CONTROLS_TOTALBUTTONS; i++){
     //if ((driver_control_isPositive[i]==true) ? (!digitalRead(driver_control_buttonsPins[i])) : (digitalRead(driver_control_buttonsPins[i]))){
     if(!digitalRead(AXP202_INT)){
@@ -60,6 +60,7 @@ void driver_controls_loop(){
         #ifdef CRIVER_CONTROLL_DEBUG
           debug("EVENT_BUTTON_RELEASED");
         #endif
+        driver_control_DOUBLE_PRESS_lastPress[i] = millis();
         
         if(driver_control_IS_LONG_PRESS[i]==false && driver_control_DOUBLE_PRESS_doublePressed[i]==false){
           onButtonEvent(EVENT_BUTTON_SHORT_PRESS, i);
@@ -67,6 +68,7 @@ void driver_controls_loop(){
             debug("EVENT_BUTTON_SHOTRPRESS");
           #endif
         }
+        
         
         driver_control_IS_LONG_PRESS[i]=false;
 
@@ -94,9 +96,16 @@ void driver_controls_loop(){
           #ifdef CRIVER_CONTROLL_DEBUG
             debug("EVENT_BUTTON_SHORT_SINGLE_PRESS");
           #endif
+        }else{
+          //debug("Not double press3 ! [1]: " + String(driver_control_DOUBLE_PRESS_lastPress[i]) + "\n [2]: " + String(_millis() - driver_control_DOUBLE_PRESS_lastPress[i]) + "\n [3]: " + String(CONTROLS_DELAY_TO_DOUBLE_CLICK_MS));
         }
-      }else driver_control_DOUBLE_PRESS_doublePressed[i] = false;
+      }else{
+        driver_control_DOUBLE_PRESS_doublePressed[i] = false;
+        //debug("Not double press2 ! [1]: " + String(driver_control_DOUBLE_PRESS_lastPress[i]) + "\n [2]: " + String(_millis() - driver_control_DOUBLE_PRESS_lastPress[i]) + "\n [3]: " + String(CONTROLS_DELAY_TO_DOUBLE_CLICK_MS));
+      }
       driver_control_DOUBLE_PRESS_lastPress[i]=0;
+    }else{
+      //debug("Not double press1 ! [1]: " + String(driver_control_DOUBLE_PRESS_lastPress[i]) + "\n [2]: " + String(_millis() - driver_control_DOUBLE_PRESS_lastPress[i]) + "\n [3]: " + String(CONTROLS_DELAY_TO_DOUBLE_CLICK_MS));
     }
   }
   
