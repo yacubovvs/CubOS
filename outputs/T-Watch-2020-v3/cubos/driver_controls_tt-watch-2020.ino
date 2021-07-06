@@ -1,6 +1,5 @@
-#include <LilyGoWatch.h>
 
-//#define DRIVER_CONTROLL_DEBUG
+#define DRIVER_CONTROLL_DEBUG
 #define _millis() millis()
 //#define TP_PWR_PIN          25
 
@@ -18,15 +17,28 @@ unsigned long driver_control_IS_LONG_PRESS[]                = {false};
 TTGOClass *watch_controlls;
 
 void driver_controls_setup(){
-  watch_controlls = TTGOClass::getWatch();
-  pinMode(AXP202_INT, INPUT);
   last_user_activity = _millis();
 }
 
 bool isDoubleOrSinglePressed = true;
 
 void driver_controls_loop(){
-  if (!digitalRead(AXP202_INT)){
+  if(get_core_driver_isLongPressed()){
+    onButtonEvent(EVENT_BUTTON_PRESSED, 0);
+    #ifdef DRIVER_CONTROLL_DEBUG
+      debug("EVENT_BUTTON_PRESSED");
+    #endif
+    onButtonEvent(EVENT_BUTTON_LONG_PRESS, 0);
+    #ifdef DRIVER_CONTROLL_DEBUG
+      debug("EVENT_BUTTON_LONG_PRESS");
+    #endif
+    onButtonEvent(EVENT_BUTTON_RELEASED, 0);
+    #ifdef DRIVER_CONTROLL_DEBUG
+      debug("EVENT_BUTTON_RELEASED");
+    #endif
+  }
+
+  if (get_core_driver_isShortPressed()){
     isDoubleOrSinglePressed = false;
     watch_controlls->power->clearIRQ();
 

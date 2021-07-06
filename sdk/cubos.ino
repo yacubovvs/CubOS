@@ -151,6 +151,11 @@ void setup(){
 
 bool isInSleep = false;
 void loop(){
+
+  #ifdef CORE_SETUP_INIT
+    core_loop_driver();
+  #endif
+
   //long t = millis();
   core_display_loop();
   driver_display_loop();

@@ -1,6 +1,3 @@
-#include <LilyGoWatch.h>
-
-TTGOClass *ttgo;
 
 uint16_t current_drawColor;
 
@@ -17,10 +14,7 @@ uint16_t getDrawColor(){
 }
 
 void driver_display_setup(){
-    ttgo = TTGOClass::getWatch();
-    //ttgo->begin();
-    ttgo->openBL();
-    //ttgo->tft->fillScreen(BLACK);
+    core_driver_openBL();
 }
 
 void sleep_displayDriver(){}
@@ -31,7 +25,7 @@ void driver_display_loop(){}
 
 void deriver_displayfillScreen(unsigned char red, unsigned char green, unsigned char blue){
   uint16_t fillColor = get_uint16Color(red, green, blue);
-  ttgo->tft->fillScreen(fillColor);
+  core_driver_fillScreen(fillColor);
   #ifdef FRAMEBUFFER_ENABLE
     FRAMEBUFFER_fill(fillColor);
   #endif
@@ -39,25 +33,25 @@ void deriver_displayfillScreen(unsigned char red, unsigned char green, unsigned 
 
 void display_driver_setPixel(int x, int y){
   #if defined(SCREEN_ROTATION_90)
-    ttgo->tft->drawPixel(SCREEN_WIDTH-x, SCREEN_HEIGHT-y, current_drawColor);
+    core_driver_drawPixel(SCREEN_WIDTH-x, SCREEN_HEIGHT-y, current_drawColor);
   #elif defined(SCREEN_ROTATION_180)
-    ttgo->tft->drawPixel(SCREEN_WIDTH-x, SCREEN_HEIGHT-y, current_drawColor);
+    core_driver_drawPixel(SCREEN_WIDTH-x, SCREEN_HEIGHT-y, current_drawColor);
   #elif defined(SCREEN_ROTATION_270)
-    ttgo->tft->drawPixel(SCREEN_WIDTH-x, SCREEN_HEIGHT-y, current_drawColor);
+    core_driver_drawPixel(SCREEN_WIDTH-x, SCREEN_HEIGHT-y, current_drawColor);
   #else
-    ttgo->tft->drawPixel(x, y, current_drawColor);
+    core_driver_drawPixel(x, y, current_drawColor);
   #endif
 }
 
 void display_driver_setPixel(int x, int y, uint16_t color){
   #if defined(SCREEN_ROTATION_90)
-    ttgo->tft->drawPixel(SCREEN_WIDTH-x, SCREEN_HEIGHT-y, color);
+    core_driver_drawPixel(SCREEN_WIDTH-x, SCREEN_HEIGHT-y, color);
   #elif defined(SCREEN_ROTATION_180)
-    ttgo->tft->drawPixel(SCREEN_WIDTH-x, SCREEN_HEIGHT-y, color);
+    core_driver_drawPixel(SCREEN_WIDTH-x, SCREEN_HEIGHT-y, color);
   #elif defined(SCREEN_ROTATION_270)
-    ttgo->tft->drawPixel(SCREEN_WIDTH-x, SCREEN_HEIGHT-y, color);
+    core_driver_drawPixel(SCREEN_WIDTH-x, SCREEN_HEIGHT-y, color);
   #else
-    ttgo->tft->drawPixel(x, y, color);
+    core_driver_drawPixel(x, y, color);
   #endif
 }
 
