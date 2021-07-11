@@ -1,6 +1,10 @@
 #define appNameClass    ClockApp          // App name without spaces
 #define appName         "Clock"              // App name with spaces 
 
+#ifndef APP_CLOCK_POWER_AFTER_SECONDS
+    #define APP_CLOCK_POWER_AFTER_SECONDS 0 
+#endif
+
 #ifdef PLATFORM_PC_EMULATOR
     long get_pedometer_days_steps(){
         return 12315;
@@ -37,6 +41,7 @@ class appNameClass: public Application{
         String last_minutes         = "";
 
         String last_date            = "";
+        String sleep_time           = "";
 
         #ifdef BATTERY_ENABLE
             unsigned char last_battery  = 0;
@@ -48,12 +53,14 @@ class appNameClass: public Application{
         #endif
 
         void drawSecondsCircle(bool draw, unsigned char second);
-        void drawStepsCircle(bool draw);
+        #ifdef PEDOMETER_ENABLE
+            void drawStepsCircle(bool draw);
+        #endif
       
 };
 
 #define SECONDS_CIRCLE_X        (SCREEN_WIDTH/2)
-#define SECONDS_CIRCLE_Y        (SCREEN_HEIGHT/2 - 10)
+#define SECONDS_CIRCLE_Y        (SCREEN_HEIGHT/2 - 20)
 #define SECONDS_CIRCLE_RADIUS   (SCREEN_WIDTH/2-2)
 #define BATTERY_LABEL_Y_POSITION (STYLE_STATUSBAR_HEIGHT/2 + 2)
 
@@ -70,7 +77,11 @@ void appNameClass::onCreate(){
     this->last_seconds = core_time_getSeconds_byte();
     for(unsigned char isecond=0; isecond<=this->last_seconds; isecond++) this->drawSecondsCircle(true, isecond);
     this->draw_current_time(true);
-    this->drawStepsCircle(true);
+    #ifdef PEDOMETER_ENABLE
+        this->drawStepsCircle(true);
+    #endif
+
+    this->sleep_device_after = APP_CLOCK_POWER_AFTER_SECONDS;
 
 }
 
@@ -131,22 +142,24 @@ void appNameClass::onEvent(unsigned char event, int val1, int val2){
 #define NARROW_CLOCK_STRING3 125
 */
 
-void appNameClass::drawStepsCircle(bool draw){
-    if(draw){
-        //int grad_i = (long)360 * (long)6800 / (long)10000;
-        int grad_i = (long)360 * (long)get_pedometer_days_steps() / (long)get_pedometer_days_steps_min_limit();
-        if(grad_i>360) grad_i = 360;
-        for(int grad=0; grad<=grad_i; grad++){
-            
-            setGradientColor(46, 255, 0, 255, 85, 0, 360, grad);
-            drawArc(SECONDS_CIRCLE_X, SECONDS_CIRCLE_Y, SECONDS_CIRCLE_RADIUS-4, -90 + grad, -90 + grad + 2, 8, true);
+#ifdef PEDOMETER_ENABLE
+    void appNameClass::drawStepsCircle(bool draw){
+        if(draw){
+            //int grad_i = (long)360 * (long)6800 / (long)10000;
+            int grad_i = (long)360 * (long)get_pedometer_days_steps() / (long)get_pedometer_days_steps_min_limit();
+            if(grad_i>360) grad_i = 360;
+            for(int grad=0; grad<=grad_i; grad++){
+                
+                setGradientColor(46, 255, 0, 255, 85, 0, 360, grad);
+                drawArc(SECONDS_CIRCLE_X, SECONDS_CIRCLE_Y, SECONDS_CIRCLE_RADIUS-4, -90 + grad, -90 + grad + 2, 8, true);
+            }
+        }else{
+            setDrawColor_BackGroundColor();
+            int grad = 360;
+            drawArc(SECONDS_CIRCLE_X, SECONDS_CIRCLE_Y, SECONDS_CIRCLE_RADIUS-4, -90 + 0, -90 + grad + 8, 8, true);
         }
-    }else{
-        setDrawColor_BackGroundColor();
-        int grad = 360;
-        drawArc(SECONDS_CIRCLE_X, SECONDS_CIRCLE_Y, SECONDS_CIRCLE_RADIUS-4, -90 + 0, -90 + grad + 8, 8, true);
     }
-}
+#endif
 
 void appNameClass::drawSecondsCircle(bool draw, unsigned char second){
     if(draw) setDrawColor(0, 0, 255);
@@ -210,65 +223,86 @@ void appNameClass::draw_current_time(bool draw){
                 last_battery_charging   = driver_battery_isCharging();
             }
 
+            #define STATUSBAR_LABELS_OFFSET_Y (-3)
             #define BATTERY_LABEL_ICON_OFFSET (-4)
 
             // (battery icon 32x16 px) 
-            drawBatteryIcon(SCREEN_WIDTH/2 + 3 + BATTERY_LABEL_ICON_OFFSET, BATTERY_LABEL_Y_POSITION - 8 + 1, last_battery, last_battery_charging, draw);
+            drawBatteryIcon(SCREEN_WIDTH/2 + 3 + BATTERY_LABEL_ICON_OFFSET, STATUSBAR_LABELS_OFFSET_Y+ BATTERY_LABEL_Y_POSITION - 8 + 1, last_battery, last_battery_charging, draw);
             String battery_percent_toPrint = String(last_battery) + "%";
 
             if(draw){
                 setDrawColor_ContrastColor();
-                drawString(battery_percent_toPrint, SCREEN_WIDTH/2 - battery_percent_toPrint.length()*FONT_CHAR_WIDTH - 3 + BATTERY_LABEL_ICON_OFFSET, BATTERY_LABEL_Y_POSITION - FONT_CHAR_HEIGHT/2 + 1, 1);
+                drawString(battery_percent_toPrint, SCREEN_WIDTH/2 - battery_percent_toPrint.length()*FONT_CHAR_WIDTH - 3 + BATTERY_LABEL_ICON_OFFSET, STATUSBAR_LABELS_OFFSET_Y + BATTERY_LABEL_Y_POSITION - FONT_CHAR_HEIGHT/2 + 1, 1);
             }else{
                 setDrawColor_BackGroundColor();  
-                clearString(battery_percent_toPrint, SCREEN_WIDTH/2 - battery_percent_toPrint.length()*FONT_CHAR_WIDTH - 3 + BATTERY_LABEL_ICON_OFFSET, BATTERY_LABEL_Y_POSITION - FONT_CHAR_HEIGHT/2 + 1, 1);
+                clearString(battery_percent_toPrint, SCREEN_WIDTH/2 - battery_percent_toPrint.length()*FONT_CHAR_WIDTH - 3 + BATTERY_LABEL_ICON_OFFSET, STATUSBAR_LABELS_OFFSET_Y + BATTERY_LABEL_Y_POSITION - FONT_CHAR_HEIGHT/2 + 1, 1);
             } 
-        #endif
+        #endif        
 
+        // SLEEP
+        #define SLEEP_LABEL_POSITION_Y (SCREEN_HEIGHT - 35)
         // DATE
-        #define DATE_LABEL_POSITION_Y (SCREEN_HEIGHT - 38)
-        
-        if(draw){
-            this->last_date = core_time_getDateFull();
-            //setDrawColor_ContrastColor();
-            setDrawColor(192,192,192);
-            drawString_centered(last_date, SCREEN_WIDTH/2, DATE_LABEL_POSITION_Y, 1);
-        }else{
-            setDrawColor_BackGroundColor();  
-            clearString_centered(last_date, SCREEN_WIDTH/2, DATE_LABEL_POSITION_Y, 1);
-        }
-        
-
+        #define DATE_LABEL_POSITION_Y (SCREEN_HEIGHT - 54)
         // PEDOMETER
-        #define PEDOMETER_LABEL_POSITION_Y (SCREEN_HEIGHT - 18)
+        #define PEDOMETER_LABEL_POSITION_Y (SCREEN_HEIGHT - 14)
         #define PEDOMETER_LABEL_POSITION_X_OFFSET (0)
         #define PEDOMETER_LABEL_POSITION_PADDING (3)
+
+        if(draw){
+            this->last_date = core_time_getDateFull();
+            setDrawColor(192,192,192);
+            drawString_centered(this->last_date, SCREEN_WIDTH/2, DATE_LABEL_POSITION_Y, 1);
+        }else{
+            setDrawColor_BackGroundColor();  
+            clearString_centered(this->last_date, SCREEN_WIDTH/2, DATE_LABEL_POSITION_Y, 1);
+        }
+
         #if defined(PEDOMETER_ENABLE) || defined(PEDOMETER_EMULATOR)
             
-            if(draw) this->last_pedometer = get_pedometer_days_steps();
-            String pedometer_toPrint = String(this->last_pedometer);
+            if(draw){
+                this->last_pedometer = get_pedometer_days_steps();
+                this->sleep_time = get_pedometer_days_sleep_hours();
+            }
 
-            // 16 - leg icon width
+            String pedometer_toPrint = String(this->last_pedometer);
+            String sleep_toPrint = String(this->sleep_time) + "  ";
+
+            // 16px - leg and sleep icon width
             int pedometer_label_width_05 = (PEDOMETER_LABEL_POSITION_PADDING*2 + 16 + pedometer_toPrint.length()*FONT_CHAR_WIDTH)/2;
-            
-            // 16 - leg icon width
+            int sleep_label_width_05 = (PEDOMETER_LABEL_POSITION_PADDING*2 + 16 + sleep_toPrint.length()*FONT_CHAR_WIDTH)/2;
+
             drawImage(draw, getIcon_legs_grey(), 
                 SCREEN_WIDTH/2 + pedometer_label_width_05 - 16 + PEDOMETER_LABEL_POSITION_X_OFFSET, 
                 PEDOMETER_LABEL_POSITION_Y + PEDOMETER_LABEL_POSITION_PADDING - 9
             );
 
+            drawImage(draw, getIcon_sleep_grey(), 
+                SCREEN_WIDTH/2 + sleep_label_width_05 - 16 + PEDOMETER_LABEL_POSITION_X_OFFSET, 
+                SLEEP_LABEL_POSITION_Y + PEDOMETER_LABEL_POSITION_PADDING - 9
+            );
+
             if(draw){
                 
                 setDrawColor(192,192,192);
+
+                // PEDOMETER
                 drawString(pedometer_toPrint, 
                     SCREEN_WIDTH/2 - pedometer_label_width_05 + PEDOMETER_LABEL_POSITION_X_OFFSET, 
                     PEDOMETER_LABEL_POSITION_Y + 1, 1);
 
+                // SLEEP
+                drawString_centered(sleep_toPrint, SCREEN_WIDTH/2, SLEEP_LABEL_POSITION_Y, 1);
+
             }else{
+
                 setDrawColor_BackGroundColor();  
+                
+                // PEDOMETER
                 clearString(pedometer_toPrint, 
                     SCREEN_WIDTH/2 - pedometer_label_width_05 + PEDOMETER_LABEL_POSITION_X_OFFSET, 
                     PEDOMETER_LABEL_POSITION_Y + 1, 1);
+                // SLEEP
+                clearString_centered(sleep_toPrint, SCREEN_WIDTH/2, SLEEP_LABEL_POSITION_Y, 1);
             }
             
         #endif

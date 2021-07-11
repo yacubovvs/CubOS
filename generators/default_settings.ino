@@ -17,7 +17,7 @@
 #define BUTTON_BACK     0x04
 #define BUTTON_POWER    0x05
 
-#define DRIVER_CONTROLS_TOTALBUTTONS 3
+#define DRIVER_CONTROLS_TOTALBUTTONS 0
 #define DRIVER_CONTROLS_DELAY_BEFORE_LONG_PRESS     50
 #define DRIVER_CONTROLS_DELAY_BEFORE_MULTY_PRESS    400
 
@@ -145,6 +145,8 @@
 
 //#define PEDOMETER_STEP_DETECTION_DELAY                30000
 
+#define PEDOMETER_DO_NOT_USER_PEDOMETER_WHILE_CONNECTED_TO_USB
+
 //#define PEDOMETER_STEP_DETECTION_DELAY                  1000
 #define PEDOMETER_STEP_DETECTION_PERIOD_MS              1000
 #define PEDOMETER_MESURES_IN_STEP_DETECTION_PERIOD      5
@@ -156,7 +158,7 @@
 
 #define WAKEUP_FOR_BACKGROUND_WORK_IDLE 1000
 
-//#define PEDOMETER_DEBUG // Just for teste
+//#define DEBUG_PEDOMETER // Just for teste
 
 #define FORCE_DISPLAY_UPDATE_ON_START // Will quick update screen on start and wakeup. Comment on unknown error.
 #define DEFAULT_TIME_TO_POWEROFF_DISPLAY 7
@@ -173,8 +175,11 @@
 #define PEDOMETER_STEP_DETECTION_DELAY_SEC_STEP         10
 #define PEDOMETER_STEP_DETECTION_DELAY_SEC_MAX          60 // MAX (255 - PEDOMETER_STEP_DETECTION_PERIOD_MS/1000) and multiple 60 seconds
 
-#define CORE_PEDOMETER_SLEEP_COUNTING_SPOINTS   3 // mesures for sleep detection 
+#define CORE_PEDOMETER_SLEEP_COUNTING_SPOINTS   1 // mesures for sleep detection 
 #define CORE_PEDOMETER_SLEEP_MIN_ACCELL_100     3 // acceletometer sensitivity/100*G for sleep detection
+
+
+#define APP_CLOCK_POWER_AFTER_SECONDS           4
 /*
     ############################################################################################
     #                                                                                          #

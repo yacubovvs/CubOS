@@ -25,6 +25,9 @@
 
 
     void set_core_powersave_lastUserAction(){
+        #ifdef DEBUG_CORE_POWERSAVE
+            debug("DEBUG_CORE_POWERSAVE: Setting core_powersave_lastUserAction");
+        #endif
         core_powersave_lastUserAction = getCurrentSystemTime();
         core_powersave_lastUserAction_tick = millis();
     }
@@ -36,7 +39,7 @@
 
         set_core_powersave_lastUserAction();
         #ifdef DEBUG_CORE_POWERSAVE
-            debug("Sleep modem");
+            debug("DEBUG_CORE_POWERSAVE: Sleep modem");
             delay(25);
         #endif
 
@@ -44,12 +47,22 @@
     }
 
     void core_powersave_loop(){
-        if(core_powersave_lastUserAction>getCurrentSystemTime()) core_powersave_lastUserAction = 0;
+        if(core_powersave_lastUserAction>getCurrentSystemTime()){
+            core_powersave_lastUserAction = 0;
+            #ifdef DEBUG_CORE_POWERSAVE
+                debug("DEBUG_CORE_POWERSAVE: reseting core_powersave_lastUserAction");
+            #endif
+        }
         long timeSincelastUserAction = getCurrentSystemTime() - core_powersave_lastUserAction;
-        
-        #ifdef DISPLAY_BACKLIGHT_FADE_CONTROL_ENABLE
-            if(timeSincelastUserAction>=get_core_display_time_delay_to_fade()){
-                if(timeSincelastUserAction - get_core_display_time_delay_to_fade()>=get_core_display_time_delay_to_poweroff()){
+        bool sleepByAppSetting = (currentApp->sleep_device_after!=0) && timeSincelastUserAction>=currentApp->sleep_device_after;
+
+        #ifdef DISPLAY_BACKLIGHT_FADE_CONTROL_ENABLE    
+
+            if(timeSincelastUserAction>=get_core_display_time_delay_to_fade() || sleepByAppSetting){
+                if(
+                    timeSincelastUserAction - get_core_display_time_delay_to_fade()>=get_core_display_time_delay_to_poweroff()
+                    || sleepByAppSetting
+                  ){
                     
                     #ifdef CPU_SLEEP_ENABLE
                         // Going to sleep
@@ -60,8 +73,7 @@
                             }
                             
                             #ifdef DEBUG_CORE_POWERSAVE
-                                debug("Deep sleep");
-                                delay(25);
+                                debug("DEBUG_CORE_POWERSAVE: Deep sleep", 25);
                             #endif
                             core_cpu_sleep(STAND_BY_SLEEP_TYPE, get_corePedometer_currentsleep_between_mesures()*1000);
                         }
@@ -69,17 +81,16 @@
                 }else{
                     // fade screen
                     #ifdef DEBUG_CORE_POWERSAVE
-                        debug("Fade screen");
-                        delay(25);
+                        debug("DEBUG_CORE_POWERSAVE: Fading screen");
                     #endif
                     if(driver_display_getBrightness()!=get_core_display_brightness_fade()){
                         #ifdef SMOOTH_BACKLIGHT_CONTROL_DELAY_CHANGE
-                        if(get_core_display_brightness_fade()<driver_display_getBrightness()){
-                            driver_display_setBrightness(driver_display_getBrightness()-1);
-                            delay(SMOOTH_BACKLIGHT_CONTROL_DELAY_CHANGE);
-                        }else{
-                            driver_display_setBrightness(get_core_display_brightness_fade());
-                        }
+                            if(get_core_display_brightness_fade()<driver_display_getBrightness()){
+                                driver_display_setBrightness(driver_display_getBrightness()-1);
+                                delay(SMOOTH_BACKLIGHT_CONTROL_DELAY_CHANGE);
+                            }else{
+                                driver_display_setBrightness(get_core_display_brightness_fade());
+                            }
                         #else
                             driver_display_setBrightness(get_core_display_brightness_fade());
                         #endif
@@ -88,12 +99,17 @@
                 }
             }else{
                 if(driver_display_getBrightness()!=get_core_display_brightness()){
+                    #ifdef DEBUG_CORE_POWERSAVE
+                        debug("DEBUG_CORE_POWERSAVE: Changing sceren brightness");
+                    #endif
                     driver_display_setBrightness(get_core_display_brightness());
                 }
-
             }
         #else
-            if(timeSincelastUserAction>=get_core_display_time_delay_to_poweroff()){
+            if(
+                timeSincelastUserAction>=get_core_display_time_delay_to_poweroff()
+                || sleepByAppSetting
+                ){
 
                 #ifdef CPU_SLEEP_ENABLE
                     // Going to sleep
@@ -104,8 +120,7 @@
                         }
                         
                         #ifdef DEBUG_CORE_POWERSAVE
-                            debug("Deep sleep");
-                            delay(25);
+                            debug("DEBUG_CORE_POWERSAVE: Deep sleep", 25);
                         #endif
                         core_cpu_sleep(STAND_BY_SLEEP_TYPE, get_corePedometer_currentsleep_between_mesures()*1000);
                     }
@@ -123,9 +138,13 @@
                     #else 
                         if(millis() - core_powersave_lastUserAction_tick>DRIVER_CONTROLS_DELAY_BEFORE_LONG_PRESS+1){
                     #endif
+
                         #ifdef DEBUG_CORE_POWERSAVE
-                            debug("Light sleep");
-                            delay(25);
+                            debug("DEBUG_CORE_POWERSAVE: timeSincelastUserAction " + String(timeSincelastUserAction));
+                        #endif
+
+                        #ifdef DEBUG_CORE_POWERSAVE
+                            debug("DEBUG_CORE_POWERSAVE: Light sleep", 25);
                         #endif
                         core_cpu_sleep(SLEEP_LIGHT, WAKEUP_FOR_BACKGROUND_WORK_IDLE);   
                     }

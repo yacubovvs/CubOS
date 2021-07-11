@@ -21,14 +21,15 @@ Application *getApp(unsigned char i);
 
 class Application{
   public:
-    int scroll_x              = 0;
-    int scroll_y              = 0;
-    int scroll_to_x           = 0;
-    int scroll_to_y           = 0;
-    bool isfullScreen         = true;
-    bool showStatusBar        = true;
-    bool preventSleep         = false;
-    bool preventInAppSleep    = false;
+    int scroll_x                        = 0;
+    int scroll_y                        = 0;
+    int scroll_to_x                     = 0;
+    int scroll_to_y                     = 0;
+    unsigned char sleep_device_after    = 0;
+    bool isfullScreen                   = true;
+    bool showStatusBar                  = true;
+    bool preventSleep                   = false;
+    bool preventInAppSleep              = false;
 
     #ifdef SOFTWARE_BUTTONS_ENABLE
       bool showSoftWareButtons = true;
@@ -76,22 +77,27 @@ void setup(){
       unsigned char wakeUpReason = core_powersave_wakeup_reason();
       if(wakeUpReason==WAKE_UP_REASON_TIMER){
         #ifdef WAKEUP_DEBUG
-          debug("Background start " + String(millis()), 10);
+          debug("WAKEUP_DEBUG: Background start " + String(millis()), 10);
           //core_cpu_setup();
+        #endif
+        #ifdef PEDOMETER_DO_NOT_USER_PEDOMETER_WHILE_CONNECTED_TO_USB
+          #ifdef BATTERY_ENABLE
+            driver_battery_setup();
+          #endif
         #endif
         core_cpu_setup();
         driver_controls_setup();
         #ifdef WAKEUP_DEBUG
-          debug("Backgroung controls inited "  + String(millis()), 10);
+          debug("WAKEUP_DEBUG: Backgroung controls inited "  + String(millis()), 10);
         #endif
         backgroundWorkAfterSleep();
         #ifdef WAKEUP_DEBUG
-          debug("Going to sleep again "  + String(millis()), 10);
+          debug("WAKEUP_DEBUG: Going to sleep again "  + String(millis()), 10);
         #endif
         core_cpu_sleep(STAND_BY_SLEEP_TYPE, get_corePedometer_currentsleep_between_mesures()*1000);
       }else{
         #ifdef WAKEUP_DEBUG
-          debug("Not background start", 10);
+          debug("WAKEUP_DEBUG: Not background start", 10);
         #endif
       }
     #endif

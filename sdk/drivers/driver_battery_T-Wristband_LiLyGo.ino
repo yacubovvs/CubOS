@@ -11,18 +11,24 @@
 
 #define ANALOG_VALUE_ION_BATTERY 2440
 
+//#define DEBUG_DRIVER_BATTERY
+
 void driver_battery_setup(){
-    pinMode(BATT_ADC_PIN, INPUT);
-    pinMode(VBUS_PIN, INPUT);
+    //pinMode(BATT_ADC_PIN, INPUT);
+    //pinMode(VBUS_PIN, INPUT);
 }
 
 void driver_battery_loop(){
-    //debug(String(analogRead(35)));
-    //delay(1000);
+    
+    #ifdef DEBUG_DRIVER_BATTERY
+        //debug("VBUS_PIN: " + String(analogRead(VBUS_PIN)));
+        //debug("BATT_ADC_PIN: " + String(analogRead(BATT_ADC_PIN)));
+    #endif
 }
 
 float driver_battery_getVoltage(){
     int analogValue = analogRead(BATT_ADC_PIN);
+    if(analogValue==0) return 0;
     float voltage = 4.2/((float)ANALOG_VALUE_ION_BATTERY)*((float)analogValue);
     return voltage;
 }
@@ -45,6 +51,7 @@ float driver_battery_getUsbCurent_mA(){
 
 float driver_battery_getVinVoltage(){
     int analogValue = analogRead(VBUS_PIN);
+    if(analogValue==0) return 0;
     float voltage = 4.2/((float)ANALOG_VALUE_ION_BATTERY)*((float)analogValue);
     return voltage;
 }
@@ -75,5 +82,11 @@ unsigned char driver_battery_getPercent(){
 }
 
 bool driver_battery_isCharging(){
-    return analogRead(VBUS_PIN)>ANALOG_VALUE_ION_BATTERY;
+
+    return analogRead(VBUS_PIN)>analogRead(BATT_ADC_PIN);
+}
+
+bool driver_battery_isUsbConnected(){
+    //return analogRead(VBUS_PIN)>1024;
+    return driver_battery_isCharging();
 }

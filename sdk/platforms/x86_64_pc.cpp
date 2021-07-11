@@ -74,7 +74,7 @@ void driver_controls_setup();
 void driver_battery_setup();
 void core_time_setup();
 void do_cpu_sleep();
-unsigned long driver_control_get_last_user_avtivity();
+/*unsigned long driver_control_get_last_user_avtivity();
 void setup_touchScreenDriver();
 void loop_touchScreenDriver();
 

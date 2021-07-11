@@ -6,3 +6,8 @@
     Added new dinamic counting of sleep and steps
     Modified watch surface application
     Added Activity application
+
+2021-07-11
+    Added sleep time to main wactch surface
+    Added parameter PEDOMETER_DO_NOT_USER_PEDOMETER_WHILE_CONNECTED_TO_USB for disallow pedometer while connected to usb
+    Added unsigned char Application::sleep_device_after, to shutdown screen after sleep_device_after seconds if sleep_device_after<DEFAULT_TIME_TO_POWEROFF_DISPLAY

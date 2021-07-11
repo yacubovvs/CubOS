@@ -26,7 +26,7 @@
 
 #define HARDWARE_BUTTONS_ENABLED              // Conf of controls with hardware btns    
 
-#define DRIVER_CONTROLS_TOTALBUTTONS 1
+#define DRIVER_CONTROLS_TOTALBUTTONS 2
 #define DRIVER_CONTROLS_DELAY_BEFORE_LONG_PRESS 350
 
 #define COLOR_SCREEN                     // Screen is colored
@@ -80,12 +80,12 @@
 #define DEFAULT_DELAY_TO_FADE_DISPLAY       5
 #define DEFAULT_TIME_TO_POWEROFF_DISPLAY    5
 #define PEDOMETER_ENABLE
-//#define PEDOMETER_DEBUG
+//#define DEBUG_PEDOMETER
 
 #define PEDOMETER_DELTA_VALUE_MIN           0.47f
 #define PEDOMETER_CENTRALWIGHT_VALUE_MIN    0.17f
 
-#define CORE_PEDOMETER_SLEEP_COUNTING_SPOINTS   0 // mesures for sleep detection 
+#define CORE_PEDOMETER_SLEEP_COUNTING_SPOINTS   2 // mesures for sleep detection 
 #define CORE_PEDOMETER_SLEEP_MIN_ACCELL_100     3 // acceletometer sensitivity/100*G for sleep detection
 /*
     ############################################################################################

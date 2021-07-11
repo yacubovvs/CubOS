@@ -1,3 +1,5 @@
+//#define DEBUG_DRIVER_BATTERY
+
 #ifdef M5STICKC_PLUS
   #include <M5StickCPlus.h>
 #else
@@ -7,6 +9,12 @@
 #include "AXP192.h"
 
 void driver_battery_setup(){
+    //begin(bool LCDEnable, bool PowerEnable, bool SerialEnable){ // temp n103
+    #ifdef DEBUG_DRIVER_BATTERY
+        debug("DEBUG_DRIVER_BATTERY: Battery is setted up");
+    #endif
+
+    M5.begin(false, true, false);
     //M5.Axp.EnableCoulombcounter();
     M5.Axp.SetChargeCurrent(CURRENT_100MA); // For M5StickC
 }
@@ -66,6 +74,19 @@ unsigned char driver_battery_getPercent(){
 
 bool driver_battery_isCharging(){
     return driver_battery_getCurent_mA()>0;
+}
+
+bool driver_battery_isUsbConnected(){
+    #ifdef DEBUG_DRIVER_BATTERY
+        debug("DEBUG_DRIVER_BATTERY: M5.Axp.GetVinVoltage(): " + String((M5.Axp.GetVinVoltage())));
+        debug("DEBUG_DRIVER_BATTERY: M5.Axp.GetVBusVoltage(): " + String((M5.Axp.GetVBusVoltage())));
+    #endif
+
+    if(M5.Axp.GetVBusVoltage()>4.3){
+        return true;
+    }else{
+        return false;
+    }
 }
 
 /* 

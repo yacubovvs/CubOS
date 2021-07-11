@@ -4,7 +4,7 @@
 //#define TP_PWR_PIN          25
 
 
-unsigned long last_user_activity = _millis();
+// unsigned long last_user_activity = _millis();
 unsigned long last_user_buttons_activity = _millis();
 
 unsigned char buttons_purpose[]                             = {BUTTON_POWER};
@@ -84,11 +84,11 @@ void driver_controls_loop(){
 
 }
 
-unsigned long driver_control_get_last_user_avtivity(){
+/*unsigned long driver_control_get_last_user_avtivity(){
   return last_user_activity;
 }
 
-void driver_control_set_last_user_avtivity(unsigned long time){
+*/void driver_control_set_last_user_avtivity(unsigned long time){
   last_user_activity = time;
 }
 

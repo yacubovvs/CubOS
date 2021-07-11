@@ -1,3 +1,5 @@
+#define DEBUG_PEDOMETER
+
 #ifdef PEDOMETER_ENABLE
     //RTC_DATA_ATTR long pedometer_days_steps = 0;
 
@@ -81,25 +83,42 @@
 
     void core_pedometer_setup(){
         // Just for test M5StickC
-        #ifdef PEDOMETER_DEBUG
+        #ifdef DEBUG_PEDOMETER
             //pinMode(10, OUTPUT);
             //digitalWrite(10, 1);
         #endif
     }
 
     void core_pedometer_loop(bool inBackGroung){
+
+        #ifdef PEDOMETER_DO_NOT_USER_PEDOMETER_WHILE_CONNECTED_TO_USB
+            #ifdef BATTERY_ENABLE
+                if(driver_battery_isUsbConnected()){
+                    #ifdef DEBUG_PEDOMETER
+                        debug("DEBUG_PEDOMETER: exit job course on usb");
+                    #endif 
+                    analyse_sleep_delta_accels=0;
+                    return;
+                }else{
+                    #ifdef DEBUG_PEDOMETER
+                        debug("DEBUG_PEDOMETER: usb is not connected");
+                    #endif 
+                }
+            #endif
+        #endif
+
         if(pedometer_on){
-            #ifdef PEDOMETER_DEBUG
+            #ifdef DEBUG_PEDOMETER
                 //debug("Pedometer is ON!", 10);
             #endif 
 
             if(core_pedometer_current_step_detection!=-1){
-                #ifdef PEDOMETER_DEBUG
+                #ifdef DEBUG_PEDOMETER
                     debug("Pedometer - Not first mesure!", 10);
                 #endif
                 core_pedometer_mesure_loop(inBackGroung);
             }else{
-                #ifdef PEDOMETER_DEBUG 
+                #ifdef DEBUG_PEDOMETER 
                     debug("Pedometer - check time!", 10);
                 #endif
                 
@@ -117,19 +136,19 @@
                         #endif
                     }
 
-                    #ifdef PEDOMETER_DEBUG
+                    #ifdef DEBUG_PEDOMETER
                         debug("Pedometer - Start step!", 10);
                     #endif
                     core_pedometer_start_step_detection(inBackGroung);
                     core_pedometer_mesure_loop(inBackGroung);
                 }else{
-                    #ifdef PEDOMETER_DEBUG
+                    #ifdef DEBUG_PEDOMETER
                         debug("!!!!! Time not come", 10);
                     #endif
                 }
             }
         }else{
-            #ifdef PEDOMETER_DEBUG
+            #ifdef DEBUG_PEDOMETER
                 debug("Pedometer is OFF!", 10);
             #endif 
         }
@@ -144,7 +163,7 @@
                 ( (millis()-core_pedometer_step_detection_start_time)/CORE_PEDOMETER_MESURE_EVERY_MS >= core_pedometer_current_step_detection ) 
                 ){ // Mesure condition
 
-                #ifdef PEDOMETER_DEBUG
+                #ifdef DEBUG_PEDOMETER
                     debug("Mesure " + String( core_pedometer_current_step_detection));
                 #endif
 
@@ -168,7 +187,7 @@
             }
 
             if(inBackGroung){
-                #ifdef PEDOMETER_DEBUG
+                #ifdef DEBUG_PEDOMETER
                     // debug("PEDOMETER MESURE IN BACKGROUN", 10);
                 #endif
                 
@@ -191,7 +210,7 @@
         core_pedometer_step_detection_start_time = millis();
     }
 
-    #ifdef PEDOMETER_DEBUG
+    #ifdef DEBUG_PEDOMETER
         float analysis_max_value = -1;
         float analysis_min_value = 100;
         float analysis_delta_value;
@@ -217,7 +236,7 @@
         // # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
         pedometr_mesurings_in_a_day++;
 
-        #ifdef PEDOMETER_DEBUG
+        #ifdef DEBUG_PEDOMETER
             analysis_max_value = -1;
             analysis_min_value = 100;
             analysis_delta_value;
@@ -272,7 +291,7 @@
 
         analysis_central_weight_value = analysis_central_weight_value/PEDOMETER_MESURES_IN_STEP_DETECTION_PERIOD;
 
-        #ifdef PEDOMETER_DEBUG
+        #ifdef DEBUG_PEDOMETER
             debug("# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #");
             debug( String("max_value: ") + analysis_max_value);
             debug( String("min_value: ") + analysis_min_value);
@@ -305,7 +324,7 @@
                 )
             ){
                 //
-                #ifdef PEDOMETER_DEBUG
+                #ifdef DEBUG_PEDOMETER
                     debug("Is walking", 10);
                     //if(!inBackground) digitalWrite(10,0);
                 #endif
@@ -333,22 +352,24 @@
                     corePedometer_currentsleep_between_mesures = PEDOMETER_STEP_DETECTION_DELAY_SEC_MAX - PEDOMETER_STEP_DETECTION_PERIOD_MS/1000;
                 }
 
-                #ifdef PEDOMETER_DEBUG
-                    debug("Is not walking", 10);    
+                #ifdef DEBUG_PEDOMETER
+                    debug("DEBUG_PEDOMETER: Is not walking", 10);    
                 #endif
 
                 unsigned char analysis_delta_value_byte = (unsigned char)(analysis_delta_value*100.0);
 
                 if(analysis_delta_value_byte<=CORE_PEDOMETER_SLEEP_MIN_ACCELL_100){
-                    debug("Sleeping analyse - " + String(analyse_sleep_delta_accels));
+                    #ifdef DEBUG_PEDOMETER
+                        debug("DEBUG_PEDOMETER: Sleeping analyse - " + String(analyse_sleep_delta_accels));
+                    #endif
                     
                     if(analyse_sleep_delta_accels>=CORE_PEDOMETER_SLEEP_COUNTING_SPOINTS){
-                        #ifdef PEDOMETER_DEBUG
+                        #ifdef DEBUG_PEDOMETER
                             debug("IS SLEEPING");
                         #endif
                         between_mesure_realy_delay = (corePedometer_currentsleep_between_mesures + PEDOMETER_STEP_DETECTION_PERIOD_MS/1000);
                         unsigned char sleep_minutes_to_add = (between_mesure_realy_delay+1)/60;
-                        #ifdef PEDOMETER_DEBUG
+                        #ifdef DEBUG_PEDOMETER
                             debug("sleep_minutes_to_add " + String(sleep_minutes_to_add));
                         #endif
                         pedometer_hours_sleep[core_time_getHours_byte()] += sleep_minutes_to_add;

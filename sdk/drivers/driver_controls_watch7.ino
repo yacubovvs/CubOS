@@ -2,7 +2,7 @@
 #define _millis() millis()
 #define DRIVER_CONTROLS_DELAY_BEFORE_LONG_PRESS 350
 
-unsigned long last_user_activity = _millis();
+// unsigned long last_user_activity = _millis();
 
 unsigned char    driver_control_buttonsPins[]  = {12,   15,    3,    1};
 bool driver_control_isPositive[]   = {true, false, true, true};     
@@ -55,11 +55,11 @@ void driver_controls_loop(){
 
 }
 
-unsigned long driver_control_get_last_user_avtivity(){
+/*unsigned long driver_control_get_last_user_avtivity(){
   return last_user_activity;
 }
 
-void driver_control_set_last_user_avtivity(unsigned long time){
+*/void driver_control_set_last_user_avtivity(unsigned long time){
   last_user_activity = time;
 }
 

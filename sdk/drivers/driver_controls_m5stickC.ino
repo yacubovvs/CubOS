@@ -1,6 +1,8 @@
+//#define DEBUG_DRIVER_CONTROLS
+
 #define _millis() millis()
 
-unsigned long last_user_activity = _millis();
+// unsigned long last_user_activity = _millis();
 
 unsigned char    driver_control_buttonsPins[]  = {37,   39};
 bool driver_control_isPositive[]   = {true, true};
@@ -16,15 +18,17 @@ void driver_controls_setup(){
   for (unsigned char i=0; i<DRIVER_CONTROLS_TOTALBUTTONS; i++){
     pinMode(driver_control_buttonsPins[i], INPUT);
   }
-  last_user_activity = _millis();
 }
 
 void driver_controls_loop(){
   for (unsigned char i=0; i<DRIVER_CONTROLS_TOTALBUTTONS; i++){
     if ((driver_control_isPositive[i]==true) ? (!digitalRead(driver_control_buttonsPins[i])) : (digitalRead(driver_control_buttonsPins[i]))){
+      
+      #ifdef DEBUG_DRIVER_CONTROLS
+        debug("DEBUG_DRIVER_CONTROLS:  set_core_powersave_lastUserAction() on button: " + String(i));
+      #endif
       set_core_powersave_lastUserAction();
       
-      last_user_activity = _millis();
       if(driver_control_pressed[i]==false){
         // press start
         driver_control_pressed[i]=true;
@@ -77,14 +81,6 @@ void driver_controls_loop(){
     }
   }
 
-}
-
-unsigned long driver_control_get_last_user_avtivity(){
-  return last_user_activity;
-}
-
-void driver_control_set_last_user_avtivity(unsigned long time){
-  last_user_activity = time;
 }
 
 void onButtonEvent(unsigned char event, int button){

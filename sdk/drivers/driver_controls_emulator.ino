@@ -2,7 +2,7 @@
 #define _millis() millis()
 #define DRIVER_CONTROLS_DELAY_BEFORE_LONG_PRESS 350
 
-unsigned long last_user_activity = _millis();
+// unsigned long last_user_activity = _millis();
 
 // Do not change:
 bool driver_control_pressed[]      = {false, false, false, false};
@@ -13,7 +13,7 @@ void onButtonEvent(unsigned char event, int button){
 }
 
 void driver_controls_setup(){
-  last_user_activity = _millis();
+
 }
 
 
@@ -24,7 +24,6 @@ void driver_controls_loop(){
 
     for (unsigned char i=0; i<DRIVER_CONTROLS_TOTALBUTTONS; i++){
         if (digRead(i)){
-        last_user_activity = _millis();
         if(driver_control_pressed[i]==false){
             // press start
             driver_control_pressed[i]=true;
@@ -51,6 +50,8 @@ void driver_controls_loop(){
 
 }
 
+/*
+
 unsigned long driver_control_get_last_user_avtivity(){
   return last_user_activity;
 }
@@ -58,3 +59,5 @@ unsigned long driver_control_get_last_user_avtivity(){
 void driver_control_set_last_user_avtivity(unsigned long time){
   last_user_activity = time;
 }
+
+*/
