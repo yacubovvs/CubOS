@@ -540,6 +540,10 @@ const unsigned char icon_arrow_bottom[] PROGMEM = {
         const unsigned char* getIcon_legs_grey(){
             return icon_leg_grey;
         }
+
+        const unsigned char* getIcon_sleep_grey(){
+            return icon_sleep_grey;
+        }
     #endif
 
     const unsigned char* getIcon_arrow_bottom(){
@@ -549,8 +553,5 @@ const unsigned char icon_arrow_bottom[] PROGMEM = {
     const unsigned char* getIcon_arrow_up(){
         return icon_arrow_up;
     }
-
-    const unsigned char* getIcon_sleep_grey(){
-        return icon_sleep_grey;
-    }
+    
 #endif

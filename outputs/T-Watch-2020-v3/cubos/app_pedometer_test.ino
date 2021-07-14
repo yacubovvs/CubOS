@@ -82,7 +82,7 @@ void appNameClass::onLoop(){
         //drawStringOnScreen(String(driver_accelerometer_get_accel_total()));
     #endif
 
-    #ifdef PEDOMETER_DEBUG
+    #ifdef DEBUG_PEDOMETER
         drawStringOnScreen(" ");
         drawStringOnScreen("Delta: ");
         drawStringOnScreen(String(get_analysis_delta_value()));

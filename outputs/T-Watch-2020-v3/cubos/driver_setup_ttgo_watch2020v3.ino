@@ -65,7 +65,7 @@ void core_loop_driver(){
 
         if (ttgo->power->isPEKShortPressIRQ()){
             debug("isPEKShortPressIRQ");
-            //core_driver_isShortPressed = true;  
+            core_driver_isShortPressed = true;  
         } 
 
         

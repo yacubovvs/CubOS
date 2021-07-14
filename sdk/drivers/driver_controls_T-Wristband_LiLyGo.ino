@@ -92,15 +92,6 @@ void driver_controls_loop(){
 
 }
 
-/*unsigned long driver_control_get_last_user_avtivity(){
-  return last_user_activity;
-}
-
-void driver_control_set_last_user_avtivity(unsigned long time){
-  last_user_activity = time;
-}
-
-*/
 
 void onButtonEvent(unsigned char event, int button){
   currentApp->onEvent(event, buttons_purpose[button], 0);
