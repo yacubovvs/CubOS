@@ -7,6 +7,7 @@
 * Pedometer
 * Sleep time
 * 1 week history
+* In day history by hours for sleep and steps
 * Up to 2 days on one charge
 * 80x160 display full framebuffer 65k colors
 
