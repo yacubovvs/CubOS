@@ -1,5 +1,5 @@
 
-#define DRIVER_CONTROLL_DEBUG
+//#define DRIVER_CONTROLL_DEBUG
 #define _millis() millis()
 //#define TP_PWR_PIN          25
 

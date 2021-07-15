@@ -99,6 +99,13 @@ void appNameClass::drawInfo(){
             drawStringOnScreen("Battery:");
             drawStringOnScreen(String(core_battery_getPercent()) + " %");
     
+            drawStringOnScreen("Battery is charging:");
+            if(driver_battery_isCharging()) drawStringOnScreen("True");
+            else drawStringOnScreen("False");
+
+            drawStringOnScreen("USB is connected:");
+            if(driver_battery_isUsbConnected()) drawStringOnScreen("True");
+            else drawStringOnScreen("False");
         //#else
             
         //#endif
@@ -130,7 +137,7 @@ void appNameClass::onDestroy(){
 
 void appNameClass::onEvent(unsigned char event, int val1, int val2){
     #if (DRIVER_CONTROLS_TOTALBUTTONS == 2 || DRIVER_CONTROLS_TOTALBUTTONS == 1)
-        if(event==EVENT_BUTTON_SHORT_SINGLE_PRESS){
+        if(event==EVENT_BUTTON_PRESSED){
             // Write you code on [val1] button pressed here
             if(val1==BUTTON_POWER){
                 startApp(-1);

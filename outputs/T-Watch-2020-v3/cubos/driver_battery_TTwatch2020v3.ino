@@ -63,5 +63,9 @@ unsigned char driver_battery_getPercent(){
 }
 
 bool driver_battery_isCharging(){
-    return false;
+    return get_core_driver_isCharging();
+}
+
+bool driver_battery_isUsbConnected(){
+    return get_core_driver_VBUSConnected();
 }

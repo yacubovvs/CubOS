@@ -82,11 +82,9 @@ unsigned char driver_battery_getPercent(){
 }
 
 bool driver_battery_isCharging(){
-
-    return analogRead(VBUS_PIN)>analogRead(BATT_ADC_PIN);
+    return get_core_driver_isCharging();
 }
 
 bool driver_battery_isUsbConnected(){
-    //return analogRead(VBUS_PIN)>1024;
-    return driver_battery_isCharging();
+    return get_core_driver_VBUSConnected();
 }

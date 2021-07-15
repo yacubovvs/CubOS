@@ -1,15 +1,22 @@
 // MAIN DEVICE DRIVER
-
+#define LILYGO_WATCH_2020_V3 
 #include <LilyGoWatch.h>
 
 TTGOClass *ttgo;
 
-bool core_driver_isCharging = false;
-bool core_driver_VBUSConnected = false;
-bool core_driver_isShortPressed = false;
-bool core_driver_isLongPressed = false;
+bool core_driver_isCharging         = true; 
+bool core_driver_VBUSConnected      = true;
+bool core_driver_isLongPressed      = false;
+bool core_driver_isShortPressed     = false;
+bool core_driver_irq                = false;
 
-bool core_driver_irq = false;
+bool get_core_driver_isCharging(){
+    //return true;
+    return core_driver_isCharging;
+}
+bool get_core_driver_VBUSConnected(){
+    return core_driver_VBUSConnected;
+}
 
 void core_setup_driver(){
     ttgo = TTGOClass::getWatch();
@@ -27,61 +34,36 @@ void core_setup_driver(){
     ttgo->power->clearIRQ();
 }
 
-void core_loop_driver(){
-    
+void core_loop_irq_check(){
     if(core_driver_irq){
         core_driver_irq = false;
-        debug("attachInterrupt AXP202_INT");
-        /*
-        ttgo->power->readIRQ();
-        if (ttgo->power->isVbusPlugInIRQ()) {
-            ttgo->tft->fillRect(20, 100, 200, 85, TFT_BLACK);
-            ttgo->tft->drawString("Power Plug In", 25, 100);
-        }
-        if (ttgo->power->isVbusRemoveIRQ()) {
-            ttgo->tft->fillRect(20, 100, 200, 85, TFT_BLACK);
-            ttgo->tft->drawString("Power Remove", 25, 100);
-        }
-        if (ttgo->power->isPEKShortPressIRQ()) {
-            ttgo->tft->fillRect(20, 100, 200, 85, TFT_BLACK);
-            ttgo->tft->drawString("PowerKey Press", 25, 100);
-        }
-        ttgo->power->clearIRQ();
-        */
-        
-        ttgo->power->readIRQ();
-        
+        ttgo->power->readIRQ(); 
+
         if (ttgo->power->isVbusPlugInIRQ()){
-            debug("isVbusPlugInIRQ");
-            //core_driver_isCharging=true; 
-            //core_driver_VBUSConnected=true;
+            core_driver_isCharging=true; 
+            core_driver_VBUSConnected=true;
         }
-
         if (ttgo->power->isVbusRemoveIRQ()){
-            debug("isVbusRemoveIRQ");
-            //core_driver_isCharging=false; 
-            //core_driver_VBUSConnected=false;
+            core_driver_isCharging=false; 
+            core_driver_VBUSConnected=false;
         }
-
         if (ttgo->power->isPEKShortPressIRQ()){
-            debug("isPEKShortPressIRQ");
-            core_driver_isShortPressed = true;  
-        } 
-
-        
-        if (ttgo->power->isChargingDoneIRQ()){
-            debug("isChargingDoneIRQ");
-            //core_driver_isCharging=false; 
-            //core_driver_VBUSConnected=true;
+            core_driver_isShortPressed = true;
         }
-
+        if (ttgo->power->isChargingDoneIRQ()){
+            core_driver_isCharging=false; 
+            core_driver_VBUSConnected=true;
+        }
         if (ttgo->power->isPEKLongtPressIRQ()){
-            debug("isPEKLongtPressIRQ");
-            //core_driver_isLongPressed = true;
+            core_driver_isLongPressed = true;
         }
         
         ttgo->power->clearIRQ();
     }
+}
+
+void core_loop_driver(){
+    core_loop_irq_check();
 }
 
 bool get_core_driver_isShortPressed(){
