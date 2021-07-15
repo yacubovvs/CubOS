@@ -48,7 +48,9 @@ void driver_cpu_sleep(unsigned char sleepType, long timeout){
             esp_light_sleep_start();
 
             esp_sleep_enable_ext0_wakeup(GPIO_NUM_33, HIGH);
-
+            #ifdef ACCELEROMETER_ENABLE
+                driver_accelerometer_sleep();
+            #endif
             break;
         case SLEEP_LIGHT:
             
@@ -58,8 +60,12 @@ void driver_cpu_sleep(unsigned char sleepType, long timeout){
             //core_time_setAlarmBySeconds(2);
             //esp_sleep_enable_ext1_wakeup(0x200000000, ESP_EXT1_WAKEUP_ANY_HIGH);
             //esp_sleep_enable_ext0_wakeup(GPIO_NUM_33, HIGH);
-            gpio_hold_en((gpio_num_t) 26);
-            gpio_deep_sleep_hold_en();
+            #ifdef ACCELEROMETER_ENABLE
+                driver_accelerometer_sleep();
+            #endif
+
+            //gpio_hold_en((gpio_num_t) 26);
+            //gpio_deep_sleep_hold_en();
             esp_sleep_enable_timer_wakeup(timeout*1000);
             //0000000200000000
             /*
@@ -71,7 +77,10 @@ void driver_cpu_sleep(unsigned char sleepType, long timeout){
 
             esp_light_sleep_start();
 
-            esp_sleep_enable_ext0_wakeup(GPIO_NUM_33, HIGH);
+            //esp_sleep_enable_ext0_wakeup(GPIO_NUM_33, HIGH);
+            #ifdef ACCELEROMETER_ENABLE
+                driver_accelerometer_sleep();
+            #endif
 
             break;
         case SLEEP_MODEM:
@@ -85,7 +94,7 @@ void driver_cpu_sleep(unsigned char sleepType, long timeout){
             break;
         case WAKE_MODEM:
             //WiFi.forceSleepEnd();
-            delay(1);
+            //delay(1);
             break;
         case WAKE_DISPLAY:
             break;

@@ -11,18 +11,18 @@
 
 #define ANALOG_VALUE_ION_BATTERY 2440
 
-#define DEBUG_DRIVER_BATTERY
+//#define DEBUG_DRIVER_BATTERY
 
 void driver_battery_setup(){
-    pinMode(BATT_ADC_PIN, INPUT);
-    pinMode(VBUS_PIN, INPUT);
+    //pinMode(BATT_ADC_PIN, INPUT);
+    //pinMode(VBUS_PIN, INPUT);
 }
 
 void driver_battery_loop(){
     
     #ifdef DEBUG_DRIVER_BATTERY
-        debug("VBUS_PIN: " + String(analogRead(VBUS_PIN)));
-        debug("BATT_ADC_PIN: " + String(analogRead(BATT_ADC_PIN)));
+        //debug("VBUS_PIN: " + String(analogRead(VBUS_PIN)));
+        //debug("BATT_ADC_PIN: " + String(analogRead(BATT_ADC_PIN)));
     #endif
 }
 
@@ -82,10 +82,8 @@ unsigned char driver_battery_getPercent(){
 }
 
 bool driver_battery_isCharging(){
-
-    return analogRead(VBUS_PIN)>analogRead(BATT_ADC_PIN);
+    return analogRead(VBUS_PIN)>ANALOG_VALUE_ION_BATTERY;
 }
-
 bool driver_battery_isUsbConnected(){
-    return analogRead(VBUS_PIN)>512;
+    return driver_battery_isCharging();
 }

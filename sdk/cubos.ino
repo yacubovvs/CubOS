@@ -62,14 +62,15 @@ Application* currentApp;
 */
 
 void setup(){   
-  #ifdef CORE_SETUP_INIT
-    core_setup_driver();
-  #endif
 
   #ifdef DEBUG_SERIAL
       DEBUG_SERIAL_PORT.begin(115200);
       delay(100);
-      debug("Serial debug started", 10);
+      debug("\n\nSerial debug started " + String(millis()));
+  #endif
+
+  #ifdef CORE_SETUP_INIT
+    core_setup_driver();
   #endif
 
   #ifdef POWERSAVE_ENABLE
@@ -77,10 +78,10 @@ void setup(){
       unsigned char wakeUpReason = core_powersave_wakeup_reason();
       if(wakeUpReason==WAKE_UP_REASON_TIMER){
         #ifdef WAKEUP_DEBUG
-          debug("WAKEUP_DEBUG: Background start " + String(millis()), 10);
+          debug("WAKEUP_DEBUG: Background start " + String(millis()));
           //core_cpu_setup();
         #endif
-        #ifdef PEDOMETER_DO_NOT_USER_PEDOMETER_WHILE_CONNECTED_TO_USB
+        #ifdef PEDOMETER_DO_NOT_USE_PEDOMETER_WHILE_CONNECTED_TO_USB
           #ifdef BATTERY_ENABLE
             driver_battery_setup();
           #endif
@@ -88,11 +89,12 @@ void setup(){
         core_cpu_setup();
         driver_controls_setup();
         #ifdef WAKEUP_DEBUG
-          debug("WAKEUP_DEBUG: Backgroung controls inited "  + String(millis()), 10);
+          debug("WAKEUP_DEBUG: Backgroung controls inited "  + String(millis()));
         #endif
         backgroundWorkAfterSleep();
         #ifdef WAKEUP_DEBUG
-          debug("WAKEUP_DEBUG: Going to sleep again "  + String(millis()), 10);
+          debug("WAKEUP_DEBUG: Going to sleep again for " + String(get_corePedometer_currentsleep_between_mesures()) + "ms " + String(millis()));
+          delay(50);
         #endif
         core_cpu_sleep(STAND_BY_SLEEP_TYPE, get_corePedometer_currentsleep_between_mesures()*1000);
       }else{

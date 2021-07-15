@@ -145,7 +145,7 @@
 
 //#define PEDOMETER_STEP_DETECTION_DELAY                30000
 
-#define PEDOMETER_DO_NOT_USER_PEDOMETER_WHILE_CONNECTED_TO_USB
+#define PEDOMETER_DO_NOT_USE_PEDOMETER_WHILE_CONNECTED_TO_USB
 
 //#define PEDOMETER_STEP_DETECTION_DELAY                  1000
 #define PEDOMETER_STEP_DETECTION_PERIOD_MS              1000
@@ -274,7 +274,7 @@
 //#define PEDOMETER_STEP_DETECTION_DELAY          1000 // Wake up to check accelerometer
 #define DEFAULT_TIME_TO_POWEROFF_DISPLAY        12
 #define DEFAULT_DELAY_TO_FADE_DISPLAY           0
-#define PEDOMETER_STEP_DETECTION_PERIOD_MS              1000
+#define PEDOMETER_STEP_DETECTION_PERIOD_MS              900
 #define PEDOMETER_MESURES_IN_STEP_DETECTION_PERIOD      5
 #define PEDOMETER_DAY_STEP_LIMMIT_DEFAULT               10000
 
@@ -289,7 +289,8 @@
 #define CORE_PEDOMETER_SLEEP_MIN_ACCELL_100     3 // acceletometer sensitivity/100*G for sleep detection
 
 #define APP_CLOCK_POWER_AFTER_SECONDS           4
-#define DEBUG_SERIAL
+
+//#define DEBUG_SERIAL
 //#define DEBUG_PEDOMETER
 //#define WAKEUP_DEBUG
 //#define DEBUG_DRIVER_BATTERY
@@ -363,14 +364,15 @@ Application* currentApp;
 */
 
 void setup(){   
-  #ifdef CORE_SETUP_INIT
-    core_setup_driver();
-  #endif
 
   #ifdef DEBUG_SERIAL
       DEBUG_SERIAL_PORT.begin(115200);
       delay(100);
-      debug("Serial debug started", 10);
+      debug("\n\nSerial debug started " + String(millis()));
+  #endif
+
+  #ifdef CORE_SETUP_INIT
+    core_setup_driver();
   #endif
 
   #ifdef POWERSAVE_ENABLE
@@ -378,10 +380,10 @@ void setup(){
       unsigned char wakeUpReason = core_powersave_wakeup_reason();
       if(wakeUpReason==WAKE_UP_REASON_TIMER){
         #ifdef WAKEUP_DEBUG
-          debug("WAKEUP_DEBUG: Background start " + String(millis()), 10);
+          debug("WAKEUP_DEBUG: Background start " + String(millis()));
           //core_cpu_setup();
         #endif
-        #ifdef PEDOMETER_DO_NOT_USER_PEDOMETER_WHILE_CONNECTED_TO_USB
+        #ifdef PEDOMETER_DO_NOT_USE_PEDOMETER_WHILE_CONNECTED_TO_USB
           #ifdef BATTERY_ENABLE
             driver_battery_setup();
           #endif
@@ -389,11 +391,12 @@ void setup(){
         core_cpu_setup();
         driver_controls_setup();
         #ifdef WAKEUP_DEBUG
-          debug("WAKEUP_DEBUG: Backgroung controls inited "  + String(millis()), 10);
+          debug("WAKEUP_DEBUG: Backgroung controls inited "  + String(millis()));
         #endif
         backgroundWorkAfterSleep();
         #ifdef WAKEUP_DEBUG
-          debug("WAKEUP_DEBUG: Going to sleep again "  + String(millis()), 10);
+          debug("WAKEUP_DEBUG: Going to sleep again for " + String(get_corePedometer_currentsleep_between_mesures()) + "ms " + String(millis()));
+          delay(50);
         #endif
         core_cpu_sleep(STAND_BY_SLEEP_TYPE, get_corePedometer_currentsleep_between_mesures()*1000);
       }else{

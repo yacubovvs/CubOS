@@ -7,7 +7,7 @@
 */
 
 // ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! !
-//      FOR ESP8266 USE NONOSSDK 2.2.2 +
+//      USING ESP32 DEV MODULE FOR FLASHING
 // ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! !
 
 #define SCREEN_WIDTH            80     // Screen resolution width
@@ -84,7 +84,7 @@
 //#define PEDOMETER_STEP_DETECTION_DELAY          1000 // Wake up to check accelerometer
 #define DEFAULT_TIME_TO_POWEROFF_DISPLAY        12
 #define DEFAULT_DELAY_TO_FADE_DISPLAY           0
-#define PEDOMETER_STEP_DETECTION_PERIOD_MS              1000
+#define PEDOMETER_STEP_DETECTION_PERIOD_MS              900
 #define PEDOMETER_MESURES_IN_STEP_DETECTION_PERIOD      5
 #define PEDOMETER_DAY_STEP_LIMMIT_DEFAULT               10000
 
@@ -99,6 +99,7 @@
 #define CORE_PEDOMETER_SLEEP_MIN_ACCELL_100     3 // acceletometer sensitivity/100*G for sleep detection
 
 #define APP_CLOCK_POWER_AFTER_SECONDS           4
+
 //#define DEBUG_SERIAL
 //#define DEBUG_PEDOMETER
 //#define WAKEUP_DEBUG

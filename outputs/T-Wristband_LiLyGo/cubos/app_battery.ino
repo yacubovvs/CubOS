@@ -99,6 +99,13 @@ void appNameClass::drawInfo(){
             drawStringOnScreen("Battery:");
             drawStringOnScreen(String(core_battery_getPercent()) + " %");
     
+            drawStringOnScreen("Battery is charging:");
+            if(driver_battery_isCharging()) drawStringOnScreen("True");
+            else drawStringOnScreen("False");
+
+            drawStringOnScreen("USB is connected:");
+            if(driver_battery_isUsbConnected()) drawStringOnScreen("True");
+            else drawStringOnScreen("False");
         //#else
             
         //#endif
