@@ -6,6 +6,8 @@
 ## Features
 * RTC
 * Pedometer
+* Sleep time
+* 1 week history
 * Up to 4 days on one charge
 * 80x160 display full framebuffer 65k colors
 
