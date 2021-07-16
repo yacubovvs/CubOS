@@ -71,16 +71,17 @@
                                  SLEEP TYPES -                               
 */
 
-#define SLEEP_IDLE_CPU          0x01
-#define SLEEP_DEEP              0x02
-#define SLEEP_LIGHT             0x03
-#define SLEEP_MODEM             0x04
-#define SLEEP_DISPLAY           0x05
-#define SLEEP_HIBERNATE         0x03
-#define WAKE_MODEM              0x06
-#define WAKE_DISPLAY            0x07
-#define WAKE                    0x08
-#define SLEEP_LIGHT_SCREEN_OFF  0x09
+#define SLEEP_IDLE_CPU                      0x01
+#define SLEEP_DEEP                          0x02
+#define SLEEP_LIGHT                         0x03
+#define SLEEP_MODEM                         0x04
+#define SLEEP_DISPLAY                       0x05
+#define SLEEP_HIBERNATE                     0x03
+#define WAKE_MODEM                          0x06
+#define WAKE_DISPLAY                        0x07
+#define WAKE                                0x08
+#define SLEEP_LIGHT_SCREEN_OFF              0x09
+#define SLEEP_LIGHT_ACCELEROMETER_SLEEP     0x0A
 
 
 #define IN_APP_SLEEP_TYPE       SLEEP_LIGHT

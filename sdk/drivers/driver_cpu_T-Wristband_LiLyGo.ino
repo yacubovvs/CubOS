@@ -52,34 +52,16 @@ void driver_cpu_sleep(unsigned char sleepType, long timeout){
                 driver_accelerometer_sleep();
             #endif
             break;
+
         case SLEEP_LIGHT:
             
-            //if(timeout!=0)esp_sleep_enable_timer_wakeup(timeout * 1000);
-            //esp_sleep_enable_ext0_wakeup(GPIO_NUM_33, HIGH);
-            //esp_sleep_enable_ext1_wakeup(0x600000000, ESP_EXT1_WAKEUP_ANY_HIGH);
-            //core_time_setAlarmBySeconds(2);
-            //esp_sleep_enable_ext1_wakeup(0x200000000, ESP_EXT1_WAKEUP_ANY_HIGH);
-            //esp_sleep_enable_ext0_wakeup(GPIO_NUM_33, HIGH);
             #ifdef ACCELEROMETER_ENABLE
                 driver_accelerometer_sleep();
             #endif
-
-            //gpio_hold_en((gpio_num_t) 26);
-            //gpio_deep_sleep_hold_en();
             esp_sleep_enable_timer_wakeup(timeout*1000);
-            //0000000200000000
-            /*
-            rtc.disableAlarm();
-            rtc.setDateTime(2019, 4, 7, 9, 5, 57);
-            rtc.setAlarmByMinutes(6);
-            rtc.enableAlarm();
-            */
-
             esp_light_sleep_start();
-
-            //esp_sleep_enable_ext0_wakeup(GPIO_NUM_33, HIGH);
             #ifdef ACCELEROMETER_ENABLE
-                driver_accelerometer_sleep();
+                driver_accelerometer_wakeup();
             #endif
 
             break;
