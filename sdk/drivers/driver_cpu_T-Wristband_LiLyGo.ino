@@ -56,14 +56,24 @@ void driver_cpu_sleep(unsigned char sleepType, long timeout){
         case SLEEP_LIGHT:
             
             #ifdef ACCELEROMETER_ENABLE
-                driver_accelerometer_sleep();
+                //driver_accelerometer_sleep();
+                //driver_accelerometer_wakeup();
             #endif
             esp_sleep_enable_timer_wakeup(timeout*1000);
             esp_light_sleep_start();
+            esp_sleep_enable_ext0_wakeup(GPIO_NUM_33, HIGH);
             #ifdef ACCELEROMETER_ENABLE
-                driver_accelerometer_wakeup();
+                //driver_accelerometer_wakeup();
+                //delay(100)
+                //esp_sleep_enable_timer_wakeup(100*1000);
+                //esp_light_sleep_start();
+                //esp_sleep_enable_ext0_wakeup(GPIO_NUM_33, HIGH);
             #endif
-
+            /*
+            esp_sleep_enable_timer_wakeup(1*1000);
+            esp_light_sleep_start();
+            esp_sleep_enable_ext0_wakeup(GPIO_NUM_33, HIGH);
+            */
             break;
         case SLEEP_MODEM:
             WiFi.disconnect();

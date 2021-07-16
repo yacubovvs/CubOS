@@ -293,11 +293,11 @@
 
         #ifdef DEBUG_PEDOMETER
             debug("# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #");
-            debug( String("max_value: ") + analysis_max_value);
-            debug( String("min_value: ") + analysis_min_value);
+            //debug( String("max_value: ") + analysis_max_value);
+            //debug( String("min_value: ") + analysis_min_value);
             debug( String("delta_value: ") + analysis_delta_value);
-            debug( String("axis_crossings: ") + analysis_axis_crossings);
-            debug( String("central_value: ") + analysis_central_value);
+            //debug( String("axis_crossings: ") + analysis_axis_crossings);
+            //debug( String("central_value: ") + analysis_central_value);
             debug( String("central_weight_value: ") + analysis_central_weight_value);
             debug("                                                                    ");
         #endif
