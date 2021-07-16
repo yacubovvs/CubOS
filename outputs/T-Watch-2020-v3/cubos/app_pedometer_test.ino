@@ -74,8 +74,9 @@ void appNameClass::onLoop(){
         drawStringOnScreen(String(get_pedometer_days_sleep()));
         drawStringOnScreen("Mesures: ");
         drawStringOnScreen(String(getPedometr_mesurings_in_a_day()));
-        //drawStringOnScreen("");
-        
+        drawStringOnScreen("");
+        drawStringOnScreen("Mesures ms: ");
+        drawStringOnScreen(String(get_corePedometer_currentsleep_between_mesures()));
         
 
         //drawStringOnScreen("Accerometer: ");

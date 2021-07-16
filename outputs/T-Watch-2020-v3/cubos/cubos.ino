@@ -71,16 +71,17 @@
                                  SLEEP TYPES -                               
 */
 
-#define SLEEP_IDLE_CPU          0x01
-#define SLEEP_DEEP              0x02
-#define SLEEP_LIGHT             0x03
-#define SLEEP_MODEM             0x04
-#define SLEEP_DISPLAY           0x05
-#define SLEEP_HIBERNATE         0x03
-#define WAKE_MODEM              0x06
-#define WAKE_DISPLAY            0x07
-#define WAKE                    0x08
-#define SLEEP_LIGHT_SCREEN_OFF  0x09
+#define SLEEP_IDLE_CPU                      0x01
+#define SLEEP_DEEP                          0x02
+#define SLEEP_LIGHT                         0x03
+#define SLEEP_MODEM                         0x04
+#define SLEEP_DISPLAY                       0x05
+#define SLEEP_HIBERNATE                     0x03
+#define WAKE_MODEM                          0x06
+#define WAKE_DISPLAY                        0x07
+#define WAKE                                0x08
+#define SLEEP_LIGHT_SCREEN_OFF              0x09
+#define SLEEP_LIGHT_ACCELEROMETER_SLEEP     0x0A
 
 
 #define IN_APP_SLEEP_TYPE       SLEEP_LIGHT
@@ -145,7 +146,7 @@
 
 //#define PEDOMETER_STEP_DETECTION_DELAY                30000
 
-#define PEDOMETER_DO_NOT_USER_PEDOMETER_WHILE_CONNECTED_TO_USB
+#define PEDOMETER_DO_NOT_USE_PEDOMETER_WHILE_CONNECTED_TO_USB
 
 //#define PEDOMETER_STEP_DETECTION_DELAY                  1000
 #define PEDOMETER_STEP_DETECTION_PERIOD_MS              1000
@@ -239,10 +240,10 @@
 #undef POWERSAVE_ENABLE
 #define CPU_CONTROLL_ENABLE
 
-//#define CLOCK_ENABLE
+#define CLOCK_ENABLE
 //#define USE_PRIMITIVE_HARDWARE_DRAW_ACCELERATION
 
-//#define RTC_ENABLE
+#define RTC_ENABLE
 
 #define SCREEN_ROTATION_0
 //#define SCREEN_ROTATION_90
@@ -329,14 +330,15 @@ Application* currentApp;
 */
 
 void setup(){   
-  #ifdef CORE_SETUP_INIT
-    core_setup_driver();
-  #endif
 
   #ifdef DEBUG_SERIAL
       DEBUG_SERIAL_PORT.begin(115200);
       delay(100);
-      debug("Serial debug started", 10);
+      debug("\n\nSerial debug started " + String(millis()));
+  #endif
+
+  #ifdef CORE_SETUP_INIT
+    core_setup_driver();
   #endif
 
   #ifdef POWERSAVE_ENABLE
@@ -344,10 +346,10 @@ void setup(){
       unsigned char wakeUpReason = core_powersave_wakeup_reason();
       if(wakeUpReason==WAKE_UP_REASON_TIMER){
         #ifdef WAKEUP_DEBUG
-          debug("WAKEUP_DEBUG: Background start " + String(millis()), 10);
+          debug("WAKEUP_DEBUG: Background start " + String(millis()));
           //core_cpu_setup();
         #endif
-        #ifdef PEDOMETER_DO_NOT_USER_PEDOMETER_WHILE_CONNECTED_TO_USB
+        #ifdef PEDOMETER_DO_NOT_USE_PEDOMETER_WHILE_CONNECTED_TO_USB
           #ifdef BATTERY_ENABLE
             driver_battery_setup();
           #endif
@@ -355,11 +357,12 @@ void setup(){
         core_cpu_setup();
         driver_controls_setup();
         #ifdef WAKEUP_DEBUG
-          debug("WAKEUP_DEBUG: Backgroung controls inited "  + String(millis()), 10);
+          debug("WAKEUP_DEBUG: Backgroung controls inited "  + String(millis()));
         #endif
         backgroundWorkAfterSleep();
         #ifdef WAKEUP_DEBUG
-          debug("WAKEUP_DEBUG: Going to sleep again "  + String(millis()), 10);
+          debug("WAKEUP_DEBUG: Going to sleep again for " + String(get_corePedometer_currentsleep_between_mesures()) + "ms " + String(millis()));
+          delay(50);
         #endif
         core_cpu_sleep(STAND_BY_SLEEP_TYPE, get_corePedometer_currentsleep_between_mesures()*1000);
       }else{

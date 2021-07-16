@@ -1,12 +1,6 @@
-#include <LilyGoWatch.h>
 
-TTGOClass *ttgo_battery;
-AXP20X_Class *power_battery;
 
 void driver_battery_setup(){
-    ttgo_battery = TTGOClass::getWatch();
-    power_battery = ttgo_battery->power;
-    power_battery->setChargeControlCur(500);
 }
 
 void driver_battery_loop(){
@@ -14,7 +8,7 @@ void driver_battery_loop(){
 }
 
 float driver_battery_getVoltage(){
-    return 4.2;
+    return get_core_driver_getBattVoltage()/1000;
 }
 
 int driver_battery_getVoltage_mV(){
@@ -22,7 +16,7 @@ int driver_battery_getVoltage_mV(){
 }
 
 float driver_battery_getCurent_mA(){
-    return 0;
+    return get_core_driver_getBattChargeCurrent() + get_core_driver_getBattDischargeCurrent();
 }
 
 float driver_battery_getUsbVoltage(){
@@ -34,11 +28,11 @@ float driver_battery_getUsbCurent_mA(){
 }
 
 float driver_battery_getVinVoltage(){
-    return 5.0;
+    return get_core_driver_getVbusVoltage();
 }
 
 float driver_battery_getVinCurent_mA(){
-    return 0;
+    return get_core_driver_getVbusCurrent();
 }
 
 float driver_battery_controller_Temp(){
@@ -60,6 +54,7 @@ unsigned char driver_battery_getPercent(){
         return dmV*10/80;
     }
     return 0;
+    //return get_core_driver_getBattPercentage();
 }
 
 bool driver_battery_isCharging(){
@@ -68,4 +63,8 @@ bool driver_battery_isCharging(){
 
 bool driver_battery_isUsbConnected(){
     return get_core_driver_VBUSConnected();
+}
+
+bool driver_battery_isBatteryConnected(){
+    return get_core_driver_isBatteryConnect();
 }

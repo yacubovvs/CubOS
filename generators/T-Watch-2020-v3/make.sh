@@ -42,6 +42,7 @@ cp sdk/drivers/driver_touchscreen_ttwatch.ino               outputs/T-Watch-2020
 cp sdk/drivers/driver_controls_tt-watch-2020.ino            outputs/T-Watch-2020-v3/cubos/     
 cp sdk/drivers/driver_cpu_TTGO_watch2020_v3.ino             outputs/T-Watch-2020-v3/cubos/     
 cp sdk/drivers/driver_battery_TTwatch2020v3.ino             outputs/T-Watch-2020-v3/cubos/ 
+cp sdk/drivers/driver_rtc_ttgo_watch2020v3.ino              outputs/T-Watch-2020-v3/cubos/ 
 #cp sdk/drivers/driver_rtc_ds3231.ino                        outputs/T-Watch-2020-v3/cubos/     
 #cp sdk/drivers/driver_cpu_m5StickS.ino                      outputs/T-Watch-2020-v3/cubos/     
 
