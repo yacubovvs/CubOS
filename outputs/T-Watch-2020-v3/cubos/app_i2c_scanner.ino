@@ -90,6 +90,11 @@ void appNameClass::onEvent(unsigned char event, int val1, int val2){
 
         if(event==EVENT_ON_TOUCH_DRAG){
         }
+        if(event==EVENT_BUTTON_PRESSED){
+            if(val1==BUTTON_POWER){
+                startApp(-1);
+            }
+        }
 
     #else
 
@@ -97,9 +102,6 @@ void appNameClass::onEvent(unsigned char event, int val1, int val2){
         #if (DRIVER_CONTROLS_TOTALBUTTONS == 2 || DRIVER_CONTROLS_TOTALBUTTONS == 1)
             
             if(event==EVENT_BUTTON_PRESSED){
-                if(val1==BUTTON_POWER){
-                    startApp(-1);
-                }
             }else if(event==EVENT_BUTTON_RELEASED){
             }else if(event==EVENT_BUTTON_LONG_PRESS){
                 if(val1==BUTTON_SELECT){

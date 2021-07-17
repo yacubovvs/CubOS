@@ -137,6 +137,8 @@
 // #define ACCELEROMETER_ENABLE
 #define DISPLAY_BACKLIGHT_CONTROL_ENABLE
 #define DISPLAY_BACKLIGHT_FADE_CONTROL_ENABLE
+#define DEFAULT_FADE_BRIGHTNES 50
+#define DEFAULT_SCREEN_BRIGHTNESS 100
 
 #define WAKEUP_FROM_LIGHT_SLEEP_EVERY_MS 1000
 #define WAKEUP_FROM_DEEP_SLEEP_EVERY_SECONDS 60*60*24 // Wake up if no any other background works as pedometer
@@ -197,8 +199,6 @@
     ############################################################################################
 */
 
-#undef CPU_CONTROLL_ENABLE
-
 #define LILYGO_WATCH_2020_V3 
 
 #define DEBUG_SERIAL
@@ -224,20 +224,18 @@
 #define DRIVER_CONTROLS_TOTALBUTTONS 1
 #define HARDWARE_BUTTONS_ENABLED              // Conf of controls with hardware btns    
 #define TOUCH_SCREEN_ENABLE
-//#define PEDOMETER_ENABLE
 
-#define COLOR_SCREEN                     // Screen is colored
-//#define NO_ANIMATION                     
+#define COLOR_SCREEN                     // Screen is colored                     
 
 //#define toDefaultApp_onLeftLongPress
 
 #define STARTING_APP_NUMM   -1    // for Mainmenu (default app)
-#define STARTING_APP_NUMM   10
+//#define STARTING_APP_NUMM   10
 
-//#define CPU_SLEEP_ENABLE
+#define CPU_SLEEP_ENABLE
 
 #define BATTERY_ENABLE
-#undef POWERSAVE_ENABLE
+#define POWERSAVE_ENABLE
 #define CPU_CONTROLL_ENABLE
 
 #define CLOCK_ENABLE
@@ -249,8 +247,15 @@
 //#define SCREEN_ROTATION_90
 //#define SCREEN_ROTATION_180
 //#define SCREEN_ROTATION_270
-#undef DISPLAY_BACKLIGHT_CONTROL_ENABLE
-#undef DISPLAY_BACKLIGHT_FADE_CONTROL_ENABLE
+#define DISPLAY_BACKLIGHT_CONTROL_ENABLE
+#define DISPLAY_BACKLIGHT_FADE_CONTROL_ENABLE
+#define SMOOTH_BACKLIGHT_CONTROL_DELAY_CHANGE  4
+#undef SMOOTH_BACKLIGHT_CONTROL_DELAY_CHANGE
+#define DEFAULT_FADE_BRIGHTNES 5
+#define DEFAULT_SCREEN_BRIGHTNESS 10
+
+#define DEFAULT_TIME_TO_POWEROFF_DISPLAY 10
+#define DEFAULT_DELAY_TO_FADE_DISPLAY 5
 
 #define STYLE_STATUSBAR_HEIGHT  30 
 #define DRIVER_CONTROLS_TOTALBUTTONS 1
@@ -260,6 +265,43 @@
 #define CONTROLS_DELAY_TO_DOUBLE_CLICK_MS           400
 
 #define FONT_SIZE_DEFAULT 1
+
+#define DRIVER_RTC_INTERRUPT_PIN    37
+#define IN_APP_SLEEP_TYPE           SLEEP_LIGHT
+#define STAND_BY_SLEEP_TYPE         SLEEP_DEEP
+
+#define ACCELEROMETER_ENABLE
+//#define MAGNITOMETER_ENABLE
+//#define PEDOMETER_ENABLE
+
+#define PEDOMETER_STEP_DETECTION_PERIOD_MS              1000
+#define PEDOMETER_MESURES_IN_STEP_DETECTION_PERIOD      5
+#define PEDOMETER_DAY_STEP_LIMMIT_DEFAULT               10000
+
+#define PEDOMETER_DELTA_VALUE_MIN           0.47f
+#define PEDOMETER_CENTRALWIGHT_VALUE_MIN    0.15f
+
+#define PEDOMETER_STEP_DETECTION_DELAY_SEC_MIN          300
+#define PEDOMETER_STEP_DETECTION_DELAY_SEC_STEP         30
+#define PEDOMETER_STEP_DETECTION_DELAY_SEC_MAX          180 // MAX (255 - PEDOMETER_STEP_DETECTION_PERIOD_MS/1000) and multiple 60 seconds
+
+#define PEDOMETER_STEP_DETECTION_DELAY_SEC_MIN          5
+#define PEDOMETER_STEP_DETECTION_DELAY_SEC_STEP         5
+#define PEDOMETER_STEP_DETECTION_DELAY_SEC_MAX          5 // MAX (255 - PEDOMETER_STEP_DETECTION_PERIOD_MS/1000) and multiple 60 seconds
+
+
+#define CORE_PEDOMETER_SLEEP_COUNTING_SPOINTS   5 // mesures for sleep detection 
+#define CORE_PEDOMETER_SLEEP_MIN_ACCELL_100     3 // acceletometer sensitivity/100*G for sleep detection
+
+//#define DEBUG_CPU_CONTROLL_ENABLE
+#define DEBUG_CORE_POWERSAVE
+#define DEBUG_SERIAL
+#define DEBUG_PEDOMETER
+#define DEBUG_WAKEUP
+#define DEBUG_BACKLIGHT
+//#define DEBUG_DRIVER_CONTROLL
+//#define DEBUG_DRIVER_BATTERY
+/*
 /*
     ############################################################################################
     #                                                                                          #
@@ -345,8 +387,8 @@ void setup(){
     #ifdef CPU_SLEEP_ENABLE
       unsigned char wakeUpReason = core_powersave_wakeup_reason();
       if(wakeUpReason==WAKE_UP_REASON_TIMER){
-        #ifdef WAKEUP_DEBUG
-          debug("WAKEUP_DEBUG: Background start " + String(millis()));
+        #ifdef DEBUG_WAKEUP
+          debug("DEBUG_WAKEUP: Background start " + String(millis()));
           //core_cpu_setup();
         #endif
         #ifdef PEDOMETER_DO_NOT_USE_PEDOMETER_WHILE_CONNECTED_TO_USB
@@ -356,18 +398,36 @@ void setup(){
         #endif
         core_cpu_setup();
         driver_controls_setup();
-        #ifdef WAKEUP_DEBUG
-          debug("WAKEUP_DEBUG: Backgroung controls inited "  + String(millis()));
+        #ifdef DEBUG_WAKEUP
+          debug("DEBUG_WAKEUP: Backgroung controls inited "  + String(millis()));
         #endif
+
+        #ifdef RTC_ENABLE
+            driver_RTC_setup();
+            core_time_driver_RTC_refresh(true);
+        #endif
+
+        #ifdef DEBUG_WAKEUP
+            debug("DEBUG_WAKEUP: RTC inited "  + String(millis()), 10);
+        #endif
+
         backgroundWorkAfterSleep();
-        #ifdef WAKEUP_DEBUG
-          debug("WAKEUP_DEBUG: Going to sleep again for " + String(get_corePedometer_currentsleep_between_mesures()) + "ms " + String(millis()));
-          delay(50);
+        #ifdef PEDOMETER_ENABLE
+          #ifdef DEBUG_WAKEUP
+            debug("DEBUG_WAKEUP: Going to sleep again for " + String(get_corePedometer_currentsleep_between_mesures()) + "ms " + String(millis()));
+            delay(50);
+          #endif
+          core_cpu_sleep(STAND_BY_SLEEP_TYPE, get_corePedometer_currentsleep_between_mesures()*1000);
+        #else
+          #ifdef DEBUG_WAKEUP
+            debug("DEBUG_WAKEUP: Going to sleep while interrupt");
+            delay(50);
+            core_cpu_sleep(STAND_BY_SLEEP_TYPE);
+          #endif
         #endif
-        core_cpu_sleep(STAND_BY_SLEEP_TYPE, get_corePedometer_currentsleep_between_mesures()*1000);
       }else{
-        #ifdef WAKEUP_DEBUG
-          debug("WAKEUP_DEBUG: Not background start", 10);
+        #ifdef DEBUG_WAKEUP
+          debug("DEBUG_WAKEUP: Not background start", 10);
         #endif
       }
     #endif
@@ -467,12 +527,7 @@ void loop(){
     driver_accelerometer_loop();
   #endif
 
-  #ifdef PEDOMETER_ENABLE
-    //core_pedometer_loop(false);
-  #endif
-
   currentApp->onLoop(); 
-  //currentApp->onLoop(); 
 
   #ifdef ESP8266
     //ESP.wdtDisable();
@@ -575,18 +630,14 @@ void debug(String string, int delaytime){
     ############################################################################################
 */
 
-#define APP_MENU_APPLICATIONS_0             AlarmApp
-#define APP_MENU_APPLICATIONS_1             BarometerApp
-#define APP_MENU_APPLICATIONS_2             ClockApp
-#define APP_MENU_APPLICATIONS_3             CompassApp
-#define APP_MENU_APPLICATIONS_4             FileManagerApp
-#define APP_MENU_APPLICATIONS_5             I2CScannerApp
-#define APP_MENU_APPLICATIONS_6             InternetApp
-#define APP_MENU_APPLICATIONS_7             SettingsApp
-#define APP_MENU_APPLICATIONS_8             SimpleGameApp
-#define APP_MENU_APPLICATIONS_9             TestApplicationApp
-#define APP_MENU_APPLICATIONS_10            BatteryApp
-#define APP_MENU_APPLICATIONS_11            TouchTest
+#define APP_MENU_APPLICATIONS_0             ClockApp
+#define APP_MENU_APPLICATIONS_1             PedometerApp
+#define APP_MENU_APPLICATIONS_2             PedometerAppTest
+#define APP_MENU_APPLICATIONS_3             I2CScannerApp
+#define APP_MENU_APPLICATIONS_4             SettingsApp
+#define APP_MENU_APPLICATIONS_5             TestApplicationApp
+#define APP_MENU_APPLICATIONS_6             BatteryApp
+#define APP_MENU_APPLICATIONS_7             TouchTest
 
 /*
     # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #

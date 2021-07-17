@@ -222,6 +222,9 @@ void appNameClass::onEvent(unsigned char event, int val1, int val2){
                 startApp(-1);
             }
         #endif
+        if(val1==BUTTON_POWER){
+            startApp(-1);
+        }
         
     }else if(event==EVENT_BUTTON_RELEASED){
         // Write you code on [val1] button released here

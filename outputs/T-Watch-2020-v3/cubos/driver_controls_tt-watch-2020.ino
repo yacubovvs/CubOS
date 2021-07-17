@@ -1,5 +1,5 @@
 
-//#define DRIVER_CONTROLL_DEBUG
+//#define DEBUG_DRIVER_CONTROLL
 #define _millis() millis()
 //#define TP_PWR_PIN          25
 
@@ -11,22 +11,37 @@ void driver_controls_setup(){
   last_user_activity = _millis();
 }
 
-bool isDoubleOrSinglePressed = true;
+//bool isDoubleOrSinglePressed = true;
 
 void driver_controls_loop(){
   
   if(get_core_driver_isLongPressed()){
+    onButtonEvent(EVENT_BUTTON_LONG_PRESS, 0);
+    #ifdef DEBUG_DRIVER_CONTROLL
+      debug("DEBUG_DRIVER_CONTROLL: EVENT_BUTTON_LONG_PRESS");
+    #endif
+  }
+
+  if (get_core_driver_isShortPressed()){
     onButtonEvent(EVENT_BUTTON_PRESSED, 0);
-    #ifdef DRIVER_CONTROLL_DEBUG
-      debug("EVENT_BUTTON_PRESSED");
+    #ifdef DEBUG_DRIVER_CONTROLL
+      debug("DEBUG_DRIVER_CONTROLL: EVENT_BUTTON_PRESSED");
+      isDoubleOrSinglePressed = false;
+    #endif
+  }
+  /*
+  if(get_core_driver_isLongPressed()){
+    onButtonEvent(EVENT_BUTTON_PRESSED, 0);
+    #ifdef DEBUG_DRIVER_CONTROLL
+      debug("DEBUG_DRIVER_CONTROLL: EVENT_BUTTON_PRESSED");
     #endif
     onButtonEvent(EVENT_BUTTON_LONG_PRESS, 0);
-    #ifdef DRIVER_CONTROLL_DEBUG
-      debug("EVENT_BUTTON_LONG_PRESS");
+    #ifdef DEBUG_DRIVER_CONTROLL
+      debug("DEBUG_DRIVER_CONTROLL: EVENT_BUTTON_LONG_PRESS");
     #endif
     onButtonEvent(EVENT_BUTTON_RELEASED, 0);
-    #ifdef DRIVER_CONTROLL_DEBUG
-      debug("EVENT_BUTTON_RELEASED");
+    #ifdef DEBUG_DRIVER_CONTROLL
+      debug("DEBUG_DRIVER_CONTROLL: EVENT_BUTTON_RELEASED");
     #endif
   }
 
@@ -37,41 +52,42 @@ void driver_controls_loop(){
     #endif
     
     onButtonEvent(EVENT_BUTTON_PRESSED, 0);
-    #ifdef DRIVER_CONTROLL_DEBUG
-      debug("EVENT_BUTTON_PRESSED");
+    #ifdef DEBUG_DRIVER_CONTROLL
+      debug("DEBUG_DRIVER_CONTROLL: EVENT_BUTTON_PRESSED");
       isDoubleOrSinglePressed = false;
     #endif
     
     if(_millis() - last_user_buttons_activity<CONTROLS_DELAY_TO_DOUBLE_CLICK_MS){
       onButtonEvent(EVENT_ON_TOUCH_DOUBLE_PRESS, 0, _millis() - last_user_activity);
       isDoubleOrSinglePressed = true;
-      #ifdef DRIVER_CONTROLL_DEBUG
-        debug("EVENT_ON_TOUCH_DOUBLE_PRESS " + String(_millis() - last_user_buttons_activity));
+      #ifdef DEBUG_DRIVER_CONTROLL
+        debug("DEBUG_DRIVER_CONTROLL: EVENT_ON_TOUCH_DOUBLE_PRESS " + String(_millis() - last_user_buttons_activity));
       #endif
     }
 
     onButtonEvent(EVENT_BUTTON_SHORT_PRESS, 0);
-    #ifdef DRIVER_CONTROLL_DEBUG
-      debug("EVENT_BUTTON_SHORT_PRESS");
+    #ifdef DEBUG_DRIVER_CONTROLL
+      debug("DEBUG_DRIVER_CONTROLL: EVENT_BUTTON_SHORT_PRESS");
     #endif
 
     onButtonEvent(EVENT_BUTTON_RELEASED, 0);
-    #ifdef DRIVER_CONTROLL_DEBUG
-      debug("EVENT_BUTTON_RELEASED");
+    #ifdef DEBUG_DRIVER_CONTROLL
+      debug("DEBUG_DRIVER_CONTROLL: EVENT_BUTTON_RELEASED");
     #endif
     
     last_user_buttons_activity = _millis();
     last_user_activity = _millis();
   }
 
+  
   if(isDoubleOrSinglePressed==false && _millis() - last_user_buttons_activity>=CONTROLS_DELAY_TO_DOUBLE_CLICK_MS){
     onButtonEvent(EVENT_BUTTON_SHORT_SINGLE_PRESS, 0);
     isDoubleOrSinglePressed=true;
-    #ifdef DRIVER_CONTROLL_DEBUG
-      debug("EVENT_BUTTON_SHORT_SINGLE_PRESS " + String(_millis() - last_user_buttons_activity));
+    #ifdef DEBUG_DRIVER_CONTROLL
+      debug("DEBUG_DRIVER_CONTROLL: EVENT_BUTTON_SHORT_SINGLE_PRESS " + String(_millis() - last_user_buttons_activity));
     #endif
     
-  }
+  }*/
 
 }
 

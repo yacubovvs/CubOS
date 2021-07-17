@@ -6,8 +6,6 @@
     ############################################################################################
 */
 
-#undef CPU_CONTROLL_ENABLE
-
 #define LILYGO_WATCH_2020_V3 
 
 #define DEBUG_SERIAL
@@ -33,20 +31,18 @@
 #define DRIVER_CONTROLS_TOTALBUTTONS 1
 #define HARDWARE_BUTTONS_ENABLED              // Conf of controls with hardware btns    
 #define TOUCH_SCREEN_ENABLE
-//#define PEDOMETER_ENABLE
 
-#define COLOR_SCREEN                     // Screen is colored
-//#define NO_ANIMATION                     
+#define COLOR_SCREEN                     // Screen is colored                     
 
 //#define toDefaultApp_onLeftLongPress
 
 #define STARTING_APP_NUMM   -1    // for Mainmenu (default app)
-#define STARTING_APP_NUMM   10
+//#define STARTING_APP_NUMM   10
 
-//#define CPU_SLEEP_ENABLE
+#define CPU_SLEEP_ENABLE
 
 #define BATTERY_ENABLE
-#undef POWERSAVE_ENABLE
+#define POWERSAVE_ENABLE
 #define CPU_CONTROLL_ENABLE
 
 #define CLOCK_ENABLE
@@ -58,8 +54,15 @@
 //#define SCREEN_ROTATION_90
 //#define SCREEN_ROTATION_180
 //#define SCREEN_ROTATION_270
-#undef DISPLAY_BACKLIGHT_CONTROL_ENABLE
-#undef DISPLAY_BACKLIGHT_FADE_CONTROL_ENABLE
+#define DISPLAY_BACKLIGHT_CONTROL_ENABLE
+#define DISPLAY_BACKLIGHT_FADE_CONTROL_ENABLE
+#define SMOOTH_BACKLIGHT_CONTROL_DELAY_CHANGE  4
+#undef SMOOTH_BACKLIGHT_CONTROL_DELAY_CHANGE
+#define DEFAULT_FADE_BRIGHTNES 5
+#define DEFAULT_SCREEN_BRIGHTNESS 10
+
+#define DEFAULT_TIME_TO_POWEROFF_DISPLAY 10
+#define DEFAULT_DELAY_TO_FADE_DISPLAY 5
 
 #define STYLE_STATUSBAR_HEIGHT  30 
 #define DRIVER_CONTROLS_TOTALBUTTONS 1
@@ -69,6 +72,43 @@
 #define CONTROLS_DELAY_TO_DOUBLE_CLICK_MS           400
 
 #define FONT_SIZE_DEFAULT 1
+
+#define DRIVER_RTC_INTERRUPT_PIN    37
+#define IN_APP_SLEEP_TYPE           SLEEP_LIGHT
+#define STAND_BY_SLEEP_TYPE         SLEEP_DEEP
+
+#define ACCELEROMETER_ENABLE
+//#define MAGNITOMETER_ENABLE
+//#define PEDOMETER_ENABLE
+
+#define PEDOMETER_STEP_DETECTION_PERIOD_MS              1000
+#define PEDOMETER_MESURES_IN_STEP_DETECTION_PERIOD      5
+#define PEDOMETER_DAY_STEP_LIMMIT_DEFAULT               10000
+
+#define PEDOMETER_DELTA_VALUE_MIN           0.47f
+#define PEDOMETER_CENTRALWIGHT_VALUE_MIN    0.15f
+
+#define PEDOMETER_STEP_DETECTION_DELAY_SEC_MIN          300
+#define PEDOMETER_STEP_DETECTION_DELAY_SEC_STEP         30
+#define PEDOMETER_STEP_DETECTION_DELAY_SEC_MAX          180 // MAX (255 - PEDOMETER_STEP_DETECTION_PERIOD_MS/1000) and multiple 60 seconds
+
+#define PEDOMETER_STEP_DETECTION_DELAY_SEC_MIN          5
+#define PEDOMETER_STEP_DETECTION_DELAY_SEC_STEP         5
+#define PEDOMETER_STEP_DETECTION_DELAY_SEC_MAX          5 // MAX (255 - PEDOMETER_STEP_DETECTION_PERIOD_MS/1000) and multiple 60 seconds
+
+
+#define CORE_PEDOMETER_SLEEP_COUNTING_SPOINTS   5 // mesures for sleep detection 
+#define CORE_PEDOMETER_SLEEP_MIN_ACCELL_100     3 // acceletometer sensitivity/100*G for sleep detection
+
+//#define DEBUG_CPU_CONTROLL_ENABLE
+#define DEBUG_CORE_POWERSAVE
+#define DEBUG_SERIAL
+#define DEBUG_PEDOMETER
+#define DEBUG_WAKEUP
+#define DEBUG_BACKLIGHT
+//#define DEBUG_DRIVER_CONTROLL
+//#define DEBUG_DRIVER_BATTERY
+/*
 /*
     ############################################################################################
     #                                                                                          #

@@ -1,4 +1,87 @@
 
+/* */
+
+void driver_RTC_setup(){
+	core_driver_setup_rtc_setup();
+}
+
+void driver_RTC_refresh(bool hard){
+	core_driver_setup_rtc_refresh(hard);
+}
+
+void driver_RTC_refresh(){
+	core_driver_setup_rtc_refresh(false);
+}
+
+unsigned char driver_RTC_getMinutes(){
+	return core_driver_setup_rtc_getMinutes();
+}
+
+void driver_RTC_setMinutes(unsigned char minutes){
+	core_driver_setup_rtc_setMinutes(minutes);
+}
+
+unsigned char driver_RTC_getSeconds(){
+	return core_driver_setup_rtc_getSeconds();
+}
+
+void driver_RTC_setSeconds(unsigned char seconds){
+	core_driver_setup_rtc_setSeconds(seconds);
+}
+
+unsigned char driver_RTC_getHours(){
+	return core_driver_setup_rtc_getHours();
+}
+
+void driver_RTC_setHours(unsigned char hours){
+	core_driver_setup_rtc_setHours(hours);
+}
+
+unsigned char driver_RTC_getTemperature(){
+	return core_driver_setup_rtc_getTemperature();
+}
+
+unsigned char driver_RTC_getWeekDay(){
+	// TODO
+	return core_driver_setup_rtc_getWeekDay();
+}
+
+void driver_RTC_setWeekDay(unsigned char weekDay){
+	core_driver_setup_rtc_setWeekDay(weekDay);
+}
+
+unsigned char driver_RTC_getDate(){
+	return core_driver_setup_rtc_getDate();
+}
+
+void driver_RTC_setDate(unsigned char date){
+	core_driver_setup_rtc_setDate(date);
+}
+
+unsigned char driver_RTC_getMonth(){
+	return core_driver_setup_rtc_getMonth();
+}
+
+void driver_RTC_setMonth(unsigned char month){
+	core_driver_setup_rtc_setMonth(month);
+}
+
+uint16_t driver_RTC_getYear(){
+	return core_driver_setup_rtc_getYear();
+}
+
+
+void driver_RTC_setYear(int year){
+	core_driver_setup_rtc_setYear(year);
+}
+
+void driver_RTC_setAlarmBySeconds(unsigned char seconds){
+	core_driver_setup_rtc_setAlarmBySeconds(seconds);
+}
+
+// /*
+
+/* * /
 unsigned char driver_rtc_emulator_hours 	= 18;
 unsigned char driver_rtc_emulator_minutes 	= 23;
 unsigned char driver_rtc_emulator_seconds 	= 48;
@@ -98,9 +181,6 @@ void driver_RTC_setYear(int year){
 }
 
 void driver_RTC_setAlarmBySeconds(unsigned char seconds){
-	/*
-	rtc.disableAlarm();
-    rtc.setAlarmBySeconds((driver_RTC_getSeconds()+seconds)%60);
-    rtc.enableAlarm();
-	*/
+
 }
+// */

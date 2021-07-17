@@ -685,6 +685,9 @@ void appNameClass::onEvent(unsigned char event, int val1, int val2){
             this->drawIcons(true);
         }
 
+        if(val1==BUTTON_POWER){
+            startApp(-1);
+        }
     #else
 
         /**/
@@ -698,6 +701,7 @@ void appNameClass::onEvent(unsigned char event, int val1, int val2){
                   ){
                     if(this->stillPressingSelect_time==0) this->stillPressingSelect_time = millis();
                 }  
+                
             }else if(event==EVENT_BUTTON_RELEASED){
                 if(
                     currentSubMenu==APP_SETTINGS_SUBMENU_SET_TIME 

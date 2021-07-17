@@ -31,6 +31,7 @@
             TOUCH_SCREEN_X = x;
             TOUCH_SCREEN_Y = y;
             TOUCH_SCREEN_isTouching = true;
+            set_core_powersave_lastUserAction();
             /*
             debug("X: ");
             debug(String(TOUCH_SCREEN_X));

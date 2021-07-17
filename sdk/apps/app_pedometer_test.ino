@@ -60,7 +60,9 @@ void appNameClass::onLoop(){
     #ifdef ACCELEROMETER_ENABLE
         //core_pedometer_loop(false);
         driver_accelerometer_update_accelerometer();
-        core_pedometer_loop(false);
+          #ifdef PEDOMETER_ENABLE
+            core_pedometer_loop(false);
+        #endif
     #endif
    
     currentPrintScreenString = 0;
@@ -69,14 +71,33 @@ void appNameClass::onLoop(){
 
     #ifdef ACCELEROMETER_ENABLE
         drawStringOnScreen("Steps: ");
-        drawStringOnScreen(String(get_pedometer_days_steps()));
+        #ifdef PEDOMETER_ENABLE
+            drawStringOnScreen(String(get_pedometer_days_steps()));
+        #else 
+            drawStringOnScreen("-");
+        #endif
+
         drawStringOnScreen("Sleep: ");
+        #ifdef PEDOMETER_ENABLE
         drawStringOnScreen(String(get_pedometer_days_sleep()));
+        #else 
+            drawStringOnScreen("-");
+        #endif
+
         drawStringOnScreen("Mesures: ");
+        #ifdef PEDOMETER_ENABLE
         drawStringOnScreen(String(getPedometr_mesurings_in_a_day()));
+        #else 
+            drawStringOnScreen("-");
+        #endif
+
         drawStringOnScreen("");
         drawStringOnScreen("Mesures ms: ");
-        drawStringOnScreen(String(get_corePedometer_currentsleep_between_mesures()));
+        #ifdef PEDOMETER_ENABLE
+            drawStringOnScreen(String(get_corePedometer_currentsleep_between_mesures()));
+        #else 
+            drawStringOnScreen("-");
+        #endif
         
 
         //drawStringOnScreen("Accerometer: ");
@@ -84,15 +105,16 @@ void appNameClass::onLoop(){
     #endif
 
     #ifdef DEBUG_PEDOMETER
-        drawStringOnScreen(" ");
-        drawStringOnScreen("Delta: ");
-        drawStringOnScreen(String(get_analysis_delta_value()));
-        //drawStringOnScreen("Central weight: ");
-        //drawStringOnScreen(String(get_analysis_central_weight_value()));
-        drawStringOnScreen("");
-        drawStringOnScreen("Mesure delay: ");
-        drawStringOnScreen(String(get_corePedometer_currentsleep_between_mesures()));
-        
+        #ifdef PEDOMETER_ENABLE
+            drawStringOnScreen(" ");
+            drawStringOnScreen("Delta: ");
+            drawStringOnScreen(String(get_analysis_delta_value()));
+            //drawStringOnScreen("Central weight: ");
+            //drawStringOnScreen(String(get_analysis_central_weight_value()));
+            drawStringOnScreen("");
+            drawStringOnScreen("Mesure delay: ");
+            drawStringOnScreen(String(get_corePedometer_currentsleep_between_mesures()));
+        #endif
     #endif
     
     
@@ -111,6 +133,11 @@ void appNameClass::onEvent(unsigned char event, int val1, int val2){
      #ifdef TOUCH_SCREEN_ENABLE
 
         if(event==EVENT_ON_TOUCH_DRAG){
+        }
+        if(event==EVENT_BUTTON_PRESSED){
+            if(val1==BUTTON_POWER){
+                startApp(-1);
+            }
         }
 
     #else

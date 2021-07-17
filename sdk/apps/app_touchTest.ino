@@ -77,6 +77,9 @@ void appNameClass::onEvent(unsigned char event, int val1, int val2){
         if(val1==BUTTON_BACK){
             startApp(-1);
         }
+        if(val1==BUTTON_POWER){
+            startApp(-1);
+        }
     }else if(event==EVENT_BUTTON_RELEASED){
         // Write you code on [val1] button released here
     }else if(event==EVENT_BUTTON_LONG_PRESS){

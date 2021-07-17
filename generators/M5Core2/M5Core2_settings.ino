@@ -99,7 +99,7 @@
 #define PEDOMETER_CENTRALWIGHT_VALUE_MIN    0.2f
 
 //#define DEBUG_PEDOMETER
-// #define WAKEUP_DEBUG
+// #define DEBUG_WAKEUP
 */
 
 //#define FRAMEBUFFER_ENABLE

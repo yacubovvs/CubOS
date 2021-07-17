@@ -1,5 +1,6 @@
 
 uint16_t current_drawColor;
+unsigned char driver_display_screenBrightness = 100;
 
 void driver_display_setDrawColor(unsigned char red, unsigned char green, unsigned char blue){
   current_drawColor = get_uint16Color(red, green, blue);
@@ -94,3 +95,24 @@ void display_driver_setPixel(int x, int y, uint16_t color){
   }
 
 #endif
+
+
+unsigned char driver_display_getBrightness(){
+  return driver_display_screenBrightness;
+}
+
+void driver_display_setBrightness(unsigned int brightness){
+  #ifdef DISPLAY_BACKLIGHT_CONTROL_ENABLE
+    #ifdef DEBUG_BACKLIGHT
+        debug("DEBUG_BACKLIGHT: Setting backlight to " + String(brightness));
+    #endif
+    driver_display_screenBrightness = brightness;
+    #ifdef DEBUG_BACKLIGHT
+        //debug("DEBUG_BACKLIGHT: Backlight convert to " + String(driver_display_screenBrightness), 20);
+    #endif
+    core_driver_setBrigtness((unsigned char)(((int)driver_display_screenBrightness)*255/100));
+  #else
+    driver_display_screenBrightness = 100;
+    core_driver_setBrigtness((unsigned char)(((int)driver_display_screenBrightness)*255/100));
+  #endif
+}
