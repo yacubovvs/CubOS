@@ -15,7 +15,7 @@ uint16_t getDrawColor(){
 }
 
 void driver_display_setup(){
-    core_driver_openBL();
+  core_driver_openBL();
 }
 
 void sleep_displayDriver(){}
@@ -102,17 +102,21 @@ unsigned char driver_display_getBrightness(){
 }
 
 void driver_display_setBrightness(unsigned int brightness){
-  #ifdef DISPLAY_BACKLIGHT_CONTROL_ENABLE
-    #ifdef DEBUG_BACKLIGHT
-        debug("DEBUG_BACKLIGHT: Setting backlight to " + String(brightness));
-    #endif
+  #ifdef DEBUG_BACKLIGHT
+      debug("DEBUG_BACKLIGHT: Setting backlight to " + String(brightness));
+  #endif
+
+  #ifdef DISPLAY_BACKLIGHT_CONTROL_ENABLE  
     driver_display_screenBrightness = brightness;
     #ifdef DEBUG_BACKLIGHT
         //debug("DEBUG_BACKLIGHT: Backlight convert to " + String(driver_display_screenBrightness), 20);
     #endif
     core_driver_setBrigtness((unsigned char)(((int)driver_display_screenBrightness)*255/100));
   #else
-    driver_display_screenBrightness = 100;
-    core_driver_setBrigtness((unsigned char)(((int)driver_display_screenBrightness)*255/100));
+    if(brightness==0) core_driver_setBrigtness(0);
+    else core_driver_setBrigtness(255);
+    
+
+    //core_driver_setBrigtness(128);
   #endif
 }

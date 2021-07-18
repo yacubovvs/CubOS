@@ -20,64 +20,70 @@ void driver_cpu_sleep(unsigned char sleepType, long timeout){
         case SLEEP_IDLE_CPU:
             break;
         case SLEEP_DEEP:
+            debug("SLEEP_DEEP!!!");
+            //core_driver_ldo_poweroff_deepSleep_test();
+            core_driver_ldo_poweroff_deepSleep();
+            break;
+            /*
+            delay(50);
             
+            
+            if(driver_display_getBrightness()!=0){
+                driver_display_setBrightness(0);
+            }
+
             sleep_displayDriver();
             #ifdef ACCELEROMETER_ENABLE
                 driver_accelerometer_sleep();
             #endif
 
-            //esp_sleep_enable_ext0_wakeup(GPIO_NUM_33, HIGH);
-            //esp_sleep_enable_ext1_wakeup(MULTIPLE_INT_BITMASK, ESP_EXT1_WAKEUP_ANY_HIGH);
-            //esp_sleep_enable_timer_wakeup(1000);
-            //esp_deep_sleep_disable_timer_wakeup();
-            //esp_sleep_disable_timer_wakeup();
-            esp_sleep_enable_timer_wakeup(1000*timeout);
-            //s_config.wakeup_triggers &= ~RTC_TIMER_TRIG_EN;
-            //s_config.sleep_duration = 0;
-            //esp_sleep_enable_ext0_wakeup(TOUCH_SCREEN_INTERRUPT_PIN, HIGH);
-            esp_sleep_enable_ext0_wakeup(TOUCH_SCREEN_INTERRUPT_PIN, LOW);
+
+            core_driver_ldo_poweroff_deepSleep();
+
+            //esp_sleep_enable_ext1_wakeup(GPIO_SEL_39, ESP_EXT1_WAKEUP_ANY_HIGH);
+            //esp_sleep_enable_ext0_wakeup(TOUCH_SCREEN_INTERRUPT_PIN, ESP_EXT1_WAKEUP_ANY_HIGH);
+            //esp_sleep_enable_ext0_wakeup(TOUCH_SCREEN_INTERRUPT_PIN, LOW);
+            //esp_sleep_enable_ext1_wakeup(GPIO_SEL_39, ESP_EXT1_WAKEUP_ANY_HIGH);
+            esp_sleep_enable_ext1_wakeup(GPIO_SEL_38, ESP_EXT1_WAKEUP_ALL_LOW);
+
             esp_deep_sleep_start();
-        
+
+            if(driver_display_getBrightness()!=100){
+                driver_display_setBrightness(100);
+            }*/
+            
             break;
         case SLEEP_LIGHT_SCREEN_OFF:
-            sleep_displayDriver();
-
-            #ifdef ACCELEROMETER_ENABLE
-                driver_accelerometer_sleep();
-            #endif
-
-            gpio_hold_en((gpio_num_t) 26);
-            gpio_deep_sleep_hold_en();
-            esp_sleep_enable_timer_wakeup(timeout*1000);
-            //esp_sleep_enable_ext0_wakeup(TOUCH_SCREEN_INTERRUPT_PIN, HIGH);
-            esp_sleep_enable_ext0_wakeup(TOUCH_SCREEN_INTERRUPT_PIN, LOW);
-            esp_light_sleep_start();
-
             
+            debug("LIGHT_SLEEP_SCREENOFF!!! start");
 
+            core_driver_ldo_poweroff_lightSleep();
+
+            debug("LIGHT_SLEEP_SCREENOFF!!! finished");
             break;
-        case SLEEP_LIGHT:
-            
-            //if(timeout!=0)esp_sleep_enable_timer_wakeup(timeout * 1000);
-            //esp_sleep_enable_ext0_wakeup(GPIO_NUM_33, HIGH);
-            //esp_sleep_enable_ext1_wakeup(0x600000000, ESP_EXT1_WAKEUP_ANY_HIGH);
-            //core_time_setAlarmBySeconds(2);
-            //esp_sleep_enable_ext1_wakeup(0x200000000, ESP_EXT1_WAKEUP_ANY_HIGH);
-            //esp_sleep_enable_ext0_wakeup(GPIO_NUM_33, HIGH);
-
-            //gpio_hold_en((gpio_num_t) 26);
-            //gpio_deep_sleep_hold_en();
-            esp_sleep_enable_timer_wakeup(timeout*1000);
-            //0000000200000000
             /*
-            rtc.disableAlarm();
-            rtc.setDateTime(2019, 4, 7, 9, 5, 57);
-            rtc.setAlarmByMinutes(6);
-            rtc.enableAlarm();
-            */
+            core_driver_openBL();
+            
+            esp_sleep_enable_ext0_wakeup(TOUCH_SCREEN_INTERRUPT_PIN, LOW);
+            esp_light_sleep_start();
+            esp_sleep_enable_timer_wakeup(10*1000*1000);
+
+            
+
+            core_driver_closeBL() ;
+
+            break;*/
+        case SLEEP_LIGHT:
+            debug("LIGHT_SLEEP!!!");
+            
+            esp_sleep_enable_timer_wakeup(timeout*1000);
 
             esp_sleep_enable_ext0_wakeup(TOUCH_SCREEN_INTERRUPT_PIN, LOW);
             esp_light_sleep_start();
+
+            if(driver_display_getBrightness()!=100){
+                driver_display_setBrightness(100);
+            }
             
             
 

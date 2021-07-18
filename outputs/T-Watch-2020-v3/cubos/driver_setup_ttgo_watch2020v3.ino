@@ -5,6 +5,7 @@
 TTGOClass *ttgo;
 AXP20X_Class *ttgo_power;
 PCF8563_Class *rtc;
+BMA *sensor;
 
 /*
 PCF8563_Class * driver_setup_getRTC(){
@@ -75,6 +76,36 @@ void core_setup_driver(){
     core_driver_VBUSConnected = ttgo_power->isVBUSPlug();
     core_driver_isCharging = ttgo_power->getBattChargeCurrent()>0;
 
+    
+    ttgo->begin();
+    //ttgo_begin();
+
+    #ifdef DEBUG_WAKEUP
+        debug("TTGO begin "  + String(millis()));
+    #endif
+    //ttgo->openBL();
+    
+    sensor = ttgo->bma;
+
+    // Accel parameter structure
+    Acfg cfg;
+    cfg.odr = BMA4_OUTPUT_DATA_RATE_100HZ;
+
+    cfg.range = BMA4_ACCEL_RANGE_2G;
+    cfg.bandwidth = BMA4_ACCEL_NORMAL_AVG4;
+
+    cfg.perf_mode = BMA4_CONTINUOUS_MODE;
+
+/*
+    sensor->accelConfig(cfg);
+    sensor->enableAccel();
+    sensor->enableFeature(BMA423_STEP_CNTR, false);
+    sensor->enableFeature(BMA423_TILT, true);
+    sensor->enableFeature(BMA423_WAKEUP, true);
+    sensor->resetStepCounter();
+    sensor->enableTiltInterrupt();
+    sensor->enableWakeupInterrupt();
+    */
 }
 
 void core_loop_irq_check(){
@@ -166,6 +197,111 @@ void core_driver_drawPixel(int x, int y, uint16_t color){
 void core_driver_setBrigtness(unsigned char brightness){
     ttgo->setBrightness(brightness); // 0..255
 }
+
+void core_driver_ldo_poweroff_deepSleep(){
+
+    ttgo->displaySleep();
+
+    ttgo_power->setPowerOutPut(AXP202_LDO3, false);
+    ttgo_power->setPowerOutPut(AXP202_LDO4, false);
+    ttgo_power->setPowerOutPut(AXP202_LDO2, false);
+    ttgo_power->setPowerOutPut(AXP202_EXTEN, false);
+    ttgo_power->setPowerOutPut(AXP202_DCDC2, false);
+    //esp_sleep_enable_ext1_wakeup(GPIO_SEL_39, ESP_EXT1_WAKEUP_ANY_HIGH);
+    esp_sleep_enable_ext1_wakeup(GPIO_SEL_38, ESP_EXT1_WAKEUP_ALL_LOW);
+    
+    esp_sleep_enable_timer_wakeup(10*1000*1000);
+    esp_deep_sleep_start();
+}
+
+void core_driver_ldo_poweroff_lightSleep(){
+
+    core_driver_setBrigtness(0);
+    core_driver_closeBL();
+    ttgo->displaySleep();
+
+    
+    ttgo_power->setPowerOutPut(AXP202_LDO3, false);
+    ttgo_power->setPowerOutPut(AXP202_LDO4, false);
+    ttgo_power->setPowerOutPut(AXP202_LDO2, false);
+    ttgo_power->setPowerOutPut(AXP202_EXTEN, false);
+    ttgo_power->setPowerOutPut(AXP202_DCDC2, false);
+    //esp_sleep_enable_ext1_wakeup(GPIO_SEL_39, ESP_EXT1_WAKEUP_ANY_HIGH);
+    esp_sleep_enable_ext1_wakeup(GPIO_SEL_38, ESP_EXT1_WAKEUP_ALL_LOW);
+    
+    esp_sleep_enable_timer_wakeup(10*1000*1000);
+    //while(!getTOUCH_SCREEN_isTouching()){
+    
+    while(true){
+        esp_light_sleep_start();   
+        unsigned char wakeUpReason = core_powersave_wakeup_reason();
+        if(wakeUpReason==WAKE_UP_REASON_TIMER){
+            #ifdef DEBUG_WAKEUP
+                debug("DEBUG_WAKEUP: wake up by timer " + String(WAKE_UP_REASON_TIMER), 10);
+            #endif
+        }else{
+            #ifdef DEBUG_WAKEUP
+                debug("DEBUG_WAKEUP: Interrupt wakeup " + String(WAKE_UP_REASON_TIMER), 10);
+            #endif
+            set_core_powersave_lastUserAction();
+            break;
+        }
+    }
+    
+
+    ttgo_power->setPowerOutPut(AXP202_LDO3, true);
+    ttgo_power->setPowerOutPut(AXP202_LDO4, true);
+    ttgo_power->setPowerOutPut(AXP202_LDO2, true);
+    ttgo_power->setPowerOutPut(AXP202_EXTEN, true);
+    ttgo_power->setPowerOutPut(AXP202_DCDC2, true);
+
+    ttgo->displayWakeup();
+    core_driver_openBL();
+    core_driver_setBrigtness(255);
+
+    /*
+    ttgo->powerOff();
+    esp_sleep_enable_timer_wakeup(10*1000*1000);
+    esp_light_sleep_start();
+    ttgo->powerOn()*/
+}
+
+
+void core_driver_ldo_poweroff_deepSleep_test(){
+    /*
+    ttgo->touch->setPowerMode(FOCALTECH_PMODE_DEEPSLEEP);
+    */
+   ttgo->power->clearIRQ();
+
+    // Set  touchscreen sleep
+    //ttgo->displaySleep();
+    ttgo->displayOff();
+    /*
+    In TWatch2019/ Twatch2020V1, touch reset is not connected to ESP32,
+    so it cannot be used. Set the touch to sleep,
+    otherwise it will not be able to wake up.
+    Only by turning off the power and powering on the touch again will the touch be working mode
+    // ttgo->displayOff();
+    */
+
+    ttgo->powerOff();
+
+    //Set all channel power off
+    
+    ttgo->power->setPowerOutPut(AXP202_LDO3, false);
+    ttgo->power->setPowerOutPut(AXP202_LDO4, false);
+    ttgo->power->setPowerOutPut(AXP202_LDO2, false);
+    ttgo->power->setPowerOutPut(AXP202_EXTEN, false);
+    ttgo->power->setPowerOutPut(AXP202_DCDC2, false);
+
+    // TOUCH SCREEN  Wakeup source
+    esp_sleep_enable_ext1_wakeup(GPIO_SEL_38, ESP_EXT1_WAKEUP_ALL_LOW);
+    // PEK KEY  Wakeup source
+    // esp_sleep_enable_ext1_wakeup(GPIO_SEL_35, ESP_EXT1_WAKEUP_ALL_LOW);
+    esp_deep_sleep_start();
+}
+
+
 
  
 //SCREEN FUNCTIONS

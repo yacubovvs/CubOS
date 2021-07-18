@@ -1,5 +1,3 @@
-//#define DEBUG_CORE_POWERSAVE
-#define POWERSAVE_ENABLE
 
 #ifdef POWERSAVE_ENABLE
 
@@ -81,7 +79,7 @@
                             }
                             
                             #ifdef DEBUG_CORE_POWERSAVE
-                                debug("DEBUG_CORE_POWERSAVE: Deep sleep", 25);
+                                debug("DEBUG_CORE_POWERSAVE: Deep sleep 1 ", 25);
                             #endif
                             #ifdef PEDOMETER_ENABLE
                                 core_cpu_sleep(STAND_BY_SLEEP_TYPE, get_corePedometer_currentsleep_between_mesures()*1000);
@@ -131,10 +129,12 @@
                         }
                         
                         #ifdef DEBUG_CORE_POWERSAVE
-                            debug("DEBUG_CORE_POWERSAVE: Deep sleep", 25);
+                            debug("DEBUG_CORE_POWERSAVE: Deep sleep 2 ", 25);
                         #endif
                         #ifdef PEDOMETER_ENABLE
                             core_cpu_sleep(STAND_BY_SLEEP_TYPE, get_corePedometer_currentsleep_between_mesures()*1000);
+                        #else
+                            core_cpu_sleep(STAND_BY_SLEEP_TYPE);
                         #endif
                     }
                 #endif
@@ -153,13 +153,13 @@
                     #endif
 
                         #ifdef DEBUG_CORE_POWERSAVE
-                            debug("DEBUG_CORE_POWERSAVE: timeSincelastUserAction " + String(timeSincelastUserAction));
+                            //debug("DEBUG_CORE_POWERSAVE: timeSincelastUserAction " + String(timeSincelastUserAction));
                         #endif
 
                         #ifdef DEBUG_CORE_POWERSAVE
                             debug("DEBUG_CORE_POWERSAVE: Light sleep", 25);
                         #endif
-                        core_cpu_sleep(SLEEP_LIGHT, WAKEUP_FOR_BACKGROUND_WORK_IDLE);   
+                        core_cpu_sleep(IN_APP_SLEEP_TYPE, WAKEUP_FOR_BACKGROUND_WORK_IDLE);   
                     }
                 #endif
                 
