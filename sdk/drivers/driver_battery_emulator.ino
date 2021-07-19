@@ -61,3 +61,7 @@ float driver_battery_Temp(){
 bool driver_battery_isCharging(){
     return true;
 }
+
+bool driver_battery_isUsbConnected(){
+  return true;
+}

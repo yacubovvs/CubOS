@@ -3,6 +3,7 @@
 #define PROGMEM /**/
 #define pgm_read_byte *
 #define pgm_read_word *
+#define RTC_DATA_ATTR /**/
 
 #define max MAX
 #define min MIN
@@ -74,7 +75,8 @@ void driver_controls_setup();
 void driver_battery_setup();
 void core_time_setup();
 void do_cpu_sleep();
-/*unsigned long driver_control_get_last_user_avtivity();
+
+unsigned long driver_control_get_last_user_avtivity();
 void setup_touchScreenDriver();
 void loop_touchScreenDriver();
 
@@ -121,6 +123,7 @@ long get_pedometer_days_steps();
 void core_pedometer_newDate();
 void core_views_softwareButtons_draw();
 void core_views_softwareButtons_draw(uint16_t offset, uint8_t color_red, uint8_t color_green, uint8_t color_blue);
+float get_pedometer_days_sleep_hours();
 
 #define DEG_TO_RAD      0.01745329
 #define RAD_TO_DEG      57.2957786

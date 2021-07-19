@@ -451,3 +451,11 @@ void core_driver_setup_rtc_setYear(int year){
 
 void core_driver_setup_rtc_setAlarmBySeconds(unsigned char seconds){
 }
+
+/*
+    ############################################################################################
+    #                                                                                          #
+    #                                      ACCELEROMETER                                       #
+    #                                                                                          #
+    ############################################################################################
+*/

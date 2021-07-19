@@ -27,6 +27,8 @@
 #define BLUETOOTH_ENABLE
 #define WIFI_ENABLE
 
+#define PEDOMETER_DAY_STEP_LIMMIT_DEFAULT               10000
+
 //#define SMOOTH_ANIMATION
 //#define NARROW_SCREEN
 
@@ -44,7 +46,7 @@
 //#define toDefaultApp_onLeftLongPress
 
 #define STARTING_APP_NUMM   -1    // for Mainmenu (default app)
-#define STARTING_APP_NUMM   11     // for App number 7
+#define STARTING_APP_NUMM   2     // for App number 7
 
 #undef CPU_SLEEP_ENABLE
 #undef POWERSAVE_ENABLE

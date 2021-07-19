@@ -37,7 +37,7 @@
 //#define toDefaultApp_onLeftLongPress
 
 #define STARTING_APP_NUMM   -1    // for Mainmenu (default app)
-//#define STARTING_APP_NUMM   10
+#define STARTING_APP_NUMM   2
 
 #define CPU_SLEEP_ENABLE
 
@@ -80,7 +80,7 @@
 
 #define ACCELEROMETER_ENABLE
 //#define MAGNITOMETER_ENABLE
-//#define PEDOMETER_ENABLE
+#define PEDOMETER_ENABLE
 
 #define PEDOMETER_STEP_DETECTION_PERIOD_MS              1000
 #define PEDOMETER_MESURES_IN_STEP_DETECTION_PERIOD      5
@@ -103,9 +103,10 @@
 
 //#define DEBUG_CPU_CONTROLL_ENABLE
 //#define DEBUG_CORE_POWERSAVE
+
 #define DEBUG_SERIAL
-//#define DEBUG_PEDOMETER
-#define DEBUG_WAKEUP
+#define DEBUG_PEDOMETER
+//#define DEBUG_WAKEUP
 //#define DEBUG_BACKLIGHT
 //#define DEBUG_DRIVER_CONTROLL
 //#define DEBUG_DRIVER_BATTERY
