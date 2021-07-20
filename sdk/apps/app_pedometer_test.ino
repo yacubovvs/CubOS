@@ -59,9 +59,9 @@ void appNameClass::onLoop(){
     */
     #ifdef ACCELEROMETER_ENABLE
         //core_pedometer_loop(false);
-        driver_accelerometer_update_accelerometer();
+        //driver_accelerometer_update_accelerometer();
           #ifdef PEDOMETER_ENABLE
-            core_pedometer_loop(false);
+            //core_pedometer_loop(false);
         #endif
     #endif
    
@@ -70,6 +70,8 @@ void appNameClass::onLoop(){
     drawRect(0,0, SCREEN_WIDTH, SCREEN_HEIGHT, true);
 
     #ifdef ACCELEROMETER_ENABLE
+        driver_accelerometer_update_accelerometer();
+
         drawStringOnScreen("Steps: ");
         #ifdef PEDOMETER_ENABLE
             drawStringOnScreen(String(get_pedometer_days_steps()));
@@ -99,6 +101,15 @@ void appNameClass::onLoop(){
             drawStringOnScreen("-");
         #endif
         
+        /*
+        #ifdef PEDOMETER_ENABLE
+            drawStringOnScreen("");
+            drawStringOnScreen("Accels X Y Z:");
+            drawStringOnScreen(String(get_driver_accelerometer_x()));
+            drawStringOnScreen(String(get_driver_accelerometer_y()));
+            drawStringOnScreen(String(get_driver_accelerometer_z()));
+        #endif
+        */    
 
         //drawStringOnScreen("Accerometer: ");
         //drawStringOnScreen(String(driver_accelerometer_get_accel_total()));
@@ -109,23 +120,22 @@ void appNameClass::onLoop(){
             drawStringOnScreen(" ");
             drawStringOnScreen("Delta: ");
             drawStringOnScreen(String(get_analysis_delta_value()));
-            //drawStringOnScreen("Central weight: ");
-            //drawStringOnScreen(String(get_analysis_central_weight_value()));
+            drawStringOnScreen("Central weight: ");
+            drawStringOnScreen(String(get_analysis_central_weight_value()));
             drawStringOnScreen("");
             drawStringOnScreen("Mesure delay: ");
             drawStringOnScreen(String(get_corePedometer_currentsleep_between_mesures()));
         #endif
     #endif
     
-    
-  
 }
 
 void appNameClass::onDestroy(){
     /*
         Write you code onDestroy here
     */
-    digitalWrite(10,1);
+    //digitalWrite(10,1);
+    
 }
 
 void appNameClass::onEvent(unsigned char event, int val1, int val2){

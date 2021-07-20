@@ -89,23 +89,78 @@ void core_setup_driver(){
 
     // Accel parameter structure
     Acfg cfg;
+    /*!
+        Output data rate in Hz, Optional parameters:
+            - BMA4_OUTPUT_DATA_RATE_0_78HZ
+            - BMA4_OUTPUT_DATA_RATE_1_56HZ
+            - BMA4_OUTPUT_DATA_RATE_3_12HZ
+            - BMA4_OUTPUT_DATA_RATE_6_25HZ
+            - BMA4_OUTPUT_DATA_RATE_12_5HZ
+            - BMA4_OUTPUT_DATA_RATE_25HZ
+            - BMA4_OUTPUT_DATA_RATE_50HZ
+            - BMA4_OUTPUT_DATA_RATE_100HZ
+            - BMA4_OUTPUT_DATA_RATE_200HZ
+            - BMA4_OUTPUT_DATA_RATE_400HZ
+            - BMA4_OUTPUT_DATA_RATE_800HZ
+            - BMA4_OUTPUT_DATA_RATE_1600HZ
+    */
     cfg.odr = BMA4_OUTPUT_DATA_RATE_100HZ;
-
+    /*!
+        G-range, Optional parameters:
+            - BMA4_ACCEL_RANGE_2G
+            - BMA4_ACCEL_RANGE_4G
+            - BMA4_ACCEL_RANGE_8G
+            - BMA4_ACCEL_RANGE_16G
+    */
     cfg.range = BMA4_ACCEL_RANGE_2G;
+    /*!
+        Bandwidth parameter, determines filter configuration, Optional parameters:
+            - BMA4_ACCEL_OSR4_AVG1
+            - BMA4_ACCEL_OSR2_AVG2
+            - BMA4_ACCEL_NORMAL_AVG4
+            - BMA4_ACCEL_CIC_AVG8
+            - BMA4_ACCEL_RES_AVG16
+            - BMA4_ACCEL_RES_AVG32
+            - BMA4_ACCEL_RES_AVG64
+            - BMA4_ACCEL_RES_AVG128
+    */
     cfg.bandwidth = BMA4_ACCEL_NORMAL_AVG4;
 
+    /*! Filter performance mode , Optional parameters:
+        - BMA4_CIC_AVG_MODE
+        - BMA4_CONTINUOUS_MODE
+    */
     cfg.perf_mode = BMA4_CONTINUOUS_MODE;
 
-/*
+    // Configure the BMA423 accelerometer
     sensor->accelConfig(cfg);
-    sensor->enableAccel();
-    sensor->enableFeature(BMA423_STEP_CNTR, false);
-    sensor->enableFeature(BMA423_TILT, true);
-    sensor->enableFeature(BMA423_WAKEUP, true);
-    sensor->resetStepCounter();
-    sensor->enableTiltInterrupt();
-    sensor->enableWakeupInterrupt();
-    */
+
+    // Enable BMA423 accelerometer
+    //sensor->enableAccel();
+
+    /*
+    while(true){
+        //void loop()
+        Accel acc;
+
+        // Get acceleration data
+        bool res = sensor->getAccel(acc);
+
+        if (res == false) {
+            debug("getAccel FAIL");
+        } else {
+            // Show the data
+            
+            debug("X:"); 
+            debug(String(acc.x));
+            debug("Y:"); 
+            debug(String(acc.y));
+            debug("Z:"); 
+            debug(String(acc.z));
+        }
+        delay(100);
+    }*/
+
 }
 
 void core_loop_irq_check(){
@@ -229,19 +284,52 @@ void core_driver_ldo_poweroff_lightSleep(){
     //esp_sleep_enable_ext1_wakeup(GPIO_SEL_39, ESP_EXT1_WAKEUP_ANY_HIGH);
     esp_sleep_enable_ext1_wakeup(GPIO_SEL_38, ESP_EXT1_WAKEUP_ALL_LOW);
     
-    esp_sleep_enable_timer_wakeup(10*1000*1000);
+    // Time between mesures
+    //esp_sleep_enable_timer_wakeup(PEDOMETER_STEP_DETECTION_PERIOD_MS/PEDOMETER_MESURES_IN_STEP_DETECTION_PERIOD*1000);
+    esp_sleep_enable_timer_wakeup(100*1000);
+
+    
+    
     //while(!getTOUCH_SCREEN_isTouching()){
     
     while(true){
+        /*
+        int timeToSleepSave = 0;
+        int timeToNextMesure = -(millis() - core_pedometer_step_detection_start_time - (((long)corePedometer_currentsleep_between_mesures)*1000));
+        if (core_pedometer_current_get_isNotInMesure()){
+            timeToSleepSave = timeToNextMesure; 
+        }else{
+            timeToSleepSave = PEDOMETER_STEP_DETECTION_PERIOD_MS/PEDOMETER_MESURES_IN_STEP_DETECTION_PERIOD;
+        }
+        debug("!!!!!! Save sleep time " + String(timeToSleepSave));
+        */
+
+        if(get_pedometer_in_work()){
+            #ifdef DEBUG_WAKEUP
+                debug("!!!!!! Pedometer is in work ! Sleeping for " + String(PEDOMETER_STEP_DETECTION_PERIOD_MS/PEDOMETER_MESURES_IN_STEP_DETECTION_PERIOD), 5);
+            #endif
+            esp_sleep_enable_timer_wakeup(PEDOMETER_STEP_DETECTION_PERIOD_MS/PEDOMETER_MESURES_IN_STEP_DETECTION_PERIOD*1000);
+        }else{
+            #ifdef DEBUG_WAKEUP
+                debug("!!!!!! Pedometer is not in work! Sleeping for " + String(get_corePedometer_currentsleep_between_mesures()*1000), 5);
+            #endif
+            esp_sleep_enable_timer_wakeup(get_corePedometer_currentsleep_between_mesures()*1000*1000);
+            
+        }
+        
+        //get_pedometer_in_work()
+
+        if(core_pedometer_current_get_isNotInMesure()) driver_accelerometer_sleep();
         esp_light_sleep_start();   
         unsigned char wakeUpReason = core_powersave_wakeup_reason();
         if(wakeUpReason==WAKE_UP_REASON_TIMER){
             #ifdef DEBUG_WAKEUP
-                debug("DEBUG_WAKEUP: wake up by timer " + String(WAKE_UP_REASON_TIMER), 10);
+                //debug("DEBUG_WAKEUP: wake up by timer " + String(WAKE_UP_REASON_TIMER), 10);
             #endif
+            core_pedometer_loop(false);
         }else{
             #ifdef DEBUG_WAKEUP
-                debug("DEBUG_WAKEUP: Interrupt wakeup " + String(WAKE_UP_REASON_TIMER), 10);
+                //debug("DEBUG_WAKEUP: Interrupt wakeup " + String(WAKE_UP_REASON_TIMER), 10);
             #endif
             set_core_powersave_lastUserAction();
             break;
@@ -451,3 +539,70 @@ void core_driver_setup_rtc_setYear(int year){
 
 void core_driver_setup_rtc_setAlarmBySeconds(unsigned char seconds){
 }
+
+/*
+    ############################################################################################
+    #                                                                                          #
+    #                                      ACCELEROMETER                                       #
+    #                                                                                          #
+    ############################################################################################
+*/
+
+//void core_driver_setup_accelerometer_ (){}
+
+void core_driver_setup_accelerometer_enableAccel(){
+    sensor->enableAccel();
+}
+
+void core_driver_setup_accelerometer_disableAccel(){
+    sensor->disableAccel();
+}
+
+Accel acc;
+
+void core_driver_setup_accelerometer_update(){
+    acc.x = 0;
+    acc.y = 0;
+    acc.z = 0;
+    bool res = sensor->getAccel(acc);
+    /*
+    #ifdef DEBUG_ACELEROMETER
+        if(!res){
+            debug("DEBUG_ACELEROMETER: ERROR: Can NOT get accelerometer data!");
+        }else{
+            debug("DEBUG_ACELEROMETER: Accelerometer data got");
+        }
+    #endif
+
+    debug("X:"); 
+    debug(String(acc.x));
+    debug("Y:"); 
+    debug(String(acc.y));
+    debug("Z:"); 
+    debug(String(acc.z));
+    */
+}
+
+float core_driver_setup_accelerometer_getX(){
+    return ((float)acc.x)/1000.0;
+}
+
+float core_driver_setup_accelerometer_getY(){
+    return ((float)acc.y)/1000.0;
+}
+
+float core_driver_setup_accelerometer_getZ(){
+    return ((float)acc.z)/1000.0;
+}
+
+/*
+
+    sensor->enableAccel();
+    sensor->disableAccel();
+    //sensor->enableFeature(BMA423_STEP_CNTR, false);
+    //sensor->enableFeature(BMA423_TILT, true);
+    //sensor->enableFeature(BMA423_WAKEUP, true);
+    //sensor->resetStepCounter();
+    //sensor->enableTiltInterrupt();
+    //sensor->enableWakeupInterrupt();
+    */

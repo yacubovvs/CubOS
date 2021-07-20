@@ -160,6 +160,7 @@
 #define PEDOMETER_DAY_SLEEP_LIMMIT_DEFAULT              7*60 //minutes
 
 #define WAKEUP_FOR_BACKGROUND_WORK_IDLE 1000
+#define RUN_BACKGROUND_AFTER_RESTART_MCU // As deep sleep in esp
 
 //#define DEBUG_PEDOMETER // Just for teste
 
@@ -230,7 +231,7 @@
 //#define toDefaultApp_onLeftLongPress
 
 #define STARTING_APP_NUMM   -1    // for Mainmenu (default app)
-//#define STARTING_APP_NUMM   10
+//#define STARTING_APP_NUMM   2
 
 #define CPU_SLEEP_ENABLE
 
@@ -238,6 +239,7 @@
 #define POWERSAVE_ENABLE
 #define CPU_CONTROLL_ENABLE
 
+#undef RUN_BACKGROUND_AFTER_RESTART_MCU // This devicw will not get in deep sleep, only long light sleep
 #define CLOCK_ENABLE
 //#define USE_PRIMITIVE_HARDWARE_DRAW_ACCELERATION
 
@@ -282,13 +284,15 @@
 #define PEDOMETER_DELTA_VALUE_MIN           0.47f
 #define PEDOMETER_CENTRALWIGHT_VALUE_MIN    0.15f
 
+/*
 #define PEDOMETER_STEP_DETECTION_DELAY_SEC_MIN          300
 #define PEDOMETER_STEP_DETECTION_DELAY_SEC_STEP         30
 #define PEDOMETER_STEP_DETECTION_DELAY_SEC_MAX          180 // MAX (255 - PEDOMETER_STEP_DETECTION_PERIOD_MS/1000) and multiple 60 seconds
+*/
 
-#define PEDOMETER_STEP_DETECTION_DELAY_SEC_MIN          5
-#define PEDOMETER_STEP_DETECTION_DELAY_SEC_STEP         5
-#define PEDOMETER_STEP_DETECTION_DELAY_SEC_MAX          5 // MAX (255 - PEDOMETER_STEP_DETECTION_PERIOD_MS/1000) and multiple 60 seconds
+#define PEDOMETER_STEP_DETECTION_DELAY_SEC_MIN          15
+#define PEDOMETER_STEP_DETECTION_DELAY_SEC_STEP         15
+#define PEDOMETER_STEP_DETECTION_DELAY_SEC_MAX          60 // MAX (255 - PEDOMETER_STEP_DETECTION_PERIOD_MS/1000) and multiple 60 seconds
 
 
 #define CORE_PEDOMETER_SLEEP_COUNTING_SPOINTS   5 // mesures for sleep detection 
@@ -296,9 +300,11 @@
 
 //#define DEBUG_CPU_CONTROLL_ENABLE
 //#define DEBUG_CORE_POWERSAVE
-#define DEBUG_SERIAL
-#define DEBUG_PEDOMETER
+
+//#define DEBUG_SERIAL
 //#define DEBUG_WAKEUP
+//#define DEBUG_PEDOMETER
+//#define DEBUG_ACELEROMETER
 //#define DEBUG_BACKLIGHT
 //#define DEBUG_DRIVER_CONTROLL
 //#define DEBUG_DRIVER_BATTERY
@@ -384,53 +390,59 @@ void setup(){
     core_setup_driver();
   #endif
 
-  #ifdef POWERSAVE_ENABLE
-    #ifdef CPU_SLEEP_ENABLE
-      unsigned char wakeUpReason = core_powersave_wakeup_reason();
-      if(wakeUpReason==WAKE_UP_REASON_TIMER){
-        #ifdef DEBUG_WAKEUP
-          debug("DEBUG_WAKEUP: Background start " + String(millis()));
-          //core_cpu_setup();
-        #endif
-        #ifdef PEDOMETER_DO_NOT_USE_PEDOMETER_WHILE_CONNECTED_TO_USB
-          #ifdef BATTERY_ENABLE
-            driver_battery_setup();
-          #endif
-        #endif
-        core_cpu_setup();
-        driver_controls_setup();
-        #ifdef DEBUG_WAKEUP
-          debug("DEBUG_WAKEUP: Backgroung controls inited "  + String(millis()));
-        #endif
-
-        #ifdef RTC_ENABLE
-            driver_RTC_setup();
-            core_time_driver_RTC_refresh(true);
-        #endif
-
-        #ifdef DEBUG_WAKEUP
-            debug("DEBUG_WAKEUP: RTC inited "  + String(millis()), 10);
-        #endif
-
-        backgroundWorkAfterSleep();
-        #ifdef PEDOMETER_ENABLE
+  #ifdef RUN_BACKGROUND_AFTER_RESTART_MCU
+    #ifdef POWERSAVE_ENABLE
+      #ifdef CPU_SLEEP_ENABLE
+        unsigned char wakeUpReason = core_powersave_wakeup_reason();
+        if(wakeUpReason==WAKE_UP_REASON_TIMER){
           #ifdef DEBUG_WAKEUP
-            debug("DEBUG_WAKEUP: Going to sleep again for " + String(get_corePedometer_currentsleep_between_mesures()) + "ms " + String(millis()));
-            delay(50);
+            debug("DEBUG_WAKEUP: Background start " + String(millis()));
+            //core_cpu_setup();
           #endif
-          core_cpu_sleep(STAND_BY_SLEEP_TYPE, get_corePedometer_currentsleep_between_mesures()*1000);
-        #else
+          #ifdef PEDOMETER_DO_NOT_USE_PEDOMETER_WHILE_CONNECTED_TO_USB
+            #ifdef BATTERY_ENABLE
+              driver_battery_setup();
+            #endif
+          #endif
+          core_cpu_setup();
+          driver_controls_setup();
           #ifdef DEBUG_WAKEUP
-            debug("DEBUG_WAKEUP: Going to sleep while interrupt");
-            delay(50);
-            core_cpu_sleep(STAND_BY_SLEEP_TYPE);
+            debug("DEBUG_WAKEUP: Backgroung controls inited "  + String(millis()));
           #endif
-        #endif
-      }else{
-        #ifdef DEBUG_WAKEUP
-          debug("DEBUG_WAKEUP: Not background start", 10);
-        #endif
-      }
+
+          #ifdef RTC_ENABLE
+              driver_RTC_setup();
+              core_time_driver_RTC_refresh(true);
+          #endif
+
+          #ifdef DEBUG_WAKEUP
+              debug("DEBUG_WAKEUP: RTC inited "  + String(millis()), 10);
+          #endif
+
+          backgroundWorkAfterSleep();
+          #ifdef PEDOMETER_ENABLE
+            #ifdef DEBUG_WAKEUP
+              debug("DEBUG_WAKEUP: Going to sleep again for " + String(get_corePedometer_currentsleep_between_mesures()) + "ms " + String(millis()));
+              delay(50);
+            #endif
+            core_cpu_sleep(STAND_BY_SLEEP_TYPE, get_corePedometer_currentsleep_between_mesures()*1000);
+          #else
+            #ifdef DEBUG_WAKEUP
+              debug("DEBUG_WAKEUP: Going to sleep while interrupt");
+              delay(50);
+              core_cpu_sleep(STAND_BY_SLEEP_TYPE);
+            #endif
+          #endif
+        }else{
+          #ifdef DEBUG_WAKEUP
+            debug("DEBUG_WAKEUP: Not background start", 10);
+          #endif
+        }
+      #endif
+    #endif
+  #else
+    #ifdef DEBUG_WAKEUP
+      debug("DEBUG_WAKEUP: Not background start", 10);
     #endif
   #endif
   //debug("**** Main app start", 10);
@@ -533,6 +545,10 @@ void loop(){
   #ifdef ESP8266
     //ESP.wdtDisable();
     ESP.wdtFeed();
+  #endif
+
+  #ifndef RUN_BACKGROUND_AFTER_RESTART_MCU
+    core_pedometer_loop(false);
   #endif
 
 }

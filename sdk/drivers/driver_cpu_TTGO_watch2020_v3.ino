@@ -55,11 +55,11 @@ void driver_cpu_sleep(unsigned char sleepType, long timeout){
             break;
         case SLEEP_LIGHT_SCREEN_OFF:
             
-            debug("LIGHT_SLEEP_SCREENOFF!!! start");
+            //debug("LIGHT_SLEEP_SCREENOFF!!! start");
 
             core_driver_ldo_poweroff_lightSleep();
 
-            debug("LIGHT_SLEEP_SCREENOFF!!! finished");
+            //debug("LIGHT_SLEEP_SCREENOFF!!! finished");
             break;
             /*
             core_driver_openBL();
@@ -74,7 +74,7 @@ void driver_cpu_sleep(unsigned char sleepType, long timeout){
 
             break;*/
         case SLEEP_LIGHT:
-            debug("LIGHT_SLEEP!!!");
+            //debug("LIGHT_SLEEP!!!");
             
             esp_sleep_enable_timer_wakeup(timeout*1000);
 

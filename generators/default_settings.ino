@@ -160,6 +160,7 @@
 #define PEDOMETER_DAY_SLEEP_LIMMIT_DEFAULT              7*60 //minutes
 
 #define WAKEUP_FOR_BACKGROUND_WORK_IDLE 1000
+#define RUN_BACKGROUND_AFTER_RESTART_MCU // As deep sleep in esp
 
 //#define DEBUG_PEDOMETER // Just for teste
 

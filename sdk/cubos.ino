@@ -73,53 +73,59 @@ void setup(){
     core_setup_driver();
   #endif
 
-  #ifdef POWERSAVE_ENABLE
-    #ifdef CPU_SLEEP_ENABLE
-      unsigned char wakeUpReason = core_powersave_wakeup_reason();
-      if(wakeUpReason==WAKE_UP_REASON_TIMER){
-        #ifdef DEBUG_WAKEUP
-          debug("DEBUG_WAKEUP: Background start " + String(millis()));
-          //core_cpu_setup();
-        #endif
-        #ifdef PEDOMETER_DO_NOT_USE_PEDOMETER_WHILE_CONNECTED_TO_USB
-          #ifdef BATTERY_ENABLE
-            driver_battery_setup();
-          #endif
-        #endif
-        core_cpu_setup();
-        driver_controls_setup();
-        #ifdef DEBUG_WAKEUP
-          debug("DEBUG_WAKEUP: Backgroung controls inited "  + String(millis()));
-        #endif
-
-        #ifdef RTC_ENABLE
-            driver_RTC_setup();
-            core_time_driver_RTC_refresh(true);
-        #endif
-
-        #ifdef DEBUG_WAKEUP
-            debug("DEBUG_WAKEUP: RTC inited "  + String(millis()), 10);
-        #endif
-
-        backgroundWorkAfterSleep();
-        #ifdef PEDOMETER_ENABLE
+  #ifdef RUN_BACKGROUND_AFTER_RESTART_MCU
+    #ifdef POWERSAVE_ENABLE
+      #ifdef CPU_SLEEP_ENABLE
+        unsigned char wakeUpReason = core_powersave_wakeup_reason();
+        if(wakeUpReason==WAKE_UP_REASON_TIMER){
           #ifdef DEBUG_WAKEUP
-            debug("DEBUG_WAKEUP: Going to sleep again for " + String(get_corePedometer_currentsleep_between_mesures()) + "ms " + String(millis()));
-            delay(50);
+            debug("DEBUG_WAKEUP: Background start " + String(millis()));
+            //core_cpu_setup();
           #endif
-          core_cpu_sleep(STAND_BY_SLEEP_TYPE, get_corePedometer_currentsleep_between_mesures()*1000);
-        #else
+          #ifdef PEDOMETER_DO_NOT_USE_PEDOMETER_WHILE_CONNECTED_TO_USB
+            #ifdef BATTERY_ENABLE
+              driver_battery_setup();
+            #endif
+          #endif
+          core_cpu_setup();
+          driver_controls_setup();
           #ifdef DEBUG_WAKEUP
-            debug("DEBUG_WAKEUP: Going to sleep while interrupt");
-            delay(50);
-            core_cpu_sleep(STAND_BY_SLEEP_TYPE);
+            debug("DEBUG_WAKEUP: Backgroung controls inited "  + String(millis()));
           #endif
-        #endif
-      }else{
-        #ifdef DEBUG_WAKEUP
-          debug("DEBUG_WAKEUP: Not background start", 10);
-        #endif
-      }
+
+          #ifdef RTC_ENABLE
+              driver_RTC_setup();
+              core_time_driver_RTC_refresh(true);
+          #endif
+
+          #ifdef DEBUG_WAKEUP
+              debug("DEBUG_WAKEUP: RTC inited "  + String(millis()), 10);
+          #endif
+
+          backgroundWorkAfterSleep();
+          #ifdef PEDOMETER_ENABLE
+            #ifdef DEBUG_WAKEUP
+              debug("DEBUG_WAKEUP: Going to sleep again for " + String(get_corePedometer_currentsleep_between_mesures()) + "ms " + String(millis()));
+              delay(50);
+            #endif
+            core_cpu_sleep(STAND_BY_SLEEP_TYPE, get_corePedometer_currentsleep_between_mesures()*1000);
+          #else
+            #ifdef DEBUG_WAKEUP
+              debug("DEBUG_WAKEUP: Going to sleep while interrupt");
+              delay(50);
+              core_cpu_sleep(STAND_BY_SLEEP_TYPE);
+            #endif
+          #endif
+        }else{
+          #ifdef DEBUG_WAKEUP
+            debug("DEBUG_WAKEUP: Not background start", 10);
+          #endif
+        }
+      #endif
+    #endif
+  #else
+    #ifdef DEBUG_WAKEUP
+      debug("DEBUG_WAKEUP: Not background start", 10);
     #endif
   #endif
   //debug("**** Main app start", 10);
@@ -222,6 +228,10 @@ void loop(){
   #ifdef ESP8266
     //ESP.wdtDisable();
     ESP.wdtFeed();
+  #endif
+
+  #ifndef RUN_BACKGROUND_AFTER_RESTART_MCU
+    core_pedometer_loop(false);
   #endif
 
 }
