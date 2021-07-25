@@ -379,8 +379,21 @@
                         #ifdef DEBUG_PEDOMETER
                             debug("IS SLEEPING");
                         #endif
+
                         between_mesure_realy_delay = (corePedometer_currentsleep_between_mesures + PEDOMETER_STEP_DETECTION_PERIOD_MS/1000);
-                        unsigned char sleep_minutes_to_add = (between_mesure_realy_delay+1)/60;
+                        #ifdef SLEEP_VALUE_DEBUG
+                            unsigned char sleep_minutes_to_add = 1;
+                        #else    
+                            unsigned char sleep_minutes_to_add = (between_mesure_realy_delay+1)/60;
+                        #endif
+                        
+                        #ifdef DEBUG_PEDOMETER_TIMING
+                        
+                            debug("corePedometer_currentsleep_between_mesures " + String(corePedometer_currentsleep_between_mesures));
+                            debug("sleep_minutes_to_add " + String(sleep_minutes_to_add));
+                            debug("between_mesure_realy_delay " + String(between_mesure_realy_delay));
+                        #endif
+
                         #ifdef DEBUG_PEDOMETER
                             debug("sleep_minutes_to_add " + String(sleep_minutes_to_add));
                         #endif

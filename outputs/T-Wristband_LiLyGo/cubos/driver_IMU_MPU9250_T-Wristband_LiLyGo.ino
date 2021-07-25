@@ -117,6 +117,10 @@
         IMU.setSleepEnabled(true);
     }
 
+    void driver_accelerometer_deepSleep(){
+        IMU.deepSleep();
+    }
+
     void driver_accelerometer_update(){
         //driver_accelerometer_update_accelerometer();
         //driver_accelerometer_update_gyroscope();

@@ -308,10 +308,13 @@ void appNameClass::draw_current_time(bool draw){
         #define PEDOMETER_LABEL_POSITION_PADDING (3)
     #else
         // Big screens as 240x240 
+        
         // SLEEP LABEL
         #define SLEEP_LABEL_POSITION_Y (SCREEN_HEIGHT - 14)
+        
         // DATE LABEL
-        #define DATE_LABEL_POSITION_Y (APPP_CLOCK_BATTERY_LABEL_Y)
+        #define DATE_LABEL_POSITION_Y (((STYLE_STATUSBAR_HEIGHT/2 + 2) - FONT_CHAR_HEIGHT/2 -2))    
+        
         #define DATE_LABEL_POSITION_X (7)
         #define DATE_DRAW_STRING(A,B,C,D) drawString(A,B,C,D)
         #define DATE_CLEAR_STRING(A,B,C,D) clearString(A,B,C,D)

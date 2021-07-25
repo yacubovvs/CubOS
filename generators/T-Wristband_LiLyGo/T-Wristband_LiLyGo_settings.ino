@@ -80,31 +80,34 @@
 //#define DEBUG_PEDOMETER
 #undef DISPLAY_BACKLIGHT_FADE_CONTROL_ENABLE
 
-#define PEDOMETER_STEP_DETECTION_DELAY          20000 // Wake up to check accelerometer
-//#define PEDOMETER_STEP_DETECTION_DELAY          1000 // Wake up to check accelerometer
-#define DEFAULT_TIME_TO_POWEROFF_DISPLAY        120
-#define DEFAULT_DELAY_TO_FADE_DISPLAY           10
+#define DEFAULT_TIME_TO_POWEROFF_DISPLAY        10
+#define DEFAULT_DELAY_TO_FADE_DISPLAY           5
 
 #define PEDOMETER_STEP_DETECTION_PERIOD_MS              1000
-#define PEDOMETER_MESURES_IN_STEP_DETECTION_PERIOD      6
+#define PEDOMETER_MESURES_IN_STEP_DETECTION_PERIOD      5
 #define PEDOMETER_DAY_STEP_LIMMIT_DEFAULT               10000
 
 #define PEDOMETER_DELTA_VALUE_MIN           0.46f
 #define PEDOMETER_CENTRALWIGHT_VALUE_MIN    0.15f
 
-#define PEDOMETER_STEP_DETECTION_DELAY_SEC_MIN          30
-#define PEDOMETER_STEP_DETECTION_DELAY_SEC_STEP         30
-#define PEDOMETER_STEP_DETECTION_DELAY_SEC_MAX          180 // MAX (255 - PEDOMETER_STEP_DETECTION_PERIOD_MS/1000) and multiple 60 seconds
 
-#define CORE_PEDOMETER_SLEEP_COUNTING_SPOINTS   6 // mesures for sleep detection 
-#define CORE_PEDOMETER_SLEEP_MIN_ACCELL_100     3 // acceletometer sensitivity/100*G for sleep detection
+#define PEDOMETER_STEP_DETECTION_DELAY_SEC_MIN          15
+#define PEDOMETER_STEP_DETECTION_DELAY_SEC_STEP         15
+#define PEDOMETER_STEP_DETECTION_DELAY_SEC_MAX          60 // MAX (255 - PEDOMETER_STEP_DETECTION_PERIOD_MS/1000) and multiple 60 seconds
 
-#define APP_CLOCK_POWER_AFTER_SECONDS           20
+#define CORE_PEDOMETER_SLEEP_COUNTING_SPOINTS   7 // mesures for sleep detection 
+#define CORE_PEDOMETER_SLEEP_MIN_ACCELL_100     5 // acceletometer sensitivity/100*G for sleep detection
+
+#define APP_CLOCK_POWER_AFTER_SECONDS           4
+
 
 //#define DEBUG_SERIAL
 //#define DEBUG_PEDOMETER
+//#define DEBUG_PEDOMETER_TIMING
 //#define DEBUG_WAKEUP
 //#define DEBUG_DRIVER_BATTERY
+
+//#define SLEEP_VALUE_DEBUG
 /*
     ############################################################################################
     #                                                                                          #

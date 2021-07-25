@@ -26,7 +26,7 @@ void driver_controls_loop(){
             (i==2 && M5.BtnC.isPressed())
         ){
         #ifdef POWERSAVE_ENABLE
-            set_core_powersave_lastUserAction();
+            //set_core_powersave_lastUserAction();
         #endif
         
         last_user_activity = _millis();
@@ -85,11 +85,11 @@ void driver_controls_loop(){
 
 }
 
-unsigned long driver_control_get_last_user_avtivity(){
+/*unsigned long driver_control_get_last_user_avtivity(){
   return last_user_activity;
 }
 
-void driver_control_set_last_user_avtivity(unsigned long time){
+*/void driver_control_set_last_user_avtivity(unsigned long time){
   last_user_activity = time;
 }
 

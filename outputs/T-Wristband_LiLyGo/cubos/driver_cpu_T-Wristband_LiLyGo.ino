@@ -45,8 +45,20 @@ void driver_cpu_sleep(unsigned char sleepType, long timeout){
             gpio_hold_en((gpio_num_t) 26);
             gpio_deep_sleep_hold_en();
             esp_sleep_enable_timer_wakeup(timeout*1000);
+            driver_accelerometer_deepSleep();
+            digitalWrite(27, 0);
+            //esp_sleep_enable_ext0_wakeup(TOUCH_SCREEN_INTERRUPT_PIN, LOW);
+            driver_display_setBrightness(0);
+            driver_accelerometer_sleep();
+
             esp_light_sleep_start();
 
+            driver_accelerometer_wakeup();
+            driver_display_setBrightness(100);
+
+            esp_light_sleep_start();
+
+            digitalWrite(27, 1);
             esp_sleep_enable_ext0_wakeup(GPIO_NUM_33, HIGH);
             #ifdef ACCELEROMETER_ENABLE
                 driver_accelerometer_sleep();

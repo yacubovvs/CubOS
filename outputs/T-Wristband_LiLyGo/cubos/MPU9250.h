@@ -254,6 +254,7 @@ class MPU9250
     void readBytes(uint8_t, uint8_t, uint8_t, uint8_t *);
     void setSleepEnabled(bool enabled); // eggfly added
     void writeBit(uint8_t devAddr, uint8_t regAddr, uint8_t bitNum, uint8_t data); // eggfly added
+    void deepSleep();
 };  // class MPU9250
 
 #endif // _MPU9250_H_

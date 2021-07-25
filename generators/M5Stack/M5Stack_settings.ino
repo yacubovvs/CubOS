@@ -18,6 +18,7 @@
 
 #define PLATFORM_ESP32
 
+//#define NARROW_SCREEN
 //#define BLUETOOTH_ENABLED
 //#define WIFI_ENABLED
 
@@ -52,7 +53,7 @@
 
 #define STYLE_STATUSBAR_HEIGHT  20
 
-//#define SMOOTH_ANIMATION
+#define SMOOTH_ANIMATION
 //#define NARROW_SCREEN
 
 //#define TOUCH_SCREEN_ENABLE

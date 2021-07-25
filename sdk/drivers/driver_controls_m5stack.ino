@@ -1,7 +1,7 @@
 #include <M5Stack.h>
 #define _millis() millis()
 
-// unsigned long last_user_activity = _millis();
+unsigned long last_user_activity = _millis();
 // Do not change:
 bool driver_control_pressed[]      = {false, false, false};
 unsigned char buttons_purpose[] = {BUTTON_UP, BUTTON_SELECT, BUTTON_DOWN};

@@ -486,3 +486,12 @@ void MPU9250::readBytes(uint8_t address, uint8_t subAddress, uint8_t count,
   while (Wire.available()) {
     dest[i++] = Wire.read(); }         // Put read results in the Rx buffer
 }
+
+void MPU9250::deepSleep(){
+  writeByte(MPU9250_ADDRESS, PWR_MGMT_1, readByte(MPU9250_ADDRESS, PWR_MGMT_1) | 0x40); // set sleep mode bit(6), disable all sensors
+  delay(100); // wait for all registers to reset
+  writeByte(AK8963_ADDRESS, AK8963_CNTL, readByte(AK8963_ADDRESS, AK8963_CNTL) & ~(0x0F) ); // clear bits 0 to 3 to power down magnetometer
+  writeByte(MPU9250_ADDRESS, PWR_MGMT_1, readByte(MPU9250_ADDRESS, PWR_MGMT_1) | 0x10); // write bit 4 to enable gyro standby
+  delay(10); // wait for all registers to reset
+}
+  

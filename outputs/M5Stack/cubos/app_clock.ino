@@ -1,9 +1,14 @@
+
 #define appNameClass    ClockApp          // App name without spaces
 #define appName         "Clock"              // App name with spaces 
 
+#ifndef APP_CLOCK_POWER_AFTER_SECONDS
+    #define APP_CLOCK_POWER_AFTER_SECONDS 0 
+#endif
+
 #ifdef PLATFORM_PC_EMULATOR
-    long get_pedometer_steps(){
-        return 12315;
+    long get_pedometer_days_steps(){
+        return 8715;
     }
 #endif
 
@@ -37,6 +42,7 @@ class appNameClass: public Application{
         String last_minutes         = "";
 
         String last_date            = "";
+        String sleep_time           = "";
 
         #ifdef BATTERY_ENABLE
             unsigned char last_battery  = 0;
@@ -48,13 +54,50 @@ class appNameClass: public Application{
         #endif
 
         void drawSecondsCircle(bool draw, unsigned char second);
+        #if defined(PEDOMETER_ENABLE) || defined(PEDOMETER_EMULATOR)
+            void drawStepsCircle(bool draw);
+        #endif
       
 };
 
-#define SECONDS_CIRCLE_X        (SCREEN_WIDTH/2)
-#define SECONDS_CIRCLE_Y        (SCREEN_HEIGHT/2 - 10)
-#define SECONDS_CIRCLE_RADIUS   (SCREEN_WIDTH/2-2)
 #define BATTERY_LABEL_Y_POSITION (STYLE_STATUSBAR_HEIGHT/2 + 2)
+
+#ifdef NARROW_SCREEN
+    // For small screens as sport wristbands
+    #define SECONDS_CIRCLE_X        (SCREEN_WIDTH/2)
+    #define SECONDS_CIRCLE_Y        (SCREEN_HEIGHT/2 - 20)
+    #define SECONDS_CIRCLE_RADIUS   (SCREEN_WIDTH/2-2)
+#else
+    // Big screens as 240x240 
+    #define SECONDS_CIRCLE_X        (SCREEN_WIDTH/2)
+    #define SECONDS_CIRCLE_Y        (SCREEN_HEIGHT/2)
+    #define SECONDS_CIRCLE_RADIUS   (SCREEN_WIDTH/2-30)
+#endif 
+
+
+#if defined(PEDOMETER_ENABLE) //|| defined(PEDOMETER_EMULATOR)
+    void appNameClass::drawStepsCircle(bool draw){
+        if(draw){
+            
+            #ifdef PEDOMETER_EMULATOR
+                int grad_i = 183;
+            #else
+                int grad_i = (long)360 * (long)get_pedometer_days_steps() / (long)get_pedometer_days_steps_min_limit();
+            #endif
+
+            if(grad_i>360) grad_i = 360;
+            for(int grad=0; grad<=grad_i; grad++){
+                
+                setGradientColor(46, 255, 0, 255, 85, 0, 360, grad);
+                drawArc(SECONDS_CIRCLE_X, SECONDS_CIRCLE_Y, SECONDS_CIRCLE_RADIUS-4, -90 + grad, -90 + grad + 2, 8, true);
+            }
+        }else{
+            setDrawColor_BackGroundColor();
+            int grad = 360;
+            drawArc(SECONDS_CIRCLE_X, SECONDS_CIRCLE_Y, SECONDS_CIRCLE_RADIUS-4, -90 + 0, -90 + grad + 8, 8, true);
+        }
+    }
+#endif
 
 void appNameClass::onCreate(){
     DRAW_LIMITS_setEnable(true);
@@ -64,11 +107,17 @@ void appNameClass::onCreate(){
     setContrastColor(255, 255, 255);
 
     setDrawColor(48, 48, 48);
-    drawCircle(SECONDS_CIRCLE_X, SECONDS_CIRCLE_Y, SECONDS_CIRCLE_RADIUS-1, true);
+    drawCircle(SECONDS_CIRCLE_X, SECONDS_CIRCLE_Y, SECONDS_CIRCLE_RADIUS-2, true);
 
     this->last_seconds = core_time_getSeconds_byte();
     for(unsigned char isecond=0; isecond<=this->last_seconds; isecond++) this->drawSecondsCircle(true, isecond);
     this->draw_current_time(true);
+
+    #if defined(PEDOMETER_ENABLE) //|| defined(PEDOMETER_EMULATOR)
+        this->drawStepsCircle(true);
+    #endif
+
+    this->sleep_device_after = APP_CLOCK_POWER_AFTER_SECONDS;
 
 }
 
@@ -92,6 +141,10 @@ void appNameClass::onEvent(unsigned char event, int val1, int val2){
             if(val1==BUTTON_BACK){
                 startApp(-1);
             }
+        #else 
+            if(val1==BUTTON_POWER){
+                startApp(-1);
+            }    
         #endif
         
     }else if(event==EVENT_BUTTON_RELEASED){
@@ -123,156 +176,246 @@ void appNameClass::onEvent(unsigned char event, int val1, int val2){
     
 }
 
-/*
-#define NARROW_CLOCK_STRING1 18
-#define NARROW_CLOCK_STRING2 73
-#define NARROW_CLOCK_STRING3 125
-*/
-
 void appNameClass::drawSecondsCircle(bool draw, unsigned char second){
-    if(draw)setGradientColor(255, 85, 0, 46, 255, 0, 60, second);
+    if(draw) setDrawColor(0, 0, 255);
     else setDrawColor_BackGroundColor();
 
     int grad = 6*second;
  
-    drawArc(SECONDS_CIRCLE_X, SECONDS_CIRCLE_Y, SECONDS_CIRCLE_RADIUS, -90 + grad, -90 + grad + 6, 8, true);
+    drawArc(SECONDS_CIRCLE_X, SECONDS_CIRCLE_Y, SECONDS_CIRCLE_RADIUS, -90 + grad, -90 + grad + 6, 4, true);
 }
 
 void appNameClass::draw_current_time(bool draw){
-    #define CLOCK_FONT      2
-    #define CLOCK_MARGIN    3
-    #define STRINGS_OFFSET  2
+    #ifdef NARROW_SCREEN
+        // For small screens as sport wristbands
+        #define CLOCK_FONT        2
+        #define CLOCK_MARGIN      3
+        #define STRINGS_OFFSET_Y  2
+    #else
+        // Big screens as 240x240 
+        #define CLOCK_FONT        4
+        #define CLOCK_MARGIN      3
+        #define STRINGS_OFFSET_Y  (-8)
+    #endif 
+
 
     //this->preventSleep         = true;
     //this->preventInAppSleep    = true;
 
-    #ifdef NARROW_SCREEN
-        // Draw
-        if(draw){
-            // SECONDS CIRCLE
-            this->timeString = core_time_getHourMinuteSecondsTime();
-            unsigned char seconds_draw;
-            if(core_time_getSeconds_byte()>this->last_seconds) seconds_draw = core_time_getSeconds_byte() - this->last_seconds;
-            else seconds_draw = 1;
-            
-            this->last_seconds = core_time_getSeconds_byte();
-            for(char i_predrawSeconds=0; i_predrawSeconds<seconds_draw; i_predrawSeconds++) this->drawSecondsCircle(draw, this->last_seconds-i_predrawSeconds);
 
-            setDrawColor_ContrastColor();
+    // Draw
+    if(draw){
+        // SECONDS CIRCLE
+        this->timeString = core_time_getHourMinuteSecondsTime();
+        unsigned char seconds_draw;
+        if(core_time_getSeconds_byte()>this->last_seconds) seconds_draw = core_time_getSeconds_byte() - this->last_seconds;
+        else seconds_draw = 1;
+        
+        this->last_seconds = core_time_getSeconds_byte();
+        for(char i_predrawSeconds=0; i_predrawSeconds<seconds_draw; i_predrawSeconds++) this->drawSecondsCircle(draw, this->last_seconds-i_predrawSeconds);
 
-            this->last_hours    = core_time_getHours_String();
-            this->last_minutes  = core_time_getMinutes_String();
+        setDrawColor_ContrastColor();
 
-            drawString_centered(core_time_getHours_String(), SCREEN_WIDTH/2, STRINGS_OFFSET + SECONDS_CIRCLE_Y-CLOCK_FONT*FONT_CHAR_HEIGHT - CLOCK_MARGIN, CLOCK_FONT);
-            drawString_centered(core_time_getMinutes_String(), SCREEN_WIDTH/2, STRINGS_OFFSET + SECONDS_CIRCLE_Y + CLOCK_MARGIN, CLOCK_FONT);
-            
-        }else{
-            if(this->last_seconds>core_time_getSeconds_byte()){
-                // if munutes changed
-                setDrawColor_BackGroundColor();  
-                for(int isecond=0; isecond<60; isecond++){
-                    drawSecondsCircle(draw, isecond);
-                }
+        this->last_hours    = core_time_getHours_String();
+        this->last_minutes  = core_time_getMinutes_String();
 
-                setDrawColor(48, 48, 48);
-                drawCircle(SECONDS_CIRCLE_X, SECONDS_CIRCLE_Y, SECONDS_CIRCLE_RADIUS-1, true);
-                
-                clearString_centered(last_hours, SCREEN_WIDTH/2, STRINGS_OFFSET + SECONDS_CIRCLE_Y-CLOCK_FONT*FONT_CHAR_HEIGHT - CLOCK_MARGIN, CLOCK_FONT);
-                clearString_centered(last_minutes, SCREEN_WIDTH/2, STRINGS_OFFSET + SECONDS_CIRCLE_Y + CLOCK_MARGIN, CLOCK_FONT);
+        drawString_centered(core_time_getHours_String(), SCREEN_WIDTH/2, STRINGS_OFFSET_Y + SECONDS_CIRCLE_Y-CLOCK_FONT*FONT_CHAR_HEIGHT - CLOCK_MARGIN, CLOCK_FONT);
+        drawString_centered(core_time_getMinutes_String(), SCREEN_WIDTH/2, STRINGS_OFFSET_Y + SECONDS_CIRCLE_Y + CLOCK_MARGIN, CLOCK_FONT);
+        
+        #ifdef NARROW_SCREEN
+            // For small screens as sport wristbands
+        #else
+            // Big screens as 240x240 
+            drawString_centered(core_time_getWeekDay_string(), SCREEN_WIDTH/2, STRINGS_OFFSET_Y + SECONDS_CIRCLE_Y + CLOCK_MARGIN + 30, 1);
+        #endif 
+    }else{
+        if(this->last_seconds>core_time_getSeconds_byte()){
+            // if munutes changed
+            setDrawColor_BackGroundColor();  
+            for(int isecond=0; isecond<60; isecond++){
+                drawSecondsCircle(draw, isecond);
             }
 
+            setDrawColor(48, 48, 48);
+            drawCircle(SECONDS_CIRCLE_X, SECONDS_CIRCLE_Y, SECONDS_CIRCLE_RADIUS-2, true);
+            
+            clearString_centered(last_hours, SCREEN_WIDTH/2, STRINGS_OFFSET_Y + SECONDS_CIRCLE_Y-CLOCK_FONT*FONT_CHAR_HEIGHT - CLOCK_MARGIN, CLOCK_FONT);
+            clearString_centered(last_minutes, SCREEN_WIDTH/2, STRINGS_OFFSET_Y + SECONDS_CIRCLE_Y + CLOCK_MARGIN, CLOCK_FONT);
+
+            #ifdef NARROW_SCREEN
+                // For small screens as sport wristbands
+            #else
+                // Big screens as 240x240 
+                clearString_centered(core_time_getWeekDay_string(), SCREEN_WIDTH/2, STRINGS_OFFSET_Y + SECONDS_CIRCLE_Y + CLOCK_MARGIN + 30, 1);
+            #endif 
         }
 
+    }
 
-        // BATTERY
-        #ifdef BATTERY_ENABLE
-            if(draw){        
-                last_battery            = driver_battery_getPercent();
-                last_battery_charging   = driver_battery_isCharging();
-            }
 
-            #define BATTERY_LABEL_ICON_OFFSET (-4)
+    // BATTERY
+    #ifdef BATTERY_ENABLE
 
-            // (battery icon 32x16 px) 
-            drawBatteryIcon(SCREEN_WIDTH/2 + 3 + BATTERY_LABEL_ICON_OFFSET, BATTERY_LABEL_Y_POSITION - 8 + 1, last_battery, last_battery_charging, draw);
-            String battery_percent_toPrint = String(last_battery) + "%";
+        
+        if(draw){        
+            last_battery            = driver_battery_getPercent();
+            last_battery_charging   = driver_battery_isCharging();
+        }
 
-            if(draw){
-                setDrawColor_ContrastColor();
-                drawString(battery_percent_toPrint, SCREEN_WIDTH/2 - battery_percent_toPrint.length()*FONT_CHAR_WIDTH - 3 + BATTERY_LABEL_ICON_OFFSET, BATTERY_LABEL_Y_POSITION - FONT_CHAR_HEIGHT/2 + 1, 1);
-            }else{
-                setDrawColor_BackGroundColor();  
-                clearString(battery_percent_toPrint, SCREEN_WIDTH/2 - battery_percent_toPrint.length()*FONT_CHAR_WIDTH - 3 + BATTERY_LABEL_ICON_OFFSET, BATTERY_LABEL_Y_POSITION - FONT_CHAR_HEIGHT/2 + 1, 1);
-            } 
-        #endif
+        String battery_percent_toPrint = String(last_battery) + "%";
 
-        // DATE
-        #define DATE_LABEL_POSITION_Y (SCREEN_HEIGHT - 38)
+        #ifdef NARROW_SCREEN
+            // For small screens as sport wristbands
+            #define APP_CLOCK_ICON_X (SCREEN_WIDTH/2 + -1)
+            #define APP_CLOCK_ICON_Y (BATTERY_LABEL_Y_POSITION - 10)
+            #define APPP_CLOCK_BATTERY_LABEL_X (SCREEN_WIDTH/2 - battery_percent_toPrint.length()*FONT_CHAR_WIDTH - 7)
+            #define APPP_CLOCK_BATTERY_LABEL_Y ( BATTERY_LABEL_Y_POSITION - FONT_CHAR_HEIGHT/2 -2)
+        #else
+            // Big screens as 240x240 
+            #define APP_CLOCK_ICON_X (SCREEN_WIDTH - 38)
+            #define APP_CLOCK_ICON_Y (BATTERY_LABEL_Y_POSITION - 10)
+            #define APPP_CLOCK_BATTERY_LABEL_X (SCREEN_WIDTH - battery_percent_toPrint.length()*FONT_CHAR_WIDTH - 42)
+            #define APPP_CLOCK_BATTERY_LABEL_Y ( BATTERY_LABEL_Y_POSITION - FONT_CHAR_HEIGHT/2 -2)
+        #endif 
+            
+            
+        // (battery icon 32x16 px) 
+        drawBatteryIcon(APP_CLOCK_ICON_X, APP_CLOCK_ICON_Y, last_battery, last_battery_charging, draw);
         
         if(draw){
-            this->last_date = core_time_getDateFull();
-            //setDrawColor_ContrastColor();
-            setDrawColor(192,192,192);
-            drawString_centered(last_date, SCREEN_WIDTH/2, DATE_LABEL_POSITION_Y, 1);
+            setDrawColor_ContrastColor();
+            drawString(battery_percent_toPrint, APPP_CLOCK_BATTERY_LABEL_X, APPP_CLOCK_BATTERY_LABEL_Y, 1);
         }else{
             setDrawColor_BackGroundColor();  
-            clearString_centered(last_date, SCREEN_WIDTH/2, DATE_LABEL_POSITION_Y, 1);
+            clearString(battery_percent_toPrint, APPP_CLOCK_BATTERY_LABEL_X, APPP_CLOCK_BATTERY_LABEL_Y, 1);
         }
         
 
-        // PEDOMETER
-        #define PEDOMETER_LABEL_POSITION_Y (SCREEN_HEIGHT - 18)
+    #endif        
+
+    #ifdef NARROW_SCREEN
+        // For small screens as sport wristbands
+        // SLEEP LABEL
+        #define SLEEP_LABEL_POSITION_Y (SCREEN_HEIGHT - 35)
+        // DATE LABEL
+        #define DATE_LABEL_POSITION_Y (SCREEN_HEIGHT - 54)
+        #define DATE_LABEL_POSITION_X (SCREEN_WIDTH/2)
+        #define DATE_DRAW_STRING(A,B,C,D) drawString_centered(A,B,C,D)
+        #define DATE_CLEAR_STRING(A,B,C,D) clearString_centered(A,B,C,D)
+        // PEDOMETER LABEL
+        #define PEDOMETER_LABEL_POSITION_Y (SCREEN_HEIGHT - 14)
         #define PEDOMETER_LABEL_POSITION_X_OFFSET (0)
         #define PEDOMETER_LABEL_POSITION_PADDING (3)
-        #if defined(PEDOMETER_ENABLE) || defined(PEDOMETER_EMULATOR)
-            
-            if(draw) this->last_pedometer = get_pedometer_steps();
-            String pedometer_toPrint = String(this->last_pedometer);
-
-            // 16 - leg icon width
-            int pedometer_label_width_05 = (PEDOMETER_LABEL_POSITION_PADDING*2 + 16 + pedometer_toPrint.length()*FONT_CHAR_WIDTH)/2;
-            
-            // 16 - leg icon width
-            drawImage(draw, getIcon(ICON_LEG_GREY), 
-                SCREEN_WIDTH/2 + pedometer_label_width_05 - 16 + PEDOMETER_LABEL_POSITION_X_OFFSET, 
-                PEDOMETER_LABEL_POSITION_Y + PEDOMETER_LABEL_POSITION_PADDING - 9
-            );
-
-            if(draw){
-                
-                setDrawColor(192,192,192);
-                drawString(pedometer_toPrint, 
-                    SCREEN_WIDTH/2 - pedometer_label_width_05 + PEDOMETER_LABEL_POSITION_X_OFFSET, 
-                    PEDOMETER_LABEL_POSITION_Y + 1, 1);
-
-            }else{
-                setDrawColor_BackGroundColor();  
-                clearString(pedometer_toPrint, 
-                    SCREEN_WIDTH/2 - pedometer_label_width_05 + PEDOMETER_LABEL_POSITION_X_OFFSET, 
-                    PEDOMETER_LABEL_POSITION_Y + 1, 1);
-            }
-            
-        #endif
-            
     #else
+        // Big screens as 240x240 
+        
+        // SLEEP LABEL
+        #define SLEEP_LABEL_POSITION_Y (SCREEN_HEIGHT - 14)
+        
+        // DATE LABEL
+        #define DATE_LABEL_POSITION_Y (((STYLE_STATUSBAR_HEIGHT/2 + 2) - FONT_CHAR_HEIGHT/2 -2))    
+        
+        #define DATE_LABEL_POSITION_X (7)
+        #define DATE_DRAW_STRING(A,B,C,D) drawString(A,B,C,D)
+        #define DATE_CLEAR_STRING(A,B,C,D) clearString(A,B,C,D)
+
+        // PEDOMETER LABEL
+        #define PEDOMETER_LABEL_POSITION_Y (SCREEN_HEIGHT - 14)
+        #define PEDOMETER_LABEL_POSITION_X_OFFSET (0)
+        #define PEDOMETER_LABEL_POSITION_PADDING (3)
+    #endif 
+    
+
+    if(draw){
+        this->last_date = core_time_getDateFull();
+        setDrawColor(192,192,192);
+        DATE_DRAW_STRING(this->last_date, DATE_LABEL_POSITION_X, DATE_LABEL_POSITION_Y, 1);
+    }else{
+        setDrawColor_BackGroundColor();  
+        DATE_CLEAR_STRING(this->last_date, DATE_LABEL_POSITION_X, DATE_LABEL_POSITION_Y, 1);
+    }
+
+    #if defined(PEDOMETER_ENABLE) || defined(PEDOMETER_EMULATOR)
+        
         if(draw){
-            setDrawColor_ContrastColor();
-            drawString(this->timeString, 2, 90, 5);
-        }else{
-
-            setDrawColor_BackGroundColor();
-            clearString(this->timeString, 2, 90, 5);
-            
+            this->last_pedometer = get_pedometer_days_steps();
+            #ifdef PLATFORM_PC_EMULATOR
+                this->sleep_time = String(5.82);
+            #else
+                this->sleep_time = get_pedometer_days_sleep_hours();
+            #endif
         }
-    #endif
 
-    /*
-    this->timeString = core_time_getHourMinuteSecondsTime();
-    setDrawColor(0, 0, 0);
-    clearString(this->timeString, 2, 90, 5);
-    setDrawColor(255, 255, 255);
-    drawString(this->timeString, 2, 90, 5);
-    */
+        String pedometer_toPrint = String(this->last_pedometer);
+        String sleep_toPrint = String(this->sleep_time) + "  ";
+
+            
+        // 16px - leg and sleep icon width
+        int pedometer_label_width_05 = (PEDOMETER_LABEL_POSITION_PADDING*2 + 16 + pedometer_toPrint.length()*FONT_CHAR_WIDTH)/2;
+        int sleep_label_width_05 = (PEDOMETER_LABEL_POSITION_PADDING*2 + 16 + sleep_toPrint.length()*FONT_CHAR_WIDTH)/2;
+
+        #ifdef NARROW_SCREEN
+            // For small screens as sport wristbands
+            #define PEDOMETER_ICON_POSITION_X   (SCREEN_WIDTH/2 + pedometer_label_width_05 - 16 + PEDOMETER_LABEL_POSITION_X_OFFSET)
+            #define PEDOMETER_ICON_POSITION_Y   (PEDOMETER_LABEL_POSITION_Y + PEDOMETER_LABEL_POSITION_PADDING - 9)
+            #define SLEEP_ICON_POSITION_X       (SCREEN_WIDTH/2 + sleep_label_width_05 - 16 + PEDOMETER_LABEL_POSITION_X_OFFSET)
+            #define SLEEP_ICON_POSITION_Y       (SLEEP_LABEL_POSITION_Y + PEDOMETER_LABEL_POSITION_PADDING - 9)
+        #else
+            // Big screens as 240x240 
+            #define PEDOMETER_ICON_POSITION_X   (SCREEN_WIDTH - 21)
+            #define PEDOMETER_ICON_POSITION_Y   (SCREEN_HEIGHT - 19)
+            #define SLEEP_ICON_POSITION_X       (5)
+            #define SLEEP_ICON_POSITION_Y       (SCREEN_HEIGHT - 19)
+        #endif 
+
+        drawImage(draw, getIcon_legs_grey(), PEDOMETER_ICON_POSITION_X, PEDOMETER_ICON_POSITION_Y);
+        drawImage(draw, getIcon_sleep_grey(), SLEEP_ICON_POSITION_X, SLEEP_ICON_POSITION_Y);
+
+        #ifdef NARROW_SCREEN
+            // For small screens as sport wristbands
+            #define PEDOMETER_LABEL_X (SCREEN_WIDTH/2 - pedometer_label_width_05 + PEDOMETER_LABEL_POSITION_X_OFFSET)
+            #define PEDOMETER_LABEL_Y (PEDOMETER_LABEL_POSITION_Y + 1)
+            #define PEDOMETER_LABEL_SIZE (1)
+            #define DRAW_PEDOMETER_LABEL(A,B,C,D) drawString(A,B,C,D)
+            #define CLEAR_PEDOMETER_LABEL(A,B,C,D) clearString(A,B,C,D)
+
+            #define SLEEP_LABEL_X (SCREEN_WIDTH/2)
+            #define SLEEP_LABEL_Y (SLEEP_LABEL_POSITION_Y)
+            #define SLEEP_LABEL_SIZE (1)
+            #define DRAW_SLEEP_LABEL(A,B,C,D) drawString_centered(A,B,C,D)
+            #define CLEAR_SLEEP_LABEL(A,B,C,D) clearString_centered(A,B,C,D)
+        #else
+            // Big screens as 240x240 
+            #define PEDOMETER_LABEL_X (SCREEN_WIDTH - pedometer_label_width_05 - 28)
+            #define PEDOMETER_LABEL_Y (PEDOMETER_LABEL_POSITION_Y)
+            #define PEDOMETER_LABEL_SIZE (1)
+            #define DRAW_PEDOMETER_LABEL(A,B,C,D) drawString(A,B,C,D)
+            #define CLEAR_PEDOMETER_LABEL(A,B,C,D) drawString(A,B,C,D)
+
+            #define SLEEP_LABEL_X (45)
+            #define SLEEP_LABEL_Y (SLEEP_LABEL_POSITION_Y)
+            #define SLEEP_LABEL_SIZE (1)
+            #define DRAW_SLEEP_LABEL(A,B,C,D) drawString_centered(A,B,C,D)
+            #define CLEAR_SLEEP_LABEL(A,B,C,D) drawString_centered(A,B,C,D)
+        #endif 
+
+        if(draw){
+            setDrawColor(192,192,192);
+            // PEDOMETER
+            DRAW_PEDOMETER_LABEL(pedometer_toPrint, PEDOMETER_LABEL_X, PEDOMETER_LABEL_Y, PEDOMETER_LABEL_SIZE);
+            // SLEEP
+            DRAW_SLEEP_LABEL(sleep_toPrint, SLEEP_LABEL_X, SLEEP_LABEL_Y, SLEEP_LABEL_SIZE);
+
+        }else{
+            setDrawColor_BackGroundColor();  
+            // PEDOMETER
+            CLEAR_PEDOMETER_LABEL(pedometer_toPrint, PEDOMETER_LABEL_X, PEDOMETER_LABEL_Y, PEDOMETER_LABEL_SIZE);
+            // SLEEP
+            CLEAR_SLEEP_LABEL(sleep_toPrint, SLEEP_LABEL_X, SLEEP_LABEL_Y, SLEEP_LABEL_SIZE);
+        }
+        
+    #endif
+        
 }
 
 const unsigned char appNameClass::icon[] PROGMEM = {

@@ -25,10 +25,15 @@ class appNameClass: public Application{
 };
 
 void appNameClass::onCreate(){
+    this->preventSleep         = true;
+    this->preventInAppSleep    = true;
+
     DRAW_LIMITS_setEnable(true);
     DRAW_LIMIT_reset();
     DRAW_LIMITS_setEnable(STYLE_STATUSBAR_HEIGHT, -1, -1, -1);
 
+    drawString(appName, 5, STYLE_STATUSBAR_HEIGHT + 10, 3);
+    /* * /
     long time_finish;
     long time_start;
 
@@ -47,6 +52,7 @@ void appNameClass::onCreate(){
     };
 
     drawImage(true, testIcon, 70, 70); 
+    // */
 
     /* * /
     fillScreen(0, 0, 0);
@@ -205,6 +211,8 @@ void appNameClass::onLoop(){
     /*
         Write you code onLoop here
     */
+
+    driver_display_setBrightness(millis()/1000%255);
 }
 
 void appNameClass::onDestroy(){

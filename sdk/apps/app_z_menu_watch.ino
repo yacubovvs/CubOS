@@ -1,44 +1,15 @@
+
 #define appNameClass    MainMenuApp      // App name without spaces
 #define appName         "Main menu"      // App name with spaces 
 
 #define PAGES_LIST_HEIGHT               20
 #define ACTIVE_SCREEN_WIDTH             SCREEN_WIDTH
 #define ACTIVE_SCREEN_HEIGHT            (SCREEN_HEIGHT - STYLE_STATUSBAR_HEIGHT - PAGES_LIST_HEIGHT)
-#define SINGLE_ELEMENT_MIN_WIDTH        100
-#define SINGLE_ELEMENT_MIN_HEIGHT       80
 
-#define SINGLE_ELEMENTS_IN_X            ((int)(ACTIVE_SCREEN_WIDTH/SINGLE_ELEMENT_MIN_WIDTH))
-#define SINGLE_ELEMENTS_IN_Y            ((int)(ACTIVE_SCREEN_HEIGHT/SINGLE_ELEMENT_MIN_HEIGHT))
-
-#define SINGLE_ELEMENTS_IN_X_MACRO      ((ACTIVE_SCREEN_WIDTH/SINGLE_ELEMENT_MIN_WIDTH))
-#define SINGLE_ELEMENTS_IN_Y_MACRO      ((ACTIVE_SCREEN_HEIGHT/SINGLE_ELEMENT_MIN_HEIGHT))
-
-#if ((ACTIVE_SCREEN_WIDTH/SINGLE_ELEMENT_MIN_WIDTH)) < 1
-  #define SINGLE_ELEMENTS_IN_X 1
-  #define SINGLE_ELEMENTS_IN_X_MACRO 1
-#endif
-
-#if ((ACTIVE_SCREEN_HEIGHT/SINGLE_ELEMENT_MIN_HEIGHT)) < 1
-  #define SINGLE_ELEMENTS_IN_Y 1
-  #define SINGLE_ELEMENTS_IN_Y_MACRO 1
-#endif
-
-#if ( ((SINGLE_ELEMENTS_IN_X_MACRO)==1) && ((SINGLE_ELEMENTS_IN_Y_MACRO)==1))
-  #define SINGLE_ELEMENT_ON_SCREEN
-#endif
-
-#ifdef NARROW_SCREEN
-  #define SINGLE_ELEMENTS_IN_X 1
-  #define SINGLE_ELEMENTS_IN_X_MACRO 1
-  #define SINGLE_ELEMENTS_IN_Y 1
-  #define SINGLE_ELEMENTS_IN_Y_MACRO 1
-  #define SINGLE_ELEMENT_ON_SCREEN
-#endif
-
-#define SINGLE_ELEMENT_REAL_WIDTH       ((int)(ACTIVE_SCREEN_WIDTH/SINGLE_ELEMENTS_IN_X))
-#define SINGLE_ELEMENT_REAL_HEIGHT      ((int)(ACTIVE_SCREEN_HEIGHT/SINGLE_ELEMENTS_IN_Y))
+#define SINGLE_ELEMENT_REAL_WIDTH       (ACTIVE_SCREEN_WIDTH)
+#define SINGLE_ELEMENT_REAL_HEIGHT      ((int)(ACTIVE_SCREEN_HEIGHT))
 #define PAGES_LIST_POSITION             (SCREEN_HEIGHT-PAGES_LIST_HEIGHT/2)
-#define APPS_ON_SINGLE_PAGE             (SINGLE_ELEMENTS_IN_X * SINGLE_ELEMENTS_IN_Y)
+#define APPS_ON_SINGLE_PAGE             1
 
 #ifdef  APP_MENU_APPLICATIONS_0
   #define APP_MENU_APPLICATIONS_QUANTITY 1
@@ -165,7 +136,10 @@ class appNameClass: public Application{
         const unsigned char* getApplicationIcon(int num);
         void drawIcons(bool draw);
         void updateActiveAppIndex(int newSelectedAppIndex);
-        void drawActiveAppFrame(bool draw);
+
+        void nextApp();
+        void prevApp();
+        bool preventTouch = false;
 
 };
 
@@ -201,20 +175,10 @@ void appNameClass::onCreate(){
 
     unsigned char app_z_menu_selectedAppIndex_presaved = app_z_menu_selectedAppIndex;
     app_z_menu_selectedAppIndex=0;
-    #ifndef SINGLE_ELEMENT_ON_SCREEN
-      core_views_draw_pages_list_simple(true, PAGES_LIST_POSITION, TOTAL_PAGES);
-    #endif
-
-    unsigned char currentPage = app_z_menu_selectedAppIndex_presaved/APPS_ON_SINGLE_PAGE;
-    if(currentPage==0) core_views_draw_active_page(true, PAGES_LIST_POSITION, TOTAL_PAGES, currentPage);
-    //else this->updateActiveAppIndex(app_z_menu_selectedAppIndex_presaved);  
-    this->updateActiveAppIndex(app_z_menu_selectedAppIndex_presaved);  
-
-    // Drawing icons
+  
+    core_views_draw_active_page(true, PAGES_LIST_POSITION, TOTAL_PAGES, app_z_menu_selectedAppIndex);
+    this->updateActiveAppIndex(app_z_menu_selectedAppIndex);  
     this->drawIcons(true);
-    #ifndef SINGLE_ELEMENT_ON_SCREEN
-      this->drawActiveAppFrame(true);  
-    #endif
     
 }
 
@@ -224,9 +188,6 @@ void appNameClass::updateActiveAppIndex(int newSelectedAppIndex){
   if(newSelectedAppIndex>=APP_MENU_APPLICATIONS_QUANTITY) newSelectedAppIndex = 0;
 
   if(app_z_menu_selectedAppIndex!=newSelectedAppIndex){
-    #ifndef SINGLE_ELEMENT_ON_SCREEN
-      this->drawActiveAppFrame(false);
-    #endif
 
     if( (int)((app_z_menu_selectedAppIndex)/APPS_ON_SINGLE_PAGE) != (int)((newSelectedAppIndex)/APPS_ON_SINGLE_PAGE)){
       // update page
@@ -238,92 +199,58 @@ void appNameClass::updateActiveAppIndex(int newSelectedAppIndex){
     }else{
       app_z_menu_selectedAppIndex = newSelectedAppIndex;
     }
-
-    // update selected app frame
-    #ifndef SINGLE_ELEMENT_ON_SCREEN
-      this->drawActiveAppFrame(true);
-    #endif
   }
-}
-
-void appNameClass::drawActiveAppFrame(bool draw){
-  #ifdef SINGLE_ELEMENT_ON_SCREEN
-    return;
-  #endif
-
-  unsigned char positionOnScreen     = app_z_menu_selectedAppIndex%APPS_ON_SINGLE_PAGE;
-  unsigned char positionOnScreen_x   = app_z_menu_selectedAppIndex%SINGLE_ELEMENTS_IN_X;
-  unsigned char positionOnScreen_y   = positionOnScreen/SINGLE_ELEMENTS_IN_X;
-
-  int x0 = positionOnScreen_x*SINGLE_ELEMENT_REAL_WIDTH;
-  int y0 = positionOnScreen_y*SINGLE_ELEMENT_REAL_HEIGHT + STYLE_STATUSBAR_HEIGHT+1;
-  int x1 = x0+SINGLE_ELEMENT_REAL_WIDTH;
-  int y1 = y0+SINGLE_ELEMENT_REAL_HEIGHT;
-
-  if(draw) setDrawColor(196, 196, 196);
-  else setDrawColor(getBackgroundColor_red(), getBackgroundColor_green(), getBackgroundColor_blue());
-
-  for(unsigned char i=0; i<4; i++){
-    unsigned char delta = 5+i;
-    drawRect(x0+delta, y0+delta, x1-delta, y1-delta);  
-  }
-  
 }
 
 void appNameClass::drawIcons(bool draw){
-  for (unsigned char y_position=0; y_position<SINGLE_ELEMENTS_IN_Y; y_position++){
-        for (unsigned char x_position=0; x_position<SINGLE_ELEMENTS_IN_X; x_position++){
-            int x0 = x_position*SINGLE_ELEMENT_REAL_WIDTH;
-            int y0 = y_position*SINGLE_ELEMENT_REAL_HEIGHT + STYLE_STATUSBAR_HEIGHT+1;
-            int x1 = x0+SINGLE_ELEMENT_REAL_WIDTH;
-            int y1 = y0+SINGLE_ELEMENT_REAL_HEIGHT;
+  int x0 = 0;
+  int y0 = STYLE_STATUSBAR_HEIGHT+1;
+  int x1 = x0+SINGLE_ELEMENT_REAL_WIDTH;
+  int y1 = y0+SINGLE_ELEMENT_REAL_HEIGHT;
 
-            int x_center = (x0+x1)/2;
-            int y_center = (y0+y1)/2;
+  int x_center = (x0+x1)/2;
+  int y_center = (y0+y1)/2;
 
-            int app_num = y_position*(SINGLE_ELEMENTS_IN_X) + x_position + APPS_ON_SINGLE_PAGE*(int)(app_z_menu_selectedAppIndex/APPS_ON_SINGLE_PAGE);
+  int app_num = app_z_menu_selectedAppIndex;
 
-            if(app_num<APP_MENU_APPLICATIONS_QUANTITY){
-              #ifdef ESP8266
-                ESP.wdtDisable();
-              #endif
+  if(app_num<APP_MENU_APPLICATIONS_QUANTITY){
+    #ifdef ESP8266
+      ESP.wdtDisable();
+    #endif
 
-              //debug(String(app_num), 1000);
-              #ifdef SMOOTH_ANIMATION
-                if(this->scroll_x!=0){
-                  if(this->scroll_x<0){
-                  }else if(this->scroll_x>0){
-                    // unsigned char lastIcon=this->scroll_x/SCREEN_WIDTH;
-                    //debug(String(lastIcon));
-                    
-                    char elementsToPreDraw = this->scroll_x/SCREEN_WIDTH + 1;
-                    elementsToPreDraw = elementsToPreDraw%APP_MENU_APPLICATIONS_QUANTITY;
-                    for(unsigned char elementDraw = 0; elementDraw<=elementsToPreDraw; elementDraw++){
-                      int appElementDraw = app_num - elementDraw;
-                      while(appElementDraw<0) appElementDraw+=APP_MENU_APPLICATIONS_QUANTITY;
-                      appElementDraw = appElementDraw%APP_MENU_APPLICATIONS_QUANTITY;
+    #ifdef SMOOTH_ANIMATION
+      if(this->scroll_x!=0){
+        if(this->scroll_x>0){
+          int appElementDraw = (app_num + -1 + APP_MENU_APPLICATIONS_QUANTITY)%APP_MENU_APPLICATIONS_QUANTITY;
+          core_views_draw_app_icon(
+            draw, 
+            this->scroll_x + x_center - SCREEN_WIDTH, 
+            y_center, 
+            (const unsigned char*)this->getApplicationTitle(appElementDraw), 
+            this->getApplicationIcon(appElementDraw)
+          );
 
-                      core_views_draw_app_icon(
-                        draw, 
-                        this->scroll_x + x_center - elementDraw*SCREEN_WIDTH , y_center, 
-                        (const unsigned char*)this->getApplicationTitle(appElementDraw), 
-                        this->getApplicationIcon(appElementDraw)
-                      );
-                    }
+        }else if(this->scroll_x<0){
+          int appElementDraw = (app_num + 1 + APP_MENU_APPLICATIONS_QUANTITY)%APP_MENU_APPLICATIONS_QUANTITY;
 
-                  }
-                }
-              #endif
-
-              core_views_draw_app_icon(
-                draw, 
-                this->scroll_x + x_center, y_center, 
-                (const unsigned char*)this->getApplicationTitle(app_num), 
-                this->getApplicationIcon(app_num)
-              );
-            }
+          core_views_draw_app_icon(
+            draw, 
+            this->scroll_x - x_center + 2*SCREEN_WIDTH, 
+            y_center, 
+            (const unsigned char*)this->getApplicationTitle(appElementDraw), 
+            this->getApplicationIcon(appElementDraw)
+          );
         }
-    }
+      }
+    #endif
+
+    core_views_draw_app_icon(
+      draw, 
+      this->scroll_x + x_center, y_center, 
+      (const unsigned char*)this->getApplicationTitle(app_num), 
+      this->getApplicationIcon(app_num)
+    );
+  }
 }
 
 void appNameClass::onLoop(){
@@ -346,6 +273,22 @@ void appNameClass::onLoop(){
 void appNameClass::onDestroy(){
 }
 
+void appNameClass::nextApp(){
+  this->drawIcons(false);
+  #ifdef SMOOTH_ANIMATION
+    this->scroll_x += SCREEN_WIDTH;
+  #endif
+  this->updateActiveAppIndex(app_z_menu_selectedAppIndex+1);
+}
+
+void appNameClass::prevApp(){
+  this->drawIcons(false);
+  #ifdef SMOOTH_ANIMATION
+    this->scroll_x -= SCREEN_WIDTH;
+  #endif
+  this->updateActiveAppIndex(app_z_menu_selectedAppIndex-1);
+}
+
 void appNameClass::onEvent(unsigned char event, int val1, int val2){
     
   /*
@@ -355,6 +298,15 @@ void appNameClass::onEvent(unsigned char event, int val1, int val2){
   BUTTON_BACK
   BUTTON_POWER
   */
+  if(event==EVENT_ON_TOUCH_DRAG){
+    if(!preventTouch && abs(val1)>abs(val2)){
+      if(val1<0) nextApp();
+      else prevApp();
+      preventTouch = true;
+    }
+  }else if(event==EVENT_ON_TOUCH_RELEASED){
+    preventTouch = false;
+  }
 
   #if (DRIVER_CONTROLS_TOTALBUTTONS == 1 || DRIVER_CONTROLS_TOTALBUTTONS == 2)
     if(event==EVENT_BUTTON_PRESSED){
@@ -368,21 +320,13 @@ void appNameClass::onEvent(unsigned char event, int val1, int val2){
     //}else if(event==EVENT_BUTTON_SHORT_SINGLE_PRESS){
     }else if(event==EVENT_BUTTON_SHORT_PRESS){
       if(val1==BUTTON_BACK){
-        this->updateActiveAppIndex(app_z_menu_selectedAppIndex-1);
+        prevApp();
       }else if(val1==BUTTON_SELECT){
-        this->drawIcons(false);
-        #ifdef SMOOTH_ANIMATION
-          this->scroll_x += SCREEN_WIDTH;
-        #endif
-        this->updateActiveAppIndex(app_z_menu_selectedAppIndex+1);
+        nextApp();
       }
     }else if(event==EVENT_ON_TOUCH_DOUBLE_PRESS){
       if(val1==BUTTON_SELECT){
-        this->drawIcons(false);
-        #ifdef SMOOTH_ANIMATION
-          this->scroll_x += SCREEN_WIDTH;
-        #endif
-        this->updateActiveAppIndex(app_z_menu_selectedAppIndex+1);
+        nextApp();
       }
     }
   #else

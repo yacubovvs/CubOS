@@ -1,7 +1,11 @@
-#define DEBUG_PEDOMETER
 
 #ifdef PEDOMETER_ENABLE
     //RTC_DATA_ATTR long pedometer_days_steps = 0;
+
+    bool pedometer_in_work = false;
+    bool get_pedometer_in_work(){
+        return pedometer_in_work;
+    }
 
     RTC_DATA_ATTR unsigned char analyse_sleep_delta_accels = 0;
     RTC_DATA_ATTR unsigned char corePedometer_currentsleep_between_mesures = PEDOMETER_STEP_DETECTION_DELAY_SEC_MIN;
@@ -77,6 +81,9 @@
     }
 
     int     core_pedometer_current_step_detection = -1;
+    bool    core_pedometer_current_get_isNotInMesure(){
+        core_pedometer_current_step_detection==-1;
+    };
     float   core_pedometer_step_detection_arrays[PEDOMETER_MESURES_IN_STEP_DETECTION_PERIOD];
     long    core_pedometer_step_detection_start_time = 0;
     RTC_DATA_ATTR long    lastTimeWalkingDetection = 0;
@@ -118,8 +125,9 @@
                 #endif
                 core_pedometer_mesure_loop(inBackGroung);
             }else{
+                driver_accelerometer_wakeup();
                 #ifdef DEBUG_PEDOMETER 
-                    debug("Pedometer - check time!", 10);
+                    //debug("Pedometer - check time!", 10);
                 #endif
                 
                 if(getCurrentSystemTime()<lastTimeWalkingDetection) lastTimeWalkingDetection = getCurrentSystemTime();
@@ -130,20 +138,20 @@
                     if(inBackGroung){
                         #ifdef ACCELEROMETER_ENABLE
                             driver_accelerometer_setup();
-                            #ifdef WAKEUP_DEBUG
-                                debug("Accelerometer is setted up " + String(millis()), 10);
+                            #ifdef DEBUG_PEDOMETER
+                                debug("DEBUG_PEDOMETER: Accelerometer is setted up " + String(millis()), 10);
                             #endif
                         #endif
                     }
 
                     #ifdef DEBUG_PEDOMETER
-                        debug("Pedometer - Start step!", 10);
+                        debug("DEBUG_PEDOMETER: Pedometer - Start step!", 10);
                     #endif
                     core_pedometer_start_step_detection(inBackGroung);
                     core_pedometer_mesure_loop(inBackGroung);
                 }else{
                     #ifdef DEBUG_PEDOMETER
-                        debug("!!!!! Time not come", 10);
+                        //debug("!!!!! Time is not come", 10);
                     #endif
                 }
             }
@@ -164,7 +172,7 @@
                 ){ // Mesure condition
 
                 #ifdef DEBUG_PEDOMETER
-                    debug("Mesure " + String( core_pedometer_current_step_detection));
+                    debug("DEBUG_PEDOMETER: Mesure " + String( core_pedometer_current_step_detection));
                 #endif
 
                 driver_accelerometer_update_accelerometer();
@@ -182,8 +190,11 @@
 
                 if(core_pedometer_current_step_detection==PEDOMETER_MESURES_IN_STEP_DETECTION_PERIOD){
                     core_pedometer_current_step_detection=-1;
+                    driver_accelerometer_sleep();
                     core_pedometer_analyse_steps_mesure(inBackGroung);
                 }
+
+                //if(!inBackGroung) core_pedometer_current_step_detection++;
             }
 
             if(inBackGroung){
@@ -191,7 +202,7 @@
                     // debug("PEDOMETER MESURE IN BACKGROUN", 10);
                 #endif
                 
-                #ifdef WAKEUP_DEBUG
+                #ifdef DEBUG_WAKEUP
                     debug("Mesure in BG "  + String(millis()), 10);
                 #endif
                 core_cpu_sleep(SLEEP_LIGHT, CORE_PEDOMETER_MESURE_EVERY_MS, false); 
@@ -203,6 +214,7 @@
     }
 
     void core_pedometer_start_step_detection(bool inBackGroung){
+        pedometer_in_work = true;
         core_pedometer_current_step_detection = 0;
         for(int i=0; i<PEDOMETER_MESURES_IN_STEP_DETECTION_PERIOD; i++){
             core_pedometer_step_detection_arrays[i] = 0.0f;
@@ -367,8 +379,21 @@
                         #ifdef DEBUG_PEDOMETER
                             debug("IS SLEEPING");
                         #endif
+
                         between_mesure_realy_delay = (corePedometer_currentsleep_between_mesures + PEDOMETER_STEP_DETECTION_PERIOD_MS/1000);
-                        unsigned char sleep_minutes_to_add = (between_mesure_realy_delay+1)/60;
+                        #ifdef SLEEP_VALUE_DEBUG
+                            unsigned char sleep_minutes_to_add = 1;
+                        #else    
+                            unsigned char sleep_minutes_to_add = (between_mesure_realy_delay+1)/60;
+                        #endif
+                        
+                        #ifdef DEBUG_PEDOMETER_TIMING
+                        
+                            debug("corePedometer_currentsleep_between_mesures " + String(corePedometer_currentsleep_between_mesures));
+                            debug("sleep_minutes_to_add " + String(sleep_minutes_to_add));
+                            debug("between_mesure_realy_delay " + String(between_mesure_realy_delay));
+                        #endif
+
                         #ifdef DEBUG_PEDOMETER
                             debug("sleep_minutes_to_add " + String(sleep_minutes_to_add));
                         #endif
@@ -389,6 +414,9 @@
 
         core_pedometer_step_detection_start_time = millis();
         lastTimeWalkingDetection = getCurrentSystemTime();
+
+        //core_pedometer_current_step_detection = -1;
+        pedometer_in_work = false;
         return true;
     }
 
