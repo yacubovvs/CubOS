@@ -184,6 +184,8 @@
 
 
 #define APP_CLOCK_POWER_AFTER_SECONDS           4
+
+#define PEDOMETER_DO_NOT_USER_PEDOMETER_WHILE_CONNECTED_TO_USB
 /*
     ############################################################################################
     #                                                                                          #

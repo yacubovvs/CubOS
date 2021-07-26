@@ -184,6 +184,8 @@
 
 
 #define APP_CLOCK_POWER_AFTER_SECONDS           4
+
+#define PEDOMETER_DO_NOT_USER_PEDOMETER_WHILE_CONNECTED_TO_USB
 /*
     ############################################################################################
     #                                                                                          #
@@ -290,7 +292,7 @@
 #define PEDOMETER_STEP_DETECTION_DELAY_SEC_MAX          60 // MAX (255 - PEDOMETER_STEP_DETECTION_PERIOD_MS/1000) and multiple 60 seconds
 
 #define CORE_PEDOMETER_SLEEP_COUNTING_SPOINTS   7 // mesures for sleep detection 
-#define CORE_PEDOMETER_SLEEP_MIN_ACCELL_100     5 // acceletometer sensitivity/100*G for sleep detection
+#define CORE_PEDOMETER_SLEEP_MIN_ACCELL_100     4 // acceletometer sensitivity/100*G for sleep detection
 
 #define APP_CLOCK_POWER_AFTER_SECONDS           4
 

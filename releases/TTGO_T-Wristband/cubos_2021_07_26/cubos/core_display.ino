@@ -814,9 +814,23 @@ void core_display_setup(){
   #endif
 }
 
-//int fs_ms_max = 0;
+#ifdef DEBUG_FPS
+  long fps_last_milllis = millis();
+#endif
 
 void core_display_loop(){
+
+  #ifdef DEBUG_FPS
+    //delay(16);
+    if(getFRAMEBUFFER_isChanged()){
+      
+      long delta_ms = millis() - fps_last_milllis;
+      float fps = (float)1000.0/((float)delta_ms);
+      debug("DEBUG_FPS: fps " + String(fps));
+    }
+    
+    fps_last_milllis = millis();
+  #endif
   
   #ifdef FRAMEBUFFER_ENABLE
     #ifdef FRAMEBUFFER_TWIN_FULL
@@ -1217,6 +1231,7 @@ void drawImage(bool draw, const unsigned char* data, int x, int y){
         for (int readingBbyte=0; readingBbyte<(image_wigth*image_height%8==0?image_wigth*image_height/8:image_wigth*image_height/8+1); readingBbyte++){
           //if(data_size<=readPosition) break;
           currentBbyte = readRawChar(data, readPosition);
+          //debug("Got color drawing " + String(currentBbyte));
 
           if(currentBbyte!=0x00 && currentBbyte!=0xFF){
             for (unsigned char d=0; d<8; d++){
