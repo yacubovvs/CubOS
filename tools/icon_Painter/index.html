@@ -265,11 +265,51 @@
                         var bluePx = px[i+2];
                         var alphaPx = px[i+3];
 
-                        //console.log( "" + (position%image_width) + " " + (Math.floor(position/image_width)) + "\n");
+                        /*
+                        //for 4096 colors
+                        var redPx = Math.floor(redPx/16)*16;
+                        var greenPx = Math.floor(greenPx/16)*16;
+                        var bluePx = Math.floor(bluePx/16)*16;
+                        */
+
+                        //for 256 colors
+                        /*
+                        var k = 256/8;
+                        var redPx = Math.floor(redPx/k)*k;
+                        var greenPx = Math.floor(greenPx/k)*k;
+                        var bluePx = Math.floor(bluePx/k)*k;
+                        */
+
+                        //for 256 colors
+                        /*
+                        var k = 80;
+                        var k2 = 112;
+                        var redPx = Math.floor(redPx/k2 + 0)*k2;
+                        var greenPx = Math.floor(greenPx/k2 + 0)*k2;
+                        var bluePx = Math.floor(bluePx/k + 0)*k;
+
+                        if(redPx>255) redPx= 255;
+                        if(greenPx>255) greenPx= 255;
+                        if(bluePx>255) bluePx= 255;
+                        */
+                        
+                        
+                        // For grayScale
+                        
+                        var k = 256/3;
+                        var gray_px = (redPx + greenPx + bluePx)/3;
+                        gray_px = Math.floor(gray_px/k + 1)*k;
+
+                        if(gray_px>255) gray_px= 255;
+
+                        var redPx = gray_px;
+                        var greenPx = gray_px;
+                        var bluePx = gray_px;
+                        
+
 
                         image_map[position%image_width][Math.floor(position/image_width)] = "" + convert_to_HEX(redPx, 1) + convert_to_HEX(greenPx, 1) + convert_to_HEX(bluePx, 1);
-                        //if (redPx!=0 || greenPx!=0 ||bluePx!=0 || alphaPx!=0){
-                        //console.log(redPx,greenPx,bluePx,alphaPx);
+                        
                         position++;
                     }   
 
@@ -330,10 +370,10 @@
                 generate_result();
             }
 
-            var image_width = 16;
-            var image_height = 16;
+            var image_width = 80;
+            var image_height = 80;
 
-            var cell_size = 20;
+            var cell_size = 14;
 
             var image_map = [];
             var current_color = 0;

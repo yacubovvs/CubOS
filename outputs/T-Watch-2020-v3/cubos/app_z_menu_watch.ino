@@ -112,6 +112,16 @@
 
 // # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # //
 
+#ifdef USE_XL_MENU_IMAGES
+  #define MENU_WATCH_IMAGE_WIDTH                  80
+  #define MENU_WATCH_APPICON_IMAGE_HEIGHT         80
+#else
+  #define MENU_WATCH_IMAGE_WIDTH                  32
+  #define MENU_WATCH_APPICON_IMAGE_HEIGHT         32
+#endif
+#define MENU_WATCH_APPICON_IMAGE_Y_OFFSET       -15
+#define MENU_WATCH_APPICON_TITLE_Y_OFFSET       40
+
 char app_z_menu_selectedAppIndex = 0; // Now it is a global variable
 
 class appNameClass: public Application{
@@ -140,6 +150,8 @@ class appNameClass: public Application{
         void nextApp();
         void prevApp();
         bool preventTouch = false;
+        void draw_app_icon_title(bool draw, int x, int y, const unsigned char* title);
+        void draw_app_icon_image(bool draw, int x, int y, const unsigned char* icon);
 
 };
 
@@ -220,38 +232,81 @@ void appNameClass::drawIcons(bool draw){
 
     #ifdef SMOOTH_ANIMATION
       if(this->scroll_x!=0){
+        int x_position;
+        int y_position;
+        int appElementDraw;
         if(this->scroll_x>0){
-          int appElementDraw = (app_num + -1 + APP_MENU_APPLICATIONS_QUANTITY)%APP_MENU_APPLICATIONS_QUANTITY;
-          core_views_draw_app_icon(
+          appElementDraw = (app_num + -1 + APP_MENU_APPLICATIONS_QUANTITY)%APP_MENU_APPLICATIONS_QUANTITY;
+
+          x_position = this->scroll_x + x_center - SCREEN_WIDTH;
+          y_position = y_center;
+          /*
+          this->draw_app_icon(
             draw, 
             this->scroll_x + x_center - SCREEN_WIDTH, 
             y_center, 
             (const unsigned char*)this->getApplicationTitle(appElementDraw), 
             this->getApplicationIcon(appElementDraw)
-          );
+          );*/
 
         }else if(this->scroll_x<0){
-          int appElementDraw = (app_num + 1 + APP_MENU_APPLICATIONS_QUANTITY)%APP_MENU_APPLICATIONS_QUANTITY;
+          appElementDraw = (app_num + 1 + APP_MENU_APPLICATIONS_QUANTITY)%APP_MENU_APPLICATIONS_QUANTITY;
 
-          core_views_draw_app_icon(
+          x_position = this->scroll_x - x_center + 2*SCREEN_WIDTH;
+          y_position = y_center;
+          /*
+          this->draw_app_icon(
             draw, 
             this->scroll_x - x_center + 2*SCREEN_WIDTH, 
             y_center, 
             (const unsigned char*)this->getApplicationTitle(appElementDraw), 
             this->getApplicationIcon(appElementDraw)
-          );
+          );*/
         }
+        this->draw_app_icon_title( draw, x_position, y_position, (const unsigned char*)this->getApplicationTitle(appElementDraw));
+      }else{
+        this->preventInAppSleep    = false;
+        //debug("Prevent sleep stop");
       }
     #endif
 
-    core_views_draw_app_icon(
-      draw, 
-      this->scroll_x + x_center, y_center, 
-      (const unsigned char*)this->getApplicationTitle(app_num), 
-      this->getApplicationIcon(app_num)
-    );
+    
+    this->draw_app_icon_image( draw, x_center, y_center, this->getApplicationIcon(app_num));
+    this->draw_app_icon_title( draw, this->scroll_x + x_center, y_center, (const unsigned char*)this->getApplicationTitle(app_num));
   }
 }
+
+/*
+void appNameClass::draw_app_icon(bool draw, int x, int y, const unsigned char* title, const unsigned char* icon){
+    // image
+    drawImage(draw, icon, x-MENU_WATCH_IMAGE_WIDTH/2, y-MENU_WATCH_APPICON_IMAGE_HEIGHT/2 + MENU_WATCH_APPICON_IMAGE_Y_OFFSET);
+
+    // title
+    if(draw){
+        setDrawColor(255, 255, 255);
+        drawString_centered((char*)title, x, y + MENU_WATCH_APPICON_TITLE_Y_OFFSET, 2);
+    }else{
+        setDrawColor(getBackgroundColor_red(), getBackgroundColor_green(), getBackgroundColor_blue());
+        clearString_centered((char*)title, x, y + MENU_WATCH_APPICON_TITLE_Y_OFFSET, 2);
+    }  
+}*/
+
+void appNameClass::draw_app_icon_image(bool draw, int x, int y, const unsigned char* icon){
+  // image
+  drawImage(draw, icon, x-MENU_WATCH_IMAGE_WIDTH/2, y-MENU_WATCH_APPICON_IMAGE_HEIGHT/2 + MENU_WATCH_APPICON_IMAGE_Y_OFFSET);
+}
+
+void appNameClass::draw_app_icon_title(bool draw, int x, int y, const unsigned char* title){
+  // title
+  if(draw){
+      setDrawColor(255, 255, 255);
+      drawString_centered((char*)title, x, y + MENU_WATCH_APPICON_TITLE_Y_OFFSET, 2);
+  }else{
+      setDrawColor(getBackgroundColor_red(), getBackgroundColor_green(), getBackgroundColor_blue());
+      clearString_centered((char*)title, x, y + MENU_WATCH_APPICON_TITLE_Y_OFFSET, 2);
+  }
+}
+
 
 void appNameClass::onLoop(){
   #ifdef SMOOTH_ANIMATION
@@ -276,6 +331,8 @@ void appNameClass::onDestroy(){
 void appNameClass::nextApp(){
   this->drawIcons(false);
   #ifdef SMOOTH_ANIMATION
+    //debug("Prevent sleep start");
+    this->preventInAppSleep    = true;
     this->scroll_x += SCREEN_WIDTH;
   #endif
   this->updateActiveAppIndex(app_z_menu_selectedAppIndex+1);
@@ -284,6 +341,8 @@ void appNameClass::nextApp(){
 void appNameClass::prevApp(){
   this->drawIcons(false);
   #ifdef SMOOTH_ANIMATION
+    //debug("Prevent sleep start");
+    this->preventInAppSleep    = true;
     this->scroll_x -= SCREEN_WIDTH;
   #endif
   this->updateActiveAppIndex(app_z_menu_selectedAppIndex-1);

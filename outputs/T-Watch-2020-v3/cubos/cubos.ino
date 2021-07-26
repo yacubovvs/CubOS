@@ -220,6 +220,9 @@
 #define BLUETOOTH_ENABLE
 #define WIFI_ENABLE
 
+//#define USE_L_MENU_IMAGES
+#define USE_XL_MENU_IMAGES
+
 #define ON_TIME_CHANGE_EVERY_MS 1000
 
 #define DRIVER_CONTROLS_TOTALBUTTONS 1
@@ -258,7 +261,7 @@
 //#define DEFAULT_FADE_BRIGHTNES 5
 //#define DEFAULT_SCREEN_BRIGHTNESS 10
 
-#define DEFAULT_TIME_TO_POWEROFF_DISPLAY 5
+#define DEFAULT_TIME_TO_POWEROFF_DISPLAY 15
 //#define DEFAULT_DELAY_TO_FADE_DISPLAY 0
 
 #define STYLE_STATUSBAR_HEIGHT  30 
@@ -304,6 +307,7 @@
 //#define DEBUG_CORE_POWERSAVE
 
 #define DEBUG_SERIAL
+//#define DEBUG_FPS
 //#define DEBUG_WAKEUP
 //#define DEBUG_PEDOMETER
 //#define DEBUG_ACELEROMETER
@@ -650,13 +654,12 @@ void debug(String string, int delaytime){
 */
 
 #define APP_MENU_APPLICATIONS_0             ClockApp
-#define APP_MENU_APPLICATIONS_1             PedometerApp
-#define APP_MENU_APPLICATIONS_2             PedometerAppTest
-#define APP_MENU_APPLICATIONS_3             I2CScannerApp
-#define APP_MENU_APPLICATIONS_4             SettingsApp
-#define APP_MENU_APPLICATIONS_5             TestApplicationApp
-#define APP_MENU_APPLICATIONS_6             BatteryApp
-#define APP_MENU_APPLICATIONS_7             TouchTest
+#define APP_MENU_APPLICATIONS_1             SettingsApp
+#define APP_MENU_APPLICATIONS_2             PedometerApp
+#define APP_MENU_APPLICATIONS_3             BatteryApp
+#define APP_MENU_APPLICATIONS_4             PedometerAppTest
+#define APP_MENU_APPLICATIONS_5             I2CScannerApp
+#define APP_MENU_APPLICATIONS_6             TestApplicationApp
 
 /*
     # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #

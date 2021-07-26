@@ -20,10 +20,10 @@ cp sdk/apps/app_i2c_scanner.ino     outputs/T-Watch-2020-v3/cubos/
 cp sdk/apps/app_settings.ino        outputs/T-Watch-2020-v3/cubos/
 cp sdk/apps/app_test.ino            outputs/T-Watch-2020-v3/cubos/
 cp sdk/apps/app_clock.ino           outputs/T-Watch-2020-v3/cubos/
-cp sdk/apps/app_touchTest.ino       outputs/T-Watch-2020-v3/cubos/
+#cp sdk/apps/app_touchTest.ino       outputs/T-Watch-2020-v3/cubos/
 cp sdk/apps/app_pedometer_test.ino  outputs/T-Watch-2020-v3/cubos/
 cp sdk/apps/app_pedometer.ino       outputs/T-Watch-2020-v3/cubos/
-cp sdk/apps/app_ble_tester.ino      outputs/T-Watch-2020-v3/cubos/
+#cp sdk/apps/app_ble_tester.ino      outputs/T-Watch-2020-v3/cubos/
 #cp sdk/apps/app_z_menu_touch.ino    outputs/T-Watch-2020-v3/cubos/
 cp sdk/apps/app_z_menu_watch.ino    outputs/T-Watch-2020-v3/cubos/
 

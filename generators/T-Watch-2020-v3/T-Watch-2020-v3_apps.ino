@@ -7,13 +7,12 @@
 */
 
 #define APP_MENU_APPLICATIONS_0             ClockApp
-#define APP_MENU_APPLICATIONS_1             PedometerApp
-#define APP_MENU_APPLICATIONS_2             PedometerAppTest
-#define APP_MENU_APPLICATIONS_3             I2CScannerApp
-#define APP_MENU_APPLICATIONS_4             SettingsApp
-#define APP_MENU_APPLICATIONS_5             TestApplicationApp
-#define APP_MENU_APPLICATIONS_6             BatteryApp
-#define APP_MENU_APPLICATIONS_7             TouchTest
+#define APP_MENU_APPLICATIONS_1             SettingsApp
+#define APP_MENU_APPLICATIONS_2             PedometerApp
+#define APP_MENU_APPLICATIONS_3             BatteryApp
+#define APP_MENU_APPLICATIONS_4             PedometerAppTest
+#define APP_MENU_APPLICATIONS_5             I2CScannerApp
+#define APP_MENU_APPLICATIONS_6             TestApplicationApp
 
 /*
     # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
