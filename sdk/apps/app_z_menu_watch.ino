@@ -365,6 +365,8 @@ void appNameClass::onEvent(unsigned char event, int val1, int val2){
     }
   }else if(event==EVENT_ON_TOUCH_RELEASED){
     preventTouch = false;
+  }else if(event==EVENT_ON_TOUCH_CLICK){
+    startApp(app_z_menu_selectedAppIndex);
   }
 
   #if (DRIVER_CONTROLS_TOTALBUTTONS == 1 || DRIVER_CONTROLS_TOTALBUTTONS == 2)

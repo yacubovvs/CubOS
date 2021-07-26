@@ -85,13 +85,22 @@ String core_views_statusBar_draw_time_TimeString = "";
 void core_views_statusBar_draw_time(bool draw){
     bool lastLimits = DRAW_LIMITS_getEnable();
     DRAW_LIMITS_setEnable(false);
+
+    #if FONT_SIZE_DEFAULT==1
+        #define CORE_VIEWS_STATUSBAR_TIMESTRING_OFFSET 2
+    #elif FONT_SIZE_DEFAULT==2
+        #define CORE_VIEWS_STATUSBAR_TIMESTRING_OFFSET 0
+    #else
+        #define CORE_VIEWS_STATUSBAR_TIMESTRING_OFFSET 0
+    #endif
+
     if(draw){
         setDrawColor(STYLE_STATUSBAR_TEXT_RED, STYLE_STATUSBAR_TEXT_GREEN, STYLE_STATUSBAR_TEXT_BLUE);
         core_views_statusBar_draw_time_TimeString = core_time_getHourMinuteTime();
-        drawString(core_views_statusBar_draw_time_TimeString, 5, STYLE_STATUSBAR_HEIGHT/2 - FONT_CHAR_HEIGHT/2 + ( (STYLE_STATUSBAR_HEIGHT)%2 ) + ( (FONT_CHAR_HEIGHT)%2 ) + 2, FONT_SIZE_DEFAULT);
+        drawString(core_views_statusBar_draw_time_TimeString, 5, STYLE_STATUSBAR_HEIGHT/2 - FONT_CHAR_HEIGHT/2 + ( (STYLE_STATUSBAR_HEIGHT)%2 ) + ( (FONT_CHAR_HEIGHT)%2 ) + CORE_VIEWS_STATUSBAR_TIMESTRING_OFFSET, FONT_SIZE_DEFAULT);
     }else{
         setDrawColor(STYLE_STATUSBAR_BACKGROUND_RED, STYLE_STATUSBAR_BACKGROUND_GREEN, STYLE_STATUSBAR_BACKGROUND_BLUE);
-        clearString(core_views_statusBar_draw_time_TimeString, 5, STYLE_STATUSBAR_HEIGHT/2 - FONT_CHAR_HEIGHT/2 + ( (STYLE_STATUSBAR_HEIGHT)%2 ) + ( (FONT_CHAR_HEIGHT)%2 ) + 2, FONT_SIZE_DEFAULT);
+        clearString(core_views_statusBar_draw_time_TimeString, 5, STYLE_STATUSBAR_HEIGHT/2 - FONT_CHAR_HEIGHT/2 + ( (STYLE_STATUSBAR_HEIGHT)%2 ) + ( (FONT_CHAR_HEIGHT)%2 ) + CORE_VIEWS_STATUSBAR_TIMESTRING_OFFSET, FONT_SIZE_DEFAULT);
     }
     DRAW_LIMITS_setEnable(lastLimits);
 }
@@ -325,7 +334,12 @@ void core_views_draw_active_page(
     unsigned char pages_quantity,
     unsigned char position
 ){
+    
     #ifdef NARROW_SCREEN
+        #define USE_NUMBERS_MAIN_MENU_IN_ACTIVE_PAGES
+    #endif
+
+    #ifdef USE_NUMBERS_MAIN_MENU_IN_ACTIVE_PAGES
         //if(draw) setDrawColor(getContrastColor_red(), getContrastColor_green(), getContrastColor_blue());
         #define GRAY_COLOR 164
         if(draw) setDrawColor(GRAY_COLOR, GRAY_COLOR, GRAY_COLOR);

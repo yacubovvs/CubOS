@@ -184,6 +184,9 @@
 
 
 #define APP_CLOCK_POWER_AFTER_SECONDS           4
+
+#define PEDOMETER_DO_NOT_USER_PEDOMETER_WHILE_CONNECTED_TO_USB
+#define USE_NUMBERS_MAIN_MENU_IN_ACTIVE_PAGES
 /*
     ############################################################################################
     #                                                                                          #
@@ -246,7 +249,7 @@
 #define CLOCK_ENABLE
 //#define USE_PRIMITIVE_HARDWARE_DRAW_ACCELERATION
 
-#define NARROW_SCREEN
+//#define NARROW_SCREEN
 #define RTC_ENABLE
 #define SMOOTH_ANIMATION
 
