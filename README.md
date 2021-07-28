@@ -24,6 +24,7 @@ A tiny operating system for embedded and wearable devices to interact with users
 - Lilygo T-Watch-2020 v2
 - Arduino Mega256
 - Esp8266
+- Esp32
 
 ### Arduino compatible
 <img alt="arduino compatible" src="documentation\images\arduino_compatible.png" width="300">
