@@ -100,17 +100,19 @@
 
         #ifdef PEDOMETER_DO_NOT_USER_PEDOMETER_WHILE_CONNECTED_TO_USB
             #ifdef BATTERY_ENABLE
-                if(driver_battery_isUsbConnected()){
-                    #ifdef DEBUG_PEDOMETER
-                        debug("DEBUG_PEDOMETER: exit job course on usb");
-                    #endif 
-                    analyse_sleep_delta_accels=0;
-                    return;
-                }else{
+                #ifndef DEBUG_PEDOMETER
+                    if(driver_battery_isUsbConnected()){
+                        #ifdef DEBUG_PEDOMETER
+                            debug("DEBUG_PEDOMETER: exit job course on usb");
+                        #endif 
+                        analyse_sleep_delta_accels=0;
+                        return;
+                    }
+                #else
                     #ifdef DEBUG_PEDOMETER
                         debug("DEBUG_PEDOMETER: usb is not connected");
                     #endif 
-                }
+                #endif
             #endif
         #endif
 
@@ -370,7 +372,7 @@
 
                 unsigned char analysis_delta_value_byte = (unsigned char)(analysis_delta_value*100.0);
 
-                if(analysis_delta_value_byte<=CORE_PEDOMETER_SLEEP_MIN_ACCELL_100){
+                if(analysis_delta_value_byte<=COREPEDOMETER_DELTA_SLEEP_VALUE_MIN_100 && analysis_central_weight_value<=COREPEDOMETER_CENTRALWIGHT_SLEEP_VALUE_MIN){
                     #ifdef DEBUG_PEDOMETER
                         debug("DEBUG_PEDOMETER: Sleeping analyse - " + String(analyse_sleep_delta_accels));
                     #endif

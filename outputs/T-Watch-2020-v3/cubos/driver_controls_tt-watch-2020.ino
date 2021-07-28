@@ -58,10 +58,10 @@ void driver_controls_loop(){
     #endif
     
     if(_millis() - last_user_buttons_activity<CONTROLS_DELAY_TO_DOUBLE_CLICK_MS){
-      onButtonEvent(EVENT_ON_TOUCH_DOUBLE_PRESS, 0, _millis() - last_user_activity);
+      onButtonEvent(EVENT_BUTTON_DOUBLE_PRESS, 0, _millis() - last_user_activity);
       isDoubleOrSinglePressed = true;
       #ifdef DEBUG_DRIVER_CONTROLL
-        debug("DEBUG_DRIVER_CONTROLL: EVENT_ON_TOUCH_DOUBLE_PRESS " + String(_millis() - last_user_buttons_activity));
+        debug("DEBUG_DRIVER_CONTROLL: EVENT_BUTTON_DOUBLE_PRESS " + String(_millis() - last_user_buttons_activity));
       #endif
     }
 

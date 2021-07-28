@@ -738,8 +738,8 @@ void appNameClass::onEvent(unsigned char event, int val1, int val2){
                 }else if(val1==BUTTON_BACK){
                     startApp(-1);
                 }
-            }else if(event==EVENT_ON_TOUCH_DOUBLE_PRESS){
-                //debug("EVENT_ON_TOUCH_DOUBLE_PRESS");
+            }else if(event==EVENT_BUTTON_DOUBLE_PRESS){
+                //debug("EVENT_BUTTON_DOUBLE_PRESS");
                 if(val1==BUTTON_SELECT){
                     if(
                         currentSubMenu==APP_SETTINGS_SUBMENU_SET_TIME 

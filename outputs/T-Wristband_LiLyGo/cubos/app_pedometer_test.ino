@@ -92,8 +92,7 @@ void appNameClass::onLoop(){
         #else 
             drawStringOnScreen("-");
         #endif
-
-        drawStringOnScreen("");
+        //drawStringOnScreen("");
         drawStringOnScreen("Mesures ms: ");
         #ifdef PEDOMETER_ENABLE
             drawStringOnScreen(String(get_corePedometer_currentsleep_between_mesures()));
@@ -171,7 +170,7 @@ void appNameClass::onEvent(unsigned char event, int val1, int val2){
                 if(val1==BUTTON_SELECT){
                 }else if(val1==BUTTON_BACK){
                 }
-            }else if(event==EVENT_ON_TOUCH_DOUBLE_PRESS){
+            }else if(event==EVENT_BUTTON_DOUBLE_PRESS){
                 #if (DRIVER_CONTROLS_TOTALBUTTONS == 1)
                     if(val1==BUTTON_SELECT){
                         startApp(-1);

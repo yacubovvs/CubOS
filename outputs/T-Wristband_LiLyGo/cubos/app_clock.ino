@@ -134,8 +134,9 @@ void appNameClass::onDestroy(){
 }
 
 void appNameClass::onEvent(unsigned char event, int val1, int val2){
-    
-    if(event==EVENT_BUTTON_PRESSED){
+    if(event==EVENT_ON_TOUCH_LONG_PRESS){
+        startApp(-1);
+    }else if(event==EVENT_BUTTON_PRESSED){
         // Write you code on [val1] button pressed here
         #if DRIVER_CONTROLS_TOTALBUTTONS > 3
             if(val1==BUTTON_BACK){
@@ -168,7 +169,7 @@ void appNameClass::onEvent(unsigned char event, int val1, int val2){
         this->draw_current_time(false);
     }else if(event==EVENT_ON_WAKE_UP){
         this->draw_current_time(true);
-    }else if(event==EVENT_ON_TOUCH_DOUBLE_PRESS){
+    }else if(event==EVENT_BUTTON_DOUBLE_PRESS){
         if(val1==BUTTON_SELECT){
             startApp(-1);
         }
@@ -195,7 +196,7 @@ void appNameClass::draw_current_time(bool draw){
         // Big screens as 240x240 
         #define CLOCK_FONT        4
         #define CLOCK_MARGIN      3
-        #define STRINGS_OFFSET_Y  (-8)
+        #define STRINGS_OFFSET_Y  (-16)
     #endif 
 
 
@@ -220,13 +221,15 @@ void appNameClass::draw_current_time(bool draw){
         this->last_minutes  = core_time_getMinutes_String();
 
         drawString_centered(core_time_getHours_String(), SCREEN_WIDTH/2, STRINGS_OFFSET_Y + SECONDS_CIRCLE_Y-CLOCK_FONT*FONT_CHAR_HEIGHT - CLOCK_MARGIN, CLOCK_FONT);
+        setDrawColor(0, 168, 0);
         drawString_centered(core_time_getMinutes_String(), SCREEN_WIDTH/2, STRINGS_OFFSET_Y + SECONDS_CIRCLE_Y + CLOCK_MARGIN, CLOCK_FONT);
         
+        setDrawColor_ContrastColor();
         #ifdef NARROW_SCREEN
             // For small screens as sport wristbands
         #else
             // Big screens as 240x240 
-            drawString_centered(core_time_getWeekDay_string(), SCREEN_WIDTH/2, STRINGS_OFFSET_Y + SECONDS_CIRCLE_Y + CLOCK_MARGIN + 30, 1);
+            drawString_centered(core_time_getWeekDay_string(), SCREEN_WIDTH/2, STRINGS_OFFSET_Y + SECONDS_CIRCLE_Y + CLOCK_MARGIN + 35, FONT_SIZE_DEFAULT);
         #endif 
     }else{
         if(this->last_seconds>core_time_getSeconds_byte()){
@@ -246,7 +249,7 @@ void appNameClass::draw_current_time(bool draw){
                 // For small screens as sport wristbands
             #else
                 // Big screens as 240x240 
-                clearString_centered(core_time_getWeekDay_string(), SCREEN_WIDTH/2, STRINGS_OFFSET_Y + SECONDS_CIRCLE_Y + CLOCK_MARGIN + 30, 1);
+                clearString_centered(core_time_getWeekDay_string(), SCREEN_WIDTH/2, STRINGS_OFFSET_Y + SECONDS_CIRCLE_Y + CLOCK_MARGIN + 35, FONT_SIZE_DEFAULT);
             #endif 
         }
 
@@ -274,8 +277,8 @@ void appNameClass::draw_current_time(bool draw){
             // Big screens as 240x240 
             #define APP_CLOCK_ICON_X (SCREEN_WIDTH - 38)
             #define APP_CLOCK_ICON_Y (BATTERY_LABEL_Y_POSITION - 10)
-            #define APPP_CLOCK_BATTERY_LABEL_X (SCREEN_WIDTH - battery_percent_toPrint.length()*FONT_CHAR_WIDTH - 42)
-            #define APPP_CLOCK_BATTERY_LABEL_Y ( BATTERY_LABEL_Y_POSITION - FONT_CHAR_HEIGHT/2 -2)
+            #define APPP_CLOCK_BATTERY_LABEL_X (SCREEN_WIDTH - battery_percent_toPrint.length()*FONT_CHAR_WIDTH*FONT_SIZE_DEFAULT - 44)
+            #define APPP_CLOCK_BATTERY_LABEL_Y ( BATTERY_LABEL_Y_POSITION - FONT_CHAR_HEIGHT*FONT_SIZE_DEFAULT/2 )
         #endif 
             
             
@@ -284,10 +287,10 @@ void appNameClass::draw_current_time(bool draw){
         
         if(draw){
             setDrawColor_ContrastColor();
-            drawString(battery_percent_toPrint, APPP_CLOCK_BATTERY_LABEL_X, APPP_CLOCK_BATTERY_LABEL_Y, 1);
+            drawString(battery_percent_toPrint, APPP_CLOCK_BATTERY_LABEL_X, APPP_CLOCK_BATTERY_LABEL_Y, FONT_SIZE_DEFAULT);
         }else{
             setDrawColor_BackGroundColor();  
-            clearString(battery_percent_toPrint, APPP_CLOCK_BATTERY_LABEL_X, APPP_CLOCK_BATTERY_LABEL_Y, 1);
+            clearString(battery_percent_toPrint, APPP_CLOCK_BATTERY_LABEL_X, APPP_CLOCK_BATTERY_LABEL_Y, FONT_SIZE_DEFAULT);
         }
         
 
@@ -310,29 +313,43 @@ void appNameClass::draw_current_time(bool draw){
         // Big screens as 240x240 
         
         // SLEEP LABEL
-        #define SLEEP_LABEL_POSITION_Y (SCREEN_HEIGHT - 14)
+        #if FONT_SIZE_DEFAULT==2
+            #define SLEEP_LABEL_POSITION_Y (SCREEN_HEIGHT - 17)  
+        #else
+            #define SLEEP_LABEL_POSITION_Y (SCREEN_HEIGHT - FONT_CHAR_HEIGHT*FONT_SIZE_DEFAULT/2 - 11)
+        #endif
         
         // DATE LABEL
-        #define DATE_LABEL_POSITION_Y (((STYLE_STATUSBAR_HEIGHT/2 + 2) - FONT_CHAR_HEIGHT/2 -2))    
+        #if FONT_SIZE_DEFAULT==2
+            #define DATE_LABEL_POSITION_Y (STYLE_STATUSBAR_HEIGHT/2 - 6)    
+        #else
+            #define DATE_LABEL_POSITION_Y (((STYLE_STATUSBAR_HEIGHT/2 + 2) - FONT_CHAR_HEIGHT*FONT_SIZE_DEFAULT/2 -2))    
+        #endif
+        
         
         #define DATE_LABEL_POSITION_X (7)
         #define DATE_DRAW_STRING(A,B,C,D) drawString(A,B,C,D)
         #define DATE_CLEAR_STRING(A,B,C,D) clearString(A,B,C,D)
 
         // PEDOMETER LABEL
-        #define PEDOMETER_LABEL_POSITION_Y (SCREEN_HEIGHT - 14)
-        #define PEDOMETER_LABEL_POSITION_X_OFFSET (0)
+        #define PEDOMETER_LABEL_POSITION_Y (SCREEN_HEIGHT - 17)
+        #define PEDOMETER_LABEL_POSITION_X_OFFSET (14)
         #define PEDOMETER_LABEL_POSITION_PADDING (3)
     #endif 
     
 
     if(draw){
-        this->last_date = core_time_getDateFull();
+        #if SCREEN_WIDTH<=320 && FONT_SIZE_DEFAULT>=2
+            this->last_date = core_time_getDateFull_short();
+        #else
+            this->last_date = core_time_getDateFull();
+        #endif
+        //this->last_date = core_time_getDateFull();
         setDrawColor(192,192,192);
-        DATE_DRAW_STRING(this->last_date, DATE_LABEL_POSITION_X, DATE_LABEL_POSITION_Y, 1);
+        DATE_DRAW_STRING(this->last_date, DATE_LABEL_POSITION_X, DATE_LABEL_POSITION_Y, FONT_SIZE_DEFAULT);
     }else{
         setDrawColor_BackGroundColor();  
-        DATE_CLEAR_STRING(this->last_date, DATE_LABEL_POSITION_X, DATE_LABEL_POSITION_Y, 1);
+        DATE_CLEAR_STRING(this->last_date, DATE_LABEL_POSITION_X, DATE_LABEL_POSITION_Y, FONT_SIZE_DEFAULT);
     }
 
     #if defined(PEDOMETER_ENABLE) || defined(PEDOMETER_EMULATOR)
@@ -351,8 +368,8 @@ void appNameClass::draw_current_time(bool draw){
 
             
         // 16px - leg and sleep icon width
-        int pedometer_label_width_05 = (PEDOMETER_LABEL_POSITION_PADDING*2 + 16 + pedometer_toPrint.length()*FONT_CHAR_WIDTH)/2;
-        int sleep_label_width_05 = (PEDOMETER_LABEL_POSITION_PADDING*2 + 16 + sleep_toPrint.length()*FONT_CHAR_WIDTH)/2;
+        int pedometer_label_width_05 = (PEDOMETER_LABEL_POSITION_PADDING*2 + 16 + pedometer_toPrint.length()*FONT_CHAR_WIDTH)*FONT_SIZE_DEFAULT/2;
+        int sleep_label_width_05 = (PEDOMETER_LABEL_POSITION_PADDING*2 + 16 + sleep_toPrint.length()*FONT_CHAR_WIDTH)*FONT_SIZE_DEFAULT/2;
 
         #ifdef NARROW_SCREEN
             // For small screens as sport wristbands
@@ -362,10 +379,11 @@ void appNameClass::draw_current_time(bool draw){
             #define SLEEP_ICON_POSITION_Y       (SLEEP_LABEL_POSITION_Y + PEDOMETER_LABEL_POSITION_PADDING - 9)
         #else
             // Big screens as 240x240 
-            #define PEDOMETER_ICON_POSITION_X   (SCREEN_WIDTH - 21)
-            #define PEDOMETER_ICON_POSITION_Y   (SCREEN_HEIGHT - 19)
-            #define SLEEP_ICON_POSITION_X       (5)
-            #define SLEEP_ICON_POSITION_Y       (SCREEN_HEIGHT - 19)
+            #define SLEEP_LABEL_POSITION_X_OFFSET   (14)
+            #define PEDOMETER_ICON_POSITION_X       (SCREEN_WIDTH - 21)
+            #define PEDOMETER_ICON_POSITION_Y       (SCREEN_HEIGHT - 19)
+            #define SLEEP_ICON_POSITION_X           (5)
+            #define SLEEP_ICON_POSITION_Y           (SCREEN_HEIGHT - 19)
         #endif 
 
         drawImage(draw, getIcon_legs_grey(), PEDOMETER_ICON_POSITION_X, PEDOMETER_ICON_POSITION_Y);
@@ -386,17 +404,17 @@ void appNameClass::draw_current_time(bool draw){
             #define CLEAR_SLEEP_LABEL(A,B,C,D) clearString_centered(A,B,C,D)
         #else
             // Big screens as 240x240 
-            #define PEDOMETER_LABEL_X (SCREEN_WIDTH - pedometer_label_width_05 - 28)
+            #define PEDOMETER_LABEL_X (SCREEN_WIDTH - pedometer_label_width_05 - SLEEP_LABEL_POSITION_X_OFFSET)
             #define PEDOMETER_LABEL_Y (PEDOMETER_LABEL_POSITION_Y)
-            #define PEDOMETER_LABEL_SIZE (1)
+            #define PEDOMETER_LABEL_SIZE (FONT_SIZE_DEFAULT)
             #define DRAW_PEDOMETER_LABEL(A,B,C,D) drawString(A,B,C,D)
-            #define CLEAR_PEDOMETER_LABEL(A,B,C,D) drawString(A,B,C,D)
+            #define CLEAR_PEDOMETER_LABEL(A,B,C,D) clearString(A,B,C,D)
 
-            #define SLEEP_LABEL_X (45)
+            #define SLEEP_LABEL_X (30)
             #define SLEEP_LABEL_Y (SLEEP_LABEL_POSITION_Y)
-            #define SLEEP_LABEL_SIZE (1)
-            #define DRAW_SLEEP_LABEL(A,B,C,D) drawString_centered(A,B,C,D)
-            #define CLEAR_SLEEP_LABEL(A,B,C,D) drawString_centered(A,B,C,D)
+            #define SLEEP_LABEL_SIZE (FONT_SIZE_DEFAULT)
+            #define DRAW_SLEEP_LABEL(A,B,C,D) drawString(A,B,C,D)
+            #define CLEAR_SLEEP_LABEL(A,B,C,D) clearString(A,B,C,D)
         #endif 
 
         if(draw){

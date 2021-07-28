@@ -237,7 +237,7 @@
 //#define toDefaultApp_onLeftLongPress
 
 #define STARTING_APP_NUMM   -1    // for Mainmenu (default app)
-//#define STARTING_APP_NUMM   2
+#define STARTING_APP_NUMM   0
 
 #define CPU_SLEEP_ENABLE
 
@@ -265,6 +265,7 @@
 //#define DEFAULT_SCREEN_BRIGHTNESS 10
 
 #define DEFAULT_TIME_TO_POWEROFF_DISPLAY 15
+#define APP_CLOCK_POWER_AFTER_SECONDS 15
 //#define DEFAULT_DELAY_TO_FADE_DISPLAY 0
 
 #define STYLE_STATUSBAR_HEIGHT  30 

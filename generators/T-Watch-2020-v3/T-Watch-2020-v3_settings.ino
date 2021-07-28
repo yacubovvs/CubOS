@@ -108,7 +108,7 @@
 
 
 #define CORE_PEDOMETER_SLEEP_COUNTING_SPOINTS   5 // mesures for sleep detection 
-#define CORE_PEDOMETER_SLEEP_MIN_ACCELL_100     3 // acceletometer sensitivity/100*G for sleep detection
+#define COREPEDOMETER_DELTA_SLEEP_VALUE_MIN_100     3 // acceletometer sensitivity/100*G for sleep detection
 
 //#define DEBUG_CPU_CONTROLL_ENABLE
 //#define DEBUG_CORE_POWERSAVE

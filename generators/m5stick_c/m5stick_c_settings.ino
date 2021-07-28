@@ -86,7 +86,7 @@
 #define PEDOMETER_CENTRALWIGHT_VALUE_MIN    0.17f
 
 #define CORE_PEDOMETER_SLEEP_COUNTING_SPOINTS   2 // mesures for sleep detection 
-#define CORE_PEDOMETER_SLEEP_MIN_ACCELL_100     3 // acceletometer sensitivity/100*G for sleep detection
+#define COREPEDOMETER_DELTA_SLEEP_VALUE_MIN_100     3 // acceletometer sensitivity/100*G for sleep detection
 /*
     ############################################################################################
     #                                                                                          #

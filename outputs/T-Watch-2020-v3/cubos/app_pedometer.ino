@@ -297,7 +297,7 @@ void appNameClass::onEvent(unsigned char event, int val1, int val2){
                     //debug("Page: " + String(this->current_page));
                 }else if(val1==BUTTON_BACK){
                 }
-            }else if(event==EVENT_ON_TOUCH_DOUBLE_PRESS){
+            }else if(event==EVENT_BUTTON_DOUBLE_PRESS){
                 #if (DRIVER_CONTROLS_TOTALBUTTONS == 1)
                     if(val1==BUTTON_SELECT){
                         startApp(-1);
