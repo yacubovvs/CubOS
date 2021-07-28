@@ -281,21 +281,45 @@
                         */
 
                         //for 256 colors
-                        /*
-                        var k = 80;
-                        var k2 = 112;
-                        var redPx = Math.floor(redPx/k2 + 0)*k2;
-                        var greenPx = Math.floor(greenPx/k2 + 0)*k2;
-                        var bluePx = Math.floor(bluePx/k + 0)*k;
+                        
+                        var kr = 256/3;
+                        var kg = 256/5;
+                        var kb = 256/3;
+                        var redPx = Math.floor(redPx/kr + 0)*kr;
+                        var greenPx = Math.floor(greenPx/kg + 0)*kg;
+                        var bluePx = Math.floor(bluePx/kb + 0)*kb;
 
                         if(redPx>255) redPx= 255;
                         if(greenPx>255) greenPx= 255;
                         if(bluePx>255) bluePx= 255;
-                        */
+
+                        /* */
+                        // For green
+                        redPx = (redPx + bluePx)/2;
+                        bluePx = redPx;
+                        /* */
+
+                        /* * /
+                        // For Blue
+                        redPx = (redPx + greenPx)/2;
+                        greenPx = redPx;
+                        /* */
+
+                        if(redPx>= 255-kr && greenPx >= 255-kg && bluePx >= 255-kb){
+                            redPx = 255;
+                            greenPx = 255;
+                            bluePx = 255;
+                        }
+
+                        if(redPx== 0 && greenPx == 0 && bluePx == 0){
+                            position++;
+                            continue;
+                        }
+                        
                         
                         
                         // For grayScale
-                        
+                        /*
                         var k = 256/3;
                         var gray_px = (redPx + greenPx + bluePx)/3;
                         gray_px = Math.floor(gray_px/k + 1)*k;
@@ -305,7 +329,8 @@
                         var redPx = gray_px;
                         var greenPx = gray_px;
                         var bluePx = gray_px;
-                        
+                        */
+                        /****/
 
 
                         image_map[position%image_width][Math.floor(position/image_width)] = "" + convert_to_HEX(redPx, 1) + convert_to_HEX(greenPx, 1) + convert_to_HEX(bluePx, 1);
