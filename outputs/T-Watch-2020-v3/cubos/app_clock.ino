@@ -156,9 +156,15 @@ void appNameClass::onDestroy(){
 }
 
 void appNameClass::onEvent(unsigned char event, int val1, int val2){
-    if(event==EVENT_ON_TOUCH_LONG_PRESS){
-        startApp(-1);
-    }else if(event==EVENT_BUTTON_PRESSED){
+    #ifdef TOUCH_SCREEN_ENABLE
+        if(event==EVENT_ON_TOUCH_QUICK_SWIPE_TO_TOP){
+            startApp(-1);
+        }else if(event==EVENT_ON_TOUCH_QUICK_SWIPE_TO_BOTTOM){
+            startApp(-1);
+        }
+    #endif
+    
+    if(event==EVENT_BUTTON_PRESSED){
         // Write you code on [val1] button pressed here
         #if DRIVER_CONTROLS_TOTALBUTTONS > 3
             if(val1==BUTTON_BACK){

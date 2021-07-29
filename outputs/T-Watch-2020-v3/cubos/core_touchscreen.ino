@@ -11,6 +11,7 @@
 
     int TOUCH_SCREEN_touch_start_x = 0;
     int TOUCH_SCREEN_touch_start_y = 0;
+    bool CORE_TOUCH_swipeStarted = false;
 
     int getTOUCH_SCREEN_touch_start_x(){
         return TOUCH_SCREEN_touch_start_x;
@@ -60,10 +61,12 @@
         }else if(TOUCH_SCREEN_last_isTouching && !getTOUCH_SCREEN_isTouching()){
 
             TOUCH_SCREEN_last_isTouching = false;
+            CORE_TOUCH_swipeStarted = false;
 
             #ifdef CORE_TOUCH_DEBUG
                 debug("Touch released");
             #endif
+
             
             currentApp->onEvent(EVENT_ON_TOUCH_RELEASED, getTOUCH_SCREEN_X(), getTOUCH_SCREEN_Y());
             #ifdef SOFTWARE_KEYBOARD_ENABLE
@@ -122,10 +125,42 @@
                 TOUCH_SCREEN_last_y = getTOUCH_SCREEN_Y();
 
                 #ifdef CORE_TOUCH_DEBUG
-                    debug("Touch drag");
+                    //debug("Touch drag");
                 #endif
                 
                 currentApp->onEvent(EVENT_ON_TOUCH_DRAG, dx, dy);
+
+                if(!CORE_TOUCH_swipeStarted){
+                    if(abs(dx)>TOUCH_SCREEN_DELTA_MOVE_FOR_SWIPE || abs(dy)>TOUCH_SCREEN_DELTA_MOVE_FOR_SWIPE){
+                        CORE_TOUCH_swipeStarted = true;
+                        if(abs(dx)>abs(dy)){
+                            if(dx>0){
+                                currentApp->onEvent(EVENT_ON_TOUCH_QUICK_SWIPE_TO_RIGHT, dx, dy);
+                                #ifdef CORE_TOUCH_DEBUG
+                                    debug("CORE_TOUCH_DEBUG: EVENT_ON_TOUCH_QUICK_SWIPE_TO_RIGHT");
+                                #endif
+                            }else{
+                                currentApp->onEvent(EVENT_ON_TOUCH_QUICK_SWIPE_TO_LEFT, dx, dy);
+                                #ifdef CORE_TOUCH_DEBUG
+                                    debug("CORE_TOUCH_DEBUG: EVENT_ON_TOUCH_QUICK_SWIPE_TO_LEFT");
+                                #endif
+                            } 
+                        }else{
+                            if(dy>0){
+                                currentApp->onEvent(EVENT_ON_TOUCH_QUICK_SWIPE_TO_BOTTOM, dx, dy);
+                                #ifdef CORE_TOUCH_DEBUG
+                                    debug("CORE_TOUCH_DEBUG: EVENT_ON_TOUCH_QUICK_SWIPE_TO_BOTTOM");
+                                #endif
+                            }else{
+                                currentApp->onEvent(EVENT_ON_TOUCH_QUICK_SWIPE_TO_TOP, dx, dy);
+                                #ifdef CORE_TOUCH_DEBUG
+                                    debug("CORE_TOUCH_DEBUG: EVENT_ON_TOUCH_QUICK_SWIPE_TO_TOP");
+                                #endif
+                            } 
+                        }
+                    }
+                }
+
                 #ifdef SOFTWARE_KEYBOARD_ENABLE
                     core_software_keyboard_onEvent(EVENT_ON_TOUCH_DRAG, dx, dy);
                 #endif

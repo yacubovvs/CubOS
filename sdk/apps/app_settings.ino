@@ -37,7 +37,7 @@
   #define SINGLE_ELEMENT_ON_SCREEN
 #endif
 
-#ifdef NARROW_SCREEN
+#if defined(NARROW_SCREEN) || defined(WATCH_SCREEN)
   #define SINGLE_ELEMENTS_IN_X 1
   #define SINGLE_ELEMENTS_IN_X_MACRO 1
   #define SINGLE_ELEMENTS_IN_Y 1
@@ -184,7 +184,7 @@ void appNameClass::drawSettingsPageFirstTime(){
         #endif
     }else if(currentSubMenu==APP_SETTINGS_SUBMENU_SET_TIME){
 
-        #ifdef NARROW_SCREEN
+        #if defined(NARROW_SCREEN) || defined(WATCH_SCREEN)
             this->drawIcons(true);
         #else
             int y_position = (SCREEN_HEIGHT - STYLE_STATUSBAR_HEIGHT)/2;
@@ -195,7 +195,7 @@ void appNameClass::drawSettingsPageFirstTime(){
 
     }else if(currentSubMenu==APP_SETTINGS_SUBMENU_SET_DATE){
 
-        #ifdef NARROW_SCREEN
+        #if defined(NARROW_SCREEN) || defined(WATCH_SCREEN)
             this->drawIcons(true);
         #else
             /*
@@ -205,7 +205,7 @@ void appNameClass::drawSettingsPageFirstTime(){
 
     }else if(currentSubMenu==APP_SETTINGS_SUBMENU_SCREEN){
 
-        #ifdef NARROW_SCREEN
+        #if defined(NARROW_SCREEN) || defined(WATCH_SCREEN)
             this->drawIcons(true);
         #else
             /*
@@ -358,7 +358,7 @@ void appNameClass::drawActiveAppFrame(bool draw){
 }
 
 void appNameClass::drawIcons(bool draw){
-    #ifdef NARROW_SCREEN
+    #if defined(NARROW_SCREEN) || defined(WATCH_SCREEN)
         int app_num = app_settings_selectedAppIndex;
         
         #ifdef SMOOTH_ANIMATION

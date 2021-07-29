@@ -149,7 +149,6 @@ class appNameClass: public Application{
 
         void nextApp();
         void prevApp();
-        bool preventTouch = false;
         void draw_app_icon_title(bool draw, int x, int y, const unsigned char* title);
         void draw_app_icon_image(bool draw, int x, int y, const unsigned char* icon);
 
@@ -357,17 +356,15 @@ void appNameClass::onEvent(unsigned char event, int val1, int val2){
   BUTTON_BACK
   BUTTON_POWER
   */
-  if(event==EVENT_ON_TOUCH_DRAG){
-    if(!preventTouch && abs(val1)>abs(val2)){
-      if(val1<0) nextApp();
-      else prevApp();
-      preventTouch = true;
+  #ifdef TOUCH_SCREEN_ENABLE
+    if(event==EVENT_ON_TOUCH_QUICK_SWIPE_TO_LEFT){
+      nextApp();
+    }else if(event==EVENT_ON_TOUCH_QUICK_SWIPE_TO_RIGHT){
+      prevApp();
+    }else if(event==EVENT_ON_TOUCH_CLICK){
+      startApp(app_z_menu_selectedAppIndex);
     }
-  }else if(event==EVENT_ON_TOUCH_RELEASED){
-    preventTouch = false;
-  }else if(event==EVENT_ON_TOUCH_CLICK){
-    startApp(app_z_menu_selectedAppIndex);
-  }
+  #endif
 
   #if (DRIVER_CONTROLS_TOTALBUTTONS == 1 || DRIVER_CONTROLS_TOTALBUTTONS == 2)
     if(event==EVENT_BUTTON_PRESSED){

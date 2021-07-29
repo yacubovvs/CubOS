@@ -10,6 +10,7 @@
 
 #define DEBUG_SERIAL
 //#define DEBUG_ON_SCREEN
+#define WATCH_SCREEN
 
 #define SCREEN_WIDTH            240     // Screen resolution width
 #define SCREEN_HEIGHT           240     // Screen resolution height
@@ -117,6 +118,7 @@
 //#define DEBUG_CORE_POWERSAVE
 
 #define DEBUG_SERIAL
+#define CORE_TOUCH_DEBUG
 //#define PEDOMETER_EMULATOR
 //#define DEBUG_FPS
 //#define DEBUG_WAKEUP
