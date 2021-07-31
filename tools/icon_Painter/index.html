@@ -280,11 +280,14 @@
                         var bluePx = Math.floor(bluePx/k)*k;
                         */
 
+
+                        /* */
                         //for 256 colors
                         
-                        var kr = 256/3;
-                        var kg = 256/5;
-                        var kb = 256/3;
+
+                        var kr = 256/4;
+                        var kg = 256/4;
+                        var kb = 256/4;
                         var redPx = Math.floor(redPx/kr + 0)*kr;
                         var greenPx = Math.floor(greenPx/kg + 0)*kg;
                         var bluePx = Math.floor(bluePx/kb + 0)*kb;
@@ -292,8 +295,8 @@
                         if(redPx>255) redPx= 255;
                         if(greenPx>255) greenPx= 255;
                         if(bluePx>255) bluePx= 255;
-
-                        /* */
+                        /**/
+                        /* * /
                         // For green
                         redPx = (redPx + bluePx)/2;
                         bluePx = redPx;
@@ -319,7 +322,7 @@
                         
                         
                         // For grayScale
-                        /*
+                        /* */
                         var k = 256/3;
                         var gray_px = (redPx + greenPx + bluePx)/3;
                         gray_px = Math.floor(gray_px/k + 1)*k;
@@ -329,7 +332,7 @@
                         var redPx = gray_px;
                         var greenPx = gray_px;
                         var bluePx = gray_px;
-                        */
+                        /* */
                         /****/
 
 
@@ -395,8 +398,8 @@
                 generate_result();
             }
 
-            var image_width = 80;
-            var image_height = 80;
+            var image_width = 56;
+            var image_height = 56;
 
             var cell_size = 14;
 

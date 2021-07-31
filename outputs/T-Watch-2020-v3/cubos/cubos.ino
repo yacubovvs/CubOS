@@ -247,7 +247,7 @@
 //#define toDefaultApp_onLeftLongPress
 
 #define STARTING_APP_NUMM   -1    // for Mainmenu (default app)
-#define STARTING_APP_NUMM   0
+#define STARTING_APP_NUMM   1 // Settings
 
 #define CPU_SLEEP_ENABLE
 
@@ -324,7 +324,8 @@
 //#define DEBUG_CORE_POWERSAVE
 
 #define DEBUG_SERIAL
-#define CORE_TOUCH_DEBUG
+//#define CORE_TOUCH_DEBUG
+#define APP_SETTINGS_DEBUG
 //#define PEDOMETER_EMULATOR
 //#define DEBUG_FPS
 //#define DEBUG_WAKEUP

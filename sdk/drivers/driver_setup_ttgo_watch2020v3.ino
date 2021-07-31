@@ -171,6 +171,7 @@ void core_loop_irq_check(){
         if (ttgo_power->isVbusPlugInIRQ()){
             core_driver_isCharging=true; 
             core_driver_VBUSConnected=true;
+            set_core_powersave_lastUserAction();
         }
         if (ttgo_power->isVbusRemoveIRQ()){
             core_driver_isCharging=false; 
@@ -183,6 +184,7 @@ void core_loop_irq_check(){
         if (ttgo_power->isChargingDoneIRQ()){
             core_driver_isCharging=false; 
             core_driver_VBUSConnected=true;
+            set_core_powersave_lastUserAction();
         }
         if (ttgo_power->isPEKLongtPressIRQ()){
             core_driver_isLongPressed = true;
