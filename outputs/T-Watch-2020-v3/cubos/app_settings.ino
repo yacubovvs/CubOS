@@ -371,13 +371,20 @@ void appNameClass::drawIcons(bool draw){
                     char elementsToPreDraw = this->scroll_x/SCREEN_WIDTH + 1;
                     elementsToPreDraw = elementsToPreDraw%getTotalPagesInSubMenu(currentSubMenu);
                     for(unsigned char elementDraw = 0; elementDraw<=elementsToPreDraw; elementDraw++){
-                        int appElementDraw = app_num - elementDraw;
+                        int appElementDraw;
+                        if(this->scroll_x>0) appElementDraw = app_num - elementDraw;
+                        else appElementDraw = app_num;
+
                         while(appElementDraw<0) appElementDraw+=getTotalPagesInSubMenu(currentSubMenu);
                         appElementDraw = appElementDraw%getTotalPagesInSubMenu(currentSubMenu);
 
                         int element_offset;
-                        if(this->scroll_x>0) element_offset = this->scroll_x + SCREEN_WIDTH/2 + SCREEN_WIDTH - elementDraw*SCREEN_WIDTH;
-                        else element_offset = this->scroll_x - SCREEN_WIDTH/2 - elementDraw*SCREEN_WIDTH;
+                        if(this->scroll_x>0) element_offset = this->scroll_x + SCREEN_WIDTH/2 - elementDraw*SCREEN_WIDTH;
+                        else element_offset = this->scroll_x + SCREEN_WIDTH*1 + SCREEN_WIDTH/2 - elementDraw*SCREEN_WIDTH;
+
+                        #ifdef APP_SETTINGS_DEBUG
+                            debug("APP_SETTINGS_DEBUG: element_offset " + String(element_offset));
+                        #endif
 
                         if(currentSubMenu==APP_SETTINGS_SUBMENU_MAIN){
                             core_views_draw_settings_item(
@@ -510,19 +517,20 @@ void appNameClass::onLoop(){
     #ifdef SMOOTH_ANIMATION
         if(this->scroll_x!=0){
             this->drawIcons(false);
-            if(this->scroll_x!=0){
-                //this->scroll_x++;
-                int dx = abs(scroll_x)/SMOOTH_ANIMATION_COEFFICIENT + 1;
-                if(scroll_x>scroll_to_x) dx *= -1;
-                scroll_x+=dx;
+            this->preventInAppSleep = true;
 
-                #ifdef APP_SETTINGS_DEBUG
-                    debug("APP_SETTINGS_DEBUG: " + String(dx));
-                #endif
+            int dx = abs(scroll_x)/SMOOTH_ANIMATION_COEFFICIENT + 1;
+            if(scroll_x>scroll_to_x) dx *= -1;
+            scroll_x+=dx;
 
-                if (abs(dx)<1) scroll_x=0;
-            }
+            #ifdef APP_SETTINGS_DEBUG
+                debug("APP_SETTINGS_DEBUG: " + String(dx));
+            #endif
+
+            if (abs(dx)<1) scroll_x=0;
             this->drawIcons(true);
+        }else{
+            this->preventInAppSleep = false;
         }
     #endif
 
