@@ -59,7 +59,7 @@
 #define EVENT_ON_TOUCH_QUICK_SWIPE_TO_LEFT      0x16
 #define EVENT_ON_TOUCH_QUICK_SWIPE_TO_RIGHT     0x17
 #define EVENT_ON_TOUCH_QUICK_SWIPE_TO_TOP       0x18
-#define EVENT_ON_TOUCH_QUICK_SWIPE_TO_BOTTOM    0x18
+#define EVENT_ON_TOUCH_QUICK_SWIPE_TO_DOWN      0x19
 
 // WAKEUP REASONS
 #define WAKE_UP_REASON_EXTERNAL_RTC_IO      0x01
@@ -106,8 +106,6 @@
 #                                 STYLES +                                 #
 ############################################################################
 */
-
-#define COREVIEWS_NO_ICON_ELEMENT_HEIGHT 40
 
 #define SOFTWARE_BUTTONS_COLOR_RED          255
 #define SOFTWARE_BUTTONS_COLOR_GREEN        255

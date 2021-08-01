@@ -147,9 +147,9 @@
                             } 
                         }else{
                             if(dy>0){
-                                currentApp->onEvent(EVENT_ON_TOUCH_QUICK_SWIPE_TO_BOTTOM, dx, dy);
+                                currentApp->onEvent(EVENT_ON_TOUCH_QUICK_SWIPE_TO_DOWN, dx, dy);
                                 #ifdef CORE_TOUCH_DEBUG
-                                    debug("CORE_TOUCH_DEBUG: EVENT_ON_TOUCH_QUICK_SWIPE_TO_BOTTOM");
+                                    debug("CORE_TOUCH_DEBUG: EVENT_ON_TOUCH_QUICK_SWIPE_TO_DOWN");
                                 #endif
                             }else{
                                 currentApp->onEvent(EVENT_ON_TOUCH_QUICK_SWIPE_TO_TOP, dx, dy);

@@ -145,29 +145,36 @@ class appNameClass: public Application{
 };
 
 #if defined(USE_XL_MENU_IMAGES)
-    #define CORE_VIEWS_SETTINGS_IMAGE_WIDTH 64
+    #define CORE_VIEWS_SETTINGS_IMAGE_WIDTH         64
 
-    #define APP_SETTINGS_MENU_IMAGE_Y_OFFSET      (-20)
-    #define APP_SETTINGS_MENU_TITLE_Y_SIZE        2
-    #define APP_SETTINGS_MENU_SUBTITLE_Y_SIZE     2
-    #define APP_SETTINGS_MENU_TITLE_Y_OFFSET      20
-    #define APP_SETTINGS_MENU_SUBTITLE_Y_OFFSET   45
+    #define APP_SETTINGS_MENU_IMAGE_Y_OFFSET        (-20)
+    #define APP_SETTINGS_MENU_TITLE_Y_SIZE          2
+    #define APP_SETTINGS_MENU_SUBTITLE_Y_SIZE       2
+    #define APP_SETTINGS_MENU_TITLE_Y_OFFSET        20
+    #define APP_SETTINGS_MENU_SUBTITLE_Y_OFFSET     45
 
-    #define APP_SETTINGS_TITLE_FONT_SIZE            1
-    #define APP_SETTINGS_SUBTITLE_FONT_SIZE         2
+    #define APP_SETTINGS_TITLE_FONT_SIZE            2
+    #define APP_SETTINGS_SUBTITLE_FONT_SIZE         3
+
+    #define APPP_SETTINGS_NO_ICON_ELEMENT_HEIGHT    55
+    #define APPP_SETTINGS_NO_ICON_ELEMENT_OFFSET    (8)
+
 #elif defined(USE_L_MENU_IMAGES)
-    #define CORE_VIEWS_SETTINGS_IMAGE_WIDTH 48
+    #define CORE_VIEWS_SETTINGS_IMAGE_WIDTH         48
 
-    #define APP_SETTINGS_MENU_IMAGE_Y_OFFSET      0
-    #define APP_SETTINGS_MENU_TITLE_Y_SIZE        1
-    #define APP_SETTINGS_MENU_SUBTITLE_Y_SIZE     1
-    #define APP_SETTINGS_MENU_TITLE_Y_OFFSET      10
-    #define APP_SETTINGS_MENU_SUBTITLE_Y_OFFSET   30
+    #define APP_SETTINGS_MENU_IMAGE_Y_OFFSET        0
+    #define APP_SETTINGS_MENU_TITLE_Y_SIZE          1
+    #define APP_SETTINGS_MENU_SUBTITLE_Y_SIZE       1
+    #define APP_SETTINGS_MENU_TITLE_Y_OFFSET        10
+    #define APP_SETTINGS_MENU_SUBTITLE_Y_OFFSET     30
 
     #define APP_SETTINGS_TITLE_FONT_SIZE            1
     #define APP_SETTINGS_SUBTITLE_FONT_SIZE         2
+
+    #define APPP_SETTINGS_NO_ICON_ELEMENT_HEIGHT    55
+    #define APPP_SETTINGS_NO_ICON_ELEMENT_OFFSET    0
 #else
-    #define CORE_VIEWS_SETTINGS_IMAGE_WIDTH     24
+    #define CORE_VIEWS_SETTINGS_IMAGE_WIDTH         24
     
     #define APP_SETTINGS_MENU_IMAGE_Y_OFFSET        0
     #define APP_SETTINGS_MENU_TITLE_Y_SIZE          1
@@ -177,41 +184,55 @@ class appNameClass: public Application{
 
     #define APP_SETTINGS_TITLE_FONT_SIZE            1
     #define APP_SETTINGS_SUBTITLE_FONT_SIZE         2
+
+    #define APPP_SETTINGS_NO_ICON_ELEMENT_HEIGHT    40
+    #define APPP_SETTINGS_NO_ICON_ELEMENT_OFFSET    0
+
 #endif
 
 void appNameClass::draw_settings_item_noicon(bool draw, int x, int y, String title, String subTitle){
     
     if(draw){
         setDrawColor_ContrastColor();
+
         drawString(
-            title,                                                                                              // TEXT
-            x - title.length()*FONT_CHAR_WIDTH/2*APP_SETTINGS_TITLE_FONT_SIZE,                                  // X
-            y - COREVIEWS_NO_ICON_ELEMENT_HEIGHT/2,                                                             // Y
-            APP_SETTINGS_TITLE_FONT_SIZE                                                                        // FONT SIZE
+            title,                                                                                              
+            x - title.length()*FONT_CHAR_WIDTH/2*APP_SETTINGS_TITLE_FONT_SIZE,                                  
+            y - APPP_SETTINGS_NO_ICON_ELEMENT_HEIGHT/2 + APPP_SETTINGS_NO_ICON_ELEMENT_OFFSET,                  
+            APP_SETTINGS_TITLE_FONT_SIZE                                                                        
         );
 
         drawString(
-            subTitle,                                                                                           // TEXT
-            x - subTitle.length()*FONT_CHAR_WIDTH/2*APP_SETTINGS_SUBTITLE_FONT_SIZE,                            // X
-            y + COREVIEWS_NO_ICON_ELEMENT_HEIGHT/2 - APP_SETTINGS_SUBTITLE_FONT_SIZE * FONT_CHAR_HEIGHT,        // Y
-            APP_SETTINGS_SUBTITLE_FONT_SIZE                                                                     // FONT SIZE
+            subTitle,                                                                                           
+            x - subTitle.length()*FONT_CHAR_WIDTH/2*APP_SETTINGS_SUBTITLE_FONT_SIZE,                            
+            y + APPP_SETTINGS_NO_ICON_ELEMENT_HEIGHT/2 - APP_SETTINGS_SUBTITLE_FONT_SIZE * FONT_CHAR_HEIGHT + APPP_SETTINGS_NO_ICON_ELEMENT_OFFSET,
+            APP_SETTINGS_SUBTITLE_FONT_SIZE                                                                     
         );
     }else{
         setDrawColor_BackGroundColor();
         clearString(
-            title,                                                                                              // TEXT
-            x - title.length()*FONT_CHAR_WIDTH/2*APP_SETTINGS_TITLE_FONT_SIZE,                                  // X
-            y - COREVIEWS_NO_ICON_ELEMENT_HEIGHT/2,                                                             // Y
-            APP_SETTINGS_TITLE_FONT_SIZE                                                                        // FONT SIZE
+            title,                                                                                              
+            x - title.length()*FONT_CHAR_WIDTH/2*APP_SETTINGS_TITLE_FONT_SIZE,                                  
+            y - APPP_SETTINGS_NO_ICON_ELEMENT_HEIGHT/2 + APPP_SETTINGS_NO_ICON_ELEMENT_OFFSET,                  
+            APP_SETTINGS_TITLE_FONT_SIZE                                                                        
         );
 
         clearString(
-            subTitle,                                                                                           // TEXT
-            x - subTitle.length()*FONT_CHAR_WIDTH/2*APP_SETTINGS_SUBTITLE_FONT_SIZE,                            // X
-            y + COREVIEWS_NO_ICON_ELEMENT_HEIGHT/2 - APP_SETTINGS_SUBTITLE_FONT_SIZE * FONT_CHAR_HEIGHT,        // Y
-            APP_SETTINGS_SUBTITLE_FONT_SIZE                                                                     // FONT SIZE
+            subTitle,                                                                                           
+            x - subTitle.length()*FONT_CHAR_WIDTH/2*APP_SETTINGS_SUBTITLE_FONT_SIZE,                            
+            y + APPP_SETTINGS_NO_ICON_ELEMENT_HEIGHT/2 - APP_SETTINGS_SUBTITLE_FONT_SIZE * FONT_CHAR_HEIGHT + APPP_SETTINGS_NO_ICON_ELEMENT_OFFSET,
+            APP_SETTINGS_SUBTITLE_FONT_SIZE                                                                      
         );
     }
+
+    //setDrawColor_BackGroundColor();
+    #ifdef TOUCH_SCREEN_ENABLE
+        //40X24 - XL images
+        //getIcon_arrow_down();
+        //getIcon_arrow_up();
+        drawImage(draw, getIcon_arrow_up(), SCREEN_WIDTH/2 - 12, STYLE_STATUSBAR_HEIGHT + 10);
+        drawImage(draw, getIcon_arrow_down(), SCREEN_WIDTH/2 - 12, SCREEN_HEIGHT - 24 - 10);
+    #endif
 
 }
 
@@ -302,9 +323,9 @@ void appNameClass::drawSettingsPageFirstTime(){
         // Drawing icons
         this->drawIcons(true);
         #ifndef TOUCH_SCREEN_ENABLE
-        #ifndef SINGLE_ELEMENT_ON_SCREEN
-            this->drawActiveAppFrame(true);  
-        #endif
+            #ifndef SINGLE_ELEMENT_ON_SCREEN
+                this->drawActiveAppFrame(true);  
+            #endif
         #endif
     }else if(currentSubMenu==APP_SETTINGS_SUBMENU_SET_TIME){
 
@@ -356,7 +377,7 @@ void appNameClass::drawSettingTimeArrows(bool draw, int position){
     //drawImage(draw, icon_arrow_down, position + 3 - 16, SCREEN_HEIGHT/2 + 20 + 15);
 
     drawImage(draw, getIcon_arrow_up(), position + 3 - 16, SCREEN_HEIGHT/2 - 19 - 15 );
-    drawImage(draw, getIcon_arrow_bottom(), position + 3 - 16, SCREEN_HEIGHT/2 + 20 + 15);
+    drawImage(draw, getIcon_arrow_down(), position + 3 - 16, SCREEN_HEIGHT/2 + 20 + 15);
 }
 
 void appNameClass::drawSettingTimeSelect(bool draw, int position){
@@ -665,89 +686,104 @@ void appNameClass::onLoop(){
         }
     #endif
 
-    if(currentSubMenu==APP_SETTINGS_SUBMENU_SET_TIME){
-        #if (DRIVER_CONTROLS_TOTALBUTTONS == 2 || DRIVER_CONTROLS_TOTALBUTTONS == 1)
-            if(stillPressingSelect_time!=0 && millis()-this->stillPressingSelect_time>=DRIVER_CONTROLS_DELAY_BEFORE_MULTY_PRESS){
-                stillPressingSelect_time = millis();
-                switch(app_settings_selectedAppIndex){
-                    case 0:
-                        // Add hours
-                        core_time_setHours(core_time_getHours_byte() + 1);
-                        break;
-                    case 1:
-                        // Add minutes
-                        core_time_setMinutes(core_time_getMinutes_byte() + 1);
-                        break;
-                    case 2:
-                        // Reset seconds
-                        core_time_setSeconds(0);
-                        break;
-                } 
-                this->drawIcons(false);
-                this->drawIcons(true);
-            }
-        #endif
-    }else if(currentSubMenu==APP_SETTINGS_SUBMENU_SET_DATE){
-        #if (DRIVER_CONTROLS_TOTALBUTTONS == 2 || DRIVER_CONTROLS_TOTALBUTTONS == 1)
-            if(stillPressingSelect_time!=0 && millis()-this->stillPressingSelect_time>=DRIVER_CONTROLS_DELAY_BEFORE_MULTY_PRESS){
-                stillPressingSelect_time = millis();
-                switch(app_settings_selectedAppIndex){
-                    case 0:
-                        // Add year
-                        core_time_setYear(core_time_getYear() + 1);
-                        break;
-                    case 1:
-                        // Add month
-                        core_time_setMonth(core_time_getMonth() + 1);
-                        break;
-                    case 2:
-                        // Add date
-                        core_time_setDate(core_time_getDate() + 1);
-                        break;
-                    case 3:
-                        // Set week day
-                        core_time_setWeekDay(core_time_getWeekDay() + 1);
-                        break;
-                } 
-                this->drawIcons(false);
-                this->drawIcons(true);
-            }
-        #endif
-    }else if(currentSubMenu==APP_SETTINGS_SUBMENU_SCREEN){
-        #if (DRIVER_CONTROLS_TOTALBUTTONS == 2 || DRIVER_CONTROLS_TOTALBUTTONS == 1)
-            if(stillPressingSelect_time!=0 && millis()-this->stillPressingSelect_time>=DRIVER_CONTROLS_DELAY_BEFORE_MULTY_PRESS){
-                stillPressingSelect_time = millis();
-                int value = 0;
+    #ifndef TOUCH_SCREEN_ENABLE
+        if(currentSubMenu==APP_SETTINGS_SUBMENU_SET_TIME){
+            #if (DRIVER_CONTROLS_TOTALBUTTONS == 2 || DRIVER_CONTROLS_TOTALBUTTONS == 1)
+                if(stillPressingSelect_time!=0 && millis()-this->stillPressingSelect_time>=DRIVER_CONTROLS_DELAY_BEFORE_MULTY_PRESS){
+                    stillPressingSelect_time = millis();
+                    switch(app_settings_selectedAppIndex){
+                        case 0:
+                            // Add hours
+                            core_time_setHours(core_time_getHours_byte() + 1);
+                            break;
+                        case 1:
+                            // Add minutes
+                            core_time_setMinutes(core_time_getMinutes_byte() + 1);
+                            break;
+                        case 2:
+                            // Reset seconds
+                            core_time_setSeconds(0);
+                            break;
+                    } 
+                    this->drawIcons(false);
+                    this->drawIcons(true);
+                }
+            #endif
+        }else if(currentSubMenu==APP_SETTINGS_SUBMENU_SET_DATE){
+            #if (DRIVER_CONTROLS_TOTALBUTTONS == 2 || DRIVER_CONTROLS_TOTALBUTTONS == 1)
+                if(stillPressingSelect_time!=0 && millis()-this->stillPressingSelect_time>=DRIVER_CONTROLS_DELAY_BEFORE_MULTY_PRESS){
+                    stillPressingSelect_time = millis();
+                    switch(app_settings_selectedAppIndex){
+                        case 0:
+                            // Add year
+                            core_time_setYear(core_time_getYear() + 1);
+                            break;
+                        case 1:
+                            // Add month
+                            core_time_setMonth(core_time_getMonth() + 1);
+                            break;
+                        case 2:
+                            // Add date
+                            core_time_setDate(core_time_getDate() + 1);
+                            break;
+                        case 3:
+                            // Set week day
+                            core_time_setWeekDay(core_time_getWeekDay() + 1);
+                            break;
+                    } 
+                    this->drawIcons(false);
+                    this->drawIcons(true);
+                }
+            #endif
+        }else if(currentSubMenu==APP_SETTINGS_SUBMENU_SCREEN){
+            #if (DRIVER_CONTROLS_TOTALBUTTONS == 2 || DRIVER_CONTROLS_TOTALBUTTONS == 1)
+                if(stillPressingSelect_time!=0 && millis()-this->stillPressingSelect_time>=DRIVER_CONTROLS_DELAY_BEFORE_MULTY_PRESS){
+                    stillPressingSelect_time = millis();
+                    int value = 0;
 
-                this->drawIcons(false);
-                switch(app_settings_selectedAppIndex){
-                    case 0:
-                        #ifdef DISPLAY_BACKLIGHT_CONTROL_ENABLE
-                            // Change display brightness
-                            value = get_core_display_brightness();
-                            if(value>=100) value = 0;
-                            else value+=5;
-                            if(value==0) value = 1;
-                            if(value==6) value = 5;
-                            set_core_display_brightness(value);
-                        #endif
-                        break;
-                    case 1:
-                        #ifdef DISPLAY_BACKLIGHT_FADE_CONTROL_ENABLE
-                            // Change display fade brightness
-                            value = get_core_display_brightness_fade();
-                            if(value>=100) value = 0;
-                            else value+=5;
-                            if(value==0) value = 1;
-                            if(value==6) value = 5;
-                            set_core_display_brightness_fade(value);
-                        #endif
-                        break;
-                    case 2:
-                        #ifdef DISPLAY_BACKLIGHT_FADE_CONTROL_ENABLE
-                            // Change time delay to fade
-                            value = get_core_display_time_delay_to_fade();
-                            if(value>=240) value = 0;
+                    this->drawIcons(false);
+                    switch(app_settings_selectedAppIndex){
+                        case 0:
+                            #ifdef DISPLAY_BACKLIGHT_CONTROL_ENABLE
+                                // Change display brightness
+                                value = get_core_display_brightness();
+                                if(value>=100) value = 0;
+                                else value+=5;
+                                if(value==0) value = 1;
+                                if(value==6) value = 5;
+                                set_core_display_brightness(value);
+                            #endif
+                            break;
+                        case 1:
+                            #ifdef DISPLAY_BACKLIGHT_FADE_CONTROL_ENABLE
+                                // Change display fade brightness
+                                value = get_core_display_brightness_fade();
+                                if(value>=100) value = 0;
+                                else value+=5;
+                                if(value==0) value = 1;
+                                if(value==6) value = 5;
+                                set_core_display_brightness_fade(value);
+                            #endif
+                            break;
+                        case 2:
+                            #ifdef DISPLAY_BACKLIGHT_FADE_CONTROL_ENABLE
+                                // Change time delay to fade
+                                value = get_core_display_time_delay_to_fade();
+                                if(value>=240) value = 0;
+                                else{
+                                    if(value<4)         value+=1;
+                                    else if(value<10)   value+=2;
+                                    else if(value<30)   value+=5;
+                                    else if(value<100)  value+=10;
+                                    else value+=20;
+                                }
+                                set_core_display_time_delay_to_fade(value);
+                                break;
+                            #endif
+                        case 3:
+                            // Change time delay to poweroff
+                            value = get_core_display_time_delay_to_poweroff();
+                            if(value>=240) value = 1;
                             else{
                                 if(value<4)         value+=1;
                                 else if(value<10)   value+=2;
@@ -755,28 +791,14 @@ void appNameClass::onLoop(){
                                 else if(value<100)  value+=10;
                                 else value+=20;
                             }
-                            set_core_display_time_delay_to_fade(value);
+                            set_core_display_time_delay_to_poweroff(value);
                             break;
-                        #endif
-                    case 3:
-                        // Change time delay to poweroff
-                        value = get_core_display_time_delay_to_poweroff();
-                        if(value>=240) value = 1;
-                        else{
-                            if(value<4)         value+=1;
-                            else if(value<10)   value+=2;
-                            else if(value<30)   value+=5;
-                            else if(value<100)  value+=10;
-                            else value+=20;
-                        }
-                        set_core_display_time_delay_to_poweroff(value);
-                        break;
-                } 
-                this->drawIcons(true);
-            }
-        #endif
-    }
-
+                    } 
+                    this->drawIcons(true);
+                }
+            #endif
+        }
+    #endif
     
 }
 
@@ -794,7 +816,7 @@ void appNameClass::pressPrevious(){
             currentSubMenu==APP_SETTINGS_SUBMENU_SET_DATE || 
             currentSubMenu==APP_SETTINGS_SUBMENU_SCREEN
       ){
-        if(app_settings_selectedAppIndex<0){
+        if(app_settings_selectedAppIndex==0){
             this->scroll_x = 0;
             switchToSubMenu(APP_SETTINGS_SUBMENU_MAIN);
             return;
@@ -847,7 +869,7 @@ void appNameClass::onEvent(unsigned char event, int val1, int val2){
             pressNext();
         }else if(event==EVENT_ON_TOUCH_QUICK_SWIPE_TO_RIGHT){
             pressPrevious();
-        }else if(event==EVENT_ON_TOUCH_QUICK_SWIPE_TO_TOP){
+        }else if(event==EVENT_ON_TOUCH_QUICK_SWIPE_TO_TOP || event==EVENT_ON_TOUCH_QUICK_SWIPE_TO_DOWN){
             if(currentSubMenu==APP_SETTINGS_SUBMENU_MAIN){
                 startApp(-1);
             }
@@ -867,22 +889,133 @@ void appNameClass::onEvent(unsigned char event, int val1, int val2){
             }
         }
 
-        if(event==EVENT_ON_TOUCH_DRAG){
-            // SCREEN SCROLL
-            /*
-            this->drawIcons(false);
-            this->scroll_x -= val1;
-            if(this->scroll_x<0) scroll_x = 0;
+        if(event==EVENT_ON_TOUCH_QUICK_SWIPE_TO_TOP || event==EVENT_ON_TOUCH_QUICK_SWIPE_TO_DOWN){
+            if(currentSubMenu==APP_SETTINGS_SUBMENU_SET_TIME){
+                switch(app_settings_selectedAppIndex){
+                    case 0:
+                        // Add hours
+                        if(event==EVENT_ON_TOUCH_QUICK_SWIPE_TO_TOP) core_time_setHours(core_time_getHours_byte() + 1);
+                        if(event==EVENT_ON_TOUCH_QUICK_SWIPE_TO_DOWN) core_time_setHours(core_time_getHours_byte() - 1);
+                        break;
+                    case 1:
+                        // Add minutes
+                        if(event==EVENT_ON_TOUCH_QUICK_SWIPE_TO_TOP) core_time_setMinutes(core_time_getMinutes_byte() + 1);
+                        if(event==EVENT_ON_TOUCH_QUICK_SWIPE_TO_DOWN) core_time_setMinutes(core_time_getMinutes_byte() - 1);
+                        break;
+                    case 2:
+                        // Reset seconds
+                        core_time_setSeconds(0);
+                        break;
+                } 
+                this->drawIcons(false);
+                this->drawIcons(true);
+            }else if(currentSubMenu==APP_SETTINGS_SUBMENU_SET_DATE){
+                switch(app_settings_selectedAppIndex){
+                    case 0:
+                        // Add year
+                        if(event==EVENT_ON_TOUCH_QUICK_SWIPE_TO_TOP) core_time_setYear(core_time_getYear() + 1);
+                        if(event==EVENT_ON_TOUCH_QUICK_SWIPE_TO_DOWN) core_time_setYear(core_time_getYear() - 1);
+                        break;
+                    case 1:
+                        // Add month
+                        if(event==EVENT_ON_TOUCH_QUICK_SWIPE_TO_TOP) core_time_setMonth(core_time_getMonth() + 1);
+                        if(event==EVENT_ON_TOUCH_QUICK_SWIPE_TO_DOWN) core_time_setMonth(core_time_getMonth() - 1);
+                        break;
+                    case 2:
+                        // Add date
+                        if(event==EVENT_ON_TOUCH_QUICK_SWIPE_TO_TOP) core_time_setDate(core_time_getDate() + 1);
+                        if(event==EVENT_ON_TOUCH_QUICK_SWIPE_TO_DOWN) core_time_setDate(core_time_getDate() - 1);
+                        break;
+                    case 3:
+                        // Set week day
+                        if(event==EVENT_ON_TOUCH_QUICK_SWIPE_TO_TOP) core_time_setWeekDay(core_time_getWeekDay() + 1);
+                        if(event==EVENT_ON_TOUCH_QUICK_SWIPE_TO_DOWN) core_time_setWeekDay(core_time_getWeekDay() - 1);
+                        break;
+                } 
+                this->drawIcons(false);
+                this->drawIcons(true);
+            }else if(currentSubMenu==APP_SETTINGS_SUBMENU_SCREEN){
 
-            int max_scroll = (this->getTotalApplicationsInSubMenu(APP_SETTINGS_SUBMENU_MAIN) - 1 ) * SCREEN_WIDTH;
-            if(this->scroll_x>max_scroll) {
-                this->scroll_x = max_scroll;
+                int value = 0;
+
+                this->drawIcons(false);
+                switch(app_settings_selectedAppIndex){
+                    case 0:
+                        #ifdef DISPLAY_BACKLIGHT_CONTROL_ENABLE
+                            // Change display brightness
+                            value = get_core_display_brightness();
+                            if(event==EVENT_ON_TOUCH_QUICK_SWIPE_TO_TOP) value += 5;
+                            if(event==EVENT_ON_TOUCH_QUICK_SWIPE_TO_DOWN) value -= 5;
+                            if(value>=100) value = 100;
+                            if(value==0) value = 1;
+                            if(value==6) value = 5;
+                            set_core_display_brightness(value);
+                        #endif
+                        break;
+                    case 1:
+                        #ifdef DISPLAY_BACKLIGHT_FADE_CONTROL_ENABLE
+                            // Change display fade brightness
+                            value = get_core_display_brightness_fade();
+                            if(event==EVENT_ON_TOUCH_QUICK_SWIPE_TO_TOP) value += 5;
+                            if(event==EVENT_ON_TOUCH_QUICK_SWIPE_TO_DOWN) value -= 5;
+                            if(value>=100) value = 100;
+                            if(value==0) value = 1;
+                            if(value==6) value = 5;
+                            set_core_display_brightness_fade(value);
+                        #endif
+                        break;
+                    case 2:
+                        #ifdef DISPLAY_BACKLIGHT_FADE_CONTROL_ENABLE
+                            // Change time delay to fade
+                            value = get_core_display_time_delay_to_fade();
+
+                            if(event==EVENT_ON_TOUCH_QUICK_SWIPE_TO_TOP){
+                                if(value<4)         value+=1;
+                                else if(value<10)   value+=2;
+                                else if(value<30)   value+=5;
+                                else if(value<100)  value+=10;
+                                else value+=20;
+                            }else if(event==EVENT_ON_TOUCH_QUICK_SWIPE_TO_DOWN){
+                                if(value<4)         value-=1;
+                                else if(value<10)   value-=2;
+                                else if(value<30)   value-=5;
+                                else if(value<100)  value-=10;
+                                else value-=20;
+                            }
+
+                            if(value>=240) value = 240;
+                            if(value<=0) value = 0;
+                            
+                            set_core_display_time_delay_to_fade(value);
+                            break;
+                        #endif
+                    case 3:
+                        // Change time delay to poweroff
+                        value = get_core_display_time_delay_to_poweroff();
+                    
+                        if(event==EVENT_ON_TOUCH_QUICK_SWIPE_TO_TOP){
+                            if(value<4)         value+=1;
+                            else if(value<10)   value+=2;
+                            else if(value<30)   value+=5;
+                            else if(value<100)  value+=10;
+                            else value+=20;
+                        }else if(event==EVENT_ON_TOUCH_QUICK_SWIPE_TO_DOWN){
+                            if(value<4)         value-=1;
+                            else if(value<10)   value-=2;
+                            else if(value<30)   value-=5;
+                            else if(value<100)  value-=10;
+                            else value-=20;
+                        }
+
+                        if(value>=240) value = 240;
+                        if(value<=0) value = 0;
+                    
+                        set_core_display_time_delay_to_poweroff(value);
+                        break;
+                } 
+                this->drawIcons(true);
             }
-
-            this->drawIcons(true);*/
-            
         }
-
 
         /*
         if(event==EVENT_ON_TOUCH_START){

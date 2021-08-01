@@ -41,7 +41,7 @@
 //#define toDefaultApp_onLeftLongPress
 
 #define STARTING_APP_NUMM   -1    // for Mainmenu (default app)
-#define STARTING_APP_NUMM   1 // Settings
+//#define STARTING_APP_NUMM   1 // Settings
 
 #define CPU_SLEEP_ENABLE
 
@@ -108,6 +108,11 @@
 #define PEDOMETER_STEP_DETECTION_DELAY_SEC_MAX          60 // MAX (255 - PEDOMETER_STEP_DETECTION_PERIOD_MS/1000) and multiple 60 seconds
 
 
+//#define PEDOMETER_STEP_DETECTION_DELAY_SEC_MIN          5
+//#define PEDOMETER_STEP_DETECTION_DELAY_SEC_STEP         5
+//#define PEDOMETER_STEP_DETECTION_DELAY_SEC_MAX          5 // MAX (255 - PEDOMETER_STEP_DETECTION_PERIOD_MS/1000) and multiple 60 seconds
+
+
 #define CORE_PEDOMETER_SLEEP_COUNTING_SPOINTS           10 // mesures for sleep detection 
 #define COREPEDOMETER_CENTRALWIGHT_SLEEP_VALUE_MIN      0.05f
 #define COREPEDOMETER_DELTA_SLEEP_VALUE_MIN_100         3 // acceletometer sensitivity/100*G for sleep detection
@@ -117,9 +122,9 @@
 //#define DEBUG_CPU_CONTROLL_ENABLE
 //#define DEBUG_CORE_POWERSAVE
 
-#define DEBUG_SERIAL
+//#define DEBUG_SERIAL
 //#define CORE_TOUCH_DEBUG
-#define APP_SETTINGS_DEBUG
+//#define APP_SETTINGS_DEBUG
 //#define PEDOMETER_EMULATOR
 //#define DEBUG_FPS
 //#define DEBUG_WAKEUP

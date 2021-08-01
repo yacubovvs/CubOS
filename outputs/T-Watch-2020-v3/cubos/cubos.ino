@@ -59,7 +59,7 @@
 #define EVENT_ON_TOUCH_QUICK_SWIPE_TO_LEFT      0x16
 #define EVENT_ON_TOUCH_QUICK_SWIPE_TO_RIGHT     0x17
 #define EVENT_ON_TOUCH_QUICK_SWIPE_TO_TOP       0x18
-#define EVENT_ON_TOUCH_QUICK_SWIPE_TO_BOTTOM    0x18
+#define EVENT_ON_TOUCH_QUICK_SWIPE_TO_DOWN      0x19
 
 // WAKEUP REASONS
 #define WAKE_UP_REASON_EXTERNAL_RTC_IO      0x01
@@ -106,8 +106,6 @@
 #                                 STYLES +                                 #
 ############################################################################
 */
-
-#define COREVIEWS_NO_ICON_ELEMENT_HEIGHT 40
 
 #define SOFTWARE_BUTTONS_COLOR_RED          255
 #define SOFTWARE_BUTTONS_COLOR_GREEN        255
@@ -247,7 +245,7 @@
 //#define toDefaultApp_onLeftLongPress
 
 #define STARTING_APP_NUMM   -1    // for Mainmenu (default app)
-#define STARTING_APP_NUMM   1 // Settings
+//#define STARTING_APP_NUMM   1 // Settings
 
 #define CPU_SLEEP_ENABLE
 
@@ -314,6 +312,11 @@
 #define PEDOMETER_STEP_DETECTION_DELAY_SEC_MAX          60 // MAX (255 - PEDOMETER_STEP_DETECTION_PERIOD_MS/1000) and multiple 60 seconds
 
 
+#define PEDOMETER_STEP_DETECTION_DELAY_SEC_MIN          5
+#define PEDOMETER_STEP_DETECTION_DELAY_SEC_STEP         5
+#define PEDOMETER_STEP_DETECTION_DELAY_SEC_MAX          5 // MAX (255 - PEDOMETER_STEP_DETECTION_PERIOD_MS/1000) and multiple 60 seconds
+
+
 #define CORE_PEDOMETER_SLEEP_COUNTING_SPOINTS           10 // mesures for sleep detection 
 #define COREPEDOMETER_CENTRALWIGHT_SLEEP_VALUE_MIN      0.05f
 #define COREPEDOMETER_DELTA_SLEEP_VALUE_MIN_100         3 // acceletometer sensitivity/100*G for sleep detection
@@ -325,11 +328,11 @@
 
 #define DEBUG_SERIAL
 //#define CORE_TOUCH_DEBUG
-#define APP_SETTINGS_DEBUG
+//#define APP_SETTINGS_DEBUG
 //#define PEDOMETER_EMULATOR
 //#define DEBUG_FPS
 //#define DEBUG_WAKEUP
-//#define DEBUG_PEDOMETER
+#define DEBUG_PEDOMETER
 //#define DEBUG_ACELEROMETER
 //#define DEBUG_BACKLIGHT
 //#define DEBUG_DRIVER_CONTROLL

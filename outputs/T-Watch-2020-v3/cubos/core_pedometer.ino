@@ -103,14 +103,14 @@
                 #ifndef DEBUG_PEDOMETER
                     if(driver_battery_isUsbConnected()){
                         #ifdef DEBUG_PEDOMETER
-                            debug("DEBUG_PEDOMETER: exit job course on usb");
+                            //debug("DEBUG_PEDOMETER: exit job course on usb");
                         #endif 
                         analyse_sleep_delta_accels=0;
                         return;
                     }
                 #else
                     #ifdef DEBUG_PEDOMETER
-                        debug("DEBUG_PEDOMETER: usb is not connected");
+                        //debug("DEBUG_PEDOMETER: usb is not connected");
                     #endif 
                 #endif
             #endif
@@ -339,7 +339,7 @@
             ){
                 //
                 #ifdef DEBUG_PEDOMETER
-                    debug("Is walking", 10);
+                    debug("Is walking", 20);
                     //if(!inBackground) digitalWrite(10,0);
                 #endif
                 unsigned char hours_to_add = (PEDOMETER_DAY_VALUE_TYPE)((pedometer_days_steps_IN_SEC*( (float)( ((long)corePedometer_currentsleep_between_mesures)*1000 + PEDOMETER_STEP_DETECTION_PERIOD_MS)))/1000);
