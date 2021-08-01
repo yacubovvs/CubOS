@@ -108,12 +108,12 @@
 #define PEDOMETER_STEP_DETECTION_DELAY_SEC_MAX          60 // MAX (255 - PEDOMETER_STEP_DETECTION_PERIOD_MS/1000) and multiple 60 seconds
 
 
-//#define PEDOMETER_STEP_DETECTION_DELAY_SEC_MIN          5
-//#define PEDOMETER_STEP_DETECTION_DELAY_SEC_STEP         5
-//#define PEDOMETER_STEP_DETECTION_DELAY_SEC_MAX          5 // MAX (255 - PEDOMETER_STEP_DETECTION_PERIOD_MS/1000) and multiple 60 seconds
+//#define PEDOMETER_STEP_DETECTION_DELAY_SEC_MIN          60
+//#define PEDOMETER_STEP_DETECTION_DELAY_SEC_STEP         60
+//#define PEDOMETER_STEP_DETECTION_DELAY_SEC_MAX          60 // MAX (255 - PEDOMETER_STEP_DETECTION_PERIOD_MS/1000) and multiple 60 seconds
 
 
-#define CORE_PEDOMETER_SLEEP_COUNTING_SPOINTS           10 // mesures for sleep detection 
+#define CORE_PEDOMETER_SLEEP_COUNTING_SPOINTS           0 // mesures for sleep detection 
 #define COREPEDOMETER_CENTRALWIGHT_SLEEP_VALUE_MIN      0.05f
 #define COREPEDOMETER_DELTA_SLEEP_VALUE_MIN_100         3 // acceletometer sensitivity/100*G for sleep detection
 
