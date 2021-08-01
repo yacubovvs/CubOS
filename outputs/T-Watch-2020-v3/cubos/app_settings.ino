@@ -137,7 +137,131 @@ class appNameClass: public Application{
         bool currentPositionIsSelected      = false;
         
         int getPositionBySelectedNumber(unsigned char selectedNumber);
+
+        void draw_element_title(bool draw, int x, int y, const unsigned char* title, String title2);
+        void draw_element_icon(bool draw, const unsigned char* icon, int x, int y);
+        void draw_settings_item(bool draw, int x, int y, const unsigned char* title, String subTitle, const unsigned char* icon);
+        void draw_settings_item_noicon(bool draw, int x, int y, String title, String subTitle);
 };
+
+#if defined(USE_XL_MENU_IMAGES)
+    #define CORE_VIEWS_SETTINGS_IMAGE_WIDTH 64
+
+    #define APP_SETTINGS_MENU_IMAGE_Y_OFFSET      (-20)
+    #define APP_SETTINGS_MENU_TITLE_Y_SIZE        2
+    #define APP_SETTINGS_MENU_SUBTITLE_Y_SIZE     2
+    #define APP_SETTINGS_MENU_TITLE_Y_OFFSET      20
+    #define APP_SETTINGS_MENU_SUBTITLE_Y_OFFSET   45
+
+    #define APP_SETTINGS_TITLE_FONT_SIZE            1
+    #define APP_SETTINGS_SUBTITLE_FONT_SIZE         2
+#elif defined(USE_L_MENU_IMAGES)
+    #define CORE_VIEWS_SETTINGS_IMAGE_WIDTH 48
+
+    #define APP_SETTINGS_MENU_IMAGE_Y_OFFSET      0
+    #define APP_SETTINGS_MENU_TITLE_Y_SIZE        1
+    #define APP_SETTINGS_MENU_SUBTITLE_Y_SIZE     1
+    #define APP_SETTINGS_MENU_TITLE_Y_OFFSET      10
+    #define APP_SETTINGS_MENU_SUBTITLE_Y_OFFSET   30
+
+    #define APP_SETTINGS_TITLE_FONT_SIZE            1
+    #define APP_SETTINGS_SUBTITLE_FONT_SIZE         2
+#else
+    #define CORE_VIEWS_SETTINGS_IMAGE_WIDTH     24
+    
+    #define APP_SETTINGS_MENU_IMAGE_Y_OFFSET        0
+    #define APP_SETTINGS_MENU_TITLE_Y_SIZE          1
+    #define APP_SETTINGS_MENU_SUBTITLE_Y_SIZE       1
+    #define APP_SETTINGS_MENU_TITLE_Y_OFFSET        10
+    #define APP_SETTINGS_MENU_SUBTITLE_Y_OFFSET     30
+
+    #define APP_SETTINGS_TITLE_FONT_SIZE            1
+    #define APP_SETTINGS_SUBTITLE_FONT_SIZE         2
+#endif
+
+void appNameClass::draw_settings_item_noicon(bool draw, int x, int y, String title, String subTitle){
+    
+    if(draw){
+        setDrawColor_ContrastColor();
+        drawString(
+            title,                                                                          // TEXT
+            x - title.length()*FONT_CHAR_WIDTH/2*APP_SETTINGS_TITLE_FONT_SIZE,                             // X
+            y - COREVIEWS_NO_ICON_ELEMENT_HEIGHT/2,                                         // Y
+            APP_SETTINGS_TITLE_FONT_SIZE                                                                   // FONT SIZE
+        );
+
+        drawString(
+            subTitle,                                                                       // TEXT
+            x - subTitle.length()*FONT_CHAR_WIDTH/2*APP_SETTINGS_SUBTITLE_FONT_SIZE,                       // X
+            y + COREVIEWS_NO_ICON_ELEMENT_HEIGHT/2 - APP_SETTINGS_SUBTITLE_FONT_SIZE * FONT_CHAR_HEIGHT,   // Y
+            APP_SETTINGS_SUBTITLE_FONT_SIZE                                                                // FONT SIZE
+        );
+    }else{
+        setDrawColor_BackGroundColor();
+        clearString(
+            title,                                                                          // TEXT
+            x - title.length()*FONT_CHAR_WIDTH/2*APP_SETTINGS_TITLE_FONT_SIZE,                             // X
+            y - COREVIEWS_NO_ICON_ELEMENT_HEIGHT/2,                                         // Y
+            APP_SETTINGS_TITLE_FONT_SIZE                                                                   // FONT SIZE
+        );
+
+        clearString(
+            subTitle,                                                                       // TEXT
+            x - subTitle.length()*FONT_CHAR_WIDTH/2*APP_SETTINGS_SUBTITLE_FONT_SIZE,                       // X
+            y + COREVIEWS_NO_ICON_ELEMENT_HEIGHT/2 - APP_SETTINGS_SUBTITLE_FONT_SIZE * FONT_CHAR_HEIGHT,   // Y
+            APP_SETTINGS_SUBTITLE_FONT_SIZE                                                                // FONT SIZE
+        );
+    }
+
+}
+
+void appNameClass::draw_element_title(bool draw, int x, int y, const unsigned char* title, String title2){
+
+    uint16_t titleShift = strlen((const char*)title)*APP_SETTINGS_MENU_TITLE_Y_SIZE*FONT_CHAR_WIDTH/2;
+    uint16_t subTitleShift = title2.length()*APP_SETTINGS_MENU_SUBTITLE_Y_SIZE*FONT_CHAR_WIDTH/2;
+
+    #if APP_SETTINGS_MENU_SUBTITLE_Y_SIZE == 1
+        x+=2;   
+    #endif
+
+    if(draw){
+        setDrawColor_ContrastColor();
+        drawString((char*)title, x - titleShift,  y+APP_SETTINGS_MENU_TITLE_Y_OFFSET, APP_SETTINGS_MENU_TITLE_Y_SIZE);
+        drawString(title2, x - subTitleShift,     y+APP_SETTINGS_MENU_SUBTITLE_Y_OFFSET, APP_SETTINGS_MENU_SUBTITLE_Y_SIZE);
+    }else{
+        setDrawColor_BackGroundColor();
+        clearString((char*)title, x - titleShift, y+APP_SETTINGS_MENU_TITLE_Y_OFFSET, APP_SETTINGS_MENU_TITLE_Y_SIZE);
+        clearString(title2, x - subTitleShift,    y+APP_SETTINGS_MENU_SUBTITLE_Y_OFFSET, APP_SETTINGS_MENU_SUBTITLE_Y_SIZE);
+    }
+}
+
+void appNameClass::draw_element_icon(bool draw, const unsigned char* icon, int x, int y){
+    drawImage(draw, icon, x - CORE_VIEWS_SETTINGS_IMAGE_WIDTH/2 + 2, y - CORE_VIEWS_SETTINGS_IMAGE_WIDTH/2 + APP_SETTINGS_MENU_IMAGE_Y_OFFSET);
+}
+
+void appNameClass::draw_settings_item(bool draw, int x, int y, const unsigned char* title, String subTitle, const unsigned char* icon){
+
+    #if defined(NARROW_SCREEN) || defined(WATCH_SCREEN)
+        this->draw_element_icon(draw, icon, x-CORE_VIEWS_SETTINGS_IMAGE_WIDTH/2, y-30);
+        this->draw_element_title(draw, x, y, title, subTitle);
+    #else
+        // image
+        int left_x = x + CORE_VIEWS_SETTINGS_IMAGE_WIDTH;
+        setDrawColor(getBackgroundColor_red(), getBackgroundColor_green(), getBackgroundColor_blue());
+        this->draw_element_icon(draw, icon, x-CORE_VIEWS_SETTINGS_IMAGE_WIDTH/2, y-CORE_VIEWS_SETTINGS_IMAGE_WIDTH/2);
+
+        // title
+        if(draw){
+            setDrawColor(255, 255, 255);
+            drawString((char*)title, left_x, y-12);
+            drawString(subTitle, left_x, y+4);
+        }else{    
+            clearString((char*)title, left_x, y-12);
+            clearString(subTitle, left_x, y+4, 1);
+        }
+    #endif
+    
+}
 
 unsigned char appNameClass::getTotalPagesInSubMenu(unsigned char submenuType){
     return (getTotalApplicationsInSubMenu(submenuType)%APPS_ON_SINGLE_PAGE==0?((int)(getTotalApplicationsInSubMenu(submenuType)/APPS_ON_SINGLE_PAGE)):((int)(getTotalApplicationsInSubMenu(submenuType)/APPS_ON_SINGLE_PAGE) + 1));
@@ -366,8 +490,6 @@ void appNameClass::drawIcons(bool draw){
                 this->preventInAppSleep=true;
                 if(this->scroll_x<0 || this->scroll_x>0){
 
-                    
-
                     char elementsToPreDraw = this->scroll_x/SCREEN_WIDTH + 1;
                     elementsToPreDraw = elementsToPreDraw%getTotalPagesInSubMenu(currentSubMenu);
                     for(unsigned char elementDraw = 0; elementDraw<=elementsToPreDraw; elementDraw++){
@@ -382,19 +504,22 @@ void appNameClass::drawIcons(bool draw){
                         if(this->scroll_x>0) element_offset = this->scroll_x + SCREEN_WIDTH/2 - elementDraw*SCREEN_WIDTH;
                         else element_offset = this->scroll_x + SCREEN_WIDTH*1 + SCREEN_WIDTH/2 - elementDraw*SCREEN_WIDTH;
 
-                        #ifdef APP_SETTINGS_DEBUG
-                            debug("APP_SETTINGS_DEBUG: element_offset " + String(element_offset));
-                        #endif
-
                         if(currentSubMenu==APP_SETTINGS_SUBMENU_MAIN){
-                            core_views_draw_settings_item(
-                                draw, 
-                                element_offset,
-                                SCREEN_HEIGHT/2, 
-                                (const unsigned char*)this->getApplicationTitle(APP_SETTINGS_SUBMENU_MAIN, appElementDraw), 
-                                this->getApplicationSubTitle(currentSubMenu, appElementDraw, !draw), 
-                                this->getApplicationIcon(currentSubMenu, appElementDraw)
-                            );
+                            #ifdef WATCH_SCREEN
+                                // special animation for smartwatch
+                                //this->draw_element_icon(draw, this->getApplicationIcon(currentSubMenu, appElementDraw), element_offset, SCREEN_HEIGHT/2);
+                                this->draw_element_icon(draw, this->getApplicationIcon(currentSubMenu, app_num), SCREEN_WIDTH/2, SCREEN_HEIGHT/2);
+                                this->draw_element_title(draw, element_offset, SCREEN_HEIGHT/2, (const unsigned char*)this->getApplicationTitle(APP_SETTINGS_SUBMENU_MAIN, appElementDraw), this->getApplicationSubTitle(currentSubMenu, appElementDraw, !draw));
+                            #else
+                                draw_settings_item(
+                                    draw, 
+                                    element_offset,
+                                    SCREEN_HEIGHT/2, 
+                                    (const unsigned char*)this->getApplicationTitle(APP_SETTINGS_SUBMENU_MAIN, appElementDraw), 
+                                    this->getApplicationSubTitle(currentSubMenu, appElementDraw, !draw), 
+                                    this->getApplicationIcon(currentSubMenu, appElementDraw)
+                                );
+                            #endif
                         }else if(
                                     currentSubMenu==APP_SETTINGS_SUBMENU_SET_TIME 
                                     || currentSubMenu==APP_SETTINGS_SUBMENU_SET_DATE 
@@ -403,14 +528,12 @@ void appNameClass::drawIcons(bool draw){
 
                             String stringTitle = reinterpret_cast<const char*>(this->getApplicationTitle(currentSubMenu, appElementDraw));
 
-                            core_views_draw_settings_item_noicon(
+                            draw_settings_item_noicon(
                                 draw, 
                                 element_offset, 
                                 SCREEN_HEIGHT/2, 
                                 stringTitle, 
-                                this->getApplicationSubTitle(currentSubMenu, appElementDraw, !draw), 
-                                1, 
-                                2
+                                this->getApplicationSubTitle(currentSubMenu, appElementDraw, !draw) 
                             );
                         }
                         
@@ -418,35 +541,40 @@ void appNameClass::drawIcons(bool draw){
                 }
             }else{
                 if(draw) this->preventInAppSleep=false;
+                
                 if(currentSubMenu==APP_SETTINGS_SUBMENU_MAIN){
-                    core_views_draw_settings_item(
-                        draw, 
-                        this->scroll_x + SCREEN_WIDTH/2,
-                        SCREEN_HEIGHT/2, 
-                        (const unsigned char*)this->getApplicationTitle(APP_SETTINGS_SUBMENU_MAIN, app_num), 
-                        this->getApplicationSubTitle(currentSubMenu, app_num, !draw), 
-                        this->getApplicationIcon(currentSubMenu, app_num)
-                    );
+                    #ifdef WATCH_SCREEN
+                        // special animation for smartwatch
+                        this->draw_element_icon(draw, this->getApplicationIcon(currentSubMenu, app_num), SCREEN_WIDTH/2, SCREEN_HEIGHT/2);
+                        this->draw_element_title(draw, SCREEN_WIDTH/2, SCREEN_HEIGHT/2, (const unsigned char*)this->getApplicationTitle(APP_SETTINGS_SUBMENU_MAIN, app_num), this->getApplicationSubTitle(currentSubMenu, app_num, !draw));
+                    #else
+                        draw_settings_item(
+                            draw, 
+                            this->scroll_x + SCREEN_WIDTH/2,
+                            SCREEN_HEIGHT/2, 
+                            (const unsigned char*)this->getApplicationTitle(APP_SETTINGS_SUBMENU_MAIN, app_num), 
+                            this->getApplicationSubTitle(currentSubMenu, app_num, !draw), 
+                            this->getApplicationIcon(currentSubMenu, app_num)
+                        );
+                    #endif
                 }else if(
                             currentSubMenu==APP_SETTINGS_SUBMENU_SET_TIME 
                             || currentSubMenu==APP_SETTINGS_SUBMENU_SET_DATE
                             || currentSubMenu==APP_SETTINGS_SUBMENU_SCREEN
                         ){
                     String stringTitle = reinterpret_cast<const char*>(this->getApplicationTitle(currentSubMenu, app_num));
-                    core_views_draw_settings_item_noicon(
+                    draw_settings_item_noicon(
                         draw, 
                         this->scroll_x + SCREEN_WIDTH/2, 
                         SCREEN_HEIGHT/2, 
                         stringTitle, 
-                        this->getApplicationSubTitle(currentSubMenu, app_num, !draw), 
-                        1, 
-                        2
+                        this->getApplicationSubTitle(currentSubMenu, app_num, !draw) 
                     );
                 }
             }
         #else
             if(currentSubMenu==APP_SETTINGS_SUBMENU_MAIN){
-                core_views_draw_settings_item(
+                draw_settings_item(
                     draw, 
                     SCREEN_WIDTH/2,
                     SCREEN_HEIGHT/2, 
@@ -491,7 +619,7 @@ void appNameClass::drawIcons(bool draw){
                         #endif
 
                         
-                        core_views_draw_settings_item(
+                        draw_settings_item(
                             draw, 
                             #ifndef TOUCH_SCREEN_ENABLE
                                 currentDrawPage*SCREEN_WIDTH - this->scroll_x + x0+35, 
@@ -523,13 +651,16 @@ void appNameClass::onLoop(){
             if(scroll_x>scroll_to_x) dx *= -1;
             scroll_x+=dx;
 
-            #ifdef APP_SETTINGS_DEBUG
-                debug("APP_SETTINGS_DEBUG: " + String(dx));
-            #endif
-
-            if (abs(dx)<1) scroll_x=0;
+            setDrawColor(0,0,0);
+            drawLine(0, STYLE_STATUSBAR_HEIGHT+1, SCREEN_WIDTH, STYLE_STATUSBAR_HEIGHT+1);
+            drawLine(0, SCREEN_WIDTH, SCREEN_HEIGHT, SCREEN_WIDTH);
+            
+            if (abs(dx)<=1){    
+                this->scroll_x=0;
+            }
             this->drawIcons(true);
         }else{
+            
             this->preventInAppSleep = false;
         }
     #endif
@@ -693,6 +824,15 @@ void appNameClass::pressNext(){
     }
 
     this->updateActiveAppIndex(this->app_settings_selectedAppIndex+1);
+
+    #if defined(WATCH_SCREEN)
+        //#ifdef APP_SETTINGS_DEBUG
+            //debug("APP_SETTINGS_DEBUG: THIS MOMENT");
+        //#endif
+        if(currentSubMenu==APP_SETTINGS_SUBMENU_MAIN){
+            this->draw_element_icon(true, this->getApplicationIcon(currentSubMenu, this->app_settings_selectedAppIndex), SCREEN_WIDTH/2, SCREEN_HEIGHT/2);
+        }
+    #endif
 }
 
 void appNameClass::pressSelect(){
@@ -707,8 +847,24 @@ void appNameClass::onEvent(unsigned char event, int val1, int val2){
             pressNext();
         }else if(event==EVENT_ON_TOUCH_QUICK_SWIPE_TO_RIGHT){
             pressPrevious();
+        }else if(event==EVENT_ON_TOUCH_QUICK_SWIPE_TO_TOP){
+            if(currentSubMenu==APP_SETTINGS_SUBMENU_MAIN){
+                startApp(-1);
+            }
         }else if(event==EVENT_ON_TOUCH_CLICK){
-            //startApp(app_z_menu_selectedAppIndex);
+            if(currentSubMenu==APP_SETTINGS_SUBMENU_MAIN){
+                switch(app_settings_selectedAppIndex){
+                    case 0:
+                        switchToSubMenu(APP_SETTINGS_SUBMENU_SET_TIME);
+                        break;
+                    case 1:
+                        switchToSubMenu(APP_SETTINGS_SUBMENU_SET_DATE);
+                        break;
+                    case 2:
+                        switchToSubMenu(APP_SETTINGS_SUBMENU_SCREEN);
+                        break;
+                }
+            }
         }
 
         if(event==EVENT_ON_TOUCH_DRAG){
@@ -727,14 +883,63 @@ void appNameClass::onEvent(unsigned char event, int val1, int val2){
             
         }
 
-        if(event==EVENT_BUTTON_PRESSED){
+
+        /*
+        if(event==EVENT_ON_TOUCH_START){
             if(val1==BUTTON_POWER){
                 #ifdef APP_SETTINGS_DEBUG
                     debug("APP_SETTINGS_DEBUG: Exit app 1");
                 #endif
                 startApp(-1);
             }
+        }*/
+        if(event==0xFF){
+            if(event==EVENT_ON_TOUCH_CLICK){
+                //debug("EVENT_BUTTON_LONG_PRESS");
+                if(val1==BUTTON_SELECT){
+                    
+                }else if(val1==BUTTON_BACK){
+                    #ifdef APP_SETTINGS_DEBUG
+                        debug("APP_SETTINGS_DEBUG: Exit app 2");
+                    #endif
+                    startApp(-1);
+                }    
+            }else if(event==EVENT_BUTTON_SHORT_PRESS){
+                //debug("EVENT_BUTTON_SHORT_PRESS");
+            }else if(event==EVENT_BUTTON_SHORT_SINGLE_PRESS){
+                //debug("EVENT_BUTTON_SHORT_SINGLE_PRESS");
+                if(val1==BUTTON_SELECT){
+                    this->pressNext();
+                }else if(val1==BUTTON_BACK){
+                    #ifdef APP_SETTINGS_DEBUG
+                        debug("APP_SETTINGS_DEBUG: Exit app 3");
+                    #endif
+                    startApp(-1);
+                }
+            }else if(event==EVENT_BUTTON_DOUBLE_PRESS){
+                //debug("EVENT_BUTTON_DOUBLE_PRESS");
+                if(val1==BUTTON_SELECT){
+                    if(
+                        currentSubMenu==APP_SETTINGS_SUBMENU_SET_TIME 
+                        || currentSubMenu==APP_SETTINGS_SUBMENU_SET_DATE
+                        || currentSubMenu==APP_SETTINGS_SUBMENU_SCREEN
+                        ){
+                        this->pressNext();
+                    } else {
+                        #ifdef APP_SETTINGS_DEBUG
+                            debug("APP_SETTINGS_DEBUG: Exit app 4");
+                        #endif
+                        startApp(-1);
+                    }
+                }
+            }
         }
+
+        /*
+        # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
+        # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
+        # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
+        */
     #else
 
         /**/

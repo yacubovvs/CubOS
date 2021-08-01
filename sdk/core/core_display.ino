@@ -870,7 +870,7 @@ void core_display_loop(){
 void drawPixel(int x, int y){
   if(DRAW_LIMITS_Enabled){
     //if out of screen
-    if(x>=DRAW_LIMITS_right || x<=DRAW_LIMITS_left || y<=DRAW_LIMITS_top+1 || y>DRAW_LIMITS_bottom) return;
+    if(x>=DRAW_LIMITS_right-1 || x<=DRAW_LIMITS_left+1 || y<=DRAW_LIMITS_top+1 || y>=DRAW_LIMITS_bottom-1) return;
   }
     
   #ifdef FRAMEBUFFER_ENABLE
