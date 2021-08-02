@@ -15,3 +15,7 @@
 2021-07-26
     Now pedometer will not works while connecting to charge
     New menu for smartwatches with screens 240x240 px with icons 80x80 px
+
+2021-08-01
+    New paramater for normal, L and XL images for smartwatches
+    Testing betta version of smartwatch version with screens 240x240 px
