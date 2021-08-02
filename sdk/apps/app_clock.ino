@@ -159,7 +159,7 @@ void appNameClass::onEvent(unsigned char event, int val1, int val2){
     #ifdef TOUCH_SCREEN_ENABLE
         if(event==EVENT_ON_TOUCH_QUICK_SWIPE_TO_TOP){
             startApp(-1);
-        }else if(event==EVENT_ON_TOUCH_QUICK_SWIPE_TO_DOWN){
+        }else if(event==EVENT_ON_TOUCH_QUICK_SWIPE_TO_BOTTOM){
             startApp(-1);
         }
     #endif
@@ -196,7 +196,9 @@ void appNameClass::onEvent(unsigned char event, int val1, int val2){
     }else if(event==EVENT_ON_GOING_TO_SLEEP){
         this->draw_current_time(false);
     }else if(event==EVENT_ON_WAKE_UP){
-        this->draw_current_time(true);
+        //this->draw_current_time(true);
+        fillScreen(0, 0, 0); 
+        this->onCreate();
     }else if(event==EVENT_BUTTON_DOUBLE_PRESS){
         if(val1==BUTTON_SELECT){
             startApp(-1);
@@ -398,11 +400,14 @@ void appNameClass::draw_current_time(bool draw){
     #if defined(PEDOMETER_ENABLE) || defined(PEDOMETER_EMULATOR)
         
         if(draw){
-            this->last_pedometer = get_pedometer_days_steps();
-            #ifdef PLATFORM_PC_EMULATOR
+
+            
+            #ifdef PEDOMETER_EMULATOR
                 this->sleep_time = String(5.82);
+                this->last_pedometer = 134;
             #else
                 this->sleep_time = get_pedometer_days_sleep_hours();
+                this->last_pedometer = get_pedometer_days_steps();
             #endif
         }
 
@@ -447,7 +452,7 @@ void appNameClass::draw_current_time(bool draw){
             #define CLEAR_SLEEP_LABEL(A,B,C,D) clearString_centered(A,B,C,D)
         #else
             // Big screens as 240x240 
-            #define PEDOMETER_LABEL_X (SCREEN_WIDTH - pedometer_label_width_05 - SLEEP_LABEL_POSITION_X_OFFSET)
+            #define PEDOMETER_LABEL_X (SCREEN_WIDTH - pedometer_label_width_05*2 + 16)
             #define PEDOMETER_LABEL_Y (PEDOMETER_LABEL_POSITION_Y)
             #define PEDOMETER_LABEL_SIZE (FONT_SIZE_DEFAULT)
             #define DRAW_PEDOMETER_LABEL(A,B,C,D) drawString(A,B,C,D)

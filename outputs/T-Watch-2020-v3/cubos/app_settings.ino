@@ -869,7 +869,7 @@ void appNameClass::onEvent(unsigned char event, int val1, int val2){
             pressNext();
         }else if(event==EVENT_ON_TOUCH_QUICK_SWIPE_TO_RIGHT){
             pressPrevious();
-        }else if(event==EVENT_ON_TOUCH_QUICK_SWIPE_TO_TOP || event==EVENT_ON_TOUCH_QUICK_SWIPE_TO_DOWN){
+        }else if(event==EVENT_ON_TOUCH_QUICK_SWIPE_TO_TOP || event==EVENT_ON_TOUCH_QUICK_SWIPE_TO_BOTTOM){
             if(currentSubMenu==APP_SETTINGS_SUBMENU_MAIN){
                 startApp(-1);
             }
@@ -889,18 +889,18 @@ void appNameClass::onEvent(unsigned char event, int val1, int val2){
             }
         }
 
-        if(event==EVENT_ON_TOUCH_QUICK_SWIPE_TO_TOP || event==EVENT_ON_TOUCH_QUICK_SWIPE_TO_DOWN){
+        if(event==EVENT_ON_TOUCH_QUICK_SWIPE_TO_TOP || event==EVENT_ON_TOUCH_QUICK_SWIPE_TO_BOTTOM){
             if(currentSubMenu==APP_SETTINGS_SUBMENU_SET_TIME){
                 switch(app_settings_selectedAppIndex){
                     case 0:
                         // Add hours
                         if(event==EVENT_ON_TOUCH_QUICK_SWIPE_TO_TOP) core_time_setHours(core_time_getHours_byte() + 1);
-                        if(event==EVENT_ON_TOUCH_QUICK_SWIPE_TO_DOWN) core_time_setHours(core_time_getHours_byte() - 1);
+                        if(event==EVENT_ON_TOUCH_QUICK_SWIPE_TO_BOTTOM) core_time_setHours(core_time_getHours_byte() - 1);
                         break;
                     case 1:
                         // Add minutes
                         if(event==EVENT_ON_TOUCH_QUICK_SWIPE_TO_TOP) core_time_setMinutes(core_time_getMinutes_byte() + 1);
-                        if(event==EVENT_ON_TOUCH_QUICK_SWIPE_TO_DOWN) core_time_setMinutes(core_time_getMinutes_byte() - 1);
+                        if(event==EVENT_ON_TOUCH_QUICK_SWIPE_TO_BOTTOM) core_time_setMinutes(core_time_getMinutes_byte() - 1);
                         break;
                     case 2:
                         // Reset seconds
@@ -914,22 +914,22 @@ void appNameClass::onEvent(unsigned char event, int val1, int val2){
                     case 0:
                         // Add year
                         if(event==EVENT_ON_TOUCH_QUICK_SWIPE_TO_TOP) core_time_setYear(core_time_getYear() + 1);
-                        if(event==EVENT_ON_TOUCH_QUICK_SWIPE_TO_DOWN) core_time_setYear(core_time_getYear() - 1);
+                        if(event==EVENT_ON_TOUCH_QUICK_SWIPE_TO_BOTTOM) core_time_setYear(core_time_getYear() - 1);
                         break;
                     case 1:
                         // Add month
                         if(event==EVENT_ON_TOUCH_QUICK_SWIPE_TO_TOP) core_time_setMonth(core_time_getMonth() + 1);
-                        if(event==EVENT_ON_TOUCH_QUICK_SWIPE_TO_DOWN) core_time_setMonth(core_time_getMonth() - 1);
+                        if(event==EVENT_ON_TOUCH_QUICK_SWIPE_TO_BOTTOM) core_time_setMonth(core_time_getMonth() - 1);
                         break;
                     case 2:
                         // Add date
                         if(event==EVENT_ON_TOUCH_QUICK_SWIPE_TO_TOP) core_time_setDate(core_time_getDate() + 1);
-                        if(event==EVENT_ON_TOUCH_QUICK_SWIPE_TO_DOWN) core_time_setDate(core_time_getDate() - 1);
+                        if(event==EVENT_ON_TOUCH_QUICK_SWIPE_TO_BOTTOM) core_time_setDate(core_time_getDate() - 1);
                         break;
                     case 3:
                         // Set week day
                         if(event==EVENT_ON_TOUCH_QUICK_SWIPE_TO_TOP) core_time_setWeekDay(core_time_getWeekDay() + 1);
-                        if(event==EVENT_ON_TOUCH_QUICK_SWIPE_TO_DOWN) core_time_setWeekDay(core_time_getWeekDay() - 1);
+                        if(event==EVENT_ON_TOUCH_QUICK_SWIPE_TO_BOTTOM) core_time_setWeekDay(core_time_getWeekDay() - 1);
                         break;
                 } 
                 this->drawIcons(false);
@@ -945,7 +945,7 @@ void appNameClass::onEvent(unsigned char event, int val1, int val2){
                             // Change display brightness
                             value = get_core_display_brightness();
                             if(event==EVENT_ON_TOUCH_QUICK_SWIPE_TO_TOP) value += 5;
-                            if(event==EVENT_ON_TOUCH_QUICK_SWIPE_TO_DOWN) value -= 5;
+                            if(event==EVENT_ON_TOUCH_QUICK_SWIPE_TO_BOTTOM) value -= 5;
                             if(value>=100) value = 100;
                             if(value==0) value = 1;
                             if(value==6) value = 5;
@@ -957,7 +957,7 @@ void appNameClass::onEvent(unsigned char event, int val1, int val2){
                             // Change display fade brightness
                             value = get_core_display_brightness_fade();
                             if(event==EVENT_ON_TOUCH_QUICK_SWIPE_TO_TOP) value += 5;
-                            if(event==EVENT_ON_TOUCH_QUICK_SWIPE_TO_DOWN) value -= 5;
+                            if(event==EVENT_ON_TOUCH_QUICK_SWIPE_TO_BOTTOM) value -= 5;
                             if(value>=100) value = 100;
                             if(value==0) value = 1;
                             if(value==6) value = 5;
@@ -975,7 +975,7 @@ void appNameClass::onEvent(unsigned char event, int val1, int val2){
                                 else if(value<30)   value+=5;
                                 else if(value<100)  value+=10;
                                 else value+=20;
-                            }else if(event==EVENT_ON_TOUCH_QUICK_SWIPE_TO_DOWN){
+                            }else if(event==EVENT_ON_TOUCH_QUICK_SWIPE_TO_BOTTOM){
                                 if(value<4)         value-=1;
                                 else if(value<10)   value-=2;
                                 else if(value<30)   value-=5;
@@ -999,7 +999,7 @@ void appNameClass::onEvent(unsigned char event, int val1, int val2){
                             else if(value<30)   value+=5;
                             else if(value<100)  value+=10;
                             else value+=20;
-                        }else if(event==EVENT_ON_TOUCH_QUICK_SWIPE_TO_DOWN){
+                        }else if(event==EVENT_ON_TOUCH_QUICK_SWIPE_TO_BOTTOM){
                             if(value<4)         value-=1;
                             else if(value<10)   value-=2;
                             else if(value<30)   value-=5;

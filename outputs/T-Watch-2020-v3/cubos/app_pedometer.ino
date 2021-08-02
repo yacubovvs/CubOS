@@ -54,9 +54,11 @@ unsigned char  appNameClass::getNextPage(){
 }
 
 unsigned char  appNameClass::getPreviousPage(){
+    /*
     char page = current_page - 1;
     if(page<0x00) return 0x03;
     return page;
+    */
 }
 
 void appNameClass::drawPage(bool draw, unsigned char page){
@@ -93,6 +95,7 @@ void appNameClass::drawPage(bool draw, unsigned char page){
                 }else{
                     setDrawColor_BackGroundColor();
                     clearString(String(get_pedometer_days_steps(i)) + " steps", X_SRINGS, Y_SRINGS);
+                    //drawString(String(get_pedometer_days_steps(i)) + " steps", X_SRINGS, Y_SRINGS);
                 }
                 
             }
@@ -266,7 +269,21 @@ void appNameClass::onDestroy(){
 
 void appNameClass::onEvent(unsigned char event, int val1, int val2){
     
-     #ifdef TOUCH_SCREEN_ENABLE
+    #ifdef TOUCH_SCREEN_ENABLE
+        if(event==EVENT_ON_TOUCH_QUICK_SWIPE_TO_LEFT){
+            this->drawPage(false, this->current_page);
+            this->current_page = getNextPage();
+            this->drawPage(true, this->current_page);
+        }else if(event==EVENT_ON_TOUCH_QUICK_SWIPE_TO_RIGHT){
+            this->drawPage(false, this->current_page);
+            this->current_page = getPreviousPage();
+            this->drawPage(true, this->current_page);
+        }else if(event==EVENT_ON_TOUCH_QUICK_SWIPE_TO_BOTTOM || event==EVENT_ON_TOUCH_QUICK_SWIPE_TO_TOP){
+            startApp(-1);
+        }
+    #endif
+
+    #ifdef TOUCH_SCREEN_ENABLE
 
         if(event==EVENT_ON_TOUCH_DRAG){
         }
@@ -341,6 +358,9 @@ void appNameClass::onEvent(unsigned char event, int val1, int val2){
 
     }else if(event==EVENT_ON_MINUTE_CHANGED){
         
+    }else if(event==EVENT_ON_TIME_CHANGED){
+        //if(millis()/1000%2==0 ) this->drawPage(false, this->current_page);
+        //else this->drawPage(true, this->current_page);
     }
     
 

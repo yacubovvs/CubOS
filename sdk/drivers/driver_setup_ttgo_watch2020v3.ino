@@ -335,6 +335,8 @@ void core_driver_ldo_poweroff_lightSleep(){
             set_core_powersave_lastUserAction();
             break;
         }
+
+        currentApp->onEvent(EVENT_ON_WAKE_UP, 0, 0);
     }
     
 
