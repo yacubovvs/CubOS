@@ -6,6 +6,10 @@
     #define APP_BATTERY_UPDATE_EVERY_MS         500
 #endif
 
+#ifndef APP_BATTERY_FONT_SIZE
+    #define APP_BATTERY_FONT_SIZE FONT_SIZE_DEFAULT
+#endif
+
 class appNameClass: public Application{
     public:
         virtual void onLoop() override;
@@ -35,7 +39,7 @@ class appNameClass: public Application{
 };
 
 void appNameClass::drawStringOnScreen(String stringToPrint){
-    drawString(stringToPrint, 5, STYLE_STATUSBAR_HEIGHT + currentPrintScreenString*10*FONT_SIZE_DEFAULT + 10, FONT_SIZE_DEFAULT);
+    drawString(stringToPrint, 5, STYLE_STATUSBAR_HEIGHT + currentPrintScreenString*10*APP_BATTERY_FONT_SIZE + 10, APP_BATTERY_FONT_SIZE);
     currentPrintScreenString ++;
 }
 

@@ -54,15 +54,13 @@ unsigned char  appNameClass::getNextPage(){
 }
 
 unsigned char  appNameClass::getPreviousPage(){
-    /*
+    if(current_page==0x00) return 0x03;
     char page = current_page - 1;
-    if(page<0x00) return 0x03;
     return page;
-    */
 }
 
 void appNameClass::drawPage(bool draw, unsigned char page){
-    #ifdef PEDOMETER_ENABLE
+    #if defined(PEDOMETER_ENABLE) || defined(PEDOMETER_EMULATOR)
         if(page==PEDOMETER_PAGES_PEDOMETER){
 
             PEDOMETER_DAY_VALUE_TYPE pedometer_days_steps_max=0;
@@ -177,10 +175,10 @@ void appNameClass::drawPage(bool draw, unsigned char page){
 
                 if(draw){
                     setDrawColor_ContrastColor();
-                    drawString(String(get_pedometer_days_sleep(i)) + " sleep m.", X_SRINGS, Y_SRINGS);
+                    drawString(String(get_pedometer_days_sleep_hours(i)) + " sleep h.", X_SRINGS, Y_SRINGS);
                 }else{
                     setDrawColor_BackGroundColor();
-                    clearString(String(get_pedometer_days_sleep(i)) + " sleep m.", X_SRINGS, Y_SRINGS);
+                    clearString(String(get_pedometer_days_sleep_hours(i)) + " sleep h.", X_SRINGS, Y_SRINGS);
                 }
                 
             }
@@ -202,7 +200,7 @@ void appNameClass::drawPage(bool draw, unsigned char page){
                 drawString("Sleep hours:",                                  PEDOMETER_PAGE_MARGIN,      Y_TITLE + PEDOMETER_CHART_HEIGHT + FONT_SIZE_DEFAULT*FONT_CHAR_HEIGHT*2/3 +     FONT_SIZE_DEFAULT*FONT_CHAR_HEIGHT*3/2*1);
                 drawString(String(get_pedometer_days_sleep_hours()),        PEDOMETER_PAGE_MARGIN,      Y_TITLE + PEDOMETER_CHART_HEIGHT + FONT_SIZE_DEFAULT*FONT_CHAR_HEIGHT*2/3 +     FONT_SIZE_DEFAULT*FONT_CHAR_HEIGHT*3/2*2);
                 drawString("Target:",                                       PEDOMETER_PAGE_MARGIN,      Y_TITLE + PEDOMETER_CHART_HEIGHT + FONT_SIZE_DEFAULT*FONT_CHAR_HEIGHT*2/3 +     FONT_SIZE_DEFAULT*FONT_CHAR_HEIGHT*3/2*3);
-                drawString(String(get_pedometer_days_sleep_min_limit()),    PEDOMETER_PAGE_MARGIN,      Y_TITLE + PEDOMETER_CHART_HEIGHT + FONT_SIZE_DEFAULT*FONT_CHAR_HEIGHT*2/3 +     FONT_SIZE_DEFAULT*FONT_CHAR_HEIGHT*3/2*4);
+                drawString(String(get_pedometer_days_sleep_hours_limit()),    PEDOMETER_PAGE_MARGIN,      Y_TITLE + PEDOMETER_CHART_HEIGHT + FONT_SIZE_DEFAULT*FONT_CHAR_HEIGHT*2/3 +     FONT_SIZE_DEFAULT*FONT_CHAR_HEIGHT*3/2*4);
                 
             }else{
                 setDrawColor_BackGroundColor();
@@ -213,7 +211,7 @@ void appNameClass::drawPage(bool draw, unsigned char page){
                 clearString("Sleep hours:",                                  PEDOMETER_PAGE_MARGIN,      Y_TITLE + PEDOMETER_CHART_HEIGHT + FONT_SIZE_DEFAULT*FONT_CHAR_HEIGHT*2/3 +     FONT_SIZE_DEFAULT*FONT_CHAR_HEIGHT*3/2*1);
                 clearString(String(get_pedometer_days_sleep_hours()),        PEDOMETER_PAGE_MARGIN,      Y_TITLE + PEDOMETER_CHART_HEIGHT + FONT_SIZE_DEFAULT*FONT_CHAR_HEIGHT*2/3 +     FONT_SIZE_DEFAULT*FONT_CHAR_HEIGHT*3/2*2);
                 clearString("Target:",                                       PEDOMETER_PAGE_MARGIN,      Y_TITLE + PEDOMETER_CHART_HEIGHT + FONT_SIZE_DEFAULT*FONT_CHAR_HEIGHT*2/3 +     FONT_SIZE_DEFAULT*FONT_CHAR_HEIGHT*3/2*3);
-                clearString(String(get_pedometer_days_sleep_min_limit()),    PEDOMETER_PAGE_MARGIN,      Y_TITLE + PEDOMETER_CHART_HEIGHT + FONT_SIZE_DEFAULT*FONT_CHAR_HEIGHT*2/3 +     FONT_SIZE_DEFAULT*FONT_CHAR_HEIGHT*3/2*4);
+                clearString(String(get_pedometer_days_sleep_hours_limit()),    PEDOMETER_PAGE_MARGIN,      Y_TITLE + PEDOMETER_CHART_HEIGHT + FONT_SIZE_DEFAULT*FONT_CHAR_HEIGHT*2/3 +     FONT_SIZE_DEFAULT*FONT_CHAR_HEIGHT*3/2*4);
             }
 
             for(unsigned char i=0; i<PEDOMETER_DAYCHART_COLUMNS; i++){
@@ -255,7 +253,6 @@ void appNameClass::onCreate(){
     setDrawColor_ContrastColor();
     
     this->drawPage(true, current_page);
-    
 }
 
 void appNameClass::onLoop(){    
@@ -290,7 +287,18 @@ void appNameClass::onEvent(unsigned char event, int val1, int val2){
         if(event==EVENT_BUTTON_PRESSED){
             if(val1==BUTTON_POWER){
                 startApp(-1);
+            }else if(val1==BUTTON_BACK){
+                startApp(-1);
+            }else if(val1==BUTTON_DOWN){
+                this->drawPage(false, this->current_page);
+                this->current_page = getNextPage();
+                this->drawPage(true, this->current_page);
+            }else if(val1==BUTTON_UP){
+                this->drawPage(false, this->current_page);
+                this->current_page = getPreviousPage();
+                this->drawPage(true, this->current_page);
             }
+
         }
 
     #else
@@ -327,12 +335,12 @@ void appNameClass::onEvent(unsigned char event, int val1, int val2){
             
         #else
             if(event==EVENT_BUTTON_PRESSED){
-                
                 if(currentSubMenu==APP_SETTINGS_SUBMENU_MAIN){
                     switch(val1){
                         case BUTTON_UP:
                             break;
                         case BUTTON_BACK:
+                            startApp(-1); // Exit
                             break;
                         case BUTTON_DOWN:
                             break;
@@ -362,7 +370,6 @@ void appNameClass::onEvent(unsigned char event, int val1, int val2){
         //if(millis()/1000%2==0 ) this->drawPage(false, this->current_page);
         //else this->drawPage(true, this->current_page);
     }
-    
 
 }
 

@@ -4,6 +4,7 @@
 #define SMOOTH_ANIMATION
 #define NARROW_SCREEN
 // */
+//#define DRIVER_CONTROLS_TOTALBUTTONS 1
 
 #define appNameClass    SettingsApp     // App name without spaces
 #define appName         "Settings"      // App name with spaces 
@@ -148,6 +149,7 @@ class appNameClass: public Application{
     #define CORE_VIEWS_SETTINGS_IMAGE_WIDTH         64
 
     #define APP_SETTINGS_MENU_IMAGE_Y_OFFSET        (-20)
+    #define APP_SETTINGS_MENU_IMAGE_X_OFFSET        0
     #define APP_SETTINGS_MENU_TITLE_Y_SIZE          2
     #define APP_SETTINGS_MENU_SUBTITLE_Y_SIZE       2
     #define APP_SETTINGS_MENU_TITLE_Y_OFFSET        20
@@ -163,6 +165,7 @@ class appNameClass: public Application{
     #define CORE_VIEWS_SETTINGS_IMAGE_WIDTH         48
 
     #define APP_SETTINGS_MENU_IMAGE_Y_OFFSET        0
+    #define APP_SETTINGS_MENU_IMAGE_X_OFFSET        0
     #define APP_SETTINGS_MENU_TITLE_Y_SIZE          1
     #define APP_SETTINGS_MENU_SUBTITLE_Y_SIZE       1
     #define APP_SETTINGS_MENU_TITLE_Y_OFFSET        10
@@ -176,7 +179,8 @@ class appNameClass: public Application{
 #else
     #define CORE_VIEWS_SETTINGS_IMAGE_WIDTH         24
     
-    #define APP_SETTINGS_MENU_IMAGE_Y_OFFSET        0
+    #define APP_SETTINGS_MENU_IMAGE_Y_OFFSET        10
+    #define APP_SETTINGS_MENU_IMAGE_X_OFFSET        12
     #define APP_SETTINGS_MENU_TITLE_Y_SIZE          1
     #define APP_SETTINGS_MENU_SUBTITLE_Y_SIZE       1
     #define APP_SETTINGS_MENU_TITLE_Y_OFFSET        10
@@ -257,7 +261,7 @@ void appNameClass::draw_element_title(bool draw, int x, int y, const unsigned ch
 }
 
 void appNameClass::draw_element_icon(bool draw, const unsigned char* icon, int x, int y){
-    drawImage(draw, icon, x - CORE_VIEWS_SETTINGS_IMAGE_WIDTH/2 + 2, y - CORE_VIEWS_SETTINGS_IMAGE_WIDTH/2 + APP_SETTINGS_MENU_IMAGE_Y_OFFSET);
+    drawImage(draw, icon, x - CORE_VIEWS_SETTINGS_IMAGE_WIDTH/2 + APP_SETTINGS_MENU_IMAGE_X_OFFSET + 2, y - CORE_VIEWS_SETTINGS_IMAGE_WIDTH/2 + APP_SETTINGS_MENU_IMAGE_Y_OFFSET);
 }
 
 void appNameClass::draw_settings_item(bool draw, int x, int y, const unsigned char* title, String subTitle, const unsigned char* icon){
@@ -1017,215 +1021,159 @@ void appNameClass::onEvent(unsigned char event, int val1, int val2){
             }
         }
 
-        /*
-        if(event==EVENT_ON_TOUCH_START){
-            if(val1==BUTTON_POWER){
+    #endif
+
+    /**/
+    #if (DRIVER_CONTROLS_TOTALBUTTONS == 2 || DRIVER_CONTROLS_TOTALBUTTONS == 1)
+        
+        if(event==EVENT_BUTTON_PRESSED){
+            if(
+                currentSubMenu==APP_SETTINGS_SUBMENU_SET_TIME 
+                || currentSubMenu==APP_SETTINGS_SUBMENU_SET_DATE
+                || currentSubMenu==APP_SETTINGS_SUBMENU_SCREEN
+                ){
+                if(this->stillPressingSelect_time==0) this->stillPressingSelect_time = millis();
+            }  
+            
+        }else if(event==EVENT_BUTTON_RELEASED){
+            if(
+                currentSubMenu==APP_SETTINGS_SUBMENU_SET_TIME 
+                || currentSubMenu==APP_SETTINGS_SUBMENU_SET_DATE
+                || currentSubMenu==APP_SETTINGS_SUBMENU_SCREEN
+                ){
+                this->stillPressingSelect_time = 0;
+            }
+        }else if(event==EVENT_BUTTON_LONG_PRESS){
+            //debug("EVENT_BUTTON_LONG_PRESS");
+            if(val1==BUTTON_SELECT){
+                if(currentSubMenu==APP_SETTINGS_SUBMENU_MAIN){
+                    switch(app_settings_selectedAppIndex){
+                        case 0:
+                            switchToSubMenu(APP_SETTINGS_SUBMENU_SET_TIME);
+                            break;
+                        case 1:
+                            switchToSubMenu(APP_SETTINGS_SUBMENU_SET_DATE);
+                            break;
+                        case 2:
+                            switchToSubMenu(APP_SETTINGS_SUBMENU_SCREEN);
+                            break;
+                    }
+                }
+            }else if(val1==BUTTON_BACK){
                 #ifdef APP_SETTINGS_DEBUG
-                    debug("APP_SETTINGS_DEBUG: Exit app 1");
+                    debug("APP_SETTINGS_DEBUG: Exit app 2");
+                #endif
+                startApp(-1);
+            }    
+        }else if(event==EVENT_BUTTON_SHORT_PRESS){
+            //debug("EVENT_BUTTON_SHORT_PRESS");
+        }else if(event==EVENT_BUTTON_SHORT_SINGLE_PRESS){
+            //debug("EVENT_BUTTON_SHORT_SINGLE_PRESS");
+            if(val1==BUTTON_SELECT){
+                this->pressNext();
+            }else if(val1==BUTTON_BACK){
+                #ifdef APP_SETTINGS_DEBUG
+                    debug("APP_SETTINGS_DEBUG: Exit app 3");
                 #endif
                 startApp(-1);
             }
-        }*/
-        if(event==0xFF){
-            if(event==EVENT_ON_TOUCH_CLICK){
-                //debug("EVENT_BUTTON_LONG_PRESS");
-                if(val1==BUTTON_SELECT){
-                    
-                }else if(val1==BUTTON_BACK){
-                    #ifdef APP_SETTINGS_DEBUG
-                        debug("APP_SETTINGS_DEBUG: Exit app 2");
-                    #endif
-                    startApp(-1);
-                }    
-            }else if(event==EVENT_BUTTON_SHORT_PRESS){
-                //debug("EVENT_BUTTON_SHORT_PRESS");
-            }else if(event==EVENT_BUTTON_SHORT_SINGLE_PRESS){
-                //debug("EVENT_BUTTON_SHORT_SINGLE_PRESS");
-                if(val1==BUTTON_SELECT){
-                    this->pressNext();
-                }else if(val1==BUTTON_BACK){
-                    #ifdef APP_SETTINGS_DEBUG
-                        debug("APP_SETTINGS_DEBUG: Exit app 3");
-                    #endif
-                    startApp(-1);
-                }
-            }else if(event==EVENT_BUTTON_DOUBLE_PRESS){
-                //debug("EVENT_BUTTON_DOUBLE_PRESS");
-                if(val1==BUTTON_SELECT){
-                    if(
-                        currentSubMenu==APP_SETTINGS_SUBMENU_SET_TIME 
-                        || currentSubMenu==APP_SETTINGS_SUBMENU_SET_DATE
-                        || currentSubMenu==APP_SETTINGS_SUBMENU_SCREEN
-                        ){
-                        this->pressNext();
-                    } else {
-                        #ifdef APP_SETTINGS_DEBUG
-                            debug("APP_SETTINGS_DEBUG: Exit app 4");
-                        #endif
-                        startApp(-1);
-                    }
-                }
-            }
-        }
-
-        /*
-        # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
-        # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
-        # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
-        */
-    #else
-
-        /**/
-        #if (DRIVER_CONTROLS_TOTALBUTTONS == 2 || DRIVER_CONTROLS_TOTALBUTTONS == 1)
-            
-            if(event==EVENT_BUTTON_PRESSED){
-                if(
-                    currentSubMenu==APP_SETTINGS_SUBMENU_SET_TIME 
-                    || currentSubMenu==APP_SETTINGS_SUBMENU_SET_DATE
-                    || currentSubMenu==APP_SETTINGS_SUBMENU_SCREEN
-                  ){
-                    if(this->stillPressingSelect_time==0) this->stillPressingSelect_time = millis();
-                }  
-                
-            }else if(event==EVENT_BUTTON_RELEASED){
+        }else if(event==EVENT_BUTTON_DOUBLE_PRESS){
+            //debug("EVENT_BUTTON_DOUBLE_PRESS");
+            if(val1==BUTTON_SELECT){
                 if(
                     currentSubMenu==APP_SETTINGS_SUBMENU_SET_TIME 
                     || currentSubMenu==APP_SETTINGS_SUBMENU_SET_DATE
                     || currentSubMenu==APP_SETTINGS_SUBMENU_SCREEN
                     ){
-                    this->stillPressingSelect_time = 0;
+                    this->pressNext();
+                } else {
+                    #ifdef APP_SETTINGS_DEBUG
+                        debug("APP_SETTINGS_DEBUG: Exit app 4");
+                    #endif
+                    startApp(-1);
                 }
-            }else if(event==EVENT_BUTTON_LONG_PRESS){
-                //debug("EVENT_BUTTON_LONG_PRESS");
-                if(val1==BUTTON_SELECT){
-                    if(currentSubMenu==APP_SETTINGS_SUBMENU_MAIN){
-                        switch(app_settings_selectedAppIndex){
+            }
+        }
+        
+    #else
+        if(event==EVENT_BUTTON_PRESSED){
+            
+            if(currentSubMenu==APP_SETTINGS_SUBMENU_MAIN){
+                switch(val1){
+                    case BUTTON_UP:
+                        this->pressPrevious();
+                        break;
+                    case BUTTON_BACK:
+                    #ifdef APP_SETTINGS_DEBUG
+                        debug("APP_SETTINGS_DEBUG: Exit app 5");
+                    #endif
+                        startApp(-1);
+                        break;
+                    case BUTTON_DOWN:
+                        this->pressNext();   
+                        break;
+                    case BUTTON_SELECT:
+                        if(currentSubMenu==APP_SETTINGS_SUBMENU_MAIN){
+                            switch (app_settings_selectedAppIndex){
                             case 0:
-                                switchToSubMenu(APP_SETTINGS_SUBMENU_SET_TIME);
+                                switchToSubMenu(APP_SETTINGS_SUBMENU_SET_TIME);    
                                 break;
                             case 1:
-                                switchToSubMenu(APP_SETTINGS_SUBMENU_SET_DATE);
+                                switchToSubMenu(APP_SETTINGS_SUBMENU_SET_DATE);    
                                 break;
                             case 2:
-                                switchToSubMenu(APP_SETTINGS_SUBMENU_SCREEN);
+                                switchToSubMenu(APP_SETTINGS_SUBMENU_SCREEN);    
                                 break;
+                            }
                         }
-                    }
-                }else if(val1==BUTTON_BACK){
-                    #ifdef APP_SETTINGS_DEBUG
-                        debug("APP_SETTINGS_DEBUG: Exit app 2");
-                    #endif
-                    startApp(-1);
-                }    
-            }else if(event==EVENT_BUTTON_SHORT_PRESS){
-                //debug("EVENT_BUTTON_SHORT_PRESS");
-            }else if(event==EVENT_BUTTON_SHORT_SINGLE_PRESS){
-                //debug("EVENT_BUTTON_SHORT_SINGLE_PRESS");
-                if(val1==BUTTON_SELECT){
-                    this->pressNext();
-                }else if(val1==BUTTON_BACK){
-                    #ifdef APP_SETTINGS_DEBUG
-                        debug("APP_SETTINGS_DEBUG: Exit app 3");
-                    #endif
-                    startApp(-1);
+                        break;
                 }
-            }else if(event==EVENT_BUTTON_DOUBLE_PRESS){
-                //debug("EVENT_BUTTON_DOUBLE_PRESS");
-                if(val1==BUTTON_SELECT){
-                    if(
-                        currentSubMenu==APP_SETTINGS_SUBMENU_SET_TIME 
-                        || currentSubMenu==APP_SETTINGS_SUBMENU_SET_DATE
-                        || currentSubMenu==APP_SETTINGS_SUBMENU_SCREEN
-                      ){
-                        this->pressNext();
-                    } else {
-                        #ifdef APP_SETTINGS_DEBUG
-                            debug("APP_SETTINGS_DEBUG: Exit app 4");
-                        #endif
-                        startApp(-1);
-                    }
-                }
-            }
-            
-        #else
-            if(event==EVENT_BUTTON_PRESSED){
+            }else if(currentSubMenu==APP_SETTINGS_SUBMENU_SET_TIME){
                 
-                if(currentSubMenu==APP_SETTINGS_SUBMENU_MAIN){
-                    switch(val1){
-                        case BUTTON_UP:
-                            this->pressPrevious();
-                            break;
-                        case BUTTON_BACK:
-                        #ifdef APP_SETTINGS_DEBUG
-                            debug("APP_SETTINGS_DEBUG: Exit app 5");
-                        #endif
-                            startApp(-1);
-                            break;
-                        case BUTTON_DOWN:
-                            this->pressNext();   
-                            break;
-                        case BUTTON_SELECT:
-                            if(currentSubMenu==APP_SETTINGS_SUBMENU_MAIN){
-                                switch (app_settings_selectedAppIndex){
-                                case 0:
-                                    switchToSubMenu(APP_SETTINGS_SUBMENU_SET_TIME);    
-                                    break;
-                                case 1:
-                                    switchToSubMenu(APP_SETTINGS_SUBMENU_SET_DATE);    
-                                    break;
-                                case 2:
-                                    switchToSubMenu(APP_SETTINGS_SUBMENU_SCREEN);    
-                                    break;
-                                }
-                            }
-                            break;
-                    }
-                }else if(currentSubMenu==APP_SETTINGS_SUBMENU_SET_TIME){
+                switch(val1){
+                    case BUTTON_UP:
+                    case BUTTON_DOWN:
+                        if(currentPositionIsSelected==false){
+                            drawSettingTimeSelect(false, getPositionBySelectedNumber(currentSelectedPosition));
+                            if(val1==BUTTON_DOWN)currentSelectedPosition++; else currentSelectedPosition--;
+                            if(currentSelectedPosition>=3)currentSelectedPosition=0;
+                            if(currentSelectedPosition<0)currentSelectedPosition=2;
+                            drawSettingTimeSelect(true, getPositionBySelectedNumber(currentSelectedPosition));
+                        }else{
+                            
+                            // time changing
+                        }
+                        break;
+                    case BUTTON_BACK:
+                        switchToSubMenu(APP_SETTINGS_SUBMENU_MAIN);            
+                        break;
                     
-                    switch(val1){
-                        case BUTTON_UP:
-                        case BUTTON_DOWN:
-                            if(currentPositionIsSelected==false){
-                                drawSettingTimeSelect(false, getPositionBySelectedNumber(currentSelectedPosition));
-                                if(val1==BUTTON_DOWN)currentSelectedPosition++; else currentSelectedPosition--;
-                                if(currentSelectedPosition>=3)currentSelectedPosition=0;
-                                if(currentSelectedPosition<0)currentSelectedPosition=2;
-                                drawSettingTimeSelect(true, getPositionBySelectedNumber(currentSelectedPosition));
-                            }else{
-                                
-                                // time changing
-                            }
-                            break;
-                        case BUTTON_BACK:
-                            switchToSubMenu(APP_SETTINGS_SUBMENU_MAIN);            
-                            break;
-                        
-                        case BUTTON_SELECT:
-                            currentPositionIsSelected = !currentPositionIsSelected;
-                            if(currentPositionIsSelected){
-                                drawSettingTimeSelect(false, getPositionBySelectedNumber(currentSelectedPosition));
-                                drawSettingTimeArrows(true, getPositionBySelectedNumber(currentSelectedPosition));
-                            }else{
-                                drawSettingTimeArrows(false, getPositionBySelectedNumber(currentSelectedPosition));
-                                drawSettingTimeSelect(true, getPositionBySelectedNumber(currentSelectedPosition));
-                            }
-                            break;
-                    }
-
-                }else if(currentSubMenu==APP_SETTINGS_SUBMENU_SET_DATE){
-                    // TODO
-                }else if(currentSubMenu==APP_SETTINGS_SUBMENU_SCREEN){
-                    // TODO
+                    case BUTTON_SELECT:
+                        currentPositionIsSelected = !currentPositionIsSelected;
+                        if(currentPositionIsSelected){
+                            drawSettingTimeSelect(false, getPositionBySelectedNumber(currentSelectedPosition));
+                            drawSettingTimeArrows(true, getPositionBySelectedNumber(currentSelectedPosition));
+                        }else{
+                            drawSettingTimeArrows(false, getPositionBySelectedNumber(currentSelectedPosition));
+                            drawSettingTimeSelect(true, getPositionBySelectedNumber(currentSelectedPosition));
+                        }
+                        break;
                 }
-            
-            }else if(event==EVENT_BUTTON_RELEASED){
 
-            }else if(event==EVENT_BUTTON_LONG_PRESS){
-
+            }else if(currentSubMenu==APP_SETTINGS_SUBMENU_SET_DATE){
+                // TODO
+            }else if(currentSubMenu==APP_SETTINGS_SUBMENU_SCREEN){
+                // TODO
             }
-        #endif
-    
+        
+        }else if(event==EVENT_BUTTON_RELEASED){
+
+        }else if(event==EVENT_BUTTON_LONG_PRESS){
+
+        }
     #endif
+
+
 
     else if(event==EVENT_ON_TIME_CHANGED){
 

@@ -10,12 +10,6 @@
 #define APP_CLOCK_CIRCLE_COLOR 48
 #define APP_CLOCK_BIG_SCREEN_FADE_SIZE 23 // temporary not used
 
-#ifdef PLATFORM_PC_EMULATOR
-    long get_pedometer_days_steps(){
-        return 8715;
-    }
-#endif
-
 class appNameClass: public Application{
     public:
         bool isfullScreen         = true;
@@ -79,15 +73,15 @@ class appNameClass: public Application{
 #endif 
 
 
-#if defined(PEDOMETER_ENABLE) //|| defined(PEDOMETER_EMULATOR)
+#if defined(PEDOMETER_ENABLE) || defined(PEDOMETER_EMULATOR)
     void appNameClass::drawStepsCircle(bool draw){
         if(draw){
             
-            #ifdef PEDOMETER_EMULATOR
-                int grad_i = 183;
-            #else
-                int grad_i = (long)360 * (long)get_pedometer_days_steps() / (long)get_pedometer_days_steps_min_limit();
-            #endif
+            //#ifdef PEDOMETER_EMULATOR
+            //    int grad_i = 260;
+            //#else
+            int grad_i = (long)360 * (long)get_pedometer_days_steps() / (long)get_pedometer_days_steps_min_limit();
+            //#endif
 
             if(grad_i>360) grad_i = 360;
             for(int grad=0; grad<=grad_i; grad++){
@@ -135,7 +129,7 @@ void appNameClass::onCreate(){
     for(unsigned char isecond=0; isecond<=this->last_seconds; isecond++) this->drawSecondsCircle(true, isecond);
     this->draw_current_time(true);
 
-    #if defined(PEDOMETER_ENABLE) //|| defined(PEDOMETER_EMULATOR)
+    #if defined(PEDOMETER_ENABLE) || defined(PEDOMETER_EMULATOR)
         this->drawStepsCircle(true);
     #endif
 
@@ -400,15 +394,8 @@ void appNameClass::draw_current_time(bool draw){
     #if defined(PEDOMETER_ENABLE) || defined(PEDOMETER_EMULATOR)
         
         if(draw){
-
-            
-            #ifdef PEDOMETER_EMULATOR
-                this->sleep_time = String(5.82);
-                this->last_pedometer = 134;
-            #else
-                this->sleep_time = get_pedometer_days_sleep_hours();
-                this->last_pedometer = get_pedometer_days_steps();
-            #endif
+            this->sleep_time = String(get_pedometer_days_sleep_hours());
+            this->last_pedometer = get_pedometer_days_steps();
         }
 
         String pedometer_toPrint = String(this->last_pedometer);

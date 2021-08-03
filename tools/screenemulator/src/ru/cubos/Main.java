@@ -13,7 +13,8 @@ public class Main {
         //Emulator emulator = new Emulator(240,240);
         //ReadServer readServer = new ReadServer(emulator);
 
-        SocketServer socketServer = new SocketServer(9100, 240, 240);
+        //SocketServer socketServer = new SocketServer(9100, 240, 240);
+        SocketServer socketServer = new SocketServer(9100, 320, 240);
         socketServer.start();
 
     }

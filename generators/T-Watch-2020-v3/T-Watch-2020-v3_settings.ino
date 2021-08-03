@@ -8,7 +8,7 @@
 
 #define LILYGO_WATCH_2020_V3 
 
-#define DEBUG_SERIAL
+//#define DEBUG_SERIAL
 //#define DEBUG_ON_SCREEN
 #define WATCH_SCREEN
 
@@ -117,8 +117,8 @@
 #define COREPEDOMETER_CENTRALWIGHT_SLEEP_VALUE_MIN      0.05f
 #define COREPEDOMETER_DELTA_SLEEP_VALUE_MIN_100         3 // acceletometer sensitivity/100*G for sleep detection
 
-#define APP_CLOCK_POWER_AFTER_SECONDS           4
-
+#define APP_CLOCK_POWER_AFTER_SECONDS           2
+#define APP_BATTERY_FONT_SIZE                   1
 //#define DEBUG_CPU_CONTROLL_ENABLE
 //#define DEBUG_CORE_POWERSAVE
 
@@ -129,7 +129,7 @@
 //#define PEDOMETER_EMULATOR
 //#define DEBUG_FPS
 //#define DEBUG_WAKEUP
-//#define DEBUG_PEDOMETER
+#define DEBUG_PEDOMETER
 //#define DEBUG_ACELEROMETER
 //#define DEBUG_BACKLIGHT
 //#define DEBUG_DRIVER_CONTROLL
