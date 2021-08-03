@@ -6,18 +6,22 @@
     ############################################################################################
 */
 
-#define APP_MENU_APPLICATIONS_0             AlarmApp
-#define APP_MENU_APPLICATIONS_1             BarometerApp
-#define APP_MENU_APPLICATIONS_2             ClockApp
-#define APP_MENU_APPLICATIONS_3             FileManagerApp
-#define APP_MENU_APPLICATIONS_4             InternetApp
-#define APP_MENU_APPLICATIONS_5             SettingsApp
-#define APP_MENU_APPLICATIONS_6             SimpleGameApp
-#define APP_MENU_APPLICATIONS_7             TestApplicationApp
-#define APP_MENU_APPLICATIONS_8             BatteryApp
-#define APP_MENU_APPLICATIONS_9             TouchCalibration
-#define APP_MENU_APPLICATIONS_10            TouchTest
-#define APP_MENU_APPLICATIONS_11            KeyboardTest
+#define APP_MENU_APPLICATIONS_0             ClockApp
+#define APP_MENU_APPLICATIONS_1             SettingsApp
+#define APP_MENU_APPLICATIONS_2             BatteryApp
+#define APP_MENU_APPLICATIONS_3             TestApplicationApp
+#define APP_MENU_APPLICATIONS_4             PedometerApp 
+#define APP_MENU_APPLICATIONS_5             PedometerAppTest
+
+#define APP_MENU_APPLICATIONS_6             AlarmApp
+#define APP_MENU_APPLICATIONS_7             BarometerApp
+#define APP_MENU_APPLICATIONS_8             FileManagerApp
+#define APP_MENU_APPLICATIONS_9             InternetApp
+#define APP_MENU_APPLICATIONS_10            SimpleGameApp
+#define APP_MENU_APPLICATIONS_11            TouchCalibration
+#define APP_MENU_APPLICATIONS_12            TouchTest
+#define APP_MENU_APPLICATIONS_13            KeyboardTest
+#define APP_MENU_APPLICATIONS_14            BleTester
 
 
 /*

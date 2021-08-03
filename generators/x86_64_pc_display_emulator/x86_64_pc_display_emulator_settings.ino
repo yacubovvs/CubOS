@@ -15,7 +15,9 @@
 //#define DEBUG_ON_SCREEN
 #define TERMINAL_DEBUG
 
-#define SCREEN_WIDTH            240     // Screen resolution width
+#undef DEBUG_SERIAL_PORT Serial
+
+#define SCREEN_WIDTH            320     // Screen resolution width
 #define SCREEN_HEIGHT           240     // Screen resolution height
 
 #define FONT_CHAR_WIDTH         6     // Font letter size width
@@ -31,6 +33,7 @@
 
 //#define SMOOTH_ANIMATION
 //#define NARROW_SCREEN
+//#define SMARTWATCH_SCREEN
 
 #define ON_TIME_CHANGE_EVERY_MS 1000
 
@@ -46,7 +49,7 @@
 //#define toDefaultApp_onLeftLongPress
 
 #define STARTING_APP_NUMM   -1    // for Mainmenu (default app)
-#define STARTING_APP_NUMM   2     // for App number 7
+//#define STARTING_APP_NUMM   1     
 
 #undef CPU_SLEEP_ENABLE
 #undef POWERSAVE_ENABLE
@@ -56,6 +59,8 @@
 #define BUTTON_SELECT   1
 #define BUTTON_DOWN     2
 #define BUTTON_BACK     3
+
+#define DRIVER_CONTROLS_TOTALBUTTONS 1
 
 #define BATTERY_ENABLE
 #define CLOCK_ENABLE
@@ -86,14 +91,28 @@
 #define SOFTWARE_BUTTONS_PADDING 50
 */
 
-#define SOFTWARE_KEYBOARD_ENABLE
+#undef NARROW_SCREEN 
+#undef USE_NUMBERS_MAIN_MENU_IN_ACTIVE_PAGES
 
+#define SOFTWARE_KEYBOARD_ENABLE
+//#define USE_XL_MENU_IMAGES
 //#define FRAMEBUFFER_ENABLE
 //#define FRAMEBUFFER_TWIN_FULL
 //#define FRAMEBUFFER_BYTE_PER_PIXEL 2
 //#define FRAMEBUFFER_PSRAM
 
 //#define NARROW_SCREEN
+//#define DEBUG_CORE_DISPLAY
+//#define CORE_TOUCH_DEBUG
+//#define APP_SETTINGS_DEBUG
+//#define PEDOMETER_EMULATOR
+//#define DEBUG_FPS
+//#define DEBUG_WAKEUP
+//#define DEBUG_PEDOMETER
+//#define DEBUG_ACELEROMETER
+//#define DEBUG_BACKLIGHT
+//#define DEBUG_DRIVER_CONTROLL
+//#define DEBUG_DRIVER_BATTERY
 /*
     ############################################################################################
     #                                                                                          #
