@@ -8,7 +8,8 @@ A tiny operating system for embedded and wearable devices to interact with users
 * Easy adapt to other platform
 * Easy to add new applications
 * Good for slow CPU and small memory
-* Support of touchscreens and hardware buttons
+* Support for touchscreens and hardware buttons
+* Support for accelerometer with software pedometer and sleep monitor
 * Easy start
 
 Feel free to contact me at yacubovvs@yandex.ru
