@@ -19,3 +19,6 @@
 2021-08-01
     New paramater for normal, L and XL images for smartwatches
     Testing betta version of smartwatch version with screens 240x240 px
+
+2021-08-05
+    Added function to stop pedometer in settings app
