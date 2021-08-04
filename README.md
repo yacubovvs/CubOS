@@ -33,7 +33,7 @@ Feel free to contact me at yacubovvs@yandex.ru
 * 2 kB RAM
 * С++ compiler
 
-Any builds at [outputs/](outputs/)
+More builds at [outputs/](outputs/)
 
 ### Ready releases:
 * [M5Stick C](releases/M5StickC/)
