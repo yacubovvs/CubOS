@@ -108,7 +108,15 @@ void setup(){
               debug("DEBUG_WAKEUP: Going to sleep again for " + String(get_corePedometer_currentsleep_between_mesures()) + "ms " + String(millis()));
               delay(50);
             #endif
-            core_cpu_sleep(STAND_BY_SLEEP_TYPE, get_corePedometer_currentsleep_between_mesures()*1000);
+            #ifdef PEDOMETER_ENABLE
+              if(core_pedometer_getEnable()){
+                core_cpu_sleep(STAND_BY_SLEEP_TYPE, get_corePedometer_currentsleep_between_mesures()*1000);
+              }else{
+                core_cpu_sleep(STAND_BY_SLEEP_TYPE, 24*60*60*1000);// Do not wake up for 1 day 
+              }
+            #else
+              core_cpu_sleep(STAND_BY_SLEEP_TYPE, get_corePedometer_currentsleep_between_mesures()*1000);
+            #endif
           #else
             #ifdef DEBUG_WAKEUP
               debug("DEBUG_WAKEUP: Going to sleep while interrupt");

@@ -209,6 +209,8 @@ void core_views_statusBar_draw_time(bool draw){
         #endif
         return 0;
     }
+#else
+    uint16_t core_view_isSoftwareButtons_clicked(int x, int y){}
 #endif
 
 void core_views_statusBar_draw(){
@@ -396,83 +398,6 @@ void core_views_draw_app_icon(bool draw, int x, int y, const unsigned char* titl
     
 }
 
-
-#define CORE_VIEWS_SETTINGS_IMAGE_WIDTH 24
-void core_views_draw_settings_item(bool draw, int x, int y, const unsigned char* title, String subTitle, const unsigned char* icon){
-
-    #ifdef NARROW_SCREEN
-        drawImage(draw, icon, x-CORE_VIEWS_SETTINGS_IMAGE_WIDTH/2, y-30);
-        uint16_t titleShift = strlen((const char*)title)*FONT_CHAR_WIDTH/2;
-        uint16_t subTitleShift = subTitle.length()*FONT_CHAR_WIDTH/2;
-
-        #define TITLE_Y_POSITION y+10
-        #define SUBTITLE_Y_POSITION y+30
-        x+=2;
-        
-        if(draw){
-            setDrawColor_ContrastColor();
-            drawString((char*)title, x - titleShift,    TITLE_Y_POSITION, 1);
-            drawString(subTitle, x - subTitleShift,     SUBTITLE_Y_POSITION, 1);
-        }else{
-            setDrawColor_BackGroundColor();
-            clearString((char*)title, x - titleShift,   TITLE_Y_POSITION, 1);
-            clearString(subTitle, x - subTitleShift,    SUBTITLE_Y_POSITION, 1);
-        }
-    #else
-        // image
-        int left_x = x + CORE_VIEWS_SETTINGS_IMAGE_WIDTH;
-        setDrawColor(getBackgroundColor_red(), getBackgroundColor_green(), getBackgroundColor_blue());
-        drawImage(draw, icon, x-CORE_VIEWS_SETTINGS_IMAGE_WIDTH/2, y-CORE_VIEWS_SETTINGS_IMAGE_WIDTH/2);
-
-        // title
-        if(draw){
-            setDrawColor(255, 255, 255);
-            drawString((char*)title, left_x, y-12);
-            drawString(subTitle, left_x, y+4);
-        }else{    
-            clearString((char*)title, left_x, y-12);
-            clearString(subTitle, left_x, y+4, 1);
-        }
-    #endif
-    
-}
-
-void core_views_draw_settings_item_noicon(bool draw, int x, int y, String title, String subTitle, unsigned char titleFontSize, unsigned char subTitleFontSize){
-    
-    if(draw){
-        setDrawColor_ContrastColor();
-        drawString(
-            title,                                                                          // TEXT
-            x - title.length()*FONT_CHAR_WIDTH/2*titleFontSize,                             // X
-            y - COREVIEWS_NO_ICON_ELEMENT_HEIGHT/2,                                         // Y
-            titleFontSize                                                                   // FONT SIZE
-        );
-
-        drawString(
-            subTitle,                                                                       // TEXT
-            x - subTitle.length()*FONT_CHAR_WIDTH/2*subTitleFontSize,                       // X
-            y + COREVIEWS_NO_ICON_ELEMENT_HEIGHT/2 - subTitleFontSize * FONT_CHAR_HEIGHT,   // Y
-            subTitleFontSize                                                                // FONT SIZE
-        );
-    }else{
-        setDrawColor_BackGroundColor();
-        clearString(
-            title,                                                                          // TEXT
-            x - title.length()*FONT_CHAR_WIDTH/2*titleFontSize,                             // X
-            y - COREVIEWS_NO_ICON_ELEMENT_HEIGHT/2,                                         // Y
-            titleFontSize                                                                   // FONT SIZE
-        );
-
-        clearString(
-            subTitle,                                                                       // TEXT
-            x - subTitle.length()*FONT_CHAR_WIDTH/2*subTitleFontSize,                       // X
-            y + COREVIEWS_NO_ICON_ELEMENT_HEIGHT/2 - subTitleFontSize * FONT_CHAR_HEIGHT,   // Y
-            subTitleFontSize                                                                // FONT SIZE
-        );
-    }
-    
-}
-
 void drawMenuElement(bool draw, uint16_t x, uint16_t y, uint16_t width, uint16_t height, const unsigned char* icon, String string1, String string2){
     if(draw) setDrawColor(255, 255, 255);
     else setDrawColor(getBackgroundColor_red(), getBackgroundColor_green(), getBackgroundColor_blue());
@@ -494,11 +419,18 @@ void drawMenuElement(bool draw, uint16_t x, uint16_t y, uint16_t width, uint16_t
     ############################################################################################
 */
 
+#if defined(USE_L_MENU_IMAGES)
+    
+#elif defined(USE_XL_MENU_IMAGES)
+
+#else
+    
+#endif
+
 const unsigned char icon_arrow_up[] PROGMEM = {
     0x02,0x01,0x02,0x18,0x02,0x10,0x04,0xff,0xff,0xff,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x18,0x00,0x00,0x3C,0x00,0x00,0x7E,0x00,0x00,0xFF,0x00,0x01,0xFF,0x80,0x03,0xFF,0xC0,0x07,0xFF,0xE0,0x0F,0xFF,0xF0,0x1F,0xFF,0xF8,0x3F,0xFF,0xFC,0x7F,0xFF,0xFE,0xFF,0xFF,0xFF,
-};
-
-const unsigned char icon_arrow_bottom[] PROGMEM = {
+};    
+const unsigned char icon_arrow_down[] PROGMEM = {
     0x02,0x01,0x02,0x18,0x02,0x10,0x04,0xff,0xff,0xff,0xFF,0xFF,0xFF,0x7F,0xFF,0xFE,0x3F,0xFF,0xFC,0x1F,0xFF,0xF8,0x0F,0xFF,0xF0,0x07,0xFF,0xE0,0x03,0xFF,0xC0,0x01,0xFF,0x80,0x00,0xFF,0x00,0x00,0x7E,0x00,0x00,0x3C,0x00,0x00,0x18,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,
 };
 
@@ -539,7 +471,7 @@ const unsigned char icon_arrow_bottom[] PROGMEM = {
                 case ICON_LEG_GREY:             return icon_leg_grey;
             #endif
             case ICON_ARROW_UP:             return icon_arrow_up;
-            case ICON_ARROW_DOWN:           return icon_arrow_bottom;
+            case ICON_ARROW_DOWN:           return icon_arrow_down;
             default: return {0};
         }
     
@@ -560,8 +492,8 @@ const unsigned char icon_arrow_bottom[] PROGMEM = {
         }
     #endif
 
-    const unsigned char* getIcon_arrow_bottom(){
-        return icon_arrow_bottom;
+    const unsigned char* getIcon_arrow_down(){
+        return icon_arrow_down;
     }
 
     const unsigned char* getIcon_arrow_up(){

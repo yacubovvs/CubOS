@@ -7,17 +7,14 @@
     ############################################################################################
 */
 
-// ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! !
-//      FOR ESP8266 USE NONOSSDK 2.2.2 +
-// ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! !
-
+//SOFTWARE_BUTTONS_ENABLE SOFTWARE_KEYBOARD_ENABLE
 //#define DEBUG_SERIAL
 //#define DEBUG_ON_SCREEN
 #define TERMINAL_DEBUG
 
 #undef DEBUG_SERIAL_PORT Serial
 
-#define SCREEN_WIDTH            320     // Screen resolution width
+#define SCREEN_WIDTH            240     // Screen resolution width
 #define SCREEN_HEIGHT           240     // Screen resolution height
 
 #define FONT_CHAR_WIDTH         6     // Font letter size width
@@ -31,9 +28,9 @@
 
 #define PEDOMETER_DAY_STEP_LIMMIT_DEFAULT               10000
 
-//#define SMOOTH_ANIMATION
+#define SMOOTH_ANIMATION
 //#define NARROW_SCREEN
-//#define SMARTWATCH_SCREEN
+#define WATCH_SCREEN
 
 #define ON_TIME_CHANGE_EVERY_MS 1000
 
@@ -49,7 +46,7 @@
 //#define toDefaultApp_onLeftLongPress
 
 #define STARTING_APP_NUMM   -1    // for Mainmenu (default app)
-//#define STARTING_APP_NUMM   1     
+#define STARTING_APP_NUMM   1
 
 #undef CPU_SLEEP_ENABLE
 #undef POWERSAVE_ENABLE
@@ -67,7 +64,6 @@
 //#define USE_PRIMITIVE_HARDWARE_DRAW_ACCELERATION
 
 #define RTC_ENABLE
-#define FONT_SIZE_DEFAULT 2
 #define SCREEN_ROTATION_0
 //#define SCREEN_ROTATION_90
 //#define SCREEN_ROTATION_180
@@ -81,7 +77,7 @@
 #undef CPU_CONTROLL_ENABLE
 
 #define PEDOMETER_EMULATOR
-#define FONT_SIZE_DEFAULT   1
+#define FONT_SIZE_DEFAULT   2
 
 /*
 #define SOFTWARE_BUTTONS_ENABLE
@@ -91,11 +87,12 @@
 #define SOFTWARE_BUTTONS_PADDING 50
 */
 
-#undef NARROW_SCREEN 
-#undef USE_NUMBERS_MAIN_MENU_IN_ACTIVE_PAGES
+//#undef NARROW_SCREEN 
+//#undef USE_NUMBERS_MAIN_MENU_IN_ACTIVE_PAGES
 
-#define SOFTWARE_KEYBOARD_ENABLE
-//#define USE_XL_MENU_IMAGES
+//#define SOFTWARE_KEYBOARD_ENABLE
+#define PEDOMETER_ENABLE_ON_START true
+#define USE_XL_MENU_IMAGES
 //#define FRAMEBUFFER_ENABLE
 //#define FRAMEBUFFER_TWIN_FULL
 //#define FRAMEBUFFER_BYTE_PER_PIXEL 2

@@ -209,6 +209,8 @@ void core_views_statusBar_draw_time(bool draw){
         #endif
         return 0;
     }
+#else
+    uint16_t core_view_isSoftwareButtons_clicked(int x, int y){}
 #endif
 
 void core_views_statusBar_draw(){

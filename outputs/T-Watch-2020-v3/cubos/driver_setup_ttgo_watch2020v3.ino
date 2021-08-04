@@ -287,7 +287,12 @@ void core_driver_ldo_poweroff_lightSleep(){
     
     // Time between mesures
     //esp_sleep_enable_timer_wakeup(PEDOMETER_STEP_DETECTION_PERIOD_MS/PEDOMETER_MESURES_IN_STEP_DETECTION_PERIOD*1000);
-    esp_sleep_enable_timer_wakeup(100*1000);
+    if(core_pedometer_getEnable()){
+        esp_sleep_enable_timer_wakeup(get_corePedometer_currentsleep_between_mesures()*1000*1000);
+    }else{
+        esp_sleep_enable_timer_wakeup(1000*1000*1000);
+    }
+    
 
     
     
@@ -314,7 +319,12 @@ void core_driver_ldo_poweroff_lightSleep(){
             #ifdef DEBUG_WAKEUP
                 debug("!!!!!! Pedometer is not in work! Sleeping for " + String(get_corePedometer_currentsleep_between_mesures()*1000), 5);
             #endif
-            esp_sleep_enable_timer_wakeup(get_corePedometer_currentsleep_between_mesures()*1000*1000);
+
+            if(core_pedometer_getEnable()){
+                esp_sleep_enable_timer_wakeup(get_corePedometer_currentsleep_between_mesures()*1000*1000);
+            }else{
+                esp_sleep_enable_timer_wakeup(1000*1000*1000);
+            }
             
         }
         

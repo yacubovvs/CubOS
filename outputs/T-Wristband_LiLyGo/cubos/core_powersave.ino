@@ -82,7 +82,13 @@
                                 debug("DEBUG_CORE_POWERSAVE: Deep sleep 1 ", 25);
                             #endif
                             #ifdef PEDOMETER_ENABLE
-                                core_cpu_sleep(STAND_BY_SLEEP_TYPE, get_corePedometer_currentsleep_between_mesures()*1000);
+                                if(core_pedometer_getEnable()){
+                                    core_cpu_sleep(STAND_BY_SLEEP_TYPE, get_corePedometer_currentsleep_between_mesures()*1000);
+                                }else{
+                                    core_cpu_sleep(STAND_BY_SLEEP_TYPE, 24*60*60*1000);// Do not wake up for 1 day 
+                                }
+                            #else
+                                core_cpu_sleep(STAND_BY_SLEEP_TYPE, 24*60*60*1000);// Do not wake up for 1 day 
                             #endif
                         }
                     #endif
@@ -132,7 +138,11 @@
                             debug("DEBUG_CORE_POWERSAVE: Deep sleep 2 ", 25);
                         #endif
                         #ifdef PEDOMETER_ENABLE
-                            core_cpu_sleep(STAND_BY_SLEEP_TYPE, get_corePedometer_currentsleep_between_mesures()*1000);
+                            if(core_pedometer_getEnable()){
+                                core_cpu_sleep(STAND_BY_SLEEP_TYPE, get_corePedometer_currentsleep_between_mesures()*1000);
+                            }else{
+                                core_cpu_sleep(STAND_BY_SLEEP_TYPE, 24*60*60*1000);// Do not wake up for 1 day 
+                            }
                         #else
                             core_cpu_sleep(STAND_BY_SLEEP_TYPE);
                         #endif

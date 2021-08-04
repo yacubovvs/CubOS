@@ -14,7 +14,7 @@ public class Main {
         //ReadServer readServer = new ReadServer(emulator);
 
         //SocketServer socketServer = new SocketServer(9100, 240, 240);
-        SocketServer socketServer = new SocketServer(9100, 320, 240);
+        SocketServer socketServer = new SocketServer(9100, 240, 240);
         socketServer.start();
 
     }
