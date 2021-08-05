@@ -8,7 +8,9 @@
 
 // TOUCH
 #define TOUCH_SCREEN_DELTA_MOVE_FOR_DRAG 7
+#define TOUCH_SCREEN_DELTA_MOVE_FOR_SWIPE 10
 #define TOUCH_SCREEN_TIME_MS_FOR_LONG_TOUCH 300
+
 
 // BUTTONS
 #define BUTTON_UP       0x01
@@ -42,15 +44,22 @@
 #define EVENT_ON_TOUCH_LONG_PRESS           0x0C
 #define EVENT_ON_TOUCH_DRAG                 0x0D
 #define EVENT_ON_TOUCH_DOUBLE_PRESS         0x0E
+/*
 #define EVENT_ON_TOUCH_SWIPE_FROM_LEFT      0x0F
 #define EVENT_ON_TOUCH_SWIPE_FROM_RIGHT     0x10
 #define EVENT_ON_TOUCH_SWIPE_FROM_TOP       0x11
 #define EVENT_ON_TOUCH_SWIPE_FROM_BOTTOM    0x12
+*/
 
 #define EVENT_ON_TIME_CHANGED               0x06
-#define EVENT_ON_MINUTE_CHANGED             0x14
-#define EVENT_ON_HOUR_CHANGED               0x15
-#define EVENT_ON_DATE_CHANGED               0x13
+#define EVENT_ON_MINUTE_CHANGED             0x13
+#define EVENT_ON_HOUR_CHANGED               0x14
+#define EVENT_ON_DATE_CHANGED               0x15
+
+#define EVENT_ON_TOUCH_QUICK_SWIPE_TO_LEFT      0x16
+#define EVENT_ON_TOUCH_QUICK_SWIPE_TO_RIGHT     0x17
+#define EVENT_ON_TOUCH_QUICK_SWIPE_TO_TOP       0x18
+#define EVENT_ON_TOUCH_QUICK_SWIPE_TO_BOTTOM      0x19
 
 // WAKEUP REASONS
 #define WAKE_UP_REASON_EXTERNAL_RTC_IO      0x01
@@ -98,8 +107,6 @@
 ############################################################################
 */
 
-#define COREVIEWS_NO_ICON_ELEMENT_HEIGHT 40
-
 #define SOFTWARE_BUTTONS_COLOR_RED          255
 #define SOFTWARE_BUTTONS_COLOR_GREEN        255
 #define SOFTWARE_BUTTONS_COLOR_BLUE         255
@@ -121,7 +128,7 @@
 #define CPU_CONTROLL_ENABLE
 #define POWERSAVE_ENABLE
 
-#define FONT_SIZE_DEFAULT 2
+#define FONT_SIZE_DEFAULT 1
 #define HARDWARE_BUTTONS_VALUE 3
 
 #define CONTROLS_DELAY_TO_DOUBLE_CLICK_MS DRIVER_CONTROLS_DELAY_BEFORE_LONG_PRESS
@@ -180,10 +187,13 @@
 #define PEDOMETER_STEP_DETECTION_DELAY_SEC_MAX          60 // MAX (255 - PEDOMETER_STEP_DETECTION_PERIOD_MS/1000) and multiple 60 seconds
 
 #define CORE_PEDOMETER_SLEEP_COUNTING_SPOINTS   1 // mesures for sleep detection 
-#define CORE_PEDOMETER_SLEEP_MIN_ACCELL_100     3 // acceletometer sensitivity/100*G for sleep detection
-
+#define COREPEDOMETER_DELTA_SLEEP_VALUE_MIN_100     3 // acceletometer sensitivity/100*G for sleep detection
+#define COREPEDOMETER_CENTRALWIGHT_SLEEP_VALUE_MIN      0.05f
 
 #define APP_CLOCK_POWER_AFTER_SECONDS           4
+
+#define PEDOMETER_DO_NOT_USER_PEDOMETER_WHILE_CONNECTED_TO_USB
+//#define USE_NUMBERS_MAIN_MENU_IN_ACTIVE_PAGES
 /*
     ############################################################################################
     #                                                                                          #
@@ -232,7 +242,7 @@
 //#define STARTING_APP_NUMM    2 // Pedometer
 //#define STARTING_APP_NUMM    0
 
-#define FONT_SIZE_DEFAULT   2
+#define FONT_SIZE_DEFAULT   1
 
 //#define BATTERY_ENABLE
 //#define CLOCK_ENABLE
@@ -420,7 +430,15 @@ void setup(){
               debug("DEBUG_WAKEUP: Going to sleep again for " + String(get_corePedometer_currentsleep_between_mesures()) + "ms " + String(millis()));
               delay(50);
             #endif
-            core_cpu_sleep(STAND_BY_SLEEP_TYPE, get_corePedometer_currentsleep_between_mesures()*1000);
+            #ifdef PEDOMETER_ENABLE
+              if(core_pedometer_getEnable()){
+                core_cpu_sleep(STAND_BY_SLEEP_TYPE, get_corePedometer_currentsleep_between_mesures()*1000);
+              }else{
+                core_cpu_sleep(STAND_BY_SLEEP_TYPE, 24*60*60*1000);// Do not wake up for 1 day 
+              }
+            #else
+              core_cpu_sleep(STAND_BY_SLEEP_TYPE, get_corePedometer_currentsleep_between_mesures()*1000);
+            #endif
           #else
             #ifdef DEBUG_WAKEUP
               debug("DEBUG_WAKEUP: Going to sleep while interrupt");

@@ -6,10 +6,7 @@
     ############################################################################################
 */
 
-// ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! !
-//      USING ESP32 DEV MODULE FOR FLASHING
-// ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! !
-
+#define USE_NUMBERS_MAIN_MENU_IN_ACTIVE_PAGES
 #define SCREEN_WIDTH            80     // Screen resolution width
 #define SCREEN_HEIGHT           160     // Screen resolution height
 
@@ -105,6 +102,7 @@
 
 #define APP_CLOCK_POWER_AFTER_SECONDS           4
 
+//#define PEDOMETER_EMULATOR
 //#define DEBUG_SERIAL
 //#define DEBUG_PEDOMETER
 //#define DEBUG_PEDOMETER_TIMING

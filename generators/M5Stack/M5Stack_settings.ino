@@ -38,7 +38,7 @@
 //#define STARTING_APP_NUMM    2 // Pedometer
 //#define STARTING_APP_NUMM    0
 
-#define FONT_SIZE_DEFAULT   2
+#define FONT_SIZE_DEFAULT   1
 
 //#define BATTERY_ENABLE
 //#define CLOCK_ENABLE

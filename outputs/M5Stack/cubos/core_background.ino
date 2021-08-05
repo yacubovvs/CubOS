@@ -2,6 +2,7 @@
 void backgroundWorkAfterSleep(){
 
     #ifdef PEDOMETER_ENABLE
+      if(core_pedometer_getEnable()){
         #ifdef DEBUG_BACKGROUND
           debug("DEBUG_BACKGROUND: PEDOMETER_ENABLE", 10);
         #endif
@@ -18,6 +19,13 @@ void backgroundWorkAfterSleep(){
         #ifdef DEBUG_BACKGROUND
           debug("DEBUG_BACKGROUND: Pedometer loop finish finished "  + String(millis()), 10);
         #endif
+      }
+      #ifdef DEBUG_BACKGROUND
+        else{
+          debug("DEBUG_BACKGROUND: pedometer is not enabled", 10);
+        }
+      #endif
+        
     #else 
         #ifdef DEBUG_BACKGROUND
           debug("DEBUG_BACKGROUND: PEDOMETER_DISABLE", 10);

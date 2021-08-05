@@ -128,7 +128,7 @@
 #define CPU_CONTROLL_ENABLE
 #define POWERSAVE_ENABLE
 
-#define FONT_SIZE_DEFAULT 2
+#define FONT_SIZE_DEFAULT 1
 #define HARDWARE_BUTTONS_VALUE 3
 
 #define CONTROLS_DELAY_TO_DOUBLE_CLICK_MS DRIVER_CONTROLS_DELAY_BEFORE_LONG_PRESS
@@ -193,7 +193,7 @@
 #define APP_CLOCK_POWER_AFTER_SECONDS           4
 
 #define PEDOMETER_DO_NOT_USER_PEDOMETER_WHILE_CONNECTED_TO_USB
-#define USE_NUMBERS_MAIN_MENU_IN_ACTIVE_PAGES
+//#define USE_NUMBERS_MAIN_MENU_IN_ACTIVE_PAGES
 /*
     ############################################################################################
     #                                                                                          #

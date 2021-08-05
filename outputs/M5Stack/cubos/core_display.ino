@@ -640,6 +640,13 @@ static const unsigned char font_cubos[] PROGMEM = {
 
 void setStr(char * dString, int x, int y, unsigned char fontSize){
   
+  #ifdef DEBUG_CORE_DISPLAY
+    debug("DEBUG_CORE_DISPLAY: dString: " + String(dString));
+    debug("DEBUG_CORE_DISPLAY: x: " + String(x));
+    debug("DEBUG_CORE_DISPLAY: y: " + String(y));
+    debug("DEBUG_CORE_DISPLAY: fontSize: " + String(fontSize));
+  #endif
+
   if(DRAW_LIMITS_Enabled){
     //if out of screen
     if(x>DRAW_LIMITS_right||y>DRAW_LIMITS_bottom) return;
@@ -703,7 +710,7 @@ void setStr(char * dString, int x, int y, unsigned char fontSize){
 }
 
 void drawString(char * dString, int x, int y){
-  setStr(dString, x, y, 1);
+  setStr(dString, x, y, FONT_SIZE_DEFAULT);
 }
 
 void drawString(char * dString, int x, int y, unsigned char fontSize){
@@ -725,7 +732,7 @@ void drawString(String dString, int x, int y, unsigned char fontSize){
 }
 
 void drawString(String dString, int x, int y){
-  drawString(dString, x, y, 1);
+  drawString(dString, x, y, FONT_SIZE_DEFAULT);
 }
 
 void drawString_centered(char * dString, int y){
@@ -734,7 +741,7 @@ void drawString_centered(char * dString, int y){
 
 void clearString(char * dString, int x, int y, unsigned char fontSize){
   #ifdef USE_PRIMITIVE_HARDWARE_DRAW_ACCELERATION
-    if(fontSize==0) fontSize = 1;
+    if(fontSize==0) fontSize = FONT_SIZE_DEFAULT;
     int string_length = strlen(dString);
     drawRect(x,y-fontSize, x+string_length*fontSize*FONT_CHAR_WIDTH, y+fontSize*(FONT_CHAR_HEIGHT-1),true);
   #else
@@ -742,11 +749,11 @@ void clearString(char * dString, int x, int y, unsigned char fontSize){
   #endif
 }
 void clearString(char * dString, int x, int y){
-  clearString(dString, x, y, 1);
+  clearString(dString, x, y, FONT_SIZE_DEFAULT);
 }
 
 void clearString_centered(char * dString, int y){
-  clearString(dString, (SCREEN_WIDTH - strlen(dString)*FONT_CHAR_WIDTH)/2, y, 1);  
+  clearString(dString, (SCREEN_WIDTH - strlen(dString)*FONT_CHAR_WIDTH)/2, y, FONT_SIZE_DEFAULT);  
 }
 
 void clearString(String dString, int x, int y, unsigned char fontSize){
@@ -770,7 +777,7 @@ void clearString_centered(String dString, int x, int y, unsigned char fontSize){
 }
 
 void clearString_centered(char * dString, int x, int y){
-  clearString(dString, x - strlen(dString)*FONT_CHAR_WIDTH/2, y, 1);    
+  clearString(dString, x - strlen(dString)*FONT_CHAR_WIDTH/2, y, FONT_SIZE_DEFAULT);    
 }
 
 void drawString_centered(String dString, int y){
@@ -814,9 +821,23 @@ void core_display_setup(){
   #endif
 }
 
-//int fs_ms_max = 0;
+#ifdef DEBUG_FPS
+  long fps_last_milllis = millis();
+#endif
 
 void core_display_loop(){
+
+  #ifdef DEBUG_FPS
+    //delay(16);
+    if(getFRAMEBUFFER_isChanged()){
+      
+      long delta_ms = millis() - fps_last_milllis;
+      float fps = (float)1000.0/((float)delta_ms);
+      debug("DEBUG_FPS: fps " + String(fps));
+    }
+    
+    fps_last_milllis = millis();
+  #endif
   
   #ifdef FRAMEBUFFER_ENABLE
     #ifdef FRAMEBUFFER_TWIN_FULL
@@ -856,7 +877,7 @@ void core_display_loop(){
 void drawPixel(int x, int y){
   if(DRAW_LIMITS_Enabled){
     //if out of screen
-    if(x>=DRAW_LIMITS_right || x<=DRAW_LIMITS_left || y<=DRAW_LIMITS_top+1 || y>DRAW_LIMITS_bottom) return;
+    if(x>=DRAW_LIMITS_right-1 || x<=DRAW_LIMITS_left+1 || y<=DRAW_LIMITS_top+1 || y>=DRAW_LIMITS_bottom-1) return;
   }
     
   #ifdef FRAMEBUFFER_ENABLE
@@ -1217,6 +1238,7 @@ void drawImage(bool draw, const unsigned char* data, int x, int y){
         for (int readingBbyte=0; readingBbyte<(image_wigth*image_height%8==0?image_wigth*image_height/8:image_wigth*image_height/8+1); readingBbyte++){
           //if(data_size<=readPosition) break;
           currentBbyte = readRawChar(data, readPosition);
+          //debug("Got color drawing " + String(currentBbyte));
 
           if(currentBbyte!=0x00 && currentBbyte!=0xFF){
             for (unsigned char d=0; d<8; d++){

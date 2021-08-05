@@ -1,4 +1,5 @@
-BSOLUTE_FILENAME=`readlink -e "$0"`
+#BSOLUTE_FILENAME=`readlink -e "$0"`
+BSOLUTE_FILENAME=`readlink "$0"`
 DIRECTORY=`dirname "$0"`
 cd $DIRECTORY
 cd ../../

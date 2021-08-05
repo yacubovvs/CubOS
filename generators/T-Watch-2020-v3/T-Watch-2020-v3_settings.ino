@@ -7,7 +7,7 @@
 */
 
 #define LILYGO_WATCH_2020_V3 
-
+#define USE_NUMBERS_MAIN_MENU_IN_ACTIVE_PAGES
 //#define DEBUG_SERIAL
 //#define DEBUG_ON_SCREEN
 #define WATCH_SCREEN

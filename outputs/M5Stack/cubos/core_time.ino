@@ -275,6 +275,10 @@ String core_time_getDateFull(){
     return core_basic_addLeadBullToInt2digits(core_time_getDate()) + "." + core_basic_addLeadBullToInt2digits(core_time_getMonth()) + "." + String(core_time_getYear());
 }
 
+String core_time_getDateFull_short(){
+    return core_basic_addLeadBullToInt2digits(core_time_getDate()) + "." + core_basic_addLeadBullToInt2digits(core_time_getMonth());
+}
+
 void core_time_setYear(uint16_t year){
     #ifdef RTC_ENABLE
         return driver_RTC_setYear(year);
