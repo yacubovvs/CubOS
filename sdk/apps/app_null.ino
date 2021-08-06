@@ -99,8 +99,6 @@ void appNameClass::onEvent(unsigned char event, int val1, int val2){
             
         #else
             if(event==EVENT_BUTTON_PRESSED){
-                
-                if(currentSubMenu==APP_SETTINGS_SUBMENU_MAIN){
                     switch(val1){
                         case BUTTON_UP:
                             break;
@@ -110,9 +108,7 @@ void appNameClass::onEvent(unsigned char event, int val1, int val2){
                             break;
                         case BUTTON_SELECT:
                             break;
-                    }
-                }   
-            
+                    }  
             }else if(event==EVENT_BUTTON_RELEASED){
 
             }else if(event==EVENT_BUTTON_LONG_PRESS){
