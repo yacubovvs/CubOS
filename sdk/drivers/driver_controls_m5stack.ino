@@ -89,7 +89,8 @@ void driver_controls_loop(){
   return last_user_activity;
 }
 
-*/void driver_control_set_last_user_avtivity(unsigned long time){
+*/
+void driver_control_set_last_user_avtivity(unsigned long time){
   last_user_activity = time;
 }
 

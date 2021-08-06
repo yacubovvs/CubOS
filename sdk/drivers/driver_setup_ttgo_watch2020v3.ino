@@ -272,10 +272,16 @@ void core_driver_ldo_poweroff_deepSleep(){
 
 void core_driver_ldo_poweroff_lightSleep(){
 
+    //debug("Getting in a sleep cycle"); 
+
     core_driver_setBrigtness(0);
     core_driver_closeBL();
-    ttgo->displaySleep();
+    
+    startApp(0);
+    core_display_loop();
+    driver_display_loop();
 
+    ttgo->displaySleep();
     
     ttgo_power->setPowerOutPut(AXP202_LDO3, false);
     ttgo_power->setPowerOutPut(AXP202_LDO4, false);
@@ -285,30 +291,17 @@ void core_driver_ldo_poweroff_lightSleep(){
     //esp_sleep_enable_ext1_wakeup(GPIO_SEL_39, ESP_EXT1_WAKEUP_ANY_HIGH);
     esp_sleep_enable_ext1_wakeup(GPIO_SEL_38, ESP_EXT1_WAKEUP_ALL_LOW);
     
+    
     // Time between mesures
-    //esp_sleep_enable_timer_wakeup(PEDOMETER_STEP_DETECTION_PERIOD_MS/PEDOMETER_MESURES_IN_STEP_DETECTION_PERIOD*1000);
-    if(core_pedometer_getEnable()){
-        esp_sleep_enable_timer_wakeup(get_corePedometer_currentsleep_between_mesures()*1000*1000);
-    }else{
-        esp_sleep_enable_timer_wakeup(1000*1000*1000);
-    }
-    
-
-    
-    
-    //while(!getTOUCH_SCREEN_isTouching()){
     
     while(true){
-        /*
-        int timeToSleepSave = 0;
-        int timeToNextMesure = -(millis() - core_pedometer_step_detection_start_time - (((long)corePedometer_currentsleep_between_mesures)*1000));
-        if (core_pedometer_current_get_isNotInMesure()){
-            timeToSleepSave = timeToNextMesure; 
+
+        if(core_pedometer_getEnable()){
+            esp_sleep_enable_timer_wakeup(get_corePedometer_currentsleep_between_mesures()*1000*1000);
         }else{
-            timeToSleepSave = PEDOMETER_STEP_DETECTION_PERIOD_MS/PEDOMETER_MESURES_IN_STEP_DETECTION_PERIOD;
+            esp_sleep_enable_timer_wakeup(1000*1000*1000);
         }
-        debug("!!!!!! Save sleep time " + String(timeToSleepSave));
-        */
+
 
         if(get_pedometer_in_work()){
             #ifdef DEBUG_WAKEUP
@@ -346,10 +339,13 @@ void core_driver_ldo_poweroff_lightSleep(){
             break;
         }
 
-        currentApp->onEvent(EVENT_ON_WAKE_UP, 0, 0);
+        //
     }
     
+    //debug("Going out of sleep");
 
+    currentApp->onEvent(EVENT_ON_WAKE_UP, 0, 0);
+    
     ttgo_power->setPowerOutPut(AXP202_LDO3, true);
     ttgo_power->setPowerOutPut(AXP202_LDO4, true);
     ttgo_power->setPowerOutPut(AXP202_LDO2, true);
@@ -359,12 +355,7 @@ void core_driver_ldo_poweroff_lightSleep(){
     ttgo->displayWakeup();
     core_driver_openBL();
     core_driver_setBrigtness(255);
-
-    /*
-    ttgo->powerOff();
-    esp_sleep_enable_timer_wakeup(10*1000*1000);
-    esp_light_sleep_start();
-    ttgo->powerOn()*/
+    set_core_powersave_lastUserAction();
 }
 
 

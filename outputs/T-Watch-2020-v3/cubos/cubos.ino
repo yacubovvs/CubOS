@@ -128,7 +128,7 @@
 #define CPU_CONTROLL_ENABLE
 #define POWERSAVE_ENABLE
 
-#define FONT_SIZE_DEFAULT 2
+#define FONT_SIZE_DEFAULT 1
 #define HARDWARE_BUTTONS_VALUE 3
 
 #define CONTROLS_DELAY_TO_DOUBLE_CLICK_MS DRIVER_CONTROLS_DELAY_BEFORE_LONG_PRESS
@@ -193,7 +193,7 @@
 #define APP_CLOCK_POWER_AFTER_SECONDS           4
 
 #define PEDOMETER_DO_NOT_USER_PEDOMETER_WHILE_CONNECTED_TO_USB
-#define USE_NUMBERS_MAIN_MENU_IN_ACTIVE_PAGES
+//#define USE_NUMBERS_MAIN_MENU_IN_ACTIVE_PAGES
 /*
     ############################################################################################
     #                                                                                          #
@@ -211,7 +211,7 @@
 */
 
 #define LILYGO_WATCH_2020_V3 
-
+#define USE_NUMBERS_MAIN_MENU_IN_ACTIVE_PAGES
 //#define DEBUG_SERIAL
 //#define DEBUG_ON_SCREEN
 #define WATCH_SCREEN
@@ -272,8 +272,8 @@
 //#define DEFAULT_FADE_BRIGHTNES 5
 //#define DEFAULT_SCREEN_BRIGHTNESS 10
 
-#define DEFAULT_TIME_TO_POWEROFF_DISPLAY 15
-#define APP_CLOCK_POWER_AFTER_SECONDS 15
+#define DEFAULT_TIME_TO_POWEROFF_DISPLAY 10
+//#define APP_CLOCK_POWER_AFTER_SECONDS 15
 //#define DEFAULT_DELAY_TO_FADE_DISPLAY 0
 
 #define STYLE_STATUSBAR_HEIGHT  30 
@@ -307,34 +307,28 @@
 #define PEDOMETER_STEP_DETECTION_DELAY_SEC_MAX          180 // MAX (255 - PEDOMETER_STEP_DETECTION_PERIOD_MS/1000) and multiple 60 seconds
 */
 
-#define PEDOMETER_STEP_DETECTION_DELAY_SEC_MIN          15
-#define PEDOMETER_STEP_DETECTION_DELAY_SEC_STEP         15
-#define PEDOMETER_STEP_DETECTION_DELAY_SEC_MAX          60 // MAX (255 - PEDOMETER_STEP_DETECTION_PERIOD_MS/1000) and multiple 60 seconds
+#define PEDOMETER_STEP_DETECTION_DELAY_SEC_MIN          10
+#define PEDOMETER_STEP_DETECTION_DELAY_SEC_STEP         10
+#define PEDOMETER_STEP_DETECTION_DELAY_SEC_MAX          60 // MAX (240 - PEDOMETER_STEP_DETECTION_PERIOD_MS/1000) and multiple 60 seconds
 
-
-//#define PEDOMETER_STEP_DETECTION_DELAY_SEC_MIN          60
-//#define PEDOMETER_STEP_DETECTION_DELAY_SEC_STEP         60
-//#define PEDOMETER_STEP_DETECTION_DELAY_SEC_MAX          60 // MAX (255 - PEDOMETER_STEP_DETECTION_PERIOD_MS/1000) and multiple 60 seconds
-
-
-#define CORE_PEDOMETER_SLEEP_COUNTING_SPOINTS           7 // mesures for sleep detection 
+#define CORE_PEDOMETER_SLEEP_COUNTING_SPOINTS           10 // mesures for sleep detection 
 #define COREPEDOMETER_CENTRALWIGHT_SLEEP_VALUE_MIN      0.05f
-#define COREPEDOMETER_DELTA_SLEEP_VALUE_MIN_100         3 // acceletometer sensitivity/100*G for sleep detection
+#define COREPEDOMETER_DELTA_SLEEP_VALUE_MIN_100         6 // acceletometer sensitivity/100*G for sleep detection
 
-#define APP_CLOCK_POWER_AFTER_SECONDS           2
+#define APP_CLOCK_POWER_AFTER_SECONDS           4
 #define APP_BATTERY_FONT_SIZE                   1
 //#define DEBUG_CPU_CONTROLL_ENABLE
 //#define DEBUG_CORE_POWERSAVE
 
 #define DEBUG_SERIAL
-#define PEDOMETER_ENABLE_ON_START false
+#define PEDOMETER_ENABLE_ON_START true
 //#define DEBUG_CORE_DISPLAY
 //#define CORE_TOUCH_DEBUG
 //#define APP_SETTINGS_DEBUG
 //#define PEDOMETER_EMULATOR
 //#define DEBUG_FPS
 //#define DEBUG_WAKEUP
-#define DEBUG_PEDOMETER
+//#define DEBUG_PEDOMETER
 //#define DEBUG_ACELEROMETER
 //#define DEBUG_BACKLIGHT
 //#define DEBUG_DRIVER_CONTROLL
@@ -456,7 +450,15 @@ void setup(){
               debug("DEBUG_WAKEUP: Going to sleep again for " + String(get_corePedometer_currentsleep_between_mesures()) + "ms " + String(millis()));
               delay(50);
             #endif
-            core_cpu_sleep(STAND_BY_SLEEP_TYPE, get_corePedometer_currentsleep_between_mesures()*1000);
+            #ifdef PEDOMETER_ENABLE
+              if(core_pedometer_getEnable()){
+                core_cpu_sleep(STAND_BY_SLEEP_TYPE, get_corePedometer_currentsleep_between_mesures()*1000);
+              }else{
+                core_cpu_sleep(STAND_BY_SLEEP_TYPE, 24*60*60*1000);// Do not wake up for 1 day 
+              }
+            #else
+              core_cpu_sleep(STAND_BY_SLEEP_TYPE, get_corePedometer_currentsleep_between_mesures()*1000);
+            #endif
           #else
             #ifdef DEBUG_WAKEUP
               debug("DEBUG_WAKEUP: Going to sleep while interrupt");

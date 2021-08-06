@@ -83,7 +83,7 @@
 
     #define CORE_PEDOMETER_MESURE_EVERY_MS                      (PEDOMETER_STEP_DETECTION_PERIOD_MS/PEDOMETER_MESURES_IN_STEP_DETECTION_PERIOD)
 
-    bool core_pedometer_on = PEDOMETER_ENABLE_ON_START;
+    RTC_DATA_ATTR bool core_pedometer_on = PEDOMETER_ENABLE_ON_START;
     void core_pedometer_setEnable(bool enable){core_pedometer_on = enable;}
     bool core_pedometer_getEnable(){return core_pedometer_on;}
     String core_pedometer_getEnable_String(){return (core_pedometer_on?"On":"Off");}
@@ -110,7 +110,7 @@
             #ifdef PEDOMETER_DO_NOT_USER_PEDOMETER_WHILE_CONNECTED_TO_USB
                 #ifdef BATTERY_ENABLE
                     #ifndef DEBUG_PEDOMETER
-                        if(driver_battery_isUsbConnected()){
+                        if(driver_battery_isUsbConnected() || !core_pedometer_getEnable()){
                             #ifdef DEBUG_PEDOMETER
                                 //debug("DEBUG_PEDOMETER: exit job course on usb");
                             #endif 

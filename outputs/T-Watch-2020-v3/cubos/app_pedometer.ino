@@ -335,19 +335,17 @@ void appNameClass::onEvent(unsigned char event, int val1, int val2){
             
         #else
             if(event==EVENT_BUTTON_PRESSED){
-                if(currentSubMenu==APP_SETTINGS_SUBMENU_MAIN){
-                    switch(val1){
-                        case BUTTON_UP:
-                            break;
-                        case BUTTON_BACK:
-                            startApp(-1); // Exit
-                            break;
-                        case BUTTON_DOWN:
-                            break;
-                        case BUTTON_SELECT:
-                            break;
-                    }
-                }   
+                switch(val1){
+                    case BUTTON_UP:
+                        break;
+                    case BUTTON_BACK:
+                        startApp(-1); // Exit
+                        break;
+                    case BUTTON_DOWN:
+                        break;
+                    case BUTTON_SELECT:
+                        break;
+                }
             
             }else if(event==EVENT_BUTTON_RELEASED){
 

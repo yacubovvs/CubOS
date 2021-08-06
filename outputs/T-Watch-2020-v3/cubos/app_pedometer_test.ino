@@ -163,8 +163,10 @@ void appNameClass::onEvent(unsigned char event, int val1, int val2){
                 if(val1==BUTTON_SELECT){
                     acceleration_max = 0;
                     acceleration_min = 0;
-                    set_pedometer_days_steps(0,0);
-                    set_pedometer_days_sleep(0,0);
+                    #ifdef PEDOMETER_ENABLE
+                        set_pedometer_days_steps(0,0);
+                        set_pedometer_days_sleep(0,0);
+                    #endif
                 }else if(val1==BUTTON_BACK){
                     startApp(-1);
                 }    
@@ -185,20 +187,16 @@ void appNameClass::onEvent(unsigned char event, int val1, int val2){
             
         #else
             if(event==EVENT_BUTTON_PRESSED){
-                
-                if(currentSubMenu==APP_SETTINGS_SUBMENU_MAIN){
-                    switch(val1){
-                        case BUTTON_UP:
-                            break;
-                        case BUTTON_BACK:
-                            break;
-                        case BUTTON_DOWN:
-                            break;
-                        case BUTTON_SELECT:
-                            break;
-                    }
-                }   
-            
+                switch(val1){
+                    case BUTTON_UP:
+                        break;
+                    case BUTTON_BACK:
+                        break;
+                    case BUTTON_DOWN:
+                        break;
+                    case BUTTON_SELECT:
+                        break;
+                }
             }else if(event==EVENT_BUTTON_RELEASED){
 
             }else if(event==EVENT_BUTTON_LONG_PRESS){

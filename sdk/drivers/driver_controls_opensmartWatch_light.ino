@@ -1,10 +1,10 @@
 #define _millis() millis()
 
 unsigned char    driver_control_buttonsPins[]  = {0, 10, 13};
-bool driver_control_isPositive[]   = {false, false, false};
+bool driver_control_isPositive[]   = {true, false, false};
 // Do not change:
 bool driver_control_pressed[]      = {false, false, false};
-byte buttons_purpose[] = {BUTTON_SELECT};
+byte buttons_purpose[] = {BUTTON_SELECT, BUTTON_DOWN, BUTTON_UP };
 unsigned long driver_control_time_pressed[]                 = {0,0,0};
 unsigned long driver_control_DOUBLE_PRESS_lastPress[]       = {0,0,0};
 unsigned long driver_control_DOUBLE_PRESS_doublePressed[]   = {false,false,false};
