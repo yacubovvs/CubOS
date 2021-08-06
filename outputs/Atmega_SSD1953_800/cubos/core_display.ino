@@ -1,4 +1,29 @@
 
+#ifdef FRAMEBUFFER_ENABLE
+
+  #ifdef FRAMEBUFFER_TWIN_FULL
+
+    #define FRAMEBUFFER_SIZE SCREEN_WIDTH * SCREEN_HEIGHT * FRAMEBUFFER_BYTE_PER_PIXEL
+    //#define FRAMEBUFFER_SIZE SCREEN_WIDTH * SCREEN_HEIGHT
+
+    #if FRAMEBUFFER_BYTE_PER_PIXEL==2
+      #define FRAMEBUFFER_TYPE uint16_t
+    #endif
+
+    #if FRAMEBUFFER_BYTE_PER_PIXEL==1
+      #define FRAMEBUFFER_TYPE uint8_t
+    #endif
+
+    FRAMEBUFFER_TYPE * FRAMEBUFFER_currentFrame;
+    FRAMEBUFFER_TYPE * FRAMEBUFFER_newFrame;
+    bool FRAMEBUFFER_pixelChanged_x[SCREEN_WIDTH];
+    bool FRAMEBUFFER_pixelChanged_y[SCREEN_HEIGHT];
+    bool FRAMEBUFFER_pixelChanged[SCREEN_WIDTH*SCREEN_HEIGHT + 1];
+
+  #endif
+#endif
+
+
 uint16_t get_uint16Color(unsigned char red, unsigned char green, unsigned char blue){
   #ifdef SCREEN_INVERT_COLORS
     red = 255 - red;
@@ -10,6 +35,7 @@ uint16_t get_uint16Color(unsigned char red, unsigned char green, unsigned char b
     return ( (blue*31/255) <<11)|( (green*31/255) <<6)|( (red*31/255) <<0);
   #else
     return ( (red*31/255) <<11)|( (green*31/255) <<6)|( (blue*31/255) <<0);
+    //return ( (red*31/255) <<11)|( (green*31/255) <<6)|( (blue*31/255) <<0);
   #endif
 }
 
@@ -97,17 +123,6 @@ void setDrawColor(uint16_t color){
 
   #ifdef FRAMEBUFFER_TWIN_FULL
 
-    #define FRAMEBUFFER_SIZE SCREEN_WIDTH * SCREEN_HEIGHT * FRAMEBUFFER_BYTE_PER_PIXEL
-    //#define FRAMEBUFFER_SIZE SCREEN_WIDTH * SCREEN_HEIGHT
-
-    #if FRAMEBUFFER_BYTE_PER_PIXEL==2
-      #define FRAMEBUFFER_TYPE uint16_t
-    #endif
-
-    #if FRAMEBUFFER_BYTE_PER_PIXEL==1
-      #define FRAMEBUFFER_TYPE uint8_t
-    #endif
-
     bool FRAMEBUFFER_isChanged = false;
 
     void setFRAMEBUFFER_isChanged(bool v){
@@ -116,50 +131,6 @@ void setDrawColor(uint16_t color){
 
     bool getFRAMEBUFFER_isChanged(){
       return FRAMEBUFFER_isChanged;
-    }
-
-    FRAMEBUFFER_TYPE * FRAMEBUFFER_currentFrame;
-    FRAMEBUFFER_TYPE * FRAMEBUFFER_newFrame;
-    bool FRAMEBUFFER_pixelChangedchanged[SCREEN_WIDTH*SCREEN_HEIGHT + 1];
-
-
-    void FRAMEBUFFER_fill(uint16_t fillColor){
-      for(int x=0; x<SCREEN_WIDTH; x++){
-        for(int y=0; y<SCREEN_HEIGHT; y++){
-          long position = y * SCREEN_WIDTH + x;
-
-          FRAMEBUFFER_pixelChangedchanged[x + SCREEN_WIDTH*y] = false;
-          FRAMEBUFFER_new_setPixel(x, y, 0);
-          FRAMEBUFFER_current_setPixel(x, y, 0);
-        }
-      }
-    }
-
-    void FRAMEBUFFER_reset(){
-      
-      #ifdef FRAMEBUFFER_PSRAM
-        FRAMEBUFFER_currentFrame  = (FRAMEBUFFER_TYPE *)ps_malloc(FRAMEBUFFER_SIZE);
-        FRAMEBUFFER_newFrame      = (FRAMEBUFFER_TYPE *)ps_malloc(FRAMEBUFFER_SIZE);
-      #else
-        FRAMEBUFFER_currentFrame  = (FRAMEBUFFER_TYPE *)malloc(FRAMEBUFFER_SIZE);
-        FRAMEBUFFER_newFrame      = (FRAMEBUFFER_TYPE *)malloc(FRAMEBUFFER_SIZE);
-      #endif
-      
-      FRAMEBUFFER_fill(0);
-    }
-
-    void FRAMEBUFFER_new_setPixel(uint16_t x, uint16_t y, uint16_t color){
-      long position = y * (SCREEN_WIDTH-1) + x;
-      FRAMEBUFFER_newFrame[position] = FRAMEBUFFER_16bitColor_to_framebufferColor(color);
-    }
-
-    void FRAMEBUFFER_current_setPixel(uint16_t x, uint16_t y, uint16_t color){
-      long position = y * (SCREEN_WIDTH-1) + x;
-      FRAMEBUFFER_currentFrame[position] = FRAMEBUFFER_16bitColor_to_framebufferColor(color);
-    }
-
-    void FRAMEBUFFER_current_setPixel(uint16_t position, uint16_t color){
-      FRAMEBUFFER_currentFrame[position] = FRAMEBUFFER_16bitColor_to_framebufferColor(color);
     }
 
     FRAMEBUFFER_TYPE FRAMEBUFFER_16bitColor_to_framebufferColor(uint16_t color){
@@ -203,12 +174,26 @@ void setDrawColor(uint16_t color){
       
     }
 
+    void FRAMEBUFFER_new_setPixel(uint16_t x, uint16_t y, uint16_t color){
+      long position = y * (SCREEN_WIDTH-1) + x;
+      FRAMEBUFFER_newFrame[position] = FRAMEBUFFER_16bitColor_to_framebufferColor(color);
+    }
+
+    void FRAMEBUFFER_current_setPixel(uint16_t x, uint16_t y, uint16_t color){
+      long position = y * (SCREEN_WIDTH-1) + x;
+      FRAMEBUFFER_currentFrame[position] = FRAMEBUFFER_16bitColor_to_framebufferColor(color);
+    }
+
+    void FRAMEBUFFER_current_setPixel(long position, uint16_t color){
+      FRAMEBUFFER_currentFrame[position] = FRAMEBUFFER_16bitColor_to_framebufferColor(color);
+    }
+
     uint16_t FRAMEBUFFER_new_getPixel(uint16_t x, uint16_t y){
       long position = y * (SCREEN_WIDTH-1) + x;
       return FRAMEBUFFER_framebufferColor_to_16bitColor(FRAMEBUFFER_newFrame[position]);
     }
 
-    uint16_t FRAMEBUFFER_new_getPixel(uint16_t position){
+    uint16_t FRAMEBUFFER_new_getPixel(long position){
       return FRAMEBUFFER_framebufferColor_to_16bitColor(FRAMEBUFFER_newFrame[position]);
     }
 
@@ -217,10 +202,24 @@ void setDrawColor(uint16_t color){
       return FRAMEBUFFER_framebufferColor_to_16bitColor(FRAMEBUFFER_currentFrame[position]);
     }
 
-    uint16_t FRAMEBUFFER_current_getPixel(uint16_t position){
+    uint16_t FRAMEBUFFER_current_getPixel(long position){
       return FRAMEBUFFER_framebufferColor_to_16bitColor(FRAMEBUFFER_currentFrame[position]);
     }
 
+    void FRAMEBUFFER_fill(uint16_t fillColor){
+      for(int x=0; x<SCREEN_WIDTH; x++){
+        for(int y=0; y<SCREEN_HEIGHT; y++){
+          long position = y * SCREEN_WIDTH + x;
+          FRAMEBUFFER_pixelChanged[x + SCREEN_WIDTH*y] = false;
+          FRAMEBUFFER_new_setPixel(x, y, 0);
+          FRAMEBUFFER_current_setPixel(x, y, 0);
+        }
+      }
+    }
+
+    void FRAMEBUFFER_reset(){
+      FRAMEBUFFER_fill(0);
+    }
   #endif
 
 #endif
@@ -285,7 +284,7 @@ bool DRAW_LIMITS_getEnable(){
                                   POWER CONTROLL
 * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * 
 */
-unsigned char core_display_brightness             = 100;
+unsigned char core_display_brightness             = DEFAULT_SCREEN_BRIGHTNESS;
 
 #ifndef DEFAULT_TIME_TO_POWEROFF_DISPLAY
   #define DEFAULT_TIME_TO_POWEROFF_DISPLAY 5;
@@ -297,10 +296,10 @@ unsigned char core_display_brightness             = 100;
 
 
 #ifdef DISPLAY_BACKLIGHT_FADE_CONTROL_ENABLE
-  unsigned char core_display_brightness_fade        = 15;
-  unsigned char core_display_time_delay_to_fade     = DEFAULT_DELAY_TO_FADE_DISPLAY; //10
+  unsigned char core_display_brightness_fade        = DEFAULT_FADE_BRIGHTNES;
+  unsigned char core_display_time_delay_to_fade     = DEFAULT_DELAY_TO_FADE_DISPLAY;
 #endif
-unsigned char core_display_time_delay_to_poweroff = DEFAULT_TIME_TO_POWEROFF_DISPLAY; //5
+unsigned char core_display_time_delay_to_poweroff = DEFAULT_TIME_TO_POWEROFF_DISPLAY;
 
 #ifdef DISPLAY_BACKLIGHT_CONTROL_ENABLE
   void set_core_display_brightness(unsigned char value){ 
@@ -641,6 +640,13 @@ static const unsigned char font_cubos[] PROGMEM = {
 
 void setStr(char * dString, int x, int y, unsigned char fontSize){
   
+  #ifdef DEBUG_CORE_DISPLAY
+    debug("DEBUG_CORE_DISPLAY: dString: " + String(dString));
+    debug("DEBUG_CORE_DISPLAY: x: " + String(x));
+    debug("DEBUG_CORE_DISPLAY: y: " + String(y));
+    debug("DEBUG_CORE_DISPLAY: fontSize: " + String(fontSize));
+  #endif
+
   if(DRAW_LIMITS_Enabled){
     //if out of screen
     if(x>DRAW_LIMITS_right||y>DRAW_LIMITS_bottom) return;
@@ -704,7 +710,7 @@ void setStr(char * dString, int x, int y, unsigned char fontSize){
 }
 
 void drawString(char * dString, int x, int y){
-  setStr(dString, x, y, 1);
+  setStr(dString, x, y, FONT_SIZE_DEFAULT);
 }
 
 void drawString(char * dString, int x, int y, unsigned char fontSize){
@@ -726,7 +732,7 @@ void drawString(String dString, int x, int y, unsigned char fontSize){
 }
 
 void drawString(String dString, int x, int y){
-  drawString(dString, x, y, 1);
+  drawString(dString, x, y, FONT_SIZE_DEFAULT);
 }
 
 void drawString_centered(char * dString, int y){
@@ -735,7 +741,7 @@ void drawString_centered(char * dString, int y){
 
 void clearString(char * dString, int x, int y, unsigned char fontSize){
   #ifdef USE_PRIMITIVE_HARDWARE_DRAW_ACCELERATION
-    if(fontSize==0) fontSize = 1;
+    if(fontSize==0) fontSize = FONT_SIZE_DEFAULT;
     int string_length = strlen(dString);
     drawRect(x,y-fontSize, x+string_length*fontSize*FONT_CHAR_WIDTH, y+fontSize*(FONT_CHAR_HEIGHT-1),true);
   #else
@@ -743,11 +749,11 @@ void clearString(char * dString, int x, int y, unsigned char fontSize){
   #endif
 }
 void clearString(char * dString, int x, int y){
-  clearString(dString, x, y, 1);
+  clearString(dString, x, y, FONT_SIZE_DEFAULT);
 }
 
 void clearString_centered(char * dString, int y){
-  clearString(dString, (SCREEN_WIDTH - strlen(dString)*FONT_CHAR_WIDTH)/2, y, 1);  
+  clearString(dString, (SCREEN_WIDTH - strlen(dString)*FONT_CHAR_WIDTH)/2, y, FONT_SIZE_DEFAULT);  
 }
 
 void clearString(String dString, int x, int y, unsigned char fontSize){
@@ -756,6 +762,10 @@ void clearString(String dString, int x, int y, unsigned char fontSize){
   dString.toCharArray(element_value, str_len);
 
   clearString(element_value, x, y, fontSize);
+}
+
+void clearString(String dString, int x, int y){
+  clearString(dString, x, y, FONT_SIZE_DEFAULT);
 }
 
 void drawString_centered(char * dString, int x, int y){
@@ -767,7 +777,7 @@ void clearString_centered(String dString, int x, int y, unsigned char fontSize){
 }
 
 void clearString_centered(char * dString, int x, int y){
-  clearString(dString, x - strlen(dString)*FONT_CHAR_WIDTH/2, y, 1);    
+  clearString(dString, x - strlen(dString)*FONT_CHAR_WIDTH/2, y, FONT_SIZE_DEFAULT);    
 }
 
 void drawString_centered(String dString, int y){
@@ -792,48 +802,71 @@ void drawString_rightAlign(String dString, int x, int y){
 
 void core_display_setup(){
   #ifdef FRAMEBUFFER_ENABLE
+
+    #ifdef FRAMEBUFFER_TWIN_FULL
+
+      #ifdef FRAMEBUFFER_PSRAM
+        FRAMEBUFFER_currentFrame  = (FRAMEBUFFER_TYPE *)ps_malloc(FRAMEBUFFER_SIZE);
+        FRAMEBUFFER_newFrame      = (FRAMEBUFFER_TYPE *)ps_malloc(FRAMEBUFFER_SIZE);
+      #else
+        FRAMEBUFFER_currentFrame  = (FRAMEBUFFER_TYPE *)malloc(FRAMEBUFFER_SIZE);
+        FRAMEBUFFER_newFrame      = (FRAMEBUFFER_TYPE *)malloc(FRAMEBUFFER_SIZE);
+      #endif
+    #endif
+  #endif
+
+  driver_display_setup();
+  #ifdef FRAMEBUFFER_ENABLE
     FRAMEBUFFER_reset();
   #endif
 }
 
-//int fs_ms_max = 0;
+#ifdef DEBUG_FPS
+  long fps_last_milllis = millis();
+#endif
 
 void core_display_loop(){
+
+  #ifdef DEBUG_FPS
+    //delay(16);
+    if(getFRAMEBUFFER_isChanged()){
+      
+      long delta_ms = millis() - fps_last_milllis;
+      float fps = (float)1000.0/((float)delta_ms);
+      debug("DEBUG_FPS: fps " + String(fps));
+    }
+    
+    fps_last_milllis = millis();
+  #endif
   
   #ifdef FRAMEBUFFER_ENABLE
     #ifdef FRAMEBUFFER_TWIN_FULL
       if(getFRAMEBUFFER_isChanged()){
-
-        //long drawMillis = millis();
+        bool shown = false;
 
         for(int y=0; y<SCREEN_HEIGHT; y++){
-          for(int x=0; x<SCREEN_WIDTH; x++){
-            if(FRAMEBUFFER_pixelChangedchanged[x + (SCREEN_WIDTH-1)*y]==true){
-              uint16_t position = y * (SCREEN_WIDTH-1) + x;
-              uint16_t newColor = FRAMEBUFFER_new_getPixel(position);
-              if(FRAMEBUFFER_current_getPixel(position)!=newColor){
-                //if(getDrawColor()!=newColor) setDrawColor(newColor);
-                display_driver_setPixel(x, y, newColor);
-                //if(x>=SCREEN_WIDTH) debug("XMORE!");
-                //if(y>=SCREEN_HEIGHT) debug("YMORE!");
-
-                FRAMEBUFFER_current_setPixel(position, newColor);
-                FRAMEBUFFER_pixelChangedchanged[x + (SCREEN_WIDTH-1)*y] = false;
+          if(FRAMEBUFFER_pixelChanged_y[y]){
+            for(int x=0; x<SCREEN_WIDTH; x++){
+              if(FRAMEBUFFER_pixelChanged_x[x]){
+                long position = y * (SCREEN_WIDTH-1) + x;  
+                if(FRAMEBUFFER_pixelChanged[position]==true){
+                  uint16_t newColor = FRAMEBUFFER_new_getPixel(position);
+                  if(FRAMEBUFFER_current_getPixel(position)!=newColor){
+                    display_driver_setPixel(x, y, newColor);
+                    FRAMEBUFFER_current_setPixel(position, newColor);
+                    FRAMEBUFFER_pixelChanged[position] = false;
+                  }
+                }
               }
             }
           }
         }
 
-        //int timeToDraw = millis() - drawMillis;
-        /*
-        if(fs_ms_max==0) fs_ms_max=1;
-        else if(fs_ms_max<timeToDraw){
-          fs_ms_max = timeToDraw;
-          log_d("Framebuffer drawing %d", fs_ms_max);
-        }*/
+        for(int x=0; x<SCREEN_WIDTH; x++){ FRAMEBUFFER_pixelChanged_x[x] = false;}
+        for(int y=0; y<SCREEN_HEIGHT; y++){ FRAMEBUFFER_pixelChanged_y[y] = false;}
 
-        //log_d("Framebuffer drawing %d", timeToDraw);
-        
+        //FRAMEBUFFER_pixelChanged[239 + (SCREEN_WIDTH-1)*239] = true;
+        //FRAMEBUFFER_new_setPixel(239,239, 65535);
       }
       setFRAMEBUFFER_isChanged(false);
     #endif
@@ -844,7 +877,7 @@ void core_display_loop(){
 void drawPixel(int x, int y){
   if(DRAW_LIMITS_Enabled){
     //if out of screen
-    if(x>=DRAW_LIMITS_right || x<=DRAW_LIMITS_left || y<=DRAW_LIMITS_top+1 || y>DRAW_LIMITS_bottom) return;
+    if(x>=DRAW_LIMITS_right-1 || x<=DRAW_LIMITS_left+1 || y<=DRAW_LIMITS_top+1 || y>=DRAW_LIMITS_bottom-1) return;
   }
     
   #ifdef FRAMEBUFFER_ENABLE
@@ -852,8 +885,11 @@ void drawPixel(int x, int y){
     #ifdef FRAMEBUFFER_TWIN_FULL
       FRAMEBUFFER_new_setPixel(x, y, getDrawColor());
 
-      uint16_t position = x + (SCREEN_WIDTH-1)*y;
-      if(position>=0 && position<=SCREEN_HEIGHT*SCREEN_WIDTH) FRAMEBUFFER_pixelChangedchanged[position] = true;
+      long position = x + (SCREEN_WIDTH-1)*y;
+      if(position>=0 && position<=SCREEN_HEIGHT*SCREEN_WIDTH) FRAMEBUFFER_pixelChanged[position] = true;
+
+      FRAMEBUFFER_pixelChanged_x[x] = true;
+      FRAMEBUFFER_pixelChanged_y[y] = true;
 
       if(!getFRAMEBUFFER_isChanged()) setFRAMEBUFFER_isChanged(true);
       
@@ -1202,6 +1238,7 @@ void drawImage(bool draw, const unsigned char* data, int x, int y){
         for (int readingBbyte=0; readingBbyte<(image_wigth*image_height%8==0?image_wigth*image_height/8:image_wigth*image_height/8+1); readingBbyte++){
           //if(data_size<=readPosition) break;
           currentBbyte = readRawChar(data, readPosition);
+          //debug("Got color drawing " + String(currentBbyte));
 
           if(currentBbyte!=0x00 && currentBbyte!=0xFF){
             for (unsigned char d=0; d<8; d++){

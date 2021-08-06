@@ -39,6 +39,7 @@ cp sdk/core/core_views.ino              outputs/Atmega_SSD1953_800/cubos/
 cp sdk/core/core_display.ino            outputs/Atmega_SSD1953_800/cubos/  
 cp sdk/core/core_time.ino               outputs/Atmega_SSD1953_800/cubos/  
 cp sdk/core/core_cpu.ino                outputs/Atmega_SSD1953_800/cubos/  
+#cp sdk/core/core_software_keyboard.ino  outputs/Atmega_SSD1953_800/cubos/  
 #cp sdk/core/core_battery.ino            outputs/Atmega_SSD1953_800/cubos/  
 #cp sdk/core/core_powersave.ino          outputs/Atmega_SSD1953_800/cubos/  
 cp sdk/core/core_background.ino         outputs/Atmega_SSD1953_800/cubos/  
