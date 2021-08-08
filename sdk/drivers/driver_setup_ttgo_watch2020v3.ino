@@ -330,6 +330,9 @@ void core_driver_ldo_poweroff_lightSleep(){
             #ifdef DEBUG_WAKEUP
                 //debug("DEBUG_WAKEUP: wake up by timer " + String(WAKE_UP_REASON_TIMER), 10);
             #endif
+            #ifdef RTC_ENABLE
+                core_time_driver_RTC_refresh();
+            #endif
             core_pedometer_loop(false);
         }else{
             #ifdef DEBUG_WAKEUP
