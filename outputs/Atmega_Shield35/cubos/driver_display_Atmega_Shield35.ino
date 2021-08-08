@@ -21,7 +21,7 @@ void display_driver_setPixel(int x, int y){
 }
 
 void display_driver_setPixel(int x, int y, uint16_t color){
-  driver_display_setDrawColor(color);
+  //driver_display_setDrawColor(color);
   myGLCD.drawPixel(x,y);
 }
 

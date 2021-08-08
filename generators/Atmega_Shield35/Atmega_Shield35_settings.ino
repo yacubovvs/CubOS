@@ -10,8 +10,8 @@
 //      FOR ESP8266 USE NONOSSDK 2.2.2 +
 // ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! !
 
-#define SCREEN_WIDTH            480     // Screen resolution width
-#define SCREEN_HEIGHT           320     // Screen resolution height
+#define SCREEN_WIDTH            320     // Screen resolution width
+#define SCREEN_HEIGHT           240     // Screen resolution height
 
 #define FONT_CHAR_WIDTH         6     // Font letter size width
 #define FONT_CHAR_HEIGHT        8     // Font letter size height
@@ -101,13 +101,13 @@
 // #define DEBUG_WAKEUP
 */
 
-#define SOFTWARE_BUTTONS_ENABLE
+//#define SOFTWARE_BUTTONS_ENABLE
 #define SOFTWARE_BUTTONS_PORITION_RIGHT
 
 #define SOFTWARE_BUTTONS_BAR_SIZE 30
 #define SOFTWARE_BUTTONS_PADDING 50
 
-#define SOFTWARE_KEYBOARD_ENABLE
+//#define SOFTWARE_KEYBOARD_ENABLE
 
 #define DEBUG_SERIAL
 

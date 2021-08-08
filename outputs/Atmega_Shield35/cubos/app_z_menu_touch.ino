@@ -183,8 +183,10 @@ const unsigned char appNameClass::icon[] PROGMEM = {
 };
 
 void appNameClass::onCreate(){
+    setBackgroundColor(0, 0, 0); 
     this->drawIcons(true);
-    
+    //setDrawColor(255,255,255);
+    //drawRect(210, 20, 239, 239, true);
 }
 
 void appNameClass::drawIcons(bool draw){
@@ -245,6 +247,7 @@ void appNameClass::onEvent(unsigned char event, int val1, int val2){
 
     }else if(event==EVENT_ON_TOUCH_RELEASED){
       #ifdef TOUCH_SCREEN_ENABLE
+        /*
         #ifdef PLATFORM_PC_EMULATOR
           this->drawIcons(false);
           float position = ((float)this->scroll_y)/((float)SINGLE_ELEMENT_REAL_HEIGHT);
@@ -278,6 +281,7 @@ void appNameClass::onEvent(unsigned char event, int val1, int val2){
             this->drawIcons(true);
           }
         #endif
+        */
       #endif
     }else if(event==EVENT_ON_TOUCH_DRAG){
 
@@ -286,7 +290,8 @@ void appNameClass::onEvent(unsigned char event, int val1, int val2){
       this->scroll_y -= val2;
       if(scroll_y<0) scroll_y = 0;
 
-      int max_scroll = (APP_MENU_APPLICATIONS_QUANTITY-1)/SINGLE_ELEMENTS_IN_Y*SINGLE_ELEMENT_REAL_HEIGHT + STYLE_STATUSBAR_HEIGHT+1+SINGLE_ELEMENT_REAL_HEIGHT - SCREEN_HEIGHT;
+      //int max_scroll = (APP_MENU_APPLICATIONS_QUANTITY-1)/SINGLE_ELEMENTS_IN_Y*SINGLE_ELEMENT_REAL_HEIGHT + STYLE_STATUSBAR_HEIGHT+1+SINGLE_ELEMENT_REAL_HEIGHT - SCREEN_HEIGHT;
+      int max_scroll = (APP_MENU_APPLICATIONS_QUANTITY-1)/SINGLE_ELEMENTS_IN_X*SINGLE_ELEMENT_REAL_HEIGHT + STYLE_STATUSBAR_HEIGHT+1+SINGLE_ELEMENT_REAL_HEIGHT - SCREEN_HEIGHT;
       if(scroll_y>max_scroll) {
         scroll_y = max_scroll;
       }
