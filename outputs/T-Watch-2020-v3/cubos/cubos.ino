@@ -311,7 +311,7 @@
 #define PEDOMETER_STEP_DETECTION_DELAY_SEC_STEP         10
 #define PEDOMETER_STEP_DETECTION_DELAY_SEC_MAX          60 // MAX (240 - PEDOMETER_STEP_DETECTION_PERIOD_MS/1000) and multiple 60 seconds
 
-#define CORE_PEDOMETER_SLEEP_COUNTING_SPOINTS           10 // mesures for sleep detection 
+#define CORE_PEDOMETER_SLEEP_COUNTING_SPOINTS           12 // mesures for sleep detection 
 #define COREPEDOMETER_CENTRALWIGHT_SLEEP_VALUE_MIN      0.05f
 #define COREPEDOMETER_DELTA_SLEEP_VALUE_MIN_100         6 // acceletometer sensitivity/100*G for sleep detection
 
@@ -319,6 +319,8 @@
 #define APP_BATTERY_FONT_SIZE                   1
 //#define DEBUG_CPU_CONTROLL_ENABLE
 //#define DEBUG_CORE_POWERSAVE
+
+#define pedometer_days_steps_IN_SEC                          1.68f
 
 #define DEBUG_SERIAL
 #define PEDOMETER_ENABLE_ON_START true
