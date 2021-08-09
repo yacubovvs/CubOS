@@ -687,6 +687,7 @@ void debug(String string, int delaytime){
 #define APP_MENU_APPLICATIONS_4             BatteryApp
 #define APP_MENU_APPLICATIONS_5             I2CScannerApp
 #define APP_MENU_APPLICATIONS_6             TestApplicationApp
+#define APP_MENU_APPLICATIONS_7             SoftResetApp
 
 /*
     # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #

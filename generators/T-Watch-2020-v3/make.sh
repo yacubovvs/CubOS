@@ -23,9 +23,11 @@ cp sdk/apps/app_clock.ino           outputs/T-Watch-2020-v3/cubos/
 #cp sdk/apps/app_touchTest.ino       outputs/T-Watch-2020-v3/cubos/
 cp sdk/apps/app_pedometer_test.ino  outputs/T-Watch-2020-v3/cubos/
 cp sdk/apps/app_pedometer.ino       outputs/T-Watch-2020-v3/cubos/
+cp sdk/apps/app_soft_reset.ino      outputs/T-Watch-2020-v3/cubos/
 #cp sdk/apps/app_ble_tester.ino      outputs/T-Watch-2020-v3/cubos/
 #cp sdk/apps/app_z_menu_touch.ino    outputs/T-Watch-2020-v3/cubos/
 cp sdk/apps/app_z_menu_watch.ino    outputs/T-Watch-2020-v3/cubos/
+
 
 # External libraries
 #cp external_libs/AXP202/axp20x.cpp                  outputs/T-Watch-2020-v3/cubos/
