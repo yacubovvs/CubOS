@@ -24,5 +24,5 @@
 ## How to install
 1. Install Arduino IDE
 2. Add ESP32 boards support to Arduino IDE
-3. Copy folder https://github.com/yacubovvs/cubos3/tree/main/external_libs/TFT_eSPI%20(T-Wristband%20ttgo) to Arduino libraries
-4. Download and upload Arduino project https://github.com/yacubovvs/cubos3/tree/main/releases/M5StickC/cubos
+3. Copy folder https://github.com/yacubovvs/CubOS/tree/main/external_libs/TFT_eSPI%20(T-Wristband%20ttgo) to Arduino libraries
+4. Download and upload Arduino project https://github.com/yacubovvs/CubOS/tree/main/releases/M5StickC/cubos
