@@ -26,7 +26,7 @@
 
 ## Extras
 ### Holder model
-STL holder model for 3D printing: https://github.com/yacubovvs/cubos3/tree/main/releases/M5StickC/models
+STL holder model for 3D printing: https://github.com/yacubovvs/CubOS/tree/main/releases/M5StickC/models
 <img alt="CubOS onM5StickC view" src="images\m5stickc_with_holder.png" height="400">
 <img alt="CubOS onM5StickC view" src="images\m5Watch.png" height="400">
 
@@ -34,4 +34,4 @@ STL holder model for 3D printing: https://github.com/yacubovvs/cubos3/tree/main/
 1. Install Arduino IDE
 2. Add ESP32 boards support to Arduino IDE
 3. Add library (https://github.com/m5stack/M5StickC) to Arduino IDE
-4. Download and upload Arduino project https://github.com/yacubovvs/cubos3/tree/main/releases/M5StickC/cubos
+4. Download and upload Arduino project https://github.com/yacubovvs/CubOS/tree/main/releases/M5StickC/cubos
