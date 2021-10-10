@@ -377,18 +377,8 @@ void core_views_draw_active_page(
     ############################################################################################
 */
 
-
 #define CORE_VIEWS_APPICON_IMAGE_WIDTH          32
 #define CORE_VIEWS_APPICON_IMAGE_HEIGHT         32
-#ifdef USE_L_MENU_IMAGES
-    #define CORE_VIEWS_APPICON_IMAGE_WIDTH          56 
-    #define CORE_VIEWS_APPICON_IMAGE_HEIGHT         56 
-#endif
-#ifdef USE_XL_MENU_IMAGES
-    #define CORE_VIEWS_APPICON_IMAGE_WIDTH          80
-    #define CORE_VIEWS_APPICON_IMAGE_HEIGHT         80
-#endif
-
 #define CORE_VIEWS_APPICON_IMAGE_Y_OFFSET       -10
 #define CORE_VIEWS_APPICON_TITLE_Y_OFFSET       20
 
@@ -398,12 +388,7 @@ void core_views_draw_app_icon(bool draw, int x, int y, const unsigned char* titl
 
     // title
     if(draw){
-        #ifdef LIGHT_COLOR_THEME
-            setDrawColor(0, 0, 0);
-        #else 
-            setDrawColor(255, 255, 255);
-        #endif
-
+        setDrawColor(255, 255, 255);
         drawString_centered((char*)title, x, y + CORE_VIEWS_APPICON_TITLE_Y_OFFSET);
     }else{
         setDrawColor(getBackgroundColor_red(), getBackgroundColor_green(), getBackgroundColor_blue());

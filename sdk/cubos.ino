@@ -63,14 +63,16 @@ Application* currentApp;
 
 void setup(){   
 
-  #ifdef DEBUG_SERIAL
-      DEBUG_SERIAL_PORT.begin(115200);
-      delay(100);
-      debug("\n\nSerial debug started " + String(millis()));
-  #endif
-
   #ifdef CORE_SETUP_INIT
     core_setup_driver();
+  #endif
+
+  #ifdef DEBUG_SERIAL
+    #ifndef DO_NOT_INIT_SERIAL
+      DEBUG_SERIAL_PORT.begin(115200);
+    #endif
+    delay(500);
+    debug("\n\nSerial debug started " + String(millis()));
   #endif
 
   #ifdef RUN_BACKGROUND_AFTER_RESTART_MCU
@@ -191,7 +193,7 @@ void setup(){
 
 bool isInSleep = false;
 void loop(){
-
+  
   #ifdef CORE_SETUP_INIT
     core_loop_driver();
   #endif

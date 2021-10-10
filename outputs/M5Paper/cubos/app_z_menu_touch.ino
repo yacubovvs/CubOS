@@ -192,11 +192,7 @@ const unsigned char appNameClass::icon[] PROGMEM = {
 };
 
 void appNameClass::onCreate(){
-    #ifdef LIGHT_COLOR_THEME
-      setBackgroundColor(255, 255, 255); 
-    #else
-      setBackgroundColor(0, 0, 0); 
-    #endif
+    setBackgroundColor(0, 0, 0); 
     this->drawIcons(true);
     //setDrawColor(255,255,255);
     //drawRect(210, 20, 239, 239, true);
