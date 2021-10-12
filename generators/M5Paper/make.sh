@@ -25,14 +25,16 @@ cp sdk/apps/app_clock.ino           outputs/M5Paper/cubos/
 cp sdk/apps/app_filemanager.ino     outputs/M5Paper/cubos/
 cp sdk/apps/app_internet.ino        outputs/M5Paper/cubos/
 cp sdk/apps/app_simplegame.ino      outputs/M5Paper/cubos/
-cp sdk/apps/app_z_menu_touch.ino          outputs/M5Paper/cubos/
+cp sdk/apps/app_touchTest.ino       outputs/M5Paper/cubos/
+cp sdk/apps/app_z_menu_touch.ino    outputs/M5Paper/cubos/
 #cp sdk/apps/app_pedometer_test.ino  outputs/M5Paper/cubos/
 
 # Drivers
-cp sdk/drivers/driver_display_M5Paper.ino               outputs/M5Paper/cubos/    
-cp sdk/drivers/driver_setup_M5Paper.ino                 outputs/M5Paper/cubos/    
-cp sdk/drivers/driver_controls_M5Paper.ino              outputs/M5Paper/cubos/    
-#cp sdk/drivers/driver_cpu_M5Paper.ino                  outputs/M5Paper/cubos/    
+cp sdk/drivers/driver_display_M5Paper.ino               outputs/M5Paper/cubos/
+cp sdk/drivers/driver_setup_M5Paper.ino                 outputs/M5Paper/cubos/
+cp sdk/drivers/driver_controls_M5Paper.ino              outputs/M5Paper/cubos/
+cp sdk/drivers/driver_touchscreen_M5Paper.ino           outputs/M5Paper/cubos/
+#cp sdk/drivers/driver_cpu_M5Paper.ino                  outputs/M5Paper/cubos/
 
 # Core
 cp sdk/core/core_basic.ino              outputs/M5Paper/cubos/  

@@ -1,7 +1,7 @@
 /*
     ############################################################################################
     #                                                                                          #
-    #                                   M5STICK SETTINGS +                                     #
+    #                                   M5PAPER SETTINGS +                                     #
     #                                                                                          #
     ############################################################################################
 */
@@ -32,6 +32,7 @@
 //#define COLOR_SCREEN                     // Screen is colored
 #define COLOR_GRAY_16
 #define E_PAPER_DISPLAY
+#define PARTIAL_DISPLAY_DRAWING   // For e-papers
 
 /*
 #define FRAMEBUFFER_ENABLE
@@ -44,7 +45,7 @@
 #define STARTING_APP_NUMM   -1    // for Mainmenu (default app)
 //#define STARTING_APP_NUMM    1 // Settings
 //#define STARTING_APP_NUMM    2 // Pedometer
-//#define STARTING_APP_NUMM    0
+#define STARTING_APP_NUMM    6  // TouchScreenTest
 
 #define FONT_SIZE_DEFAULT   2
 
@@ -64,7 +65,9 @@
 //#define SMOOTH_ANIMATION
 //#define NARROW_SCREEN
 
-//#define TOUCH_SCREEN_ENABLE
+#define TOUCH_SCREEN_ENABLE
+#define MULTITOUCH_SCREEN_ENABLE
+#define MULTITOUCH_SCREEN_FINGERS 2
 
 //#define FRAMEBUFFER_ENABLE
 //#define FRAMEBUFFER_TWIN_FULL
@@ -125,7 +128,7 @@
 /*
     ############################################################################################
     #                                                                                          #
-    #                                   M5STICK SETTINGS -                                     #
+    #                                   M5PAPER SETTINGS -                                     #
     #                                                                                          #
     ############################################################################################
 */
