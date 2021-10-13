@@ -272,7 +272,7 @@
         return -1;
     }
 
-    void core_software_keyboard_onEvent(unsigned char event, int val1, int val2){
+    void core_software_keyboard_onEvent(unsigned char event, int val1, int val2, int val3, int val4, int val5){
         if(!core_software_keyboard_isVisible) return; 
         
         if(event==EVENT_ON_TOUCH_START){

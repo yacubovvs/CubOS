@@ -45,22 +45,24 @@
 #define STARTING_APP_NUMM   -1    // for Mainmenu (default app)
 //#define STARTING_APP_NUMM    1 // Settings
 //#define STARTING_APP_NUMM    2 // Pedometer
-#define STARTING_APP_NUMM    6  // TouchScreenTest
+//#define STARTING_APP_NUMM    6  // TouchScreenTest
+
+#define STARTING_APP_NUMM   3
 
 #define FONT_SIZE_DEFAULT   2
 
-//#define BATTERY_ENABLE
-//#define CLOCK_ENABLE
+#define BATTERY_ENABLE
+#define CLOCK_ENABLE
 //#define USE_PRIMITIVE_HARDWARE_DRAW_ACCELERATION
 
-//#define RTC_ENABLE
+#define RTC_ENABLE
 
 //#define SCREEN_ROTATION_0
 //#define SCREEN_ROTATION_90
 //#define SCREEN_ROTATION_180
 //#define SCREEN_ROTATION_270
 
-#define STYLE_STATUSBAR_HEIGHT  20
+#define STYLE_STATUSBAR_HEIGHT  40
 
 //#define SMOOTH_ANIMATION
 //#define NARROW_SCREEN
@@ -76,7 +78,7 @@
 
 //#define SCREEN_INVERT_COLORS
 //#define SCREEN_CHANGE_BLUE_RED
-
+#define APP_MENU_TOUCH_DO_NOT_SCROLL_BY_DRAGGING
 #define USE_XL_MENU_IMAGES
 #define DRIVER_RTC_INTERRUPT_PIN    34
 
@@ -102,7 +104,7 @@
 
 #undef POWERSAVE_ENABLE
 #undef CPU_CONTROLL_ENABLE
-#undef BATTERY_ENABLE
+#define BATTERY_ENABLE
 
 #define CORE_SETUP_INIT
 /*

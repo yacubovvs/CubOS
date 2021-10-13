@@ -9,15 +9,11 @@
 #define APP_MENU_APPLICATIONS_0             ClockApp
 #define APP_MENU_APPLICATIONS_1             SettingsApp
 #define APP_MENU_APPLICATIONS_2             I2CScannerApp
-#define APP_MENU_APPLICATIONS_3             AlarmApp
-#define APP_MENU_APPLICATIONS_4             TestApplicationApp
-#define APP_MENU_APPLICATIONS_5             FileManagerApp
-#define APP_MENU_APPLICATIONS_6             TouchTest
-#define APP_MENU_APPLICATIONS_7             TestApplicationApp
-#define APP_MENU_APPLICATIONS_8             TestApplicationApp
-#define APP_MENU_APPLICATIONS_9             TestApplicationApp
-#define APP_MENU_APPLICATIONS_10            TestApplicationApp
-#define APP_MENU_APPLICATIONS_11            TestApplicationApp
+#define APP_MENU_APPLICATIONS_3             BatteryApp
+#define APP_MENU_APPLICATIONS_4             FileManagerApp
+#define APP_MENU_APPLICATIONS_5             TouchTest
+#define APP_MENU_APPLICATIONS_6             TestApplicationApp
+
 
 //#define APP_MENU_APPLICATIONS_2             PedometerAppTest
 //#define APP_MENU_APPLICATIONS_2             BatteryApp

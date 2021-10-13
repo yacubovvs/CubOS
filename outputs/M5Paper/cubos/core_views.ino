@@ -7,14 +7,50 @@
 */
 
 // background
-#define STYLE_STATUSBAR_BACKGROUND_RED      116
-#define STYLE_STATUSBAR_BACKGROUND_GREEN    0
-#define STYLE_STATUSBAR_BACKGROUND_BLUE     176
+#ifdef E_PAPER_DISPLAY
+    #ifndef STYLE_STATUSBAR_BACKGROUND_RED
+        #define STYLE_STATUSBAR_BACKGROUND_RED      0
+    #endif
+    #ifndef STYLE_STATUSBAR_BACKGROUND_GREEN
+        #define STYLE_STATUSBAR_BACKGROUND_GREEN    0
+    #endif
+    #ifndef STYLE_STATUSBAR_BACKGROUND_BLUE
+        #define STYLE_STATUSBAR_BACKGROUND_BLUE     0
+    #endif
+#else
+    #ifndef STYLE_STATUSBAR_BACKGROUND_RED
+        #define STYLE_STATUSBAR_BACKGROUND_RED      116
+    #endif
+    #ifndef STYLE_STATUSBAR_BACKGROUND_GREEN
+        #define STYLE_STATUSBAR_BACKGROUND_GREEN    0
+    #endif
+    #ifndef STYLE_STATUSBAR_BACKGROUND_BLUE
+        #define STYLE_STATUSBAR_BACKGROUND_BLUE     176
+    #endif
+#endif
 
 // text color
-#define STYLE_STATUSBAR_TEXT_RED      255
-#define STYLE_STATUSBAR_TEXT_GREEN    255
-#define STYLE_STATUSBAR_TEXT_BLUE     255
+#ifdef E_PAPER_DISPLAY
+     #ifndef STYLE_STATUSBAR_TEXT_RED
+        #define STYLE_STATUSBAR_TEXT_RED      255
+    #endif
+    #ifndef STYLE_STATUSBAR_TEXT_GREEN
+        #define STYLE_STATUSBAR_TEXT_GREEN    255
+    #endif
+    #ifndef STYLE_STATUSBAR_TEXT_BLUE
+        #define STYLE_STATUSBAR_TEXT_BLUE     255
+    #endif
+#else
+    #ifndef STYLE_STATUSBAR_TEXT_RED
+        #define STYLE_STATUSBAR_TEXT_RED      255
+    #endif
+    #ifndef STYLE_STATUSBAR_TEXT_GREEN
+        #define STYLE_STATUSBAR_TEXT_GREEN    255
+    #endif
+    #ifndef STYLE_STATUSBAR_TEXT_BLUE
+        #define STYLE_STATUSBAR_TEXT_BLUE     255
+    #endif
+#endif
 
 #ifdef BATTERY_ENABLE
 
@@ -380,17 +416,21 @@ void core_views_draw_active_page(
 
 #define CORE_VIEWS_APPICON_IMAGE_WIDTH          32
 #define CORE_VIEWS_APPICON_IMAGE_HEIGHT         32
+#define CORE_VIEWS_APPICON_IMAGE_Y_OFFSET       -10
+#define CORE_VIEWS_APPICON_TITLE_Y_OFFSET       20
+
 #ifdef USE_L_MENU_IMAGES
     #define CORE_VIEWS_APPICON_IMAGE_WIDTH          56 
     #define CORE_VIEWS_APPICON_IMAGE_HEIGHT         56 
+    #define CORE_VIEWS_APPICON_IMAGE_Y_OFFSET       -10
+    #define CORE_VIEWS_APPICON_TITLE_Y_OFFSET       20
 #endif
 #ifdef USE_XL_MENU_IMAGES
     #define CORE_VIEWS_APPICON_IMAGE_WIDTH          80
     #define CORE_VIEWS_APPICON_IMAGE_HEIGHT         80
+    #define CORE_VIEWS_APPICON_IMAGE_Y_OFFSET       -10
+    #define CORE_VIEWS_APPICON_TITLE_Y_OFFSET       45
 #endif
-
-#define CORE_VIEWS_APPICON_IMAGE_Y_OFFSET       -10
-#define CORE_VIEWS_APPICON_TITLE_Y_OFFSET       20
 
 void core_views_draw_app_icon(bool draw, int x, int y, const unsigned char* title, const unsigned char* icon){
     // image
@@ -404,13 +444,12 @@ void core_views_draw_app_icon(bool draw, int x, int y, const unsigned char* titl
             setDrawColor(255, 255, 255);
         #endif
 
-        drawString_centered((char*)title, x, y + CORE_VIEWS_APPICON_TITLE_Y_OFFSET);
+        drawString_centered((char*)title, x, y + CORE_VIEWS_APPICON_TITLE_Y_OFFSET, FONT_SIZE_DEFAULT);
     }else{
         setDrawColor(getBackgroundColor_red(), getBackgroundColor_green(), getBackgroundColor_blue());
-        clearString_centered((char*)title, x, y + CORE_VIEWS_APPICON_TITLE_Y_OFFSET);
+        clearString_centered((char*)title, x, y + CORE_VIEWS_APPICON_TITLE_Y_OFFSET, FONT_SIZE_DEFAULT);
     }
 
-    
 }
 
 void drawMenuElement(bool draw, uint16_t x, uint16_t y, uint16_t width, uint16_t height, const unsigned char* icon, String string1, String string2){

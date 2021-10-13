@@ -23,6 +23,11 @@
   #endif
 #endif
 
+unsigned char get_16GrayscaleColor(unsigned char red, unsigned char green, unsigned char blue){
+  int grayColor = ((int)red + (int)green + (int)blue)/3/16;
+  //debug("#### COLOR " + String(red) + " " + String(green) + " " + String(blue) + " - " + grayColor);
+  return 15 - (unsigned char)grayColor;
+}
 
 uint16_t get_uint16Color(unsigned char red, unsigned char green, unsigned char blue){
   #ifdef SCREEN_INVERT_COLORS

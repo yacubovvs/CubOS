@@ -12,12 +12,12 @@
 #define SINGLE_ELEMENT_MIN_WIDTH        100
 #define SINGLE_ELEMENT_MIN_HEIGHT       80
 #ifdef USE_L_MENU_IMAGES
-  #define SINGLE_ELEMENT_MIN_WIDTH        130
+  #define SINGLE_ELEMENT_MIN_WIDTH        110
   #define SINGLE_ELEMENT_MIN_HEIGHT       110
 #endif
 #ifdef USE_XL_MENU_IMAGES
   #define SINGLE_ELEMENT_MIN_WIDTH        135
-  #define SINGLE_ELEMENT_MIN_HEIGHT       105
+  #define SINGLE_ELEMENT_MIN_HEIGHT       135
 #endif
 
 #define SINGLE_ELEMENTS_IN_X            ((int)(ACTIVE_SCREEN_WIDTH/SINGLE_ELEMENT_MIN_WIDTH))
@@ -150,10 +150,16 @@ class appNameClass: public Application{
     public:
         virtual void onLoop() override;
         virtual void onDestroy() override;
-        virtual void onEvent(unsigned char event, int val1, int val2) override;
+        virtual void onEvent(unsigned char event, int val1, int val2, int val3, int val4, int val5) override;
 
         void onCreate();
-        appNameClass(){ fillScreen(0, 0, 0); super_onCreate(); onCreate(); };
+        appNameClass(){ 
+          #ifdef LIGHT_COLOR_THEME
+            fillScreen(255, 255, 255); 
+          #else
+            fillScreen(0, 0, 0); 
+          #endif
+          super_onCreate(); onCreate(); };
         static unsigned const char* getParams(const unsigned char type){
           switch(type){ 
             case PARAM_TYPE_NAME: return (unsigned char*)appName; 
@@ -238,7 +244,7 @@ void appNameClass::onLoop(){
 void appNameClass::onDestroy(){
 }
 
-void appNameClass::onEvent(unsigned char event, int val1, int val2){
+void appNameClass::onEvent(unsigned char event, int val1, int val2, int val3, int val4, int val5){
 
     if(event==EVENT_ON_TOUCH_START){
 
@@ -298,18 +304,20 @@ void appNameClass::onEvent(unsigned char event, int val1, int val2){
       #endif
     }else if(event==EVENT_ON_TOUCH_DRAG){
 
-      // SCREEN SCROLL
-      this->drawIcons(false);
-      this->scroll_y -= val2;
-      if(scroll_y<0) scroll_y = 0;
+      #ifndef APP_MENU_TOUCH_DO_NOT_SCROLL_BY_DRAGGING
+        // SCREEN SCROLL
+        this->drawIcons(false);
+        this->scroll_y -= val2;
+        if(scroll_y<0) scroll_y = 0;
 
-      //int max_scroll = (APP_MENU_APPLICATIONS_QUANTITY-1)/SINGLE_ELEMENTS_IN_Y*SINGLE_ELEMENT_REAL_HEIGHT + STYLE_STATUSBAR_HEIGHT+1+SINGLE_ELEMENT_REAL_HEIGHT - SCREEN_HEIGHT;
-      int max_scroll = (APP_MENU_APPLICATIONS_QUANTITY-1)/SINGLE_ELEMENTS_IN_X*SINGLE_ELEMENT_REAL_HEIGHT + STYLE_STATUSBAR_HEIGHT+1+SINGLE_ELEMENT_REAL_HEIGHT - SCREEN_HEIGHT;
-      if(scroll_y>max_scroll) {
-        scroll_y = max_scroll;
-      }
+        //int max_scroll = (APP_MENU_APPLICATIONS_QUANTITY-1)/SINGLE_ELEMENTS_IN_Y*SINGLE_ELEMENT_REAL_HEIGHT + STYLE_STATUSBAR_HEIGHT+1+SINGLE_ELEMENT_REAL_HEIGHT - SCREEN_HEIGHT;
+        int max_scroll = (APP_MENU_APPLICATIONS_QUANTITY-1)/SINGLE_ELEMENTS_IN_X*SINGLE_ELEMENT_REAL_HEIGHT + STYLE_STATUSBAR_HEIGHT+1+SINGLE_ELEMENT_REAL_HEIGHT - SCREEN_HEIGHT;
+        if(scroll_y>max_scroll) {
+          scroll_y = max_scroll;
+        }
 
-      this->drawIcons(true);
+        this->drawIcons(true);
+      #endif
     }
 
 }

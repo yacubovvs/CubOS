@@ -12,19 +12,26 @@ void setParticalyUpdateEnable(bool value){
 }
 //#endif
 
+void driver_display_partial_loop(){
+  if(driver_display_changed){
+    canvas.pushCanvas(0,0,UPDATE_MODE_DU4);
+    driver_display_changed = false;
+
+    debug("Display partial canvas update " + String(millis()));
+  }
+}
+
 void driver_display_loop(){
   
   //
   if(driver_display_changed){
-    //
-    if(driver_siaply_particaly_update) canvas.pushCanvas(0,0,UPDATE_MODE_DU4);
-    else canvas.pushCanvas(0,0,UPDATE_MODE_GC16);
+
+    canvas.pushCanvas(0,0,UPDATE_MODE_GC16);
     driver_display_changed = false;
 
     debug("Display canvas update " + String(millis()));
     //M5.update();
   }else{
-    //debug("Loop with out updating " + String(millis()));
     //debug("c");
     //delay(200);
     //M5.update();
@@ -36,39 +43,34 @@ void driver_display_setup(){
 }
 
 void display_driver_setPixel(int x, int y){
-	//M5.Lcd.drawPixel(x, y, current_drawColor);
   display_driver_setPixel(x, y, current_drawColor);
 }
 
-//int val = 0;
 void display_driver_setPixel(int x, int y, int color){
-  //driver_display_setDrawColor(color);
-
   driver_display_changed = true;
   canvas.drawPixel(x, y, color);
-
 }
 
-void driver_display_setBrightness(unsigned char brightness){
-  // brightness: 0..100%
-  brightness =  (unsigned char)((int)brightness*255/100);
-  //M5.Lcd.setBrightness(brightness);
-}
+void driver_display_setBrightness(unsigned char brightness){}
 
 void deriver_displayfillScreen(unsigned char red, unsigned char green, unsigned char blue){
-  //M5.Lcd.fillScreen(get_uint16Color(red, green, blue));
+  driver_display_changed = true;
+  canvas.fillRect(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT, get_16GrayscaleColor(red, green, blue));
+  //debug("Filling " + String(red) + " " + String(green) + " " + String(blue) + " " + String(get_16GrayscaleColor(red, green, blue)));
 }
 
 void driver_display_setDrawColor(unsigned char red, unsigned char green, unsigned char blue){
 
-  uint16_t grayColor = (((uint16_t)red) + ((uint16_t)green) + ((uint16_t)blue))/3;
+  //uint16_t grayColor = (((uint16_t)red) + ((uint16_t)green) + ((uint16_t)blue))/3;
   //grayColor = get_uint16Color(red, green, blue);
   //current_drawColor = get_uint16Color(red, green, blue);
   
-  current_drawColor = get_uint16Color(grayColor, grayColor, grayColor);
+  //current_drawColor = get_uint16Color(grayColor, grayColor, grayColor);
+  current_drawColor = get_16GrayscaleColor(red, green, blue);
 
-  if(grayColor<127) current_drawColor = WHITE;
-  else current_drawColor = BLACK;
+  //if(grayColor<127) current_drawColor = WHITE;
+  //if(grayColor<get_16GrayscaleColor(red, green, blue);
+  //else current_drawColor = BLACK;
 
   
 }

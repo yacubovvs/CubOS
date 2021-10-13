@@ -37,7 +37,11 @@ class Application{
 
     virtual void onLoop()     = 0;
     virtual void onDestroy()  = 0;
-    virtual void onEvent(unsigned char event, int val1, int val2) = 0;
+    virtual void onEvent(unsigned char event, int val1, int val2, int val3, int val4, int val5) = 0;
+
+    void onEvent(unsigned char event, int val1, int val2){
+      onEvent(event, val1, val2, 0, 0, 0);
+    }
 
     void super_onCreate(){
       this->preventSleep = false;
@@ -187,6 +191,10 @@ void setup(){
   #ifndef FORCE_DISPLAY_UPDATE_ON_START
     currentApp = getApp(STARTING_APP_NUMM);
     currentAppSetted = true;
+  #endif
+
+  #ifdef TOUCH_SCREEN_ENABLE
+    setup_touchScreenCore();
   #endif
   
 }

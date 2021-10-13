@@ -205,7 +205,7 @@
 /*
     ############################################################################################
     #                                                                                          #
-    #                                   M5STICK SETTINGS +                                     #
+    #                                   M5PAPER SETTINGS +                                     #
     #                                                                                          #
     ############################################################################################
 */
@@ -236,6 +236,7 @@
 //#define COLOR_SCREEN                     // Screen is colored
 #define COLOR_GRAY_16
 #define E_PAPER_DISPLAY
+#define PARTIAL_DISPLAY_DRAWING   // For e-papers
 
 /*
 #define FRAMEBUFFER_ENABLE
@@ -248,27 +249,31 @@
 #define STARTING_APP_NUMM   -1    // for Mainmenu (default app)
 //#define STARTING_APP_NUMM    1 // Settings
 //#define STARTING_APP_NUMM    2 // Pedometer
-//#define STARTING_APP_NUMM    0
+//#define STARTING_APP_NUMM    6  // TouchScreenTest
+
+#define STARTING_APP_NUMM   3
 
 #define FONT_SIZE_DEFAULT   2
 
-//#define BATTERY_ENABLE
-//#define CLOCK_ENABLE
+#define BATTERY_ENABLE
+#define CLOCK_ENABLE
 //#define USE_PRIMITIVE_HARDWARE_DRAW_ACCELERATION
 
-//#define RTC_ENABLE
+#define RTC_ENABLE
 
 //#define SCREEN_ROTATION_0
 //#define SCREEN_ROTATION_90
 //#define SCREEN_ROTATION_180
 //#define SCREEN_ROTATION_270
 
-#define STYLE_STATUSBAR_HEIGHT  20
+#define STYLE_STATUSBAR_HEIGHT  40
 
 //#define SMOOTH_ANIMATION
 //#define NARROW_SCREEN
 
-//#define TOUCH_SCREEN_ENABLE
+#define TOUCH_SCREEN_ENABLE
+#define MULTITOUCH_SCREEN_ENABLE
+#define MULTITOUCH_SCREEN_FINGERS 2
 
 //#define FRAMEBUFFER_ENABLE
 //#define FRAMEBUFFER_TWIN_FULL
@@ -277,7 +282,7 @@
 
 //#define SCREEN_INVERT_COLORS
 //#define SCREEN_CHANGE_BLUE_RED
-
+#define APP_MENU_TOUCH_DO_NOT_SCROLL_BY_DRAGGING
 #define USE_XL_MENU_IMAGES
 #define DRIVER_RTC_INTERRUPT_PIN    34
 
@@ -303,7 +308,7 @@
 
 #undef POWERSAVE_ENABLE
 #undef CPU_CONTROLL_ENABLE
-#undef BATTERY_ENABLE
+#define BATTERY_ENABLE
 
 #define CORE_SETUP_INIT
 /*
@@ -329,7 +334,7 @@
 /*
     ############################################################################################
     #                                                                                          #
-    #                                   M5STICK SETTINGS -                                     #
+    #                                   M5PAPER SETTINGS -                                     #
     #                                                                                          #
     ############################################################################################
 */
@@ -371,7 +376,11 @@ class Application{
 
     virtual void onLoop()     = 0;
     virtual void onDestroy()  = 0;
-    virtual void onEvent(unsigned char event, int val1, int val2) = 0;
+    virtual void onEvent(unsigned char event, int val1, int val2, int val3, int val4, int val5) = 0;
+
+    void onEvent(unsigned char event, int val1, int val2){
+      onEvent(event, val1, val2, 0, 0, 0);
+    }
 
     void super_onCreate(){
       this->preventSleep = false;
@@ -521,6 +530,10 @@ void setup(){
   #ifndef FORCE_DISPLAY_UPDATE_ON_START
     currentApp = getApp(STARTING_APP_NUMM);
     currentAppSetted = true;
+  #endif
+
+  #ifdef TOUCH_SCREEN_ENABLE
+    setup_touchScreenCore();
   #endif
   
 }
@@ -677,15 +690,11 @@ void debug(String string, int delaytime){
 #define APP_MENU_APPLICATIONS_0             ClockApp
 #define APP_MENU_APPLICATIONS_1             SettingsApp
 #define APP_MENU_APPLICATIONS_2             I2CScannerApp
-#define APP_MENU_APPLICATIONS_3             AlarmApp
-#define APP_MENU_APPLICATIONS_4             TestApplicationApp
-#define APP_MENU_APPLICATIONS_5             FileManagerApp
+#define APP_MENU_APPLICATIONS_3             BatteryApp
+#define APP_MENU_APPLICATIONS_4             FileManagerApp
+#define APP_MENU_APPLICATIONS_5             TouchTest
 #define APP_MENU_APPLICATIONS_6             TestApplicationApp
-#define APP_MENU_APPLICATIONS_7             TestApplicationApp
-#define APP_MENU_APPLICATIONS_8             TestApplicationApp
-#define APP_MENU_APPLICATIONS_9             TestApplicationApp
-#define APP_MENU_APPLICATIONS_10            TestApplicationApp
-#define APP_MENU_APPLICATIONS_11            TestApplicationApp
+
 
 //#define APP_MENU_APPLICATIONS_2             PedometerAppTest
 //#define APP_MENU_APPLICATIONS_2             BatteryApp

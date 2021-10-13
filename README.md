@@ -45,6 +45,7 @@ More builds at [outputs/](outputs/)
 - M5stick-C Plus
 - M5Stack
 - M5Stack Core2
+- M5Paper
 - TTGO-T-Wristband
 - TTGO-T-Wristband
 - Lilygo T-Watch-2020 v3

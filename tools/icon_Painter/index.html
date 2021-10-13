@@ -281,7 +281,7 @@
                         */
 
 
-                        /* */
+                        /* * /
                         //for 256 colors
                         
 
@@ -296,6 +296,22 @@
                         if(greenPx>255) greenPx= 255;
                         if(bluePx>255) bluePx= 255;
                         /**/
+
+                        /* */
+                        //for 8 colors
+                        
+                        var kr = 64;
+                        var kg = 64;
+                        var kb = 64;
+                        var redPx = Math.floor(redPx/kr + 0)*kr;
+                        var greenPx = Math.floor(greenPx/kg + 0)*kg;
+                        var bluePx = Math.floor(bluePx/kb + 0)*kb;
+
+                        if(redPx>255) redPx= 255;
+                        if(greenPx>255) greenPx= 255;
+                        if(bluePx>255) bluePx= 255;
+                        /**/
+
                         /* * /
                         // For green
                         redPx = (redPx + bluePx)/2;
@@ -314,7 +330,8 @@
                             bluePx = 255;
                         }
 
-                        if(redPx== 0 && greenPx == 0 && bluePx == 0){
+                        // Background to transparent
+                        if(redPx== 255 && greenPx == 255 && bluePx == 255){
                             position++;
                             continue;
                         }
@@ -322,10 +339,10 @@
                         
                         
                         // For grayScale
-                        /* * /
-                        var k = 256/3;
-                        var gray_px = (redPx + greenPx + bluePx)/3;
-                        gray_px = Math.floor(gray_px/k + 1)*k;
+                        /* */
+                        var k = 2;
+                        var gray_px = (redPx + greenPx + bluePx + 3)/3;
+                        gray_px = Math.floor(gray_px/k - 1)*k;
 
                         if(gray_px>255) gray_px= 255;
 
@@ -398,8 +415,8 @@
                 generate_result();
             }
 
-            var image_width = 56;
-            var image_height = 56;
+            var image_width = 80;
+            var image_height = 80;
 
             var cell_size = 14;
 

@@ -321,6 +321,9 @@ void core_time_loop(){
             if(currentApp->showStatusBar==true){
                 core_views_statusBar_draw_time(false);
                 core_views_statusBar_draw_time(true);
+                #ifdef PARTIAL_DISPLAY_DRAWING
+                    driver_display_partial_loop();
+                #endif
             }
         #endif
         #ifdef RTC_ENABLE

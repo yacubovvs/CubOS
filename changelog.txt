@@ -22,3 +22,11 @@
 
 2021-08-05
     Added function to stop pedometer in settings app
+
+2021-10-11 
+    Added support of M5Paper device
+    Added support for updating e-paper displays
+    Added light theme
+    Support of multitouch
+    Changed API of Events 3 variables to 6 variables (old Api is partially supported) look at "virtual void onEvent(unsigned char event, int val1, int val2, int val3, int val4, int val5) = 0;" in cubos.ino
+    Changed API of touchscreen drivers for support multitouch displays
