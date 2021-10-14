@@ -43,6 +43,7 @@
                     }
                     
                 }
+                set_core_powersave_lastUserAction();
             }else{
                 for(int i=0;i<MULTITOUCH_SCREEN_FINGERS; i++){
                     TOUCH_SCREEN_isTouching[i] = false;

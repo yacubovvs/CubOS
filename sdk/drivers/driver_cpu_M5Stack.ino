@@ -7,6 +7,8 @@
         //M5.begin();
     }
 
+    void driver_cpu_poweroff(){}
+
     void driver_cpu_loop(){
         //M5.update();
     }

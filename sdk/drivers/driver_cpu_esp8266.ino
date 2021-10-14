@@ -27,6 +27,8 @@ void driver_cpu_setup(){
     //wifi_fpm_do_sleep(0xFFFFFFF); // Sl
 }
 
+void driver_cpu_poweroff(){}
+
 void driver_cpu_wakeup(){
   WiFi.forceSleepWake();
     delay(50);

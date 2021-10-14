@@ -778,7 +778,7 @@ void drawString_centered(char * dString, int x, int y){
 }
 
 void clearString_centered(String dString, int x, int y, unsigned char fontSize){
-  clearString(dString, x - dString.length()*fontSize*FONT_CHAR_WIDTH/2, y, fontSize);  
+  clearString(dString, x - dString.length()*fontSize*FONT_CHAR_WIDTH/2 + fontSize/2, y, fontSize);  
 }
 
 void clearString_centered(char * dString, int x, int y){
@@ -794,11 +794,7 @@ void drawString_centered(String dString, int x, int y){
 }
 
 void drawString_centered(String dString, int x, int y, unsigned char fontSize){
-  drawString(dString, x - dString.length()*FONT_CHAR_WIDTH*fontSize/2, y, fontSize);  
-}
-
-void drawString_centered_fontSize(String dString, uint16_t y, unsigned char fontSize){
-  drawString(dString, (SCREEN_WIDTH - dString.length()*(FONT_CHAR_WIDTH)*fontSize)/2 + (int)(fontSize/2), y, fontSize);
+  drawString(dString, x - dString.length()*FONT_CHAR_WIDTH*fontSize/2 + fontSize/2, y, fontSize);  
 }
 
 void drawString_rightAlign(String dString, int x, int y){

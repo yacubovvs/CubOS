@@ -206,6 +206,9 @@ void appNameClass::onCreate(){
     this->drawIcons(true);
     //setDrawColor(255,255,255);
     //drawRect(210, 20, 239, 239, true);
+    #ifdef PARTIAL_DISPLAY_DRAWING
+      driver_display_loop();
+    #endif
 }
 
 void appNameClass::drawIcons(bool draw){

@@ -17,13 +17,14 @@ unsigned char core_battery_getPercent(){
             last_upodate_battery = millis();
             
             if(currentApp->showStatusBar){
-                core_views_draw_statusbar_battery(false, driver_battery_getPercent());
-                core_views_draw_statusbar_battery(true, driver_battery_getPercent());
-                #ifdef PARTIAL_DISPLAY_DRAWING
-                    driver_display_partial_loop();
-                #endif
+                bool needToUpdate = core_views_draw_statusbar_battery(false, driver_battery_getPercent());
+                if(needToUpdate){
+                    core_views_draw_statusbar_battery(true, driver_battery_getPercent());
+                    #ifdef PARTIAL_DISPLAY_DRAWING
+                        driver_display_partial_loop();
+                    #endif
+                }
             }
-            
         }
 
         //ICON_BATTERY_100

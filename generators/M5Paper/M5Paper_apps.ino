@@ -13,6 +13,8 @@
 #define APP_MENU_APPLICATIONS_4             FileManagerApp
 #define APP_MENU_APPLICATIONS_5             TouchTest
 #define APP_MENU_APPLICATIONS_6             TestApplicationApp
+#define APP_MENU_APPLICATIONS_7             TestButtonsApp
+#define APP_MENU_APPLICATIONS_8             PowerOffApp
 
 
 //#define APP_MENU_APPLICATIONS_2             PedometerAppTest

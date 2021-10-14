@@ -17,7 +17,7 @@ void driver_display_partial_loop(){
     canvas.pushCanvas(0,0,UPDATE_MODE_DU4);
     driver_display_changed = false;
 
-    debug("Display partial canvas update " + String(millis()));
+    //debug("Display partial canvas update " + String(millis()));
   }
 }
 
@@ -29,7 +29,7 @@ void driver_display_loop(){
     canvas.pushCanvas(0,0,UPDATE_MODE_GC16);
     driver_display_changed = false;
 
-    debug("Display canvas update " + String(millis()));
+    //debug("Display canvas update " + String(millis()));
     //M5.update();
   }else{
     //debug("c");
@@ -51,6 +51,7 @@ void display_driver_setPixel(int x, int y, int color){
   canvas.drawPixel(x, y, color);
 }
 
+unsigned char driver_display_getBrightness(){return 0;}
 void driver_display_setBrightness(unsigned char brightness){}
 
 void deriver_displayfillScreen(unsigned char red, unsigned char green, unsigned char blue){

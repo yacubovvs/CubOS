@@ -1,4 +1,3 @@
-
 #define _millis() millis()
 
 unsigned long last_user_activity = _millis();
@@ -9,9 +8,11 @@ unsigned long driver_control_time_pressed[]                 = {0, 0, 0};
 unsigned long driver_control_DOUBLE_PRESS_lastPress[]       = {0, 0, 0};
 unsigned long driver_control_DOUBLE_PRESS_doublePressed[]   = {false, false, false};
 unsigned long driver_control_IS_LONG_PRESS[]                = {false, false, false};
-
+unsigned char driver_control_buttonsPins[]                  = {37,   38,    39};
 void driver_controls_setup(){
   last_user_activity = _millis();
+
+  
 }
 
 void driver_controls_loop(){
@@ -19,15 +20,17 @@ void driver_controls_loop(){
     //debug(String(i) + " not pressed", 1000);
     //debug("Controls loop ", 1000);
 
-    /*
     for (unsigned char i=0; i<DRIVER_CONTROLS_TOTALBUTTONS; i++){
         if (
-            (i==0 && M5.BtnA.isPressed())||
-            (i==1 && M5.BtnB.isPressed())||
-            (i==2 && M5.BtnC.isPressed())
+            !digitalRead(driver_control_buttonsPins[i])
         ){
+        /*if (
+            (i==0 && M5.BtnL.isPressed())||
+            (i==1 && M5.BtnP.isPressed())||
+            (i==2 && M5.BtnR.isPressed())
+        ){*/
         #ifdef POWERSAVE_ENABLE
-            //set_core_powersave_lastUserAction();
+            set_core_powersave_lastUserAction();
         #endif
         
         last_user_activity = _millis();
@@ -83,24 +86,23 @@ void driver_controls_loop(){
         driver_control_DOUBLE_PRESS_lastPress[i]=0;
         }
     }
-    */
 
 }
 
-/*
-unsigned long driver_control_get_last_user_avtivity(){
+/*unsigned long driver_control_get_last_user_avtivity(){
   return last_user_activity;
 }
-*/
+
 
 void driver_control_set_last_user_avtivity(unsigned long time){
   last_user_activity = time;
 }
+*/
 
 void onButtonEvent(unsigned char event, int button){
-  currentApp->onEvent(event, buttons_purpose[button], 0);
+  currentApp->onEvent(event, buttons_purpose[button], 0, 0, 0, button);
 }
 
 void onButtonEvent(unsigned char event, int button, int value){
-  currentApp->onEvent(event, buttons_purpose[button], value);
+  currentApp->onEvent(event, buttons_purpose[button], value, 0, 0, button);
 }

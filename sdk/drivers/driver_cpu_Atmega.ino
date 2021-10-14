@@ -9,6 +9,8 @@ void driver_cpu_wakeup(){
 
 }
 
+void driver_cpu_poweroff(){}
+
 void driver_cpu_sleep(unsigned char sleepType, long timeout_ms){
     
     switch (sleepType)

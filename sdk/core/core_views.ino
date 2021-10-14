@@ -118,7 +118,7 @@
 #endif
 
 String core_views_statusBar_draw_time_TimeString = "";
-void core_views_statusBar_draw_time(bool draw){
+bool core_views_statusBar_draw_time(bool draw){
     bool lastLimits = DRAW_LIMITS_getEnable();
     DRAW_LIMITS_setEnable(false);
 
@@ -135,10 +135,16 @@ void core_views_statusBar_draw_time(bool draw){
         core_views_statusBar_draw_time_TimeString = core_time_getHourMinuteTime();
         drawString(core_views_statusBar_draw_time_TimeString, 5, STYLE_STATUSBAR_HEIGHT/2 - FONT_CHAR_HEIGHT/2 + ( (STYLE_STATUSBAR_HEIGHT)%2 ) + ( (FONT_CHAR_HEIGHT)%2 ) + CORE_VIEWS_STATUSBAR_TIMESTRING_OFFSET, FONT_SIZE_DEFAULT);
     }else{
-        setDrawColor(STYLE_STATUSBAR_BACKGROUND_RED, STYLE_STATUSBAR_BACKGROUND_GREEN, STYLE_STATUSBAR_BACKGROUND_BLUE);
-        clearString(core_views_statusBar_draw_time_TimeString, 5, STYLE_STATUSBAR_HEIGHT/2 - FONT_CHAR_HEIGHT/2 + ( (STYLE_STATUSBAR_HEIGHT)%2 ) + ( (FONT_CHAR_HEIGHT)%2 ) + CORE_VIEWS_STATUSBAR_TIMESTRING_OFFSET, FONT_SIZE_DEFAULT);
+        if(core_views_statusBar_draw_time_TimeString!=core_time_getHourMinuteTime()){
+            setDrawColor(STYLE_STATUSBAR_BACKGROUND_RED, STYLE_STATUSBAR_BACKGROUND_GREEN, STYLE_STATUSBAR_BACKGROUND_BLUE);
+            clearString(core_views_statusBar_draw_time_TimeString, 5, STYLE_STATUSBAR_HEIGHT/2 - FONT_CHAR_HEIGHT/2 + ( (STYLE_STATUSBAR_HEIGHT)%2 ) + ( (FONT_CHAR_HEIGHT)%2 ) + CORE_VIEWS_STATUSBAR_TIMESTRING_OFFSET, FONT_SIZE_DEFAULT);    
+        }else{
+            DRAW_LIMITS_setEnable(lastLimits);
+            return false;
+        }
     }
     DRAW_LIMITS_setEnable(lastLimits);
+    return true;
 }
 
 #ifdef SOFTWARE_BUTTONS_ENABLE
@@ -276,7 +282,10 @@ void core_views_statusBar_draw(){
 #ifdef BATTERY_ENABLE
     unsigned char batteryCharge_last = 0;
     bool batteryCharge_last_wasCharging = false;
-    void core_views_draw_statusbar_battery(bool draw, unsigned char batteryCharge){
+    bool core_views_draw_statusbar_battery(bool draw, unsigned char batteryCharge){
+
+        if(!draw && batteryCharge_last==batteryCharge) return false;
+
         TEMPORARILY_DISABLE_BACKGROUND();
 
         setBackgroundColor(STYLE_STATUSBAR_BACKGROUND_RED, STYLE_STATUSBAR_BACKGROUND_GREEN, STYLE_STATUSBAR_BACKGROUND_BLUE);
@@ -288,6 +297,8 @@ void core_views_statusBar_draw(){
         drawBatteryIcon(SCREEN_WIDTH-32-STYLE_STATUSBAR_HEIGHT/5, STYLE_STATUSBAR_HEIGHT/2 - 8 + 1, batteryCharge_last, batteryCharge_last_wasCharging, draw);
 
         TEMPORARILY_RESTORE_BACKGROUND();
+
+        return true;
     }
 
     void drawBatteryIcon(int x, int y, unsigned char charge, bool isCharging, bool draw){

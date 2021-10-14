@@ -65,13 +65,13 @@ float driver_battery_Temp(){
 
 unsigned char driver_battery_getPercent(){
     int mV = driver_battery_getVoltage_mV();
-    if(mV>=4000){
+    if(mV>=4100){
         return 100;
     }else if(mV<=3200){
         return 0;
     }else{
         int dmV = mV - 3200;
-        return dmV*10/80;
+        return dmV*10/90;
     }
     return 0;
 }

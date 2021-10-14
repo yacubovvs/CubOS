@@ -85,12 +85,12 @@
 #define SLEEP_LIGHT                         0x03
 #define SLEEP_MODEM                         0x04
 #define SLEEP_DISPLAY                       0x05
-#define SLEEP_HIBERNATE                     0x03
-#define WAKE_MODEM                          0x06
-#define WAKE_DISPLAY                        0x07
-#define WAKE                                0x08
-#define SLEEP_LIGHT_SCREEN_OFF              0x09
-#define SLEEP_LIGHT_ACCELEROMETER_SLEEP     0x0A
+#define SLEEP_HIBERNATE                     0x06
+#define WAKE_MODEM                          0x07
+#define WAKE_DISPLAY                        0x08
+#define WAKE                                0x09
+#define SLEEP_LIGHT_SCREEN_OFF              0x0A
+#define SLEEP_LIGHT_ACCELEROMETER_SLEEP     0x0B
 
 
 #define IN_APP_SLEEP_TYPE       SLEEP_LIGHT
@@ -229,9 +229,8 @@
 #define ON_TIME_CHANGE_EVERY_MS 1000
 
 #define HARDWARE_BUTTONS_ENABLED              // Conf of controls with hardware btns    
-
 #define DRIVER_CONTROLS_TOTALBUTTONS 3
-#define DRIVER_CONTROLS_DELAY_BEFORE_LONG_PRESS 350
+#define DRIVER_CONTROLS_DELAY_BEFORE_LONG_PRESS 600
 
 //#define COLOR_SCREEN                     // Screen is colored
 #define COLOR_GRAY_16
@@ -251,7 +250,7 @@
 //#define STARTING_APP_NUMM    2 // Pedometer
 //#define STARTING_APP_NUMM    6  // TouchScreenTest
 
-#define STARTING_APP_NUMM   3
+//#define STARTING_APP_NUMM   7
 
 #define FONT_SIZE_DEFAULT   2
 
@@ -287,6 +286,7 @@
 #define DRIVER_RTC_INTERRUPT_PIN    34
 
 #define IN_APP_SLEEP_TYPE       SLEEP_LIGHT
+#define WAKEUP_FOR_BACKGROUND_WORK_IDLE 60000
 //#define STAND_BY_SLEEP_TYPE     SLEEP_LIGHT_SCREEN_OFF
 #define STAND_BY_SLEEP_TYPE     SLEEP_DEEP
 
@@ -297,17 +297,18 @@
 
 //#define ACCELEROMETER_ENABLE
 //#define MAGNITOMETER_ENABLE
-//#define PEDOMETER_ENABLE
+#undef PEDOMETER_ENABLE
 //#define DEBUG_PEDOMETER
 #undef DISPLAY_BACKLIGHT_FADE_CONTROL_ENABLE
 
 
 
-#define DEFAULT_TIME_TO_POWEROFF_DISPLAY        15
+#define DEFAULT_TIME_TO_POWEROFF_DISPLAY        300
 #define DEFAULT_DELAY_TO_FADE_DISPLAY           10
 
-#undef POWERSAVE_ENABLE
-#undef CPU_CONTROLL_ENABLE
+#define POWERSAVE_ENABLE
+#define CPU_CONTROLL_ENABLE
+#define CPU_SLEEP_ENABLE
 #define BATTERY_ENABLE
 
 #define CORE_SETUP_INIT
@@ -331,6 +332,9 @@
 
 #define DEBUG_SERIAL_PORT Serial
 #define DO_NOT_INIT_SERIAL
+
+//#define DEBUG_CPU_CONTROLL_ENABLE
+//#define DEBUG_CORE_POWERSAVE
 /*
     ############################################################################################
     #                                                                                          #
@@ -540,7 +544,7 @@ void setup(){
 
 bool isInSleep = false;
 void loop(){
-  
+
   #ifdef CORE_SETUP_INIT
     core_loop_driver();
   #endif
@@ -694,6 +698,8 @@ void debug(String string, int delaytime){
 #define APP_MENU_APPLICATIONS_4             FileManagerApp
 #define APP_MENU_APPLICATIONS_5             TouchTest
 #define APP_MENU_APPLICATIONS_6             TestApplicationApp
+#define APP_MENU_APPLICATIONS_7             TestButtonsApp
+#define APP_MENU_APPLICATIONS_8             PowerOffApp
 
 
 //#define APP_MENU_APPLICATIONS_2             PedometerAppTest

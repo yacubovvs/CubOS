@@ -201,7 +201,7 @@ void setup(){
 
 bool isInSleep = false;
 void loop(){
-  
+
   #ifdef CORE_SETUP_INIT
     core_loop_driver();
   #endif

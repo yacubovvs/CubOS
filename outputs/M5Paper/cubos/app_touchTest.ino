@@ -12,7 +12,15 @@ class appNameClass: public Application{
         void onCreate();
         void drawLabelFingers(bool draw, unsigned char event, unsigned char finger, int x, int y);
         appNameClass(){ 
-            fillScreen(0, 0, 0);  // filling background
+            //fillScreen(0, 0, 0);  // filling background
+            
+            #ifdef LIGHT_COLOR_THEME
+                setBackgroundColor(255, 255, 255); 
+                fillScreen(255, 255, 255);
+            #else
+                setBackgroundColor(0, 0, 0);
+                fillScreen(0, 0, 0);
+            #endif
             super_onCreate();           // Drawind statusbar and etc if needed
             onCreate(); 
         };
