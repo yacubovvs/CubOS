@@ -30,3 +30,7 @@
     Support of multitouch
     Changed API of Events 3 variables to 6 variables (old Api is partially supported) look at "virtual void onEvent(unsigned char event, int val1, int val2, int val3, int val4, int val5) = 0;" in cubos.ino
     Changed API of touchscreen drivers for support multitouch displays
+
+2021-10-15
+    Added battery support for Opensmartwatch
+    Added support for round displays
