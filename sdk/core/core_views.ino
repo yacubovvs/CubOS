@@ -266,14 +266,21 @@ void core_views_statusBar_draw(){
     setDrawColor(STYLE_STATUSBAR_BACKGROUND_RED, STYLE_STATUSBAR_BACKGROUND_GREEN, STYLE_STATUSBAR_BACKGROUND_BLUE);
     drawRect(0, 0, SCREEN_WIDTH-1, STYLE_STATUSBAR_HEIGHT, true);
 
-    // TIME
-    #ifdef CLOCK_ENABLE
-        core_views_statusBar_draw_time(true);
-    #endif
+    #ifdef ROUND_SCREEN
+        // BATTERY
+        #ifdef BATTERY_ENABLE
+            core_views_draw_statusbar_battery(true, driver_battery_getPercent());
+        #endif
+    #else
+        // TIME
+        #ifdef CLOCK_ENABLE
+            core_views_statusBar_draw_time(true);
+        #endif
 
-    // BATTERY
-    #ifdef BATTERY_ENABLE
-        core_views_draw_statusbar_battery(true, driver_battery_getPercent());
+        // BATTERY
+        #ifdef BATTERY_ENABLE
+            core_views_draw_statusbar_battery(true, driver_battery_getPercent());
+        #endif
     #endif
 
     DRAW_LIMITS_setEnable(DRAW_LIMITS_Enabled);
@@ -293,8 +300,12 @@ void core_views_statusBar_draw(){
             batteryCharge_last = batteryCharge;
             batteryCharge_last_wasCharging = driver_battery_isCharging();
         }
-
-        drawBatteryIcon(SCREEN_WIDTH-32-STYLE_STATUSBAR_HEIGHT/5, STYLE_STATUSBAR_HEIGHT/2 - 8 + 1, batteryCharge_last, batteryCharge_last_wasCharging, draw);
+        
+        #ifdef ROUND_SCREEN
+            drawBatteryIcon(SCREEN_WIDTH/2-32/2, STYLE_STATUSBAR_HEIGHT/2 - 8 + 1, batteryCharge_last, batteryCharge_last_wasCharging, draw);
+        #else
+            drawBatteryIcon(SCREEN_WIDTH-32-STYLE_STATUSBAR_HEIGHT/5, STYLE_STATUSBAR_HEIGHT/2 - 8 + 1, batteryCharge_last, batteryCharge_last_wasCharging, draw);
+        #endif
 
         TEMPORARILY_RESTORE_BACKGROUND();
 

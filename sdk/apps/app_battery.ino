@@ -43,8 +43,13 @@ class appNameClass: public Application{
 };
 
 void appNameClass::drawStringOnScreen(String stringToPrint){
-    drawString(stringToPrint, 5, STYLE_STATUSBAR_HEIGHT + currentPrintScreenString*10*APP_BATTERY_FONT_SIZE + 10, APP_BATTERY_FONT_SIZE);
-    currentPrintScreenString ++;
+    #ifdef ROUND_SCREEN
+        drawString_centered(stringToPrint, SCREEN_WIDTH/2, STYLE_STATUSBAR_HEIGHT + currentPrintScreenString*10*APP_BATTERY_FONT_SIZE + 10, APP_BATTERY_FONT_SIZE);
+        currentPrintScreenString ++;
+    #else
+        drawString(stringToPrint, 5, STYLE_STATUSBAR_HEIGHT + currentPrintScreenString*10*APP_BATTERY_FONT_SIZE + 10, APP_BATTERY_FONT_SIZE);
+        currentPrintScreenString ++;
+    #endif
 }
 
 /*

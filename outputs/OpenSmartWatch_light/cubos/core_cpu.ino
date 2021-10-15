@@ -23,7 +23,36 @@
 
     void core_cpu_sleep(unsigned char SLEEP_TYPE, long timeToWakeUp_s, bool accelerometer_sleep){
         #ifdef DEBUG_CPU_CONTROLL_ENABLE
-            debug("DEBUG_CPU_CONTROLL_ENABLE: going to sleep " + String(SLEEP_TYPE) + " for " + String(timeToWakeUp_s), 25);
+            String sleepTypeText;
+
+            switch (SLEEP_TYPE){
+                case SLEEP_IDLE_CPU:
+                    sleepTypeText = "SLEEP_IDLE_CPU"; break;
+                case SLEEP_DEEP:
+                    sleepTypeText = "SLEEP_DEEP"; break;
+                case SLEEP_LIGHT:
+                    sleepTypeText = "SLEEP_LIGHT"; break;
+                case SLEEP_MODEM:
+                    sleepTypeText = "SLEEP_MODEM"; break;
+                case SLEEP_DISPLAY:
+                    sleepTypeText = "SLEEP_DISPLAY"; break;
+                case SLEEP_HIBERNATE:
+                    sleepTypeText = "SLEEP_HIBERNATE"; break;
+                case WAKE_MODEM:
+                    sleepTypeText = "WAKE_MODEM"; break;
+                case WAKE_DISPLAY:
+                    sleepTypeText = "WAKE_DISPLAY"; break;
+                case WAKE:
+                    sleepTypeText = "WAKE"; break;
+                case SLEEP_LIGHT_SCREEN_OFF:
+                    sleepTypeText = "SLEEP_LIGHT_SCREEN_OFF"; break;
+                case SLEEP_LIGHT_ACCELEROMETER_SLEEP:
+                    sleepTypeText = "SLEEP_LIGHT_ACCELEROMETER_SLEEP"; break;
+                
+                default:
+                    sleepTypeText = "UNKNOWN"; break;
+            }
+            debug("DEBUG_CPU_CONTROLL_ENABLE: going to sleep " + sleepTypeText + " for " + String(timeToWakeUp_s), 25);
         #endif
 
         #ifdef ACCELEROMETER_ENABLE

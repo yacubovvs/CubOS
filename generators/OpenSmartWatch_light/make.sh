@@ -30,7 +30,7 @@ cp sdk/apps/app_pedometer.ino       outputs/OpenSmartWatch_light/cubos/
 cp sdk/apps/app_z_menu_watch.ino    outputs/OpenSmartWatch_light/cubos/
 
 # Drivers
-#cp sdk/drivers/driver_battery_T-Wristband_LiLyGo.ino                outputs/OpenSmartWatch_light/cubos/     
+cp sdk/drivers/driver_battery_opensmartwatch_light.ino               outputs/OpenSmartWatch_light/cubos/     
 cp sdk/drivers/driver_display_opensmartwatch.ino                     outputs/OpenSmartWatch_light/cubos/    
 cp sdk/drivers/driver_cpu_opensmartwatch_light.ino                   outputs/OpenSmartWatch_light/cubos/    
 #cp sdk/drivers/driver_display_adafruit_ST7735.ino                   outputs/OpenSmartWatch_light/cubos/     

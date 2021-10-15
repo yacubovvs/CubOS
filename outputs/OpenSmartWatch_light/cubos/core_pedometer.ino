@@ -78,7 +78,7 @@
     }
 
     #ifndef pedometer_days_steps_IN_SEC
-        #define pedometer_days_steps_IN_SEC                          1.81f
+        #define pedometer_days_steps_IN_SEC                          1.68f
     #endif
 
     #define CORE_PEDOMETER_MESURE_EVERY_MS                      (PEDOMETER_STEP_DETECTION_PERIOD_MS/PEDOMETER_MESURES_IN_STEP_DETECTION_PERIOD)

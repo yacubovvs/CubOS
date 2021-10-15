@@ -128,7 +128,7 @@ class appNameClass: public Application{
     public:
         virtual void onLoop() override;
         virtual void onDestroy() override;
-        virtual void onEvent(unsigned char event, int val1, int val2) override;
+        virtual void onEvent(unsigned char event, int val1, int val2, int val3, int val4, int val5) override;
 
         void onCreate();
         appNameClass(){ fillScreen(0, 0, 0); super_onCreate(); onCreate(); };
@@ -347,7 +347,7 @@ void appNameClass::prevApp(){
   this->updateActiveAppIndex(app_z_menu_selectedAppIndex-1);
 }
 
-void appNameClass::onEvent(unsigned char event, int val1, int val2){
+void appNameClass::onEvent(unsigned char event, int val1, int val2, int val3, int val4, int val5){
     
   /*
   BUTTON_UP

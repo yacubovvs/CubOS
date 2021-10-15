@@ -318,15 +318,19 @@ void core_time_loop(){
     long currentTime = millis()/ON_TIME_CHANGE_EVERY_MS;
     if(currentTime!=lastTimeChange){
         #ifdef CLOCK_ENABLE
-            if(currentApp->showStatusBar==true){
-                bool needToUpdateTime = core_views_statusBar_draw_time(false);
-                if(needToUpdateTime){
-                    core_views_statusBar_draw_time(true);
-                    #ifdef PARTIAL_DISPLAY_DRAWING
-                        driver_display_partial_loop();
-                    #endif
+            #ifdef ROUND_SCREEN 
+                // Do not show time on round displays
+            #else
+                if(currentApp->showStatusBar==true){
+                    bool needToUpdateTime = core_views_statusBar_draw_time(false);
+                    if(needToUpdateTime){
+                        core_views_statusBar_draw_time(true);
+                        #ifdef PARTIAL_DISPLAY_DRAWING
+                            driver_display_partial_loop();
+                        #endif
+                    }
                 }
-            }
+            #endif
         #endif
         #ifdef RTC_ENABLE
             core_time_driver_RTC_refresh();

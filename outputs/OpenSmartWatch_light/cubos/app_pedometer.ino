@@ -25,7 +25,7 @@ class appNameClass: public Application{
     public:
         virtual void onLoop() override;
         virtual void onDestroy() override;
-        virtual void onEvent(unsigned char event, int val1, int val2) override;
+        virtual void onEvent(unsigned char event, int val1, int val2, int val3, int val4, int val5) override;
 
         void onCreate();
         appNameClass(){ 
@@ -264,7 +264,7 @@ void appNameClass::onDestroy(){
     */
 }
 
-void appNameClass::onEvent(unsigned char event, int val1, int val2){
+void appNameClass::onEvent(unsigned char event, int val1, int val2, int val3, int val4, int val5){
     
     #ifdef TOUCH_SCREEN_ENABLE
         if(event==EVENT_ON_TOUCH_QUICK_SWIPE_TO_LEFT){

@@ -91,12 +91,15 @@ void driver_controls_loop(){
 
 
 void onButtonEvent(unsigned char event, int button){
-  currentApp->onEvent(event, buttons_purpose[button], 0);
+  #ifdef DEBUG_CONTROLS
+    debug("DEBUG_CONTROLS: onButtonEvent:" + String(event) + "   btn:" + String(button));
+  #endif
+  currentApp->onEvent(event, buttons_purpose[button], 0, 0, 0, button);
 }
 
 void onButtonEvent(unsigned char event, int button, int value){
   #ifdef DEBUG_CONTROLS
-    debug("DEBUG_CONTROLS: onButtonEvent " + String(event) + " " + String(value));
+    debug("DEBUG_CONTROLS: onButtonEvent:" + String(event) + "   btn:" + String(button));
   #endif
-  currentApp->onEvent(event, buttons_purpose[button], value);
+  currentApp->onEvent(event, buttons_purpose[button], value, 0, 0, button);
 }

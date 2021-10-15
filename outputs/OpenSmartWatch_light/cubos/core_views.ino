@@ -7,14 +7,50 @@
 */
 
 // background
-#define STYLE_STATUSBAR_BACKGROUND_RED      116
-#define STYLE_STATUSBAR_BACKGROUND_GREEN    0
-#define STYLE_STATUSBAR_BACKGROUND_BLUE     176
+#ifdef E_PAPER_DISPLAY
+    #ifndef STYLE_STATUSBAR_BACKGROUND_RED
+        #define STYLE_STATUSBAR_BACKGROUND_RED      0
+    #endif
+    #ifndef STYLE_STATUSBAR_BACKGROUND_GREEN
+        #define STYLE_STATUSBAR_BACKGROUND_GREEN    0
+    #endif
+    #ifndef STYLE_STATUSBAR_BACKGROUND_BLUE
+        #define STYLE_STATUSBAR_BACKGROUND_BLUE     0
+    #endif
+#else
+    #ifndef STYLE_STATUSBAR_BACKGROUND_RED
+        #define STYLE_STATUSBAR_BACKGROUND_RED      116
+    #endif
+    #ifndef STYLE_STATUSBAR_BACKGROUND_GREEN
+        #define STYLE_STATUSBAR_BACKGROUND_GREEN    0
+    #endif
+    #ifndef STYLE_STATUSBAR_BACKGROUND_BLUE
+        #define STYLE_STATUSBAR_BACKGROUND_BLUE     176
+    #endif
+#endif
 
 // text color
-#define STYLE_STATUSBAR_TEXT_RED      255
-#define STYLE_STATUSBAR_TEXT_GREEN    255
-#define STYLE_STATUSBAR_TEXT_BLUE     255
+#ifdef E_PAPER_DISPLAY
+     #ifndef STYLE_STATUSBAR_TEXT_RED
+        #define STYLE_STATUSBAR_TEXT_RED      255
+    #endif
+    #ifndef STYLE_STATUSBAR_TEXT_GREEN
+        #define STYLE_STATUSBAR_TEXT_GREEN    255
+    #endif
+    #ifndef STYLE_STATUSBAR_TEXT_BLUE
+        #define STYLE_STATUSBAR_TEXT_BLUE     255
+    #endif
+#else
+    #ifndef STYLE_STATUSBAR_TEXT_RED
+        #define STYLE_STATUSBAR_TEXT_RED      255
+    #endif
+    #ifndef STYLE_STATUSBAR_TEXT_GREEN
+        #define STYLE_STATUSBAR_TEXT_GREEN    255
+    #endif
+    #ifndef STYLE_STATUSBAR_TEXT_BLUE
+        #define STYLE_STATUSBAR_TEXT_BLUE     255
+    #endif
+#endif
 
 #ifdef BATTERY_ENABLE
 
@@ -82,7 +118,7 @@
 #endif
 
 String core_views_statusBar_draw_time_TimeString = "";
-void core_views_statusBar_draw_time(bool draw){
+bool core_views_statusBar_draw_time(bool draw){
     bool lastLimits = DRAW_LIMITS_getEnable();
     DRAW_LIMITS_setEnable(false);
 
@@ -99,10 +135,16 @@ void core_views_statusBar_draw_time(bool draw){
         core_views_statusBar_draw_time_TimeString = core_time_getHourMinuteTime();
         drawString(core_views_statusBar_draw_time_TimeString, 5, STYLE_STATUSBAR_HEIGHT/2 - FONT_CHAR_HEIGHT/2 + ( (STYLE_STATUSBAR_HEIGHT)%2 ) + ( (FONT_CHAR_HEIGHT)%2 ) + CORE_VIEWS_STATUSBAR_TIMESTRING_OFFSET, FONT_SIZE_DEFAULT);
     }else{
-        setDrawColor(STYLE_STATUSBAR_BACKGROUND_RED, STYLE_STATUSBAR_BACKGROUND_GREEN, STYLE_STATUSBAR_BACKGROUND_BLUE);
-        clearString(core_views_statusBar_draw_time_TimeString, 5, STYLE_STATUSBAR_HEIGHT/2 - FONT_CHAR_HEIGHT/2 + ( (STYLE_STATUSBAR_HEIGHT)%2 ) + ( (FONT_CHAR_HEIGHT)%2 ) + CORE_VIEWS_STATUSBAR_TIMESTRING_OFFSET, FONT_SIZE_DEFAULT);
+        if(core_views_statusBar_draw_time_TimeString!=core_time_getHourMinuteTime()){
+            setDrawColor(STYLE_STATUSBAR_BACKGROUND_RED, STYLE_STATUSBAR_BACKGROUND_GREEN, STYLE_STATUSBAR_BACKGROUND_BLUE);
+            clearString(core_views_statusBar_draw_time_TimeString, 5, STYLE_STATUSBAR_HEIGHT/2 - FONT_CHAR_HEIGHT/2 + ( (STYLE_STATUSBAR_HEIGHT)%2 ) + ( (FONT_CHAR_HEIGHT)%2 ) + CORE_VIEWS_STATUSBAR_TIMESTRING_OFFSET, FONT_SIZE_DEFAULT);    
+        }else{
+            DRAW_LIMITS_setEnable(lastLimits);
+            return false;
+        }
     }
     DRAW_LIMITS_setEnable(lastLimits);
+    return true;
 }
 
 #ifdef SOFTWARE_BUTTONS_ENABLE
@@ -224,14 +266,21 @@ void core_views_statusBar_draw(){
     setDrawColor(STYLE_STATUSBAR_BACKGROUND_RED, STYLE_STATUSBAR_BACKGROUND_GREEN, STYLE_STATUSBAR_BACKGROUND_BLUE);
     drawRect(0, 0, SCREEN_WIDTH-1, STYLE_STATUSBAR_HEIGHT, true);
 
-    // TIME
-    #ifdef CLOCK_ENABLE
-        core_views_statusBar_draw_time(true);
-    #endif
+    #ifdef ROUND_SCREEN
+        // BATTERY
+        #ifdef BATTERY_ENABLE
+            core_views_draw_statusbar_battery(true, driver_battery_getPercent());
+        #endif
+    #else
+        // TIME
+        #ifdef CLOCK_ENABLE
+            core_views_statusBar_draw_time(true);
+        #endif
 
-    // BATTERY
-    #ifdef BATTERY_ENABLE
-        core_views_draw_statusbar_battery(true, driver_battery_getPercent());
+        // BATTERY
+        #ifdef BATTERY_ENABLE
+            core_views_draw_statusbar_battery(true, driver_battery_getPercent());
+        #endif
     #endif
 
     DRAW_LIMITS_setEnable(DRAW_LIMITS_Enabled);
@@ -240,7 +289,10 @@ void core_views_statusBar_draw(){
 #ifdef BATTERY_ENABLE
     unsigned char batteryCharge_last = 0;
     bool batteryCharge_last_wasCharging = false;
-    void core_views_draw_statusbar_battery(bool draw, unsigned char batteryCharge){
+    bool core_views_draw_statusbar_battery(bool draw, unsigned char batteryCharge){
+
+        if(!draw && batteryCharge_last==batteryCharge) return false;
+
         TEMPORARILY_DISABLE_BACKGROUND();
 
         setBackgroundColor(STYLE_STATUSBAR_BACKGROUND_RED, STYLE_STATUSBAR_BACKGROUND_GREEN, STYLE_STATUSBAR_BACKGROUND_BLUE);
@@ -248,10 +300,16 @@ void core_views_statusBar_draw(){
             batteryCharge_last = batteryCharge;
             batteryCharge_last_wasCharging = driver_battery_isCharging();
         }
-
-        drawBatteryIcon(SCREEN_WIDTH-32-STYLE_STATUSBAR_HEIGHT/5, STYLE_STATUSBAR_HEIGHT/2 - 8 + 1, batteryCharge_last, batteryCharge_last_wasCharging, draw);
+        
+        #ifdef ROUND_SCREEN
+            drawBatteryIcon(SCREEN_WIDTH/2-32/2, STYLE_STATUSBAR_HEIGHT/2 - 8 + 1, batteryCharge_last, batteryCharge_last_wasCharging, draw);
+        #else
+            drawBatteryIcon(SCREEN_WIDTH-32-STYLE_STATUSBAR_HEIGHT/5, STYLE_STATUSBAR_HEIGHT/2 - 8 + 1, batteryCharge_last, batteryCharge_last_wasCharging, draw);
+        #endif
 
         TEMPORARILY_RESTORE_BACKGROUND();
+
+        return true;
     }
 
     void drawBatteryIcon(int x, int y, unsigned char charge, bool isCharging, bool draw){
@@ -377,10 +435,24 @@ void core_views_draw_active_page(
     ############################################################################################
 */
 
+
 #define CORE_VIEWS_APPICON_IMAGE_WIDTH          32
 #define CORE_VIEWS_APPICON_IMAGE_HEIGHT         32
 #define CORE_VIEWS_APPICON_IMAGE_Y_OFFSET       -10
 #define CORE_VIEWS_APPICON_TITLE_Y_OFFSET       20
+
+#ifdef USE_L_MENU_IMAGES
+    #define CORE_VIEWS_APPICON_IMAGE_WIDTH          56 
+    #define CORE_VIEWS_APPICON_IMAGE_HEIGHT         56 
+    #define CORE_VIEWS_APPICON_IMAGE_Y_OFFSET       -10
+    #define CORE_VIEWS_APPICON_TITLE_Y_OFFSET       20
+#endif
+#ifdef USE_XL_MENU_IMAGES
+    #define CORE_VIEWS_APPICON_IMAGE_WIDTH          80
+    #define CORE_VIEWS_APPICON_IMAGE_HEIGHT         80
+    #define CORE_VIEWS_APPICON_IMAGE_Y_OFFSET       -10
+    #define CORE_VIEWS_APPICON_TITLE_Y_OFFSET       45
+#endif
 
 void core_views_draw_app_icon(bool draw, int x, int y, const unsigned char* title, const unsigned char* icon){
     // image
@@ -388,14 +460,18 @@ void core_views_draw_app_icon(bool draw, int x, int y, const unsigned char* titl
 
     // title
     if(draw){
-        setDrawColor(255, 255, 255);
-        drawString_centered((char*)title, x, y + CORE_VIEWS_APPICON_TITLE_Y_OFFSET);
+        #ifdef LIGHT_COLOR_THEME
+            setDrawColor(0, 0, 0);
+        #else 
+            setDrawColor(255, 255, 255);
+        #endif
+
+        drawString_centered((char*)title, x, y + CORE_VIEWS_APPICON_TITLE_Y_OFFSET, FONT_SIZE_DEFAULT);
     }else{
         setDrawColor(getBackgroundColor_red(), getBackgroundColor_green(), getBackgroundColor_blue());
-        clearString_centered((char*)title, x, y + CORE_VIEWS_APPICON_TITLE_Y_OFFSET);
+        clearString_centered((char*)title, x, y + CORE_VIEWS_APPICON_TITLE_Y_OFFSET, FONT_SIZE_DEFAULT);
     }
 
-    
 }
 
 void drawMenuElement(bool draw, uint16_t x, uint16_t y, uint16_t width, uint16_t height, const unsigned char* icon, String string1, String string2){

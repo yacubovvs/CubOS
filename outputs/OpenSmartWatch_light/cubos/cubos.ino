@@ -85,12 +85,12 @@
 #define SLEEP_LIGHT                         0x03
 #define SLEEP_MODEM                         0x04
 #define SLEEP_DISPLAY                       0x05
-#define SLEEP_HIBERNATE                     0x03
-#define WAKE_MODEM                          0x06
-#define WAKE_DISPLAY                        0x07
-#define WAKE                                0x08
-#define SLEEP_LIGHT_SCREEN_OFF              0x09
-#define SLEEP_LIGHT_ACCELEROMETER_SLEEP     0x0A
+#define SLEEP_HIBERNATE                     0x06
+#define WAKE_MODEM                          0x07
+#define WAKE_DISPLAY                        0x08
+#define WAKE                                0x09
+#define SLEEP_LIGHT_SCREEN_OFF              0x0A
+#define SLEEP_LIGHT_ACCELEROMETER_SLEEP     0x0B
 
 
 #define IN_APP_SLEEP_TYPE       SLEEP_LIGHT
@@ -205,10 +205,17 @@
 /*
     ############################################################################################
     #                                                                                          #
-    #                                   M5STICK SETTINGS +                                     #
+    #                            OPENSMARTWATCH LIGHT SETTINGS +                               #
     #                                                                                          #
     ############################################################################################
 */
+
+#define STYLE_STATUSBAR_BACKGROUND_RED      0
+#define STYLE_STATUSBAR_BACKGROUND_GREEN    0
+#define STYLE_STATUSBAR_BACKGROUND_BLUE     0
+
+#define APP_BATTERY_FONT_SIZE 1
+
 
 #define USE_NUMBERS_MAIN_MENU_IN_ACTIVE_PAGES
 #define SCREEN_WIDTH            240     // Screen resolution width
@@ -235,13 +242,11 @@
 #define STARTING_APP_NUMM   -1    // for Mainmenu (default app)
 //#define STARTING_APP_NUMM    1 // Settings
 //#define STARTING_APP_NUMM    2 // Pedometer
-#define STARTING_APP_NUMM    0
+//#define STARTING_APP_NUMM    4
 
-#define FONT_SIZE_DEFAULT   1
+#define FONT_SIZE_DEFAULT   4
 
 #define CPU_SLEEP_ENABLE
-
-#define BATTERY_ENABLE
 #define CLOCK_ENABLE
 //#define USE_PRIMITIVE_HARDWARE_DRAW_ACCELERATION
 
@@ -255,7 +260,7 @@
 #define I2C_ENABLE
 #define CPU_CONTROLL_ENABLE
 #define POWERSAVE_ENABLE
-#undef BATTERY_ENABLE
+#define BATTERY_ENABLE
 
 #define STYLE_STATUSBAR_HEIGHT  20
 #define PEDOMETER_DO_NOT_USE_PEDOMETER_WHILE_CONNECTED_TO_USB
@@ -283,8 +288,8 @@
 //#define DEBUG_PEDOMETER
 #undef DISPLAY_BACKLIGHT_FADE_CONTROL_ENABLE
 
-#define DEFAULT_TIME_TO_POWEROFF_DISPLAY        10
-#define DEFAULT_DELAY_TO_FADE_DISPLAY           5
+#define DEFAULT_TIME_TO_POWEROFF_DISPLAY        1000
+#define DEFAULT_DELAY_TO_FADE_DISPLAY           500
 
 #define PEDOMETER_STEP_DETECTION_PERIOD_MS              1000
 #define PEDOMETER_MESURES_IN_STEP_DETECTION_PERIOD      7
@@ -306,22 +311,27 @@
 #define COREPEDOMETER_CENTRALWIGHT_SLEEP_VALUE_MIN      0.05f
 #define COREPEDOMETER_DELTA_SLEEP_VALUE_MIN_100         3 // acceletometer sensitivity/100*G for sleep detection
 
-#define APP_CLOCK_POWER_AFTER_SECONDS           10
+#define APP_CLOCK_POWER_AFTER_SECONDS           1000
 
 #define DEBUG_SERIAL
-#define DEBUG_CONTROLS
+//#define DEBUG_CONTROLS
+#define DEBUG_WAKEUP
+#define DEBUG_CORE_POWERSAVE
+
 //#define PEDOMETER_EMULATOR
 
 //#define DEBUG_PEDOMETER
 //#define DEBUG_PEDOMETER_TIMING
-//#define DEBUG_WAKEUP
+
 //#define DEBUG_DRIVER_BATTERY
 
 //#define SLEEP_VALUE_DEBUG
+
+
 /*
     ############################################################################################
     #                                                                                          #
-    #                                   M5STICK SETTINGS -                                     #
+    #                            OPENSMARTWATCH LIGHT SETTINGS -                               #
     #                                                                                          #
     ############################################################################################
 */
@@ -363,7 +373,11 @@ class Application{
 
     virtual void onLoop()     = 0;
     virtual void onDestroy()  = 0;
-    virtual void onEvent(unsigned char event, int val1, int val2) = 0;
+    virtual void onEvent(unsigned char event, int val1, int val2, int val3, int val4, int val5) = 0;
+
+    void onEvent(unsigned char event, int val1, int val2){
+      onEvent(event, val1, val2, 0, 0, 0);
+    }
 
     void super_onCreate(){
       this->preventSleep = false;
@@ -389,14 +403,16 @@ Application* currentApp;
 
 void setup(){   
 
-  #ifdef DEBUG_SERIAL
-      DEBUG_SERIAL_PORT.begin(115200);
-      delay(100);
-      debug("\n\nSerial debug started " + String(millis()));
-  #endif
-
   #ifdef CORE_SETUP_INIT
     core_setup_driver();
+  #endif
+
+  #ifdef DEBUG_SERIAL
+    #ifndef DO_NOT_INIT_SERIAL
+      DEBUG_SERIAL_PORT.begin(115200);
+    #endif
+    delay(500);
+    debug("\n\nSerial debug started " + String(millis()));
   #endif
 
   #ifdef RUN_BACKGROUND_AFTER_RESTART_MCU
@@ -511,6 +527,10 @@ void setup(){
   #ifndef FORCE_DISPLAY_UPDATE_ON_START
     currentApp = getApp(STARTING_APP_NUMM);
     currentAppSetted = true;
+  #endif
+
+  #ifdef TOUCH_SCREEN_ENABLE
+    setup_touchScreenCore();
   #endif
   
 }
