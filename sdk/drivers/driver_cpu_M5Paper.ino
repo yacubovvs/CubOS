@@ -47,7 +47,6 @@
                     currentApp->onEvent(EVENT_ON_TIME_CHANGED, 0, 0);
                 }
                 //debug("Wake up from deep sleep");
-                delay(100);
 
                 break;
             case SLEEP_LIGHT:
@@ -59,13 +58,15 @@
                 driver_controls_loop();
                 driver_display_loop();
 
-                //#define MIDDLE_WAKERUP_DELAY 200
-                #define MIDDLE_WAKERUP_DELAY 150
+                //#define MIDDLE_LIGHTSLEEP_WAKERUP_DELAY 200
+                #ifndef MIDDLE_LIGHTSLEEP_WAKERUP_DELAY
+                    #define MIDDLE_LIGHTSLEEP_WAKERUP_DELAY 150
+                #endif
 
-                for (long timer=0; timer<timeout_ms/MIDDLE_WAKERUP_DELAY; timer++){
+                for (long timer=0; timer<timeout_ms/MIDDLE_LIGHTSLEEP_WAKERUP_DELAY; timer++){
                     //debug("Middle sleep");
                     //Serial.flush();
-                    esp_sleep_enable_timer_wakeup(MIDDLE_WAKERUP_DELAY*1000);
+                    esp_sleep_enable_timer_wakeup(MIDDLE_LIGHTSLEEP_WAKERUP_DELAY*1000);
                     esp_sleep_enable_ext0_wakeup(GPIO_NUM_36, LOW);
                     esp_light_sleep_start();
 

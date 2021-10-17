@@ -33,11 +33,9 @@ cp sdk/apps/app_z_menu_watch.ino    outputs/OpenSmartWatch_light/cubos/
 cp sdk/drivers/driver_battery_opensmartwatch_light.ino               outputs/OpenSmartWatch_light/cubos/     
 cp sdk/drivers/driver_display_opensmartwatch.ino                     outputs/OpenSmartWatch_light/cubos/    
 cp sdk/drivers/driver_cpu_opensmartwatch_light.ino                   outputs/OpenSmartWatch_light/cubos/    
-#cp sdk/drivers/driver_display_adafruit_ST7735.ino                   outputs/OpenSmartWatch_light/cubos/     
 cp sdk/drivers/driver_controls_opensmartWatch_light.ino              outputs/OpenSmartWatch_light/cubos/     
-#cp sdk/drivers/driver_rtc_pcf8563.ino                               outputs/OpenSmartWatch_light/cubos/     
-#cp sdk/drivers/driver_cpu_T-Wristband_LiLyGo.ino                    outputs/OpenSmartWatch_light/cubos/     
-#cp sdk/drivers/driver_IMU_MPU9250_T-Wristband_LiLyGo.ino            outputs/OpenSmartWatch_light/cubos/     
+cp sdk/drivers/driver_rtc_ds3231.ino                                 outputs/OpenSmartWatch_light/cubos/     
+cp sdk/drivers/driver_IMU_BMA400.ino                                 outputs/OpenSmartWatch_light/cubos/     
 
 # Core
 cp sdk/core/core_basic.ino              outputs/OpenSmartWatch_light/cubos/  

@@ -29,6 +29,9 @@ void driver_display_setup(){
 
   //gfx->fillScreen(TFT_BLACK);
   driver_display_setBrightness(get_core_display_brightness());
+
+  pinMode(9, OUTPUT);
+  digitalWrite(9, 1);
 }
 
 void driver_display_setDrawColor(unsigned char red, unsigned char green, unsigned char blue){
@@ -40,15 +43,23 @@ void driver_display_setDrawColor(uint16_t color){
 }
 
 void sleep_displayDriver(){
+  gfx->displayOff();
+  digitalWrite(9, 0);
 }
 
 void wakeup_displayDriver(){
+  gfx->displayOn();
+  digitalWrite(9, 1);
 }
 
 void powerOff_displayDriver(){
+  gfx->displayOff();
+  digitalWrite(9, 0);
 }
 
 void powerOn_displayDriver(){
+  gfx->displayOn();
+  digitalWrite(9, 1);
 }
 
 
@@ -78,6 +89,7 @@ unsigned char driver_display_getBrightness(){
 }
 
 void driver_display_setBrightness(unsigned int brightness){
+  debug("Setting brightness to " + String(brightness));
   #ifdef DISPLAY_BACKLIGHT_CONTROL_ENABLE
     //if(brightness==0) ledcAttachPin(TFT_BL, 1);
     //else ledcAttachPin(TFT_BL, 0);

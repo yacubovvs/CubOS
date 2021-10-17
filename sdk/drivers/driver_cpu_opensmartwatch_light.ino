@@ -1,8 +1,10 @@
 #include "WiFi.h"
 #include "esp_sleep.h"
 
+#define ALL_BUTTONS_WAKEUP_MASK 0x1401 //(GPIO00 + GPIO10 + GPIO13)
+
 void driver_cpu_setup(){
-    esp_sleep_enable_ext0_wakeup(GPIO_NUM_33, HIGH);
+    //esp_sleep_enable_ext1_wakeup(1, ESP_EXT1_WAKEUP_ANY_HIGH);
 }
 
 void driver_cpu_wakeup(){
@@ -13,85 +15,66 @@ void driver_cpu_poweroff(){}
 void driver_cpu_loop(){
 }
 
-void driver_cpu_sleep(unsigned char sleepType, long timeout){
+void driver_cpu_sleep(unsigned char sleepType, long timeout_ms){
     
-    switch (sleepType)
-    {
+    switch (sleepType){
         case SLEEP_IDLE_CPU:
             break;
         case SLEEP_DEEP:
-            /*
-            sleep_displayDriver();
             #ifdef ACCELEROMETER_ENABLE
-                driver_accelerometer_sleep();
+                //driver_accelerometer_sleep();
+                //driver_accelerometer_wakeup();
             #endif
 
-            //esp_sleep_enable_ext0_wakeup(GPIO_NUM_33, HIGH);
-            //esp_sleep_enable_ext1_wakeup(MULTIPLE_INT_BITMASK, ESP_EXT1_WAKEUP_ANY_HIGH);
-            //esp_sleep_enable_timer_wakeup(1000);
-            //esp_deep_sleep_disable_timer_wakeup();
-            //esp_sleep_disable_timer_wakeup();
-            esp_sleep_enable_timer_wakeup(1000*timeout);
-            //s_config.wakeup_triggers &= ~RTC_TIMER_TRIG_EN;
-            //s_config.sleep_duration = 0;
+            startApp(0); // Start clock app
+            powerOff_displayDriver();
+
+            esp_sleep_enable_timer_wakeup(timeout_ms*1000);
+            esp_sleep_enable_ext0_wakeup(GPIO_NUM_13, HIGH);
+            //esp_light_sleep_start();
             esp_deep_sleep_start();
-        
+
+            powerOn_displayDriver();
+            
+            #ifdef ACCELEROMETER_ENABLE
+                //driver_accelerometer_wakeup();
+                //delay(100)
+            #endif
+            
             break;
-            */
+
         case SLEEP_LIGHT_SCREEN_OFF:
-        /*
-            sleep_displayDriver();
-
-            #ifdef ACCELEROMETER_ENABLE
-                driver_accelerometer_sleep();
-            #endif
-
-            gpio_hold_en((gpio_num_t) 26);
-            gpio_deep_sleep_hold_en();
-            esp_sleep_enable_timer_wakeup(timeout*1000);
-            #ifdef ACCELEROMETER_ENABLE
-                driver_accelerometer_deepSleep();
-            #endif
-            //digitalWrite(27, 0);
-            //esp_sleep_enable_ext0_wakeup(TOUCH_SCREEN_INTERRUPT_PIN, LOW);
-            driver_display_setBrightness(0);
-            #ifdef ACCELEROMETER_ENABLE
-                driver_accelerometer_sleep();
-            #endif
-
-            esp_light_sleep_start();
-
-            #ifdef ACCELEROMETER_ENABLE
-                driver_accelerometer_wakeup();
-            #endif
-            driver_display_setBrightness(100);
-
-            esp_light_sleep_start();
-
-            //digitalWrite(27, 1);
-            esp_sleep_enable_ext0_wakeup(GPIO_NUM_33, HIGH);
-            #ifdef ACCELEROMETER_ENABLE
-                driver_accelerometer_sleep();
-            #endif
             break;
-        */
         case SLEEP_LIGHT:
             
             #ifdef ACCELEROMETER_ENABLE
                 //driver_accelerometer_sleep();
                 //driver_accelerometer_wakeup();
             #endif
-            esp_sleep_enable_timer_wakeup(timeout*1000);
-            esp_light_sleep_start();
-            //esp_sleep_enable_ext0_wakeup(GPIO_NUM_33, HIGH);
+
+            #ifndef MIDDLE_LIGHTSLEEP_WAKERUP_DELAY
+                #define MIDDLE_LIGHTSLEEP_WAKERUP_DELAY 150
+            #endif
+
+            for (long timer=0; timer<timeout_ms/MIDDLE_LIGHTSLEEP_WAKERUP_DELAY; timer++){
+                esp_sleep_enable_timer_wakeup(MIDDLE_LIGHTSLEEP_WAKERUP_DELAY*1000);
+                esp_sleep_enable_ext0_wakeup(GPIO_NUM_13, HIGH);
+                esp_light_sleep_start();
+
+                if(
+                    !digitalRead(0) ||
+                    digitalRead(10) ||
+                    digitalRead(13)
+                ){      
+                    driver_controls_loop();
+                    break;
+                }
+            }
+
             #ifdef ACCELEROMETER_ENABLE
                 //driver_accelerometer_wakeup();
                 //delay(100)
-                //esp_sleep_enable_timer_wakeup(100*1000);
-                //esp_light_sleep_start();
-                //esp_sleep_enable_ext0_wakeup(GPIO_NUM_33, HIGH);
             #endif
-            
             
             break;
         case SLEEP_MODEM:

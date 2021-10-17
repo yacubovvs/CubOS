@@ -373,6 +373,14 @@ void setContrastColor(unsigned char r, unsigned char g, unsigned char b){
   contrast_blue   = b;
 } 
 
+void core_display_poweroff(){
+  powerOff_displayDriver();
+}
+
+void core_display_poweron(){
+  powerOn_displayDriver();
+}
+
 void setDrawColor_BackGroundColor(){
   setDrawColor(getBackgroundColor_red(), getBackgroundColor_green(), getBackgroundColor_blue());
 }
