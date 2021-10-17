@@ -51,10 +51,12 @@ More builds at [outputs/](outputs/)
 - M5Stack Core2
 - M5Paper
 - TTGO-T-Wristband
-- TTGO-T-Wristband
 - Lilygo T-Watch-2020 v3
 - Lilygo T-Watch-2020 v2
-- Arduino Mega256
+- Arduino Mega2560
+- Arduino ADK
+- ATmega128L
+- STM32F103
 - Esp8266
 - Esp32
 
