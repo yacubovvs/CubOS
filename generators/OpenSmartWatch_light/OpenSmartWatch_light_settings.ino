@@ -23,6 +23,7 @@
 #define PLATFORM_ESP32
 #define BLUETOOTH_ENABLED
 #define WIFI_ENABLED
+#define RUN_BACKGROUND_AFTER_RESTART_MCU
 
 #define ON_TIME_CHANGE_EVERY_MS 1000
 
@@ -38,7 +39,7 @@
 #define STARTING_APP_NUMM   -1    // for Mainmenu (default app)
 //#define STARTING_APP_NUMM    0 // Clock
 //#define STARTING_APP_NUMM    1 // Settings
-#define STARTING_APP_NUMM    3 // Pedometer test
+//#define STARTING_APP_NUMM    3 // Pedometer test
 //#define STARTING_APP_NUMM    4
 
 #define FONT_SIZE_DEFAULT   2
@@ -60,7 +61,7 @@
 #define BATTERY_ENABLE
 
 #define STYLE_STATUSBAR_HEIGHT  20
-#define PEDOMETER_DO_NOT_USE_PEDOMETER_WHILE_CONNECTED_TO_USB
+//#define PEDOMETER_DO_NOT_USE_PEDOMETER_WHILE_CONNECTED_TO_USB
 //#define SMOOTH_ANIMATION
 #define WATCH_SCREEN
 #define ROUND_SCREEN
@@ -76,6 +77,7 @@
 
 #undef SMOOTH_BACKLIGHT_CONTROL_DELAY_CHANGE
 #undef DISPLAY_BACKLIGHT_CONTROL_ENABLE
+#undef DISPLAY_BACKLIGHT_FADE_CONTROL_ENABLE
 
 #define SMOOTH_ANIMATION_COEFFICIENT    4
 
@@ -84,7 +86,6 @@
 #define PEDOMETER_ENABLE
 
 #define MIDDLE_LIGHTSLEEP_WAKERUP_DELAY 150 // Check buttons while light sleep every ms (if buttons have no rtc interrupt)
-#undef DISPLAY_BACKLIGHT_FADE_CONTROL_ENABLE
 
 #define DEFAULT_TIME_TO_POWEROFF_DISPLAY        10
 //#define DEFAULT_DELAY_TO_FADE_DISPLAY           5
@@ -98,7 +99,7 @@
 
 
 #define PEDOMETER_STEP_DETECTION_DELAY_SEC_MIN          5 // Minumum seconds between accelerometer measurement
-#define PEDOMETER_STEP_DETECTION_DELAY_SEC_STEP         15
+#define PEDOMETER_STEP_DETECTION_DELAY_SEC_STEP         0 //15
 #define PEDOMETER_STEP_DETECTION_DELAY_SEC_MAX          60 // MAX (255 - PEDOMETER_STEP_DETECTION_PERIOD_MS/1000) and multiple 60 seconds
 
 //#define PEDOMETER_STEP_DETECTION_DELAY_SEC_MIN          5
@@ -116,7 +117,7 @@
 
 #define DEBUG_SERIAL
 //#define DEBUG_CONTROLS
-//#define DEBUG_WAKEUP
+#define DEBUG_WAKEUP
 //#define DEBUG_CORE_POWERSAVE
 #define DEBUG_PEDOMETER
 

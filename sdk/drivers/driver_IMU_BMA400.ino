@@ -29,6 +29,7 @@
     float get_driver_accelerometer_z(){return accelZ;}
 
     void driver_accelerometer_update_gyroscope(){}
+    long driver_IMU_timer = 0;
 
     void driver_accelerometer_setup(){
         rslt = bma400_interface_init(&bma, BMA400_I2C_INTF);
@@ -50,8 +51,8 @@
         /* Modify the desired configurations as per macros
         * available in bma400_defs.h file */
         conf.param.accel.odr = BMA400_ODR_800HZ;
-        conf.param.accel.range = BMA400_RANGE_4G;
-        conf.param.accel.data_src = BMA400_DATA_SRC_ACCEL_FILT_2;
+        conf.param.accel.range = BMA400_RANGE_2G;
+        conf.param.accel.data_src = BMA400_DATA_SRC_ACCEL_FILT_1;
 
         /* Set the desired configurations to the sensor */
         rslt = bma400_set_sensor_conf(&conf, 1, &bma);
@@ -65,33 +66,52 @@
 
         rslt = bma400_enable_interrupt(&int_en, 1, &bma);
         bma400_check_rslt("bma400_enable_interrupt", rslt);
+
+        driver_IMU_timer = millis();
     }
 
     void driver_accelerometer_update_accelerometer(){
-        rslt = bma400_get_interrupt_status(&int_status, &bma);
-        bma400_check_rslt("bma400_get_interrupt_status", rslt);
+        #ifdef DEBUG_WAKEUP
+            debug("DEBUG_WAKEUP_ACCELEROMETER: Accelerometer update");
+        #endif
+        driver_IMU_timer = millis();
 
-        if (int_status & BMA400_ASSERTED_DRDY_INT)
-        {
-            rslt = bma400_get_accel_data(BMA400_DATA_ONLY, &data, &bma);
-            bma400_check_rslt("bma400_get_accel_data", rslt);
+        while ((rslt == BMA400_OK)){
 
-            /* 12-bit accelerometer at range 2G */
-            accelX = lsb_to_ms2(data.x, 2, 12);
-            accelY = lsb_to_ms2(data.y, 2, 12);
-            accelZ = lsb_to_ms2(data.z, 2, 12);
+            rslt = bma400_get_interrupt_status(&int_status, &bma);
+            bma400_check_rslt("bma400_get_interrupt_status", rslt);
+            
+            if (int_status & BMA400_ASSERTED_DRDY_INT)
+            {
+                rslt = bma400_get_accel_data(BMA400_DATA_ONLY, &data, &bma);
+                bma400_check_rslt("bma400_get_accel_data", rslt);
 
-            /*
-            Serial.print("Gravity-x : ");
-            Serial.print(x);
-            Serial.print(", Gravity-y : ");
-            Serial.print(y);
-            Serial.print(", Gravity-z : ");
-            Serial.println(z);
-            Serial.flush();
-            */
-            //n_samples--;
-            //delay(100);
+                /* 12-bit accelerometer at range 2G */
+                accelX = lsb_to_ms2(data.x, 2, 12);
+                accelY = lsb_to_ms2(data.y, 2, 12);
+                accelZ = lsb_to_ms2(data.z, 2, 12);
+
+                #ifdef DEBUG_WAKEUP
+                    long timerr = millis() - driver_IMU_timer;
+                    debug("DEBUG_WAKEUP_ACCELEROMETER: Accelerometer updated    X:" + String(accelX) + " Y:" + String(accelY) + " Z:" + String(accelZ) + " time:" + String(timerr));
+                #endif
+                break;
+                /*
+                Serial.print("Gravity-x : ");
+                Serial.print(x);
+                Serial.print(", Gravity-y : ");
+                Serial.print(y);
+                Serial.print(", Gravity-z : ");
+                Serial.println(z);
+                Serial.flush();
+                */
+                //n_samples--;
+                //delay(100);
+            }else{
+                #ifdef DEBUG_WAKEUP
+                    //debug("DEBUG_WAKEUP_ACCELEROMETER: Accelerometer something went wrong");
+                #endif
+            }
         }
     }
     void driver_accelerometer_update_angles(){}
@@ -103,21 +123,35 @@
     }
 
     void driver_accelerometer_wakeup(){
+        //return;
+        #ifdef DEBUG_WAKEUP
+            debug("DEBUG_WAKEUP_ACCELEROMETER: Mode normal", 10);
+        #endif
         //IMU.setSleepEnabled(false);
         rslt = bma400_set_power_mode(BMA400_MODE_NORMAL, &bma);
         bma400_check_rslt("bma400_set_low_power_mode", rslt);
     }
 
     void driver_accelerometer_sleep(){
-        //rslt = bma400_set_power_mode(BMA400_MODE_LOW_POWER, &bma);
-        rslt = bma400_set_power_mode(BMA400_MODE_SLEEP, &bma);
+        //return;
+        #ifdef DEBUG_WAKEUP
+            debug("DEBUG_WAKEUP_ACCELEROMETER: Accelerometer low power", 10);
+        #endif
+
+        rslt = bma400_set_power_mode(BMA400_MODE_LOW_POWER, &bma);
+        //rslt = bma400_set_power_mode(BMA400_MODE_SLEEP, &bma);
         //rslt = bma400_set_power_mode(BMA400_MODE_NORMAL, &bma);
         //bma400_check_rslt("bma400_set_power_mode", rslt);
-        bma400_check_rslt("bma400_set_sleep_mode", rslt);
+        bma400_check_rslt("bma400_set_lowpower_mode", rslt);
         //bma400_check_rslt("bma400_set_low_power_mode", rslt);
     }
 
     void driver_accelerometer_deepSleep(){
+        //return;
+        #ifdef DEBUG_WAKEUP
+            debug("DEBUG_WAKEUP_ACCELEROMETER: Accelerometer sleep", 10);
+        #endif
+
         //IMU.deepSleep();
         rslt = bma400_set_power_mode(BMA400_MODE_SLEEP, &bma);
         bma400_check_rslt("bma400_set_sleep_mode", rslt);

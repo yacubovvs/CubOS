@@ -273,6 +273,7 @@ void debug(String string, int delaytime){
 
     #ifdef DEBUG_SERIAL
       Serial.println(string);
+      Serial.flush();
       delay(delaytime);
     #endif
 
