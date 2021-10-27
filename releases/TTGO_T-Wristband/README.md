@@ -17,9 +17,9 @@
 <img alt="CubOS onM5StickC view" src="images\ttgo_wristband_scheme.png" width="250">
 
 ### Select button
-* One click - next
-* Long click - select
-* Double click - back
+* One tap - next
+* Long tap - select
+* Double tap - back
 
 ## How to install
 1. Install Arduino IDE
