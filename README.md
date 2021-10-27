@@ -25,10 +25,10 @@ Feel free to contact me at yacubovvs@yandex.ru
 
 ## CubOS on tablets
 <img alt="CubOS tablet screenshot" src="documentation/images/screenshots/CubOS_tablet/ss_touchscreen_tablet_2.png" max-width="500">
+<img alt="CubOS tablet screenshot" src="documentation/images/cubos_work_station.png" max-width="500">
 
 ## CubOS on e-Paper (M5Paper)
 <img alt="CubOS m5paper screenshot" src="documentation/images/screenshots/CubOS_tablet/m5Paper.png" max-width="500">
-
 
 # Developing with emulator on PC
 <img alt="CubOS on PC emulator" src="documentation/images/screenshots/Emulator_on_PC.png" max-width="800">
