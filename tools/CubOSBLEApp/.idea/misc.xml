@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="DesignSurface">
+    <option name="filePathToZoomLevelMap">
+      <map>
+        <entry key="../../../../layout/custom_preview.xml" value="0.24791666666666667" />
+        <entry key="../../.gradle/caches/transforms-3/43711b72eaf2f529e5b9b1576380fb27/transformed/appcompat-1.3.1/res/drawable/abc_btn_borderless_material.xml" value="0.13148148148148148" />
+        <entry key="../../.gradle/caches/transforms-3/43711b72eaf2f529e5b9b1576380fb27/transformed/appcompat-1.3.1/res/drawable/abc_btn_default_mtrl_shape.xml" value="0.13148148148148148" />
+        <entry key="app/src/main/res/drawable-v24/ic_launcher_background.xml" value="0.22923076923076924" />
+        <entry key="app/src/main/res/drawable-v24/ic_launcher_foreground.xml" value="0.21614583333333334" />
+        <entry key="app/src/main/res/drawable/btn_stroke_style.xml" value="0.13148148148148148" />
+        <entry key="app/src/main/res/drawable/ic_baseline_settings_24.xml" value="0.21302083333333333" />
+        <entry key="app/src/main/res/drawable/stroke_btn.xml" value="0.13148148148148148" />
+        <entry key="app/src/main/res/layout/activity_activity.xml" value="0.16485507246376813" />
+        <entry key="app/src/main/res/layout/activity_activityscreen.xml" value="0.33242753623188404" />
+        <entry key="app/src/main/res/layout/activity_main.xml" value="0.22" />
+        <entry key="app/src/main/res/layout/activity_settings.xml" value="0.2873900293255132" />
+        <entry key="app/src/main/res/layout/recycleview_stats.xml" value="0.5" />
+        <entry key="app/src/main/res/menu/main.xml" value="0.337037037037037" />
+        <entry key="app/src/main/res/menu/mainactivity.xml" value="0.196875" />
+      </map>
+    </option>
+  </component>
+  <component name="ProjectRootManager" version="2" languageLevel="JDK_11" default="true" project-jdk-name="Android Studio default JDK" project-jdk-type="JavaSDK">
+    <output url="file://$PROJECT_DIR$/build/classes" />
+  </component>
+  <component name="ProjectType">
+    <option name="id" value="Android" />
+  </component>
+</project>

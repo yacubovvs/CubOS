@@ -34,3 +34,7 @@
 2021-10-15
     Added battery support for Opensmartwatch
     Added support for round displays
+
+2021-11-08
+    Added an experimental Android BLE application for connecting to CubOS devices /tools/CubOSBLEApp/
+    Added an experimental ESP32 sketch for testing BLE on 2 cores /tools/cubosBleEsp32driver/ - fixed memory leaking, exception and freezing

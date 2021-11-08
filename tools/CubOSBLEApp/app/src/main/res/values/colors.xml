@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="primary_superlight">#DCA1FA</color>
+    <color name="primary_3">#8400c8</color>
+    <color name="primary_2">#7400b0</color>
+    <color name="primary_1">#51007a</color>
+    <color name="secondary_1">#FF03DAC5</color>
+    <color name="secondary_2">#FF018786</color>
+    <color name="black">#FF000000</color>
+    <color name="not_very_black">#CB000000</color>
+    <color name="white">#FFFFFFFF</color>
+
+    <color name="predark_green">#008000</color>
+    <color name="predark_blue">#000099</color>
+    <color name="predark_red">#800000</color>
+</resources>
