@@ -9,6 +9,7 @@
 
 // PREDEFINITION
 void core_views_statusBar_draw();
+void core_views_draw_active_page(bool draw, int y0, unsigned char pages_quantity, unsigned char position);
 #ifdef SOFTWARE_BUTTONS_ENABLE
   void core_views_softwareButtons_draw();
 #endif

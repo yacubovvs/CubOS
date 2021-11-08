@@ -38,3 +38,7 @@
 2021-11-08
     Added an experimental Android BLE application for connecting to CubOS devices /tools/CubOSBLEApp/
     Added an experimental ESP32 sketch for testing BLE on 2 cores /tools/cubosBleEsp32driver/ - fixed memory leaking, exception and freezing
+
+2021-11-09
+    Added new app events EVENT_ON_BATTERY_VALUE_CHANGE and EVENT_ON_BATTERY_CHARGING_CHANGE. Working only if statusbar drawing setting ON.
+    Added new BLE sync application

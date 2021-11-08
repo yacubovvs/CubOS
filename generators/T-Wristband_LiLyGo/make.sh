@@ -16,17 +16,18 @@ cat generators/T-Wristband_LiLyGo/T-Wristband_LiLyGo_apps.ino           >> outpu
 # Applications
 cp sdk/apps/app_alarm.ino           outputs/T-Wristband_LiLyGo/cubos/     
 cp sdk/apps/app_battery.ino         outputs/T-Wristband_LiLyGo/cubos/
-cp sdk/apps/app_compass.ino         outputs/T-Wristband_LiLyGo/cubos/
+#cp sdk/apps/app_compass.ino         outputs/T-Wristband_LiLyGo/cubos/
+cp sdk/apps/app_ble_sync.ino        outputs/T-Wristband_LiLyGo/cubos/
 cp sdk/apps/app_i2c_scanner.ino     outputs/T-Wristband_LiLyGo/cubos/
 cp sdk/apps/app_settings.ino        outputs/T-Wristband_LiLyGo/cubos/
-cp sdk/apps/app_test.ino            outputs/T-Wristband_LiLyGo/cubos/
-cp sdk/apps/app_barometer.ino       outputs/T-Wristband_LiLyGo/cubos/
+#cp sdk/apps/app_test.ino            outputs/T-Wristband_LiLyGo/cubos/
+#cp sdk/apps/app_barometer.ino       outputs/T-Wristband_LiLyGo/cubos/
 cp sdk/apps/app_clock.ino           outputs/T-Wristband_LiLyGo/cubos/
-cp sdk/apps/app_filemanager.ino     outputs/T-Wristband_LiLyGo/cubos/
-cp sdk/apps/app_internet.ino        outputs/T-Wristband_LiLyGo/cubos/
-cp sdk/apps/app_simplegame.ino      outputs/T-Wristband_LiLyGo/cubos/
+#cp sdk/apps/app_filemanager.ino     outputs/T-Wristband_LiLyGo/cubos/
+#cp sdk/apps/app_internet.ino        outputs/T-Wristband_LiLyGo/cubos/
+#cp sdk/apps/app_simplegame.ino      outputs/T-Wristband_LiLyGo/cubos/
 cp sdk/apps/app_z_menu.ino          outputs/T-Wristband_LiLyGo/cubos/
-cp sdk/apps/app_pedometer_test.ino  outputs/T-Wristband_LiLyGo/cubos/
+#cp sdk/apps/app_pedometer_test.ino  outputs/T-Wristband_LiLyGo/cubos/
 cp sdk/apps/app_pedometer.ino       outputs/T-Wristband_LiLyGo/cubos/
 
 # Drivers

@@ -56,9 +56,6 @@
 #define EVENT_ON_HOUR_CHANGED               0x14
 #define EVENT_ON_DATE_CHANGED               0x15
 
-#define EVENT_ON_BATTERY_VALUE_CHANGE       0x1A
-#define EVENT_ON_BATTERY_CHARGING_CHANGE    0x1B
-
 #define EVENT_ON_TOUCH_QUICK_SWIPE_TO_LEFT      0x16
 #define EVENT_ON_TOUCH_QUICK_SWIPE_TO_RIGHT     0x17
 #define EVENT_ON_TOUCH_QUICK_SWIPE_TO_TOP       0x18
@@ -88,12 +85,12 @@
 #define SLEEP_LIGHT                         0x03
 #define SLEEP_MODEM                         0x04
 #define SLEEP_DISPLAY                       0x05
-#define SLEEP_HIBERNATE                     0x06
-#define WAKE_MODEM                          0x07
-#define WAKE_DISPLAY                        0x08
-#define WAKE                                0x09
-#define SLEEP_LIGHT_SCREEN_OFF              0x0A
-#define SLEEP_LIGHT_ACCELEROMETER_SLEEP     0x0B
+#define SLEEP_HIBERNATE                     0x03
+#define WAKE_MODEM                          0x06
+#define WAKE_DISPLAY                        0x07
+#define WAKE                                0x08
+#define SLEEP_LIGHT_SCREEN_OFF              0x09
+#define SLEEP_LIGHT_ACCELEROMETER_SLEEP     0x0A
 
 
 #define IN_APP_SLEEP_TYPE       SLEEP_LIGHT
@@ -131,7 +128,7 @@
 #define CPU_CONTROLL_ENABLE
 #define POWERSAVE_ENABLE
 
-#define FONT_SIZE_DEFAULT 1
+#define FONT_SIZE_DEFAULT 2
 #define HARDWARE_BUTTONS_VALUE 3
 
 #define CONTROLS_DELAY_TO_DOUBLE_CLICK_MS DRIVER_CONTROLS_DELAY_BEFORE_LONG_PRESS
@@ -196,7 +193,7 @@
 #define APP_CLOCK_POWER_AFTER_SECONDS           4
 
 #define PEDOMETER_DO_NOT_USER_PEDOMETER_WHILE_CONNECTED_TO_USB
-//#define USE_NUMBERS_MAIN_MENU_IN_ACTIVE_PAGES
+#define USE_NUMBERS_MAIN_MENU_IN_ACTIVE_PAGES
 /*
     ############################################################################################
     #                                                                                          #
@@ -208,14 +205,15 @@
 /*
     ############################################################################################
     #                                                                                          #
-    #                             LILYGO T-WRISTBAND SETTINGS +                                #
+    #                                   M5STICK SETTINGS +                                     #
     #                                                                                          #
     ############################################################################################
 */
 
-#define DIVICE_LILYGO_T_WRISTBAND
+// ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! !
+//      USING ESP32 DEV MODULE FOR FLASHING
+// ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! !
 
-#define USE_NUMBERS_MAIN_MENU_IN_ACTIVE_PAGES
 #define SCREEN_WIDTH            80     // Screen resolution width
 #define SCREEN_HEIGHT           160     // Screen resolution height
 
@@ -224,8 +222,7 @@
 
 #define PLATFORM_ESP32
 #define BLUETOOTH_ENABLED
-#define BLE_ENABLED
-#undef WIFI_ENABLED
+#define WIFI_ENABLED
 
 #define ON_TIME_CHANGE_EVERY_MS 1000
 
@@ -242,7 +239,6 @@
 //#define STARTING_APP_NUMM    1 // Settings
 //#define STARTING_APP_NUMM    2 // Pedometer
 #define STARTING_APP_NUMM    0
-#define STARTING_APP_NUMM    1 // BLE sync
 
 #define FONT_SIZE_DEFAULT   1
 
@@ -269,7 +265,7 @@
 #define FRAMEBUFFER_BYTE_PER_PIXEL 2
 
 //#define SCREEN_INVERT_COLORS
-#define SCREEN_CHANGE_BLUE_RED
+//#define SCREEN_CHANGE_BLUE_RED
 
 #define DRIVER_RTC_INTERRUPT_PIN    34
 
@@ -288,7 +284,7 @@
 //#define DEBUG_PEDOMETER
 #undef DISPLAY_BACKLIGHT_FADE_CONTROL_ENABLE
 
-#define DEFAULT_TIME_TO_POWEROFF_DISPLAY        160 //15 
+#define DEFAULT_TIME_TO_POWEROFF_DISPLAY        10
 #define DEFAULT_DELAY_TO_FADE_DISPLAY           5
 
 #define PEDOMETER_STEP_DETECTION_PERIOD_MS              1000
@@ -313,8 +309,7 @@
 
 #define APP_CLOCK_POWER_AFTER_SECONDS           4
 
-//#define PEDOMETER_EMULATOR
-#define DEBUG_SERIAL
+//#define DEBUG_SERIAL
 //#define DEBUG_PEDOMETER
 //#define DEBUG_PEDOMETER_TIMING
 //#define DEBUG_WAKEUP
@@ -324,7 +319,7 @@
 /*
     ############################################################################################
     #                                                                                          #
-    #                             LILYGO T-WRISTBAND SETTINGS -                                #
+    #                                   M5STICK SETTINGS -                                     #
     #                                                                                          #
     ############################################################################################
 */
@@ -338,7 +333,6 @@
 
 // PREDEFINITION
 void core_views_statusBar_draw();
-void core_views_draw_active_page(bool draw, int y0, unsigned char pages_quantity, unsigned char position);
 #ifdef SOFTWARE_BUTTONS_ENABLE
   void core_views_softwareButtons_draw();
 #endif
@@ -367,11 +361,7 @@ class Application{
 
     virtual void onLoop()     = 0;
     virtual void onDestroy()  = 0;
-    virtual void onEvent(unsigned char event, int val1, int val2, int val3, int val4, int val5) = 0;
-
-    void onEvent(unsigned char event, int val1, int val2){
-      onEvent(event, val1, val2, 0, 0, 0);
-    }
+    virtual void onEvent(unsigned char event, int val1, int val2) = 0;
 
     void super_onCreate(){
       this->preventSleep = false;
@@ -397,16 +387,14 @@ Application* currentApp;
 
 void setup(){   
 
-  #ifdef CORE_SETUP_INIT
-    core_setup_driver();
+  #ifdef DEBUG_SERIAL
+      DEBUG_SERIAL_PORT.begin(115200);
+      delay(100);
+      debug("\n\nSerial debug started " + String(millis()));
   #endif
 
-  #ifdef DEBUG_SERIAL
-    #ifndef DO_NOT_INIT_SERIAL
-      DEBUG_SERIAL_PORT.begin(115200);
-    #endif
-    delay(500);
-    debug("\n\nSerial debug started " + String(millis()));
+  #ifdef CORE_SETUP_INIT
+    core_setup_driver();
   #endif
 
   #ifdef RUN_BACKGROUND_AFTER_RESTART_MCU
@@ -522,10 +510,6 @@ void setup(){
     currentApp = getApp(STARTING_APP_NUMM);
     currentAppSetted = true;
   #endif
-
-  #ifdef TOUCH_SCREEN_ENABLE
-    setup_touchScreenCore();
-  #endif
   
 }
 
@@ -603,7 +587,6 @@ void debug(String string, int delaytime){
 
     #ifdef DEBUG_SERIAL
       Serial.println(string);
-      Serial.flush();
       delay(delaytime);
     #endif
 
@@ -680,13 +663,11 @@ void debug(String string, int delaytime){
 */
 
 #define APP_MENU_APPLICATIONS_0             ClockApp
-#define APP_MENU_APPLICATIONS_1             BleSync
+#define APP_MENU_APPLICATIONS_1             SettingsApp
 #define APP_MENU_APPLICATIONS_2             PedometerApp
-//#define APP_MENU_APPLICATIONS_3             PedometerAppTest
-#define APP_MENU_APPLICATIONS_3             SettingsApp
+#define APP_MENU_APPLICATIONS_3             PedometerAppTest
 #define APP_MENU_APPLICATIONS_4             BatteryApp
 #define APP_MENU_APPLICATIONS_5             I2CScannerApp
-
 
 /*
     # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #

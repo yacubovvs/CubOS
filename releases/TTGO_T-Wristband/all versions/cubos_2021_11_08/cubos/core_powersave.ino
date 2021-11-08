@@ -1,5 +1,6 @@
 
 #ifdef POWERSAVE_ENABLE
+
     unsigned char core_powersave_wakeup_reason(){
         esp_sleep_wakeup_cause_t wakeup_reason;
         wakeup_reason = esp_sleep_get_wakeup_cause();
@@ -21,9 +22,6 @@
         return core_powersave_lastUserAction;
     }
 
-    void core_powersave_poweroff(){
-        driver_cpu_poweroff();
-    }
 
     void set_core_powersave_lastUserAction(){
         /*
@@ -117,7 +115,7 @@
             }else{
                 if(driver_display_getBrightness()!=get_core_display_brightness()){
                     #ifdef DEBUG_CORE_POWERSAVE
-                        debug("DEBUG_CORE_POWERSAVE: Changing screen brightness");
+                        debug("DEBUG_CORE_POWERSAVE: Changing sceren brightness");
                     #endif
                     driver_display_setBrightness(get_core_display_brightness());
                 }
@@ -146,7 +144,7 @@
                                 core_cpu_sleep(STAND_BY_SLEEP_TYPE, 24*60*60*1000);// Do not wake up for 1 day 
                             }
                         #else
-                            core_cpu_sleep(STAND_BY_SLEEP_TYPE, 24*60*60*1000);
+                            core_cpu_sleep(STAND_BY_SLEEP_TYPE);
                         #endif
                     }
                 #endif

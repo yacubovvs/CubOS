@@ -4,7 +4,6 @@
 #define PAGES_LIST_HEIGHT               20
 #define ACTIVE_SCREEN_WIDTH             SCREEN_WIDTH
 #define ACTIVE_SCREEN_HEIGHT            (SCREEN_HEIGHT - STYLE_STATUSBAR_HEIGHT - PAGES_LIST_HEIGHT)
-//#define USE_XL_MENU_IMAGES
 #define SINGLE_ELEMENT_MIN_WIDTH        100
 #define SINGLE_ELEMENT_MIN_HEIGHT       80
 
@@ -148,7 +147,7 @@ class appNameClass: public Application{
     public:
         virtual void onLoop() override;
         virtual void onDestroy() override;
-        virtual void onEvent(unsigned char event, int val1, int val2, int val3, int val4, int val5) override;
+        virtual void onEvent(unsigned char event, int val1, int val2) override;
 
         void onCreate();
         appNameClass(){ fillScreen(0, 0, 0); super_onCreate(); onCreate(); };
@@ -347,7 +346,7 @@ void appNameClass::onLoop(){
 void appNameClass::onDestroy(){
 }
 
-void appNameClass::onEvent(unsigned char event, int val1, int val2, int val3, int val4, int val5){
+void appNameClass::onEvent(unsigned char event, int val1, int val2){
     
   /*
   BUTTON_UP

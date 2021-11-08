@@ -23,11 +23,6 @@
   #endif
 #endif
 
-unsigned char get_16GrayscaleColor(unsigned char red, unsigned char green, unsigned char blue){
-  int grayColor = ((int)red + (int)green + (int)blue)/3/16;
-  //debug("#### COLOR " + String(red) + " " + String(green) + " " + String(blue) + " - " + grayColor);
-  return 15 - (unsigned char)grayColor;
-}
 
 uint16_t get_uint16Color(unsigned char red, unsigned char green, unsigned char blue){
   #ifdef SCREEN_INVERT_COLORS
@@ -372,14 +367,6 @@ void setContrastColor(unsigned char r, unsigned char g, unsigned char b){
   contrast_green  = g;
   contrast_blue   = b;
 } 
-
-void core_display_poweroff(){
-  powerOff_displayDriver();
-}
-
-void core_display_poweron(){
-  powerOn_displayDriver();
-}
 
 void setDrawColor_BackGroundColor(){
   setDrawColor(getBackgroundColor_red(), getBackgroundColor_green(), getBackgroundColor_blue());
@@ -786,7 +773,7 @@ void drawString_centered(char * dString, int x, int y){
 }
 
 void clearString_centered(String dString, int x, int y, unsigned char fontSize){
-  clearString(dString, x - dString.length()*fontSize*FONT_CHAR_WIDTH/2 + fontSize/2, y, fontSize);  
+  clearString(dString, x - dString.length()*fontSize*FONT_CHAR_WIDTH/2, y, fontSize);  
 }
 
 void clearString_centered(char * dString, int x, int y){
@@ -802,7 +789,11 @@ void drawString_centered(String dString, int x, int y){
 }
 
 void drawString_centered(String dString, int x, int y, unsigned char fontSize){
-  drawString(dString, x - dString.length()*FONT_CHAR_WIDTH*fontSize/2 + fontSize/2, y, fontSize);  
+  drawString(dString, x - dString.length()*FONT_CHAR_WIDTH*fontSize/2, y, fontSize);  
+}
+
+void drawString_centered_fontSize(String dString, uint16_t y, unsigned char fontSize){
+  drawString(dString, (SCREEN_WIDTH - dString.length()*(FONT_CHAR_WIDTH)*fontSize)/2 + (int)(fontSize/2), y, fontSize);
 }
 
 void drawString_rightAlign(String dString, int x, int y){

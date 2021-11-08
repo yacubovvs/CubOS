@@ -50,10 +50,15 @@ void appNameClass::onCreate(){
 
         if (error == 0){
             
-            if(address==119) drawStringOnScreen("Barometr " + getHexStringFromByte(address));
-            else if(address==13) drawStringOnScreen("Compass " + getHexStringFromByte(address));
-            else if(address==104) drawStringOnScreen("RTC " + getHexStringFromByte(address));
-            else drawStringOnScreen("I2C device " + getHexStringFromByte(address));
+            if(address==119) drawStringOnScreen(getHexStringFromByte(address) + " Barometr");
+            else if(address==13) drawStringOnScreen(getHexStringFromByte(address) + " Compass");
+            else if(address==104) drawStringOnScreen(getHexStringFromByte(address) + " RTC or MTU9250");
+            else if(address==105) drawStringOnScreen(getHexStringFromByte(address) + " MTU9250");
+            #ifdef NARROW_SCREEN
+                else drawStringOnScreen(getHexStringFromByte(address) + " I2C");
+            #else
+                else drawStringOnScreen(getHexStringFromByte(address) + " I2C device");
+            #endif
             nDevices++;
         }
         else if (error==4) {

@@ -1,10 +1,12 @@
 /*
     ############################################################################################
     #                                                                                          #
-    #                                   M5STICK SETTINGS +                                     #
+    #                             LILYGO T-WRISTBAND SETTINGS +                                #
     #                                                                                          #
     ############################################################################################
 */
+
+#define DIVICE_LILYGO_T_WRISTBAND
 
 #define USE_NUMBERS_MAIN_MENU_IN_ACTIVE_PAGES
 #define SCREEN_WIDTH            80     // Screen resolution width
@@ -15,7 +17,8 @@
 
 #define PLATFORM_ESP32
 #define BLUETOOTH_ENABLED
-#define WIFI_ENABLED
+#define BLE_ENABLED
+#undef WIFI_ENABLED
 
 #define ON_TIME_CHANGE_EVERY_MS 1000
 
@@ -32,6 +35,7 @@
 //#define STARTING_APP_NUMM    1 // Settings
 //#define STARTING_APP_NUMM    2 // Pedometer
 #define STARTING_APP_NUMM    0
+#define STARTING_APP_NUMM    1 // BLE sync
 
 #define FONT_SIZE_DEFAULT   1
 
@@ -58,7 +62,7 @@
 #define FRAMEBUFFER_BYTE_PER_PIXEL 2
 
 //#define SCREEN_INVERT_COLORS
-//#define SCREEN_CHANGE_BLUE_RED
+#define SCREEN_CHANGE_BLUE_RED
 
 #define DRIVER_RTC_INTERRUPT_PIN    34
 
@@ -77,7 +81,7 @@
 //#define DEBUG_PEDOMETER
 #undef DISPLAY_BACKLIGHT_FADE_CONTROL_ENABLE
 
-#define DEFAULT_TIME_TO_POWEROFF_DISPLAY        10
+#define DEFAULT_TIME_TO_POWEROFF_DISPLAY        160 //15 
 #define DEFAULT_DELAY_TO_FADE_DISPLAY           5
 
 #define PEDOMETER_STEP_DETECTION_PERIOD_MS              1000
@@ -103,7 +107,7 @@
 #define APP_CLOCK_POWER_AFTER_SECONDS           4
 
 //#define PEDOMETER_EMULATOR
-//#define DEBUG_SERIAL
+#define DEBUG_SERIAL
 //#define DEBUG_PEDOMETER
 //#define DEBUG_PEDOMETER_TIMING
 //#define DEBUG_WAKEUP
@@ -113,7 +117,7 @@
 /*
     ############################################################################################
     #                                                                                          #
-    #                                   M5STICK SETTINGS -                                     #
+    #                             LILYGO T-WRISTBAND SETTINGS -                                #
     #                                                                                          #
     ############################################################################################
 */

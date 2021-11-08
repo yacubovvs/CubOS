@@ -8,8 +8,6 @@ void driver_cpu_setup(){
 void driver_cpu_wakeup(){
 }
 
-void driver_cpu_poweroff(){}
-
 void driver_cpu_loop(){
 }
 
@@ -47,21 +45,15 @@ void driver_cpu_sleep(unsigned char sleepType, long timeout){
             gpio_hold_en((gpio_num_t) 26);
             gpio_deep_sleep_hold_en();
             esp_sleep_enable_timer_wakeup(timeout*1000);
-            #ifdef ACCELEROMETER_ENABLE
-                driver_accelerometer_deepSleep();
-            #endif
+            driver_accelerometer_deepSleep();
             digitalWrite(27, 0);
             //esp_sleep_enable_ext0_wakeup(TOUCH_SCREEN_INTERRUPT_PIN, LOW);
             driver_display_setBrightness(0);
-            #ifdef ACCELEROMETER_ENABLE
-                driver_accelerometer_sleep();
-            #endif
+            driver_accelerometer_sleep();
 
             esp_light_sleep_start();
 
-            #ifdef ACCELEROMETER_ENABLE
-                driver_accelerometer_wakeup();
-            #endif
+            driver_accelerometer_wakeup();
             driver_display_setBrightness(100);
 
             esp_light_sleep_start();

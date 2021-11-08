@@ -78,7 +78,7 @@
     }
 
     #ifndef pedometer_days_steps_IN_SEC
-        #define pedometer_days_steps_IN_SEC                          1.68f
+        #define pedometer_days_steps_IN_SEC                          1.81f
     #endif
 
     #define CORE_PEDOMETER_MESURE_EVERY_MS                      (PEDOMETER_STEP_DETECTION_PERIOD_MS/PEDOMETER_MESURES_IN_STEP_DETECTION_PERIOD)
@@ -106,24 +106,20 @@
 
     #ifdef PEDOMETER_ENABLE
         void core_pedometer_loop(bool inBackGroung){
-            #ifdef DEBUG_PEDOMETER
-                //debug("Core pedometer loop");
-            #endif 
+
             #ifdef PEDOMETER_DO_NOT_USER_PEDOMETER_WHILE_CONNECTED_TO_USB
                 #ifdef BATTERY_ENABLE
                     #ifndef DEBUG_PEDOMETER
                         if(driver_battery_isUsbConnected() || !core_pedometer_getEnable()){
                             #ifdef DEBUG_PEDOMETER
-                                debug("DEBUG_PEDOMETER: exit job course on usb");
+                                //debug("DEBUG_PEDOMETER: exit job course on usb");
                             #endif 
                             analyse_sleep_delta_accels=0;
                             return;
                         }
                     #else
                         #ifdef DEBUG_PEDOMETER
-                            if(driver_battery_isUsbConnected()){
-                                //debug("DEBUG_PEDOMETER: usb is connected");
-                            }
+                            //debug("DEBUG_PEDOMETER: usb is not connected");
                         #endif 
                     #endif
                 #endif
@@ -131,12 +127,12 @@
 
             if(core_pedometer_on){
                 #ifdef DEBUG_PEDOMETER
-                    //debug("Pedometer is ON!");
+                    //debug("Pedometer is ON!", 10);
                 #endif 
 
                 if(core_pedometer_current_step_detection!=-1){
                     #ifdef DEBUG_PEDOMETER
-                        //debug("Pedometer - Not first mesure!");
+                        debug("Pedometer - Not first mesure!", 10);
                     #endif
                     core_pedometer_mesure_loop(inBackGroung);
                 }else{
@@ -174,7 +170,7 @@
                 }
             }else{
                 #ifdef DEBUG_PEDOMETER
-                    debug("Pedometer is OFF!", 10);
+                    //debug("Pedometer is OFF!", 10);
                 #endif 
             }
         }
@@ -198,16 +194,14 @@
                     core_pedometer_step_detection_arrays[core_pedometer_current_step_detection] = driver_accelerometer_get_accel_total();
 
                     core_pedometer_current_step_detection++;
-
-                    /*
                     if(
                         core_pedometer_step_detection_arrays[core_pedometer_current_step_detection-1]<0.2f ||
                         core_pedometer_step_detection_arrays[core_pedometer_current_step_detection-1]>1.8f
                     ){
                         core_pedometer_step_detection_arrays[core_pedometer_current_step_detection-1] = 1;
                         core_pedometer_current_step_detection--;
-                        // Testnig for detecting noise n103
-                    }*/
+                        // Testnig fot detecting noise n103
+                    }
 
                     if(core_pedometer_current_step_detection==PEDOMETER_MESURES_IN_STEP_DETECTION_PERIOD){
                         core_pedometer_current_step_detection=-1;
