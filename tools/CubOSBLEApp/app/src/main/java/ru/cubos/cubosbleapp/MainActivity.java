@@ -7,7 +7,9 @@ import android.content.IntentFilter;
 import android.icu.text.DateFormat;
 import android.icu.text.SimpleDateFormat;
 import android.os.Bundle;
+import android.view.View;
 import android.view.WindowManager;
+import android.widget.Button;
 import android.widget.TextView;
 
 import java.util.Date;
@@ -25,6 +27,9 @@ public class MainActivity extends AppCompatActivity {
     private TextView mLocalTimeView;
     BLEServer bleServer;
     TextView lastTimeSync;
+    Button btn_settings;
+    Button btn_activity_history;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -49,6 +54,24 @@ public class MainActivity extends AppCompatActivity {
         lastTimeSync = findViewById(R.id.lastTimeSync);
 
         updateLastSyncFromMemory();
+
+        btn_settings = findViewById(R.id.btn_settings);
+        btn_activity_history = findViewById(R.id.btn_activity_history);
+
+        btn_settings.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(MainActivity.this, Settings.class);
+                MainActivity.this.startActivity(intent);
+            }
+        });
+        btn_activity_history.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(MainActivity.this, ActivityScreen.class);
+                MainActivity.this.startActivity(intent);
+            }
+        });
     }
 
     /*

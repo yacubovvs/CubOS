@@ -197,6 +197,10 @@ void setup(){
   #ifdef TOUCH_SCREEN_ENABLE
     setup_touchScreenCore();
   #endif
+
+  #ifdef BLE_ENABLED
+    //core_ble_sync_setup(); // Will be setted up only if needed
+  #endif
   
 }
 
@@ -251,6 +255,10 @@ void loop(){
 
   #ifndef RUN_BACKGROUND_AFTER_RESTART_MCU
     core_pedometer_loop(false);
+  #endif
+
+  #ifdef BLE_ENABLED
+    //core_ble_sync_loop();
   #endif
 
 }

@@ -25,6 +25,39 @@
 
 /*
 ############################################################################
+#                                SYNC STATUS                               #
+############################################################################
+*/
+
+#define SYNC_STATUS_NOT_STARTED                     0x01
+#define SYNC_STATUS_CONNECTING                      0x02
+#define SYNC_STATUS_IN_PROGRESS                     0x03
+#define SYNC_STATUS_FINISHED                        0x04
+#define SYNC_STATUS_ERROR_SERVER_NOT_FOUND          0x05
+#define SYNC_STATUS_ERROR_DIFFERENT_API_VERSIONS    0x06
+#define SYNC_STATUS_ERROR_EXCHANGE_FAILED           0x07
+#define SYNC_STATUS_ERROR_UNKNOWN                   0x08
+
+/*
+############################################################################
+#                               SYNC VARIANTS                              #
+############################################################################
+*/
+
+#define SYNC_VARIANTS_GET_API_VERSION                           0b0000000000000001
+#define SYNC_VARIANTS_GET_SETTINGS                              0b0000000000000010
+#define SYNC_VARIANTS_GET_CURRENT_TIME                          0b0000000000000100
+#define SYNC_VARIANTS_GET_PEDOMETER_DAY_STEPS_SLEEP_LIMITS      0b0000000000001000
+#define SYNC_VARIANTS_SET_PEDOMETER_CURRENT_DAY_STEPS_SLEEP     0b0000000000010000
+#define SYNC_VARIANTS_SET_PEDOMETER_DAY_DATA_PER_HOUR           0b0000000000100000
+#define SYNC_VARIANTS_SET_PEDOMETER_WEEK_DATA_PER_DAY           0b0000000001000000
+#define SYNC_VARIANTS_GET_NOTIFICATIONS                         0b0000000010000000
+#define SYNC_VARIANTS_GET_CURRENT_CALL                          0b0000000100000000
+#define SYNC_VARIANTS_GET_MISSED_CALLS                          0b0000001000000000
+#define SYNC_VARIANTS_GET_DATA_HASH                             0b0000010000000000
+
+/*
+############################################################################
 #                                 EVENTS +                                 #
 ############################################################################
 */
@@ -223,9 +256,10 @@
 #define FONT_CHAR_HEIGHT        8     // Font letter size height
 
 #define PLATFORM_ESP32
-#define BLUETOOTH_ENABLED
+//#define BLUETOOTH_ENABLED
 #define BLE_ENABLED
-#undef WIFI_ENABLED
+#define SYNC_ON_CHARGE
+//#undef WIFI_ENABLED
 
 #define ON_TIME_CHANGE_EVERY_MS 1000
 
@@ -288,7 +322,7 @@
 //#define DEBUG_PEDOMETER
 #undef DISPLAY_BACKLIGHT_FADE_CONTROL_ENABLE
 
-#define DEFAULT_TIME_TO_POWEROFF_DISPLAY        160 //15 
+#define DEFAULT_TIME_TO_POWEROFF_DISPLAY        10 //15 
 #define DEFAULT_DELAY_TO_FADE_DISPLAY           5
 
 #define PEDOMETER_STEP_DETECTION_PERIOD_MS              1000
@@ -526,6 +560,10 @@ void setup(){
   #ifdef TOUCH_SCREEN_ENABLE
     setup_touchScreenCore();
   #endif
+
+  #ifdef BLE_ENABLED
+    //core_ble_sync_setup(); // Will be setted up only if needed
+  #endif
   
 }
 
@@ -580,6 +618,10 @@ void loop(){
 
   #ifndef RUN_BACKGROUND_AFTER_RESTART_MCU
     core_pedometer_loop(false);
+  #endif
+
+  #ifdef BLE_ENABLED
+    //core_ble_sync_loop();
   #endif
 
 }

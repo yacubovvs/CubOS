@@ -32,12 +32,12 @@ cp sdk/apps/app_pedometer.ino       outputs/T-Wristband_LiLyGo/cubos/
 
 # Drivers
 cp sdk/drivers/driver_battery_T-Wristband_LiLyGo.ino                outputs/T-Wristband_LiLyGo/cubos/     
-cp sdk/drivers/driver_display_eTFT_ST7735_T-Wristband_LiLyGo.ino    outputs/T-Wristband_LiLyGo/cubos/     
-#cp sdk/drivers/driver_display_adafruit_ST7735.ino                   outputs/T-Wristband_LiLyGo/cubos/     
+cp sdk/drivers/driver_display_eTFT_ST7735_T-Wristband_LiLyGo.ino    outputs/T-Wristband_LiLyGo/cubos/    
+cp sdk/drivers/driver_ble_sync_esp32.ino                            outputs/T-Wristband_LiLyGo/cubos/      
 cp sdk/drivers/driver_controls_T-Wristband_LiLyGo.ino               outputs/T-Wristband_LiLyGo/cubos/     
 cp sdk/drivers/driver_rtc_pcf8563.ino                               outputs/T-Wristband_LiLyGo/cubos/     
 cp sdk/drivers/driver_cpu_T-Wristband_LiLyGo.ino                    outputs/T-Wristband_LiLyGo/cubos/     
-cp sdk/drivers/driver_IMU_MPU9250_T-Wristband_LiLyGo.ino                outputs/T-Wristband_LiLyGo/cubos/     
+cp sdk/drivers/driver_IMU_MPU9250_T-Wristband_LiLyGo.ino            outputs/T-Wristband_LiLyGo/cubos/     
 
 # Core
 cp sdk/core/core_basic.ino              outputs/T-Wristband_LiLyGo/cubos/  
@@ -50,6 +50,7 @@ cp sdk/core/core_battery.ino            outputs/T-Wristband_LiLyGo/cubos/
 cp sdk/core/core_powersave.ino          outputs/T-Wristband_LiLyGo/cubos/  
 cp sdk/core/core_background.ino         outputs/T-Wristband_LiLyGo/cubos/  
 cp sdk/core/core_pedometer.ino          outputs/T-Wristband_LiLyGo/cubos/  
+cp sdk/core/core_ble_sync.ino           outputs/T-Wristband_LiLyGo/cubos/  
 
 #external libs
 cp external_libs/MPU9250_LiLyGO_T-Wristband/MPU9250.cpp                 outputs/T-Wristband_LiLyGo/cubos/ 
