@@ -99,7 +99,12 @@ void driver_cpu_sleep(unsigned char sleepType, long timeout){
             WiFi.disconnect();
             //WiFi.forceSleepBegin();
             WiFi.mode(WIFI_OFF);
-            btStop();
+            
+            #ifndef BLUETOOTH_ENABLED 
+            #ifndef BLE_ENABLED
+                btStop();
+            #endif 
+            #endif
 
             break;
         case SLEEP_DISPLAY:

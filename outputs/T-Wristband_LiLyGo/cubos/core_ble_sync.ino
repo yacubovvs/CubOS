@@ -5,9 +5,8 @@ void set_core_ble_setted_up(bool value){core_ble_setted_up = value;}
 void core_ble_sync_setup(){
     if(!get_core_ble_setted_up()){
         set_core_ble_setted_up(true);
-        //debug("Start ble sriver setup " + String(millis()));
+        debug("BLE setting up");
         driver_ble_sync_setup();
-        //debug("Finish ble sriver setup " + String(millis()));
     }
 }
 
@@ -36,6 +35,7 @@ void core_ble_sync_loop(){
 }
 
 bool core_ble_sync_start(){
+    core_ble_sync_setup();
     if(!get_core_ble_is_syncing()){
         //set_core_ble_is_syncing(true);
         debug("Sync started");

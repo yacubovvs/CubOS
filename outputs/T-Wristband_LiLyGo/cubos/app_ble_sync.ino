@@ -174,7 +174,6 @@ void appNameClass::checkCharging(){
     }
 
     if(this->currentActivity==ACTIVITY_SYNCING){
-        core_ble_sync_setup();
         core_ble_sync_start();
     }
 }

@@ -36,6 +36,7 @@ void driver_ble_start_sync(long syncVariants){
 
     // Created FreeRTOS task for running in multitask
     if(get_core_ble_is_syncing()==false){
+        debug("Ready to create task");
         set_core_ble_is_syncing(true);
         xTaskCreatePinnedToCore(
                         driver_ble_BleEsp32SyncTask,
@@ -45,7 +46,9 @@ void driver_ble_start_sync(long syncVariants){
                         1,
                         &driver_ble_Task1,
                         0); 
-    } 
+    } else{
+        debug("Task already created");
+    }
 }
 
 bool driver_ble_connectToServer() {
@@ -98,10 +101,13 @@ bool driver_ble_connectToServer() {
 
 void driver_ble_BleEsp32SyncTask( void * pvParameters ){
     // This is running on Core0
+    debug("Task started");
     driver_ble_pRemoteService = nullptr;  
+    debug("Task started--1");
     driver_ble_pBLEScan->start(5, false);
-
+    debug("Task started--2");
     driver_ble_connected = driver_ble_connectToServer();
+    debug("Task started--3");
     if (driver_ble_connected) {
         #ifdef DEBUG_DRIVER_BLE_PRINT_INCONNECT_OUTPUT
             debug("--Get current time");
@@ -251,6 +257,7 @@ void driver_ble_init_BLE_SCAN(){
     driver_ble_pBLEScan->setInterval(1349);
     driver_ble_pBLEScan->setWindow(449);
     driver_ble_pBLEScan->setActiveScan(true);
+    driver_ble_pBLEScan->start(5, false);
 }
 
 
@@ -304,6 +311,20 @@ void driver_ble_getCurrentTime(){
       debug(String((byte)server_seconds));
     #endif
     
+    core_time_setHours(server_hours);
+    core_time_setMinutes(server_minutes);
+    core_time_setSeconds(server_seconds);
+    core_time_setYear(server_year);
+    core_time_setMonth(server_month);
+    core_time_setDate(server_date);
+    core_time_setWeekDay(server_dayOfWeek);
+    debug("Server day of week " + String(server_dayOfWeek));
+    debug("Cubos day of week " + String(core_time_getWeekDay()));
+    debug("Day of week string " + core_time_getWeekDay_stringShort());
+    core_time_setWeekDay(2);
+    debug("Server day of week " + String(server_dayOfWeek));
+    debug("Cubos day of week " + String(core_time_getWeekDay()));
+    debug("Day of week string " + core_time_getWeekDay_stringShort());
 }
 
 void driver_ble_getAPIVersion(){

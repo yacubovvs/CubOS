@@ -4,7 +4,7 @@
 
 PCF8563_Class rtc;
 
-unsigned char driver_rtc_weekDay_shift = 0;
+RTC_DATA_ATTR unsigned char driver_rtc_weekDay_shift = 0;
 RTC_Date driver_rtc_dateTime;
 
 void driver_RTC_setup(){
