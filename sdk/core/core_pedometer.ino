@@ -30,14 +30,23 @@
     #endif
 
     PEDOMETER_DAY_VALUE_TYPE get_pedometer_days_steps(unsigned char day){ return pedometer_days_steps[day];}
-    PEDOMETER_DAY_VALUE_TYPE get_pedometer_days_steps(){ return get_pedometer_days_steps(0);}
+    
     
     uint16_t get_pedometer_hours_steps(unsigned char hour){ return pedometer_hours_steps[hour];}
     uint8_t get_pedometer_hours_sleep(unsigned char hour){ return pedometer_hours_sleep[hour];}
     uint16_t get_pedometer_days_sleep(unsigned char day){ return pedometer_days_sleep[day];}
-    uint16_t get_pedometer_days_sleep(){ return get_pedometer_days_sleep(0);}
     float get_pedometer_days_sleep_hours(unsigned char day){ return (((float)(((int)pedometer_days_sleep[day])*100/60))/100.0);}
-    float get_pedometer_days_sleep_hours(){ return get_pedometer_days_sleep_hours(0);}
+
+    #ifdef PEDOMETER_EMULATOR
+        float get_pedometer_days_sleep_hours(){ return 8*60 - 10;}
+        uint16_t get_pedometer_days_sleep(){return 8*60 - 10;}
+        PEDOMETER_DAY_VALUE_TYPE get_pedometer_days_steps(){ return 5500;}
+    #else
+        float get_pedometer_days_sleep_hours(){return get_pedometer_days_sleep_hours(0);}
+        uint16_t get_pedometer_days_sleep(){return get_pedometer_days_sleep(0);}
+        PEDOMETER_DAY_VALUE_TYPE get_pedometer_days_steps(){ return get_pedometer_days_steps(0);}
+    #endif
+
     uint16_t get_pedometer_days_steps_min_limit(){return pedometer_days_steps_min_limit;}
     uint16_t get_pedometer_days_sleep_min_limit(){return pedometer_days_sleep_min_limit;} //in minutes
     float get_pedometer_days_sleep_hours_limit(){return (((float)(((int)get_pedometer_days_sleep_min_limit())*100/60))/100.0);} //in hours

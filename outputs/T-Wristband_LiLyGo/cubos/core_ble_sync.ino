@@ -35,12 +35,23 @@ void core_ble_sync_loop(){
 }
 
 bool core_ble_sync_start(){
+    core_ble_set_syncStatus(SYNC_STATUS_IN_PROGRESS);
+
     core_ble_sync_setup();
     if(!get_core_ble_is_syncing()){
         //set_core_ble_is_syncing(true);
-        debug("Sync started");
+        //debug("Sync started");
+        set_core_ble_sync_error(false);
 
-        driver_ble_start_sync(SYNC_VARIANTS_GET_API_VERSION|SYNC_VARIANTS_GET_SETTINGS|SYNC_VARIANTS_GET_CURRENT_TIME|SYNC_VARIANTS_GET_DATA_HASH);
+        driver_ble_start_sync(
+            SYNC_VARIANTS_GET_API_VERSION|
+            SYNC_VARIANTS_GET_SETTINGS|
+            SYNC_VARIANTS_GET_CURRENT_TIME|
+            SYNC_VARIANTS_SET_PEDOMETER_CURRENT_DAY_STEPS_SLEEP|
+            SYNC_VARIANTS_SET_PEDOMETER_DAY_DATA_PER_HOUR|
+            SYNC_VARIANTS_SET_PEDOMETER_WEEK_DATA_PER_DAY|
+            SYNC_VARIANTS_GET_DATA_HASH
+            );
     }
 
     
@@ -53,7 +64,7 @@ String core_ble_get_syncStatus_String(){
 
     switch(syncStatus){
         case SYNC_STATUS_NOT_STARTED:
-            return "Syncing"; break;
+            return "Not started"; break;
         case SYNC_STATUS_CONNECTING:
             return "Connecting"; break;
         case SYNC_STATUS_IN_PROGRESS:

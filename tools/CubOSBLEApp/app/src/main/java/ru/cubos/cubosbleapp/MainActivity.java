@@ -16,6 +16,7 @@ import java.util.Date;
 import java.util.Locale;
 
 import ru.cubos.cubosbleapp.ble.BLEServer;
+import ru.cubos.cubosbleapp.customUI.CircleCart;
 import ru.cubos.cubosbleapp.helpers.Preferences;
 
 
@@ -29,7 +30,13 @@ public class MainActivity extends AppCompatActivity {
     TextView lastTimeSync;
     Button btn_settings;
     Button btn_activity_history;
+    CircleCart sleepstepchart;
 
+    TextView steps_labels;
+    TextView step_percents_label;
+    TextView sleep_min_label;
+    TextView sleep_min_percents_label;
+    TextView calories_label;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -55,8 +62,15 @@ public class MainActivity extends AppCompatActivity {
 
         updateLastSyncFromMemory();
 
+        steps_labels = findViewById(R.id.steps_labels);
+        step_percents_label = findViewById(R.id.step_percents_label);
+        sleep_min_label = findViewById(R.id.sleep_min_label);
+        sleep_min_percents_label = findViewById(R.id.sleep_min_percents_label);
+        calories_label = findViewById(R.id.calories_label);
+
         btn_settings = findViewById(R.id.btn_settings);
         btn_activity_history = findViewById(R.id.btn_activity_history);
+        sleepstepchart = findViewById(R.id.sleepstepchart);
 
         btn_settings.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -128,14 +142,30 @@ public class MainActivity extends AppCompatActivity {
     }
 
 
-    public void setCurrentSteps(int steps){
+    public void setCurrentSteps(int steps, int stepsLimits){
         //((TextView)findViewById(R.id.bleSteps)).setText(steps + " steps");
+        steps_labels.setText("" + steps + "/" + stepsLimits + " steps");
+        calories_label.setText("" + (int)((float)steps*0.033f) + " kcal");
+
+        float k; if(stepsLimits==0) k = 0; else k = (float)steps/(float)stepsLimits;
+
+        step_percents_label.setText("" +  (int)(k *100) + "% steps");
+        sleepstepchart.setCurrentStepsK(k);
     }
 
-    public void setCurrentSleepTime(int sleepTime){
+    public void setCurrentSleepTime(int sleepTime, int sleepTimeLimits){
         int minutes = sleepTime%60;
         int hours = (sleepTime - minutes)/60;
-        //((TextView)findViewById(R.id.bleSleepHours)).setText(hours + " hours " + minutes + " minutes");
+
+        int minutes_limit = sleepTimeLimits%60;
+        int hours_limit = (sleepTimeLimits - minutes_limit)/60;
+
+        sleep_min_label.setText("" + hours + "h " + minutes + "min / " + hours_limit + "h " + minutes_limit + "min");
+
+        float k; if(sleepTimeLimits==0) k = 0; else k = (float)sleepTime/(float)sleepTimeLimits;
+
+        sleep_min_percents_label.setText("" +  (int)(k*100) + "% steps");
+        sleepstepchart.setCurrentSleepTimeK(k);
     }
 
     public void updateLastSync(){

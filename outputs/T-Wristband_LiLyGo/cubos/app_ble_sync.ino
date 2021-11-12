@@ -16,6 +16,8 @@
 #define ACTIVITY_NONE                   0x00
 #define ACTIVITY_CONNECT_TO_CHARGE      0x01
 #define ACTIVITY_SYNCING                0x02
+#define ACTIVITY_SYNC_SUCCESS           0x03
+#define ACTIVITY_SYNC_FAILED            0x04
 
 class appNameClass: public Application{
     public:
@@ -187,6 +189,7 @@ void appNameClass::drawActivity(byte activity){
 void appNameClass::drawActivity(bool draw, byte activity){
 
     if(draw){
+        debug("Drawing activity " + String(activity));
         this->drawActivity(false, this->currentActivity);
         this->currentActivity = activity;
 
@@ -233,8 +236,6 @@ void appNameClass::drawActivity(bool draw, byte activity){
 
         #ifdef DIVICE_LILYGO_T_WRISTBAND
             
-            //this->draw_charging_plug(draw, true, IMAGE_CONNECT_COLOR_R, IMAGE_CONNECT_COLOR_G, IMAGE_CONNECT_COLOR_B);
-
             if(draw){
                 setDrawColor_ContrastColor();
                 drawString_centered("Syncing", SCREEN_WIDTH/2, STYLE_STATUSBAR_HEIGHT + 15, FONT_SIZE_DEFAULT);
@@ -254,6 +255,65 @@ void appNameClass::drawActivity(bool draw, byte activity){
             }
         #endif 
         
+    }else if(this->currentActivity==ACTIVITY_SYNC_SUCCESS){
+
+        #ifdef DIVICE_LILYGO_T_WRISTBAND
+            if(draw){
+                setDrawColor_ContrastColor();
+                drawString_centered("Success", SCREEN_WIDTH/2, STYLE_STATUSBAR_HEIGHT + 15, FONT_SIZE_DEFAULT);
+                setDrawColor(0,0x90,0);
+                drawCircle(SCREEN_WIDTH/2, 70, 15, true);
+
+                const unsigned char sync_success_icon[] PROGMEM = {
+                    0x02,0x01,0x02,0x10,0x02,0x10,0x04,0xff,0xff,0xff,0x00,0x01,0x00,0x07,0x00,0x0E,0x00,0x1C,0x00,0x38,0x00,0x70,0x00,0xE0,0x81,0xE0,0xE3,0xC0,0x73,0xC0,0x3F,0x80,0x1F,0x80,0x1F,0x00,0x0F,0x00,0x06,0x00,0x06,0x00,
+                };
+
+                drawImage(draw, sync_success_icon, SCREEN_WIDTH/2 - 8, STYLE_STATUSBAR_HEIGHT + 43);
+                setDrawColor_ContrastColor();
+            }else{
+                setDrawColor_BackGroundColor();
+                drawCircle(SCREEN_WIDTH/2, 70, 15, true);
+                clearString_centered("Success", SCREEN_WIDTH/2, STYLE_STATUSBAR_HEIGHT + 15, FONT_SIZE_DEFAULT);
+            }
+        #else
+            if(draw){
+                setDrawColor_ContrastColor();
+                drawString_centered("Success", SCREEN_WIDTH/2, STYLE_STATUSBAR_HEIGHT + 15, FONT_SIZE_DEFAULT);
+            }else{
+                setDrawColor_BackGroundColor();
+                clearString_centered("Success", SCREEN_WIDTH/2, STYLE_STATUSBAR_HEIGHT + 15, FONT_SIZE_DEFAULT);
+            }
+        #endif 
+
+    }else if(this->currentActivity==ACTIVITY_SYNC_FAILED){
+
+        #ifdef DIVICE_LILYGO_T_WRISTBAND
+            if(draw){
+                setDrawColor_ContrastColor();
+                drawString_centered("Failed", SCREEN_WIDTH/2, STYLE_STATUSBAR_HEIGHT + 15, FONT_SIZE_DEFAULT);
+                setDrawColor(0x90,0,0);
+                drawCircle(SCREEN_WIDTH/2, 70, 15, true);
+
+                const unsigned char sync_failed_icon[] PROGMEM = {
+                    0x02,0x01,0x02,0x10,0x02,0x10,0x04,0xff,0xff,0xff,0x00,0x00,0x20,0x04,0x70,0x0E,0x38,0x1C,0x1C,0x38,0x0E,0x70,0x07,0xE0,0x03,0xC0,0x03,0xC0,0x07,0xE0,0x0E,0x70,0x1C,0x38,0x38,0x1C,0x70,0x0E,0x20,0x04,0x00,0x00,
+                };
+
+                drawImage(draw, sync_failed_icon, SCREEN_WIDTH/2 - 8, STYLE_STATUSBAR_HEIGHT + 43);
+                setDrawColor_ContrastColor();
+            }else{
+                setDrawColor_BackGroundColor();
+                drawCircle(SCREEN_WIDTH/2, 70, 15, true);
+                clearString_centered("Failed", SCREEN_WIDTH/2, STYLE_STATUSBAR_HEIGHT + 15, FONT_SIZE_DEFAULT);
+            }
+        #else
+            if(draw){
+                setDrawColor_ContrastColor();
+                drawString_centered("Failed", SCREEN_WIDTH/2, STYLE_STATUSBAR_HEIGHT + 15, FONT_SIZE_DEFAULT);
+            }else{
+                setDrawColor_BackGroundColor();
+                clearString_centered("Failed", SCREEN_WIDTH/2, STYLE_STATUSBAR_HEIGHT + 15, FONT_SIZE_DEFAULT);
+            }
+        #endif 
     }
     
 }
@@ -261,7 +321,6 @@ void appNameClass::drawActivity(bool draw, byte activity){
 void appNameClass::onCreate(){
 
     this->preventSleep         = true;
-
     this->preventInAppSleep    = false;
 
     DRAW_LIMITS_setEnable(true);
@@ -271,12 +330,24 @@ void appNameClass::onCreate(){
     setBackgroundColor(0,0,0);
     setContrastColor(255, 255, 255);
 
+    //this->drawActivity(ACTIVITY_SYNC_SUCCESS); // for tests n103
     this->checkCharging();
 }
 
 void appNameClass::onLoop(){
     if(this->currentActivity==ACTIVITY_SYNCING){
-        this->drawSyncIconAnimation(true, true);
+        if(get_core_ble_is_syncing()){
+            //debug("Is syncing - onLoop")
+            this->drawSyncIconAnimation(true, true);
+        }else{
+            if(get_core_ble_sync_error()){
+                // Show error activity
+                drawActivity(ACTIVITY_SYNC_FAILED);
+            }else{
+                // Show success activity
+                drawActivity(ACTIVITY_SYNC_SUCCESS);
+            }
+        }
     }
 }
 
@@ -294,7 +365,6 @@ void appNameClass::onEvent(unsigned char event, int val1, int val2, int val3, in
         this->checkCharging();
     }
 
-
     #ifdef TOUCH_SCREEN_ENABLE
 
         if(event==EVENT_ON_TOUCH_DRAG){
@@ -310,6 +380,12 @@ void appNameClass::onEvent(unsigned char event, int val1, int val2, int val3, in
             }else if(event==EVENT_BUTTON_RELEASED){
             }else if(event==EVENT_BUTTON_LONG_PRESS){
                 if(val1==BUTTON_SELECT){
+                    if(this->currentActivity==ACTIVITY_SYNC_SUCCESS || this->currentActivity==ACTIVITY_SYNC_FAILED){
+                        debug("Long press select button");
+                        //this->currentActivity = ACTIVITY_NONE;
+                        this->drawActivity(ACTIVITY_NONE);
+                        this->checkCharging();
+                    }
                 }else if(val1==BUTTON_BACK){
                     startApp(-1);
                 }    

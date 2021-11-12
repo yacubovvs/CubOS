@@ -353,12 +353,15 @@ public class BLEServer extends BluetoothGattServerCallback {
     public void onCharacteristicWriteRequest(BluetoothDevice device, int requestId, BluetoothGattCharacteristic characteristic, boolean preparedWrite, boolean responseNeeded, int offset, byte[] value) {
         //Log.d("BLE_log", "DataGot " + value);
         if(BLEServer.DAY_SET_STEPS_SLEEP.equals(characteristic.getUuid())){
-            int sleep_minutes = ((value[4]&0xFF)<<8) | (value[5]&0xFF);
+
             int day_steps = ((value[0]&0xFF)<<24) | ((value[1]&0xFF)<<16) | ((value[2]&0xFF)<<8) | (value[3]&0xFF);
+            int sleep_minutes = ((value[4]&0xFF)<<8) | (value[5]&0xFF);
+            int steps_limit = ((value[6]&0xFF)<<8) | (value[7]&0xFF);
+            int sleep_limit = ((value[8]&0xFF)<<8) | (value[9]&0xFF);
 
             if(mainActivity!=null) {
-                mainActivity.setCurrentSteps(day_steps);
-                mainActivity.setCurrentSleepTime(sleep_minutes);
+                mainActivity.setCurrentSteps(day_steps, steps_limit);
+                mainActivity.setCurrentSleepTime(sleep_minutes, sleep_limit);
             }
 
         }

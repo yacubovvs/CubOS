@@ -63,9 +63,13 @@ unsigned char driver_RTC_getWeekDay(){
 }
 
 void driver_RTC_setWeekDay(unsigned char weekDay){
-	//weekDay = weekDay%7;
-	driver_rtc_weekDay_shift ++;
-	driver_rtc_weekDay_shift = driver_rtc_weekDay_shift%7;
+	// If it works, it's not stupid!
+	weekDay = weekDay%7;
+	while(driver_RTC_getWeekDay()!=weekDay){
+		driver_rtc_weekDay_shift ++;
+		driver_rtc_weekDay_shift = driver_rtc_weekDay_shift%7;
+	}
+	
 	// TODO
 }
 

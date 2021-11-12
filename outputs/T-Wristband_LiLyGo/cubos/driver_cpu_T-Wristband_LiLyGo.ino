@@ -27,7 +27,12 @@ void driver_cpu_sleep(unsigned char sleepType, long timeout){
             #endif
 
             //esp_sleep_enable_ext0_wakeup(GPIO_NUM_33, HIGH);
-            //esp_sleep_enable_ext1_wakeup(MULTIPLE_INT_BITMASK, ESP_EXT1_WAKEUP_ANY_HIGH);
+            #define MULTIPLE_INT_BITMASK_ONCHARGE  0b1000000000000000000000000000000000000
+            #define MULTIPLE_INT_BITMASK_EMPTY  0b0000000000000000000000000000000000000
+            if(driver_battery_isCharging()) esp_sleep_enable_ext1_wakeup(MULTIPLE_INT_BITMASK_EMPTY, ESP_EXT1_WAKEUP_ANY_HIGH);
+            else esp_sleep_enable_ext1_wakeup(MULTIPLE_INT_BITMASK_ONCHARGE, ESP_EXT1_WAKEUP_ANY_HIGH);
+            
+            
             //esp_sleep_enable_timer_wakeup(1000);
             //esp_deep_sleep_disable_timer_wakeup();
             //esp_sleep_disable_timer_wakeup();

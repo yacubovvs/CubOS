@@ -101,6 +101,7 @@ bool driver_ble_connectToServer() {
 
 void driver_ble_BleEsp32SyncTask( void * pvParameters ){
     // This is running on Core0
+    core_ble_set_syncStatus(SYNC_STATUS_CONNECTING);
     debug("Task started");
     driver_ble_pRemoteService = nullptr;  
     debug("Task started--1");
@@ -109,64 +110,99 @@ void driver_ble_BleEsp32SyncTask( void * pvParameters ){
     driver_ble_connected = driver_ble_connectToServer();
     debug("Task started--3");
     if (driver_ble_connected) {
+        core_ble_set_syncStatus(SYNC_STATUS_IN_PROGRESS);
         #ifdef DEBUG_DRIVER_BLE_PRINT_INCONNECT_OUTPUT
             debug("--Get current time");
         #endif
-        driver_ble_getCurrentTime();
-        driver_ble_getDataHash();
+        
         #ifdef DEBUG_DRIVER_BLE_PRINT_INCONNECT_OUTPUT
             debug("--Disconnect");
         #endif
+
+        if(current_sync_variant&SYNC_VARIANTS_GET_DATA_HASH){
+          #ifdef DEBUG_DRIVER_BLE_PRINT_INCONNECT_OUTPUT
+            debug("Sync variant SYNC_VARIANTS_GET_DATA_HASH");
+          #endif
+          driver_ble_getDataHash();
+        }
     
         if(current_sync_variant&SYNC_VARIANTS_GET_API_VERSION){
+          #ifdef DEBUG_DRIVER_BLE_PRINT_INCONNECT_OUTPUT
             debug("Sync variant SYNC_VARIANTS_GET_API_VERSION");
+          #endif
         }
 
         if(current_sync_variant&SYNC_VARIANTS_GET_SETTINGS){
+          #ifdef DEBUG_DRIVER_BLE_PRINT_INCONNECT_OUTPUT
             debug("Sync variant SYNC_VARIANTS_GET_SETTINGS");
+          #endif
         }
 
         if(current_sync_variant&SYNC_VARIANTS_GET_CURRENT_TIME){
+          #ifdef DEBUG_DRIVER_BLE_PRINT_INCONNECT_OUTPUT
             debug("Sync variant SYNC_VARIANTS_GET_CURRENT_TIME");
+          #endif
+          driver_ble_getCurrentTime();
         }
 
         if(current_sync_variant&SYNC_VARIANTS_GET_PEDOMETER_DAY_STEPS_SLEEP_LIMITS){
+          #ifdef DEBUG_DRIVER_BLE_PRINT_INCONNECT_OUTPUT
             debug("Sync variant SYNC_VARIANTS_GET_PEDOMETER_DAY_STEPS_SLEEP_LIMITS");
+          #endif
         }
 
         if(current_sync_variant&SYNC_VARIANTS_SET_PEDOMETER_CURRENT_DAY_STEPS_SLEEP){
-            debug("Sync variant SYNC_VARIANTS_SET_PEDOMETER_CURRENT_DAY_STEPS_SLEEP");
+          #if defined(PEDOMETER_ENABLE) || defined(PEDOMETER_EMULATOR)
+            #ifdef DEBUG_DRIVER_BLE_PRINT_INCONNECT_OUTPUT
+              debug("Sync variant SYNC_VARIANTS_SET_PEDOMETER_CURRENT_DAY_STEPS_SLEEP");
+            #endif
+            //(uint32_t steps, uint16_t sleep_min, uint16_t steps_limits, uint16_t sleep_min_limits)
+            driver_ble_setStepsAndSleep_values(get_pedometer_days_steps(), get_pedometer_days_sleep(), get_pedometer_days_steps_min_limit(), get_pedometer_days_sleep_min_limit());
+          #else
+            #ifdef DEBUG_DRIVER_BLE_PRINT_INCONNECT_OUTPUT
+              debug("Can't sync variant SYNC_VARIANTS_SET_PEDOMETER_CURRENT_DAY_STEPS_SLEEP. Pedometer is not available on this device");
+            #endif
+          #endif
         }
 
         if(current_sync_variant&SYNC_VARIANTS_SET_PEDOMETER_DAY_DATA_PER_HOUR){
+          #ifdef DEBUG_DRIVER_BLE_PRINT_INCONNECT_OUTPUT
             debug("Sync variant SYNC_VARIANTS_SET_PEDOMETER_DAY_DATA_PER_HOUR");
+          #endif
         }
 
         if(current_sync_variant&SYNC_VARIANTS_SET_PEDOMETER_WEEK_DATA_PER_DAY){
+          #ifdef DEBUG_DRIVER_BLE_PRINT_INCONNECT_OUTPUT
             debug("Sync variant SYNC_VARIANTS_SET_PEDOMETER_WEEK_DATA_PER_DAY");
+          #endif
         }
 
         if(current_sync_variant&SYNC_VARIANTS_GET_NOTIFICATIONS){
+          #ifdef DEBUG_DRIVER_BLE_PRINT_INCONNECT_OUTPUT
             debug("Sync variant SYNC_VARIANTS_GET_NOTIFICATIONS");
+          #endif
         }
 
         if(current_sync_variant&SYNC_VARIANTS_GET_CURRENT_CALL){
+          #ifdef DEBUG_DRIVER_BLE_PRINT_INCONNECT_OUTPUT
             debug("Sync variant SYNC_VARIANTS_GET_CURRENT_CALL");
+          #endif
         }
 
         if(current_sync_variant&SYNC_VARIANTS_GET_MISSED_CALLS){
+          #ifdef DEBUG_DRIVER_BLE_PRINT_INCONNECT_OUTPUT
             debug("Sync variant SYNC_VARIANTS_GET_MISSED_CALLS");
-        }
-
-        if(current_sync_variant&SYNC_VARIANTS_GET_DATA_HASH){
-            debug("Sync variant SYNC_VARIANTS_GET_DATA_HASH");
+          #endif
         }
 
         driver_ble_pClient->disconnect();
-    } else {
+        core_ble_set_syncStatus(SYNC_STATUS_FINISHED);
+    }else{
         #ifdef DEBUG_DRIVER_BLE_PRINT_INCONNECT_OUTPUT
-            debug("--- Was not connected");
+          debug("--- Was not connected");
         #endif
+        core_ble_set_syncStatus(SYNC_STATUS_ERROR_SERVER_NOT_FOUND);
+        set_core_ble_sync_error(true);
     }//*/
     
     driver_ble_connected = false;
@@ -317,14 +353,14 @@ void driver_ble_getCurrentTime(){
     core_time_setYear(server_year);
     core_time_setMonth(server_month);
     core_time_setDate(server_date);
-    core_time_setWeekDay(server_dayOfWeek);
-    debug("Server day of week " + String(server_dayOfWeek));
-    debug("Cubos day of week " + String(core_time_getWeekDay()));
-    debug("Day of week string " + core_time_getWeekDay_stringShort());
-    core_time_setWeekDay(2);
-    debug("Server day of week " + String(server_dayOfWeek));
-    debug("Cubos day of week " + String(core_time_getWeekDay()));
-    debug("Day of week string " + core_time_getWeekDay_stringShort());
+    core_time_setWeekDay( (server_dayOfWeek-1+7)%7);
+    #ifdef DEBUG_DRIVER_BLE_PRINT_INCONNECT_OUTPUT
+        debug("###########################################################");
+        debug("Server day of week " + String(server_dayOfWeek));
+        debug("Cubos day of week " + String(core_time_getWeekDay()));
+        debug("Day of week string " + core_time_getWeekDay_stringShort());
+    #endif
+
 }
 
 void driver_ble_getAPIVersion(){
@@ -619,7 +655,7 @@ void driver_ble_getStepSleepLimits(){
 * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
 */
 
-void driver_ble_setStepsAndSleep_values(uint32_t steps, uint16_t sleep_min){
+void driver_ble_setStepsAndSleep_values(uint32_t steps, uint16_t sleep_min, uint16_t steps_limits, uint16_t sleep_min_limits){
   BLERemoteCharacteristic* pRemoteCharacteristic = driver_ble_pRemoteService->getCharacteristic(driver_ble_day_set_steps_sleep_characteristic_UUID);
   if(pRemoteCharacteristic==nullptr) return;
 
@@ -631,9 +667,20 @@ void driver_ble_setStepsAndSleep_values(uint32_t steps, uint16_t sleep_min){
   byte sleep_1 = (sleep_min&0xFF00)>>(8*1);
   byte sleep_2 = (sleep_min&0x00FF);
 
+  byte steps_limits_1 = (steps_limits&0x0000FF00)>>(8*1);
+  byte steps_limits_2 = (steps_limits&0x000000FF);
+
+  byte sleep_min_limits_1 = (sleep_min_limits&0x0000FF00)>>(8*1);
+  byte sleep_min_limits_2 = (sleep_min_limits&0x000000FF);
+
   //std::string string = "" + (byte)step_1 + (byte)step_2 + (byte)step_3 + (byte)step_4 + (byte)sleep_1 + (byte)sleep_2;
   
-  pRemoteCharacteristic->writeValue({step_1,step_2,step_3,step_4,sleep_1,sleep_2});
+  pRemoteCharacteristic->writeValue({
+    step_1,step_2,step_3,step_4,
+    sleep_1,sleep_2, 
+    steps_limits_1, steps_limits_2, 
+    sleep_min_limits_1, sleep_min_limits_2, 
+  });
 
   #ifdef DEBUG_DRIVER_BLE_PRINT_INCONNECT_OUTPUT
     debug("Steps and sleep data sended");

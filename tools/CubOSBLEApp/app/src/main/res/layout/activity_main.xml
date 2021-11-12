@@ -46,7 +46,7 @@
                     app:layout_constraintVertical_bias="0.6">
 
                     <TextView
-                        android:id="@+id/textView2"
+                        android:id="@+id/steps_labels"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:text="125000/5000"
@@ -55,7 +55,7 @@
                         android:textStyle="bold" />
 
                     <TextView
-                        android:id="@+id/textView3"
+                        android:id="@+id/step_percents_label"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:text="235% steps"
@@ -63,7 +63,7 @@
                         android:textSize="16sp" />
 
                     <TextView
-                        android:id="@+id/textView4"
+                        android:id="@+id/sleep_min_label"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="10dp"
@@ -73,7 +73,7 @@
                         android:textStyle="bold" />
 
                     <TextView
-                        android:id="@+id/textView5"
+                        android:id="@+id/sleep_min_percents_label"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:text="90% sleep"
@@ -94,14 +94,14 @@
                             app:srcCompat="@drawable/calories_64" />
 
                         <TextView
-                            android:id="@+id/textView7"
+                            android:id="@+id/calories_label"
                             android:layout_width="wrap_content"
                             android:layout_height="27dp"
                             android:layout_marginLeft="10dp"
                             android:layout_marginTop="10dp"
                             android:layout_weight="0"
                             android:gravity="center_vertical"
-                            android:text="12 138" />
+                            android:text="- kcal          " />
                     </LinearLayout>
                 </LinearLayout>
 

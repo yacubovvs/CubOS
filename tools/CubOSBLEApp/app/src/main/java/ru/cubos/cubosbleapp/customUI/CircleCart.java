@@ -12,6 +12,9 @@ import androidx.annotation.Nullable;
 
 public class CircleCart extends View {
 
+    public float steps_k = 0f;
+    public float sleep_k = 0f;
+
     public CircleCart(Context context) {
         super(context);
     }
@@ -62,14 +65,20 @@ public class CircleCart extends View {
         oval.set(center_x - radius_dg, center_y - radius_dg, center_x + radius_dg, center_y + radius_dg);
         canvas.drawArc(oval, 135, 270, false, paint);
 
+        float steps_angle = (float)(270)*steps_k;
+        float sleep_angle = (float)(270)*sleep_k;
+
+        if(steps_angle>270) steps_angle = 270;
+        if(sleep_angle>270) sleep_angle = 270;
+
         paint.setStrokeWidth(strokeWidth);
         paint.setColor(greenColor);
         oval.set(center_x - radius, center_y - radius, center_x + radius, center_y + radius);
-        canvas.drawArc(oval, 135, 250, false, paint);
+        canvas.drawArc(oval, 135, steps_angle, false, paint);
 
         paint.setColor(blueColor);
         oval.set(center_x - radius2, center_y - radius2, center_x + radius2, center_y + radius2);
-        canvas.drawArc(oval, 135, 90, false, paint);
+        canvas.drawArc(oval, 135, sleep_angle, false, paint);
 
         /*
         paint.setStyle(Paint.Style.STROKE);
@@ -78,5 +87,14 @@ public class CircleCart extends View {
         */
         //canvas.drawArc(oval, 45, 270, true, paint);
 
+    }
+
+    public void setCurrentStepsK(float steps_k){
+        this.steps_k = steps_k;
+        this.invalidate();
+    }
+    public void setCurrentSleepTimeK(float sleep_k){
+        this.sleep_k = sleep_k;
+        this.invalidate();
     }
 }

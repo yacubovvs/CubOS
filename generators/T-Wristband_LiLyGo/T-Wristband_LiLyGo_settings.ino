@@ -33,10 +33,10 @@
 //#define toDefaultApp_onLeftLongPress
 
 #define STARTING_APP_NUMM   -1    // for Mainmenu (default app)
-//#define STARTING_APP_NUMM    1 // Settings
 //#define STARTING_APP_NUMM    2 // Pedometer
-#define STARTING_APP_NUMM    0
-#define STARTING_APP_NUMM    1 // BLE sync
+
+//#define STARTING_APP_NUMM    1 // BLE sync
+//#define STARTING_APP_NUMM    3 // Settings
 
 #define FONT_SIZE_DEFAULT   1
 
@@ -107,7 +107,7 @@
 
 #define APP_CLOCK_POWER_AFTER_SECONDS           4
 
-//#define PEDOMETER_EMULATOR
+#define PEDOMETER_EMULATOR
 #define DEBUG_SERIAL
 //#define DEBUG_PEDOMETER
 //#define DEBUG_PEDOMETER_TIMING

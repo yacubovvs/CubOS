@@ -42,3 +42,7 @@
 2021-11-09
     Added new app events EVENT_ON_BATTERY_VALUE_CHANGE and EVENT_ON_BATTERY_CHARGING_CHANGE. Working only if statusbar drawing setting ON.
     Added new BLE sync application
+
+2021-11-12
+    Added wakeup on charge for T-Wristband. 
+    Success exchange of pedometer data with android app via BLE
