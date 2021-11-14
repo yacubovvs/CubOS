@@ -89,9 +89,9 @@
                 android:text="Time" />
 
             <Switch
-                android:id="@+id/switch5"
+                android:id="@+id/switch_syncTime"
                 android:layout_width="match_parent"
-                android:layout_height="40dp"
+                android:layout_height="48dp"
                 android:text="Sync time" />
 
             <TextView
@@ -101,9 +101,9 @@
                 android:text="Pedometer" />
 
             <Switch
-                android:id="@+id/switch6"
+                android:id="@+id/switch_usePedometer"
                 android:layout_width="match_parent"
-                android:layout_height="40dp"
+                android:layout_height="48dp"
                 android:text="Use pedometer" />
 
             <TextView
@@ -177,9 +177,9 @@
                 android:text="Sync" />
 
             <Switch
-                android:id="@+id/switch1"
+                android:id="@+id/switch_autosyncOnCharge"
                 android:layout_width="match_parent"
-                android:layout_height="40dp"
+                android:layout_height="48dp"
                 android:text="Auto sync on charge" />
 
         </LinearLayout>

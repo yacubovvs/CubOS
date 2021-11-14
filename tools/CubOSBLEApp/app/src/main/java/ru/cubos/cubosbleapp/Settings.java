@@ -2,6 +2,8 @@ package ru.cubos.cubosbleapp;
 
 import android.os.Bundle;
 import android.view.MenuItem;
+import android.widget.CompoundButton;
+import android.widget.Switch;
 
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
@@ -12,7 +14,9 @@ import androidx.navigation.ui.NavigationUI;
 
 public class Settings extends AppCompatActivity {
 
-    private AppBarConfiguration appBarConfiguration;
+    Switch switch_syncTime;
+    Switch switch_usePedometer;
+    Switch switch_autosyncOnCharge;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -24,6 +28,16 @@ public class Settings extends AppCompatActivity {
 
         actionBar.setHomeButtonEnabled(true);
         actionBar.setDisplayHomeAsUpEnabled(true);
+
+        switch_syncTime = findViewById(R.id.switch_syncTime);
+        switch_usePedometer = findViewById(R.id.switch_usePedometer);
+        switch_autosyncOnCharge = findViewById(R.id.switch_autosyncOnCharge);
+
+        switch_syncTime.setChecked(MainActivity.mainActivity.preferences.getBoolean("switch_syncTime", true));
+        switch_usePedometer.setChecked(MainActivity.mainActivity.preferences.getBoolean("switch_usePedometer", true));
+        switch_autosyncOnCharge.setChecked(MainActivity.mainActivity.preferences.getBoolean("switch_autosyncOnCharge", true));
+
+        setListeners();
     }
 
     @Override
@@ -35,6 +49,29 @@ public class Settings extends AppCompatActivity {
             default:
                 return super.onOptionsItemSelected(item);
         }
+    }
+
+    void setListeners(){
+        switch_syncTime.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                MainActivity.mainActivity.preferences.putBoolean("switch_syncTime", isChecked);
+            }
+        });
+
+        switch_usePedometer.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                MainActivity.mainActivity.preferences.putBoolean("switch_usePedometer", isChecked);
+            }
+        });
+
+        switch_autosyncOnCharge.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                MainActivity.mainActivity.preferences.putBoolean("switch_autosyncOnCharge", isChecked);
+            }
+        });
     }
 
 }

@@ -207,6 +207,7 @@ public class BLEServer extends BluetoothGattServerCallback {
                     }
             );
 
+            MainActivity.mainActivity.preferences.putInt("last_DateUpdate", (new Date()).getDate());
             MainActivity.mainActivity.updateLastSync();
         }
         else if (BLEServer.DISCONNECT.equals(characteristic.getUuid())){
