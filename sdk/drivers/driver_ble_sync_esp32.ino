@@ -1,7 +1,5 @@
 #include "NimBLEDevice.h"
 
-#define DEBUG_DRIVER_BLE_PRINT_INCONNECT_OUTPUT // for exchange debug
-
 // The server service:
 static BLEUUID driver_ble_serviceUUID("000a1805-0000-1000-8000-00805f9b34fb");
 
@@ -111,25 +109,18 @@ void driver_ble_BleEsp32SyncTask( void * pvParameters ){
     debug("Task started--3");
     if (driver_ble_connected) {
         core_ble_set_syncStatus(SYNC_STATUS_IN_PROGRESS);
-        #ifdef DEBUG_DRIVER_BLE_PRINT_INCONNECT_OUTPUT
-            debug("--Get current time");
-        #endif
-        
-        #ifdef DEBUG_DRIVER_BLE_PRINT_INCONNECT_OUTPUT
-            debug("--Disconnect");
-        #endif
+
+        if(current_sync_variant&SYNC_VARIANTS_GET_API_VERSION){
+          #ifdef DEBUG_DRIVER_BLE_PRINT_INCONNECT_OUTPUT
+            debug("Sync variant SYNC_VARIANTS_GET_API_VERSION");
+          #endif
+        }
 
         if(current_sync_variant&SYNC_VARIANTS_GET_DATA_HASH){
           #ifdef DEBUG_DRIVER_BLE_PRINT_INCONNECT_OUTPUT
             debug("Sync variant SYNC_VARIANTS_GET_DATA_HASH");
           #endif
           driver_ble_getDataHash();
-        }
-    
-        if(current_sync_variant&SYNC_VARIANTS_GET_API_VERSION){
-          #ifdef DEBUG_DRIVER_BLE_PRINT_INCONNECT_OUTPUT
-            debug("Sync variant SYNC_VARIANTS_GET_API_VERSION");
-          #endif
         }
 
         if(current_sync_variant&SYNC_VARIANTS_GET_SETTINGS){
@@ -169,11 +160,40 @@ void driver_ble_BleEsp32SyncTask( void * pvParameters ){
           #ifdef DEBUG_DRIVER_BLE_PRINT_INCONNECT_OUTPUT
             debug("Sync variant SYNC_VARIANTS_SET_PEDOMETER_DAY_DATA_PER_HOUR");
           #endif
+
+          #ifdef PEDOMETER_ENABLE
+            uint8_t current_day = core_time_getDate();
+            uint8_t current_hour = core_time_getHours_byte();
+            for(int hour=0; hour<24; hour++){
+              //driver_ble_setDayData_values(uint16_t current_day, uint16_t hour, uint32_t steps, uint16_t sleep_min)
+              driver_ble_setDayData_values(current_day, current_hour, hour, get_pedometer_hours_steps(hour), get_pedometer_hours_sleep(hour));
+              delay(20);
+            }
+            
+          #else
+            #ifdef DEBUG_DRIVER_BLE_PRINT_INCONNECT_OUTPUT
+              debug("Can't sync variant SYNC_VARIANTS_SET_PEDOMETER_DAY_DATA_PER_HOUR. Pedometer is not available on this device");
+            #endif
+          #endif
         }
 
         if(current_sync_variant&SYNC_VARIANTS_SET_PEDOMETER_WEEK_DATA_PER_DAY){
           #ifdef DEBUG_DRIVER_BLE_PRINT_INCONNECT_OUTPUT
             debug("Sync variant SYNC_VARIANTS_SET_PEDOMETER_WEEK_DATA_PER_DAY");
+          #endif
+
+          #ifdef PEDOMETER_ENABLE
+            uint8_t current_day = core_time_getDate();
+            for(uint16_t day_shift=0; day_shift<PEDOMETER_DAYS_HISTORY; day_shift++){
+              //driver_ble_setWeekData_values(uint16_t current_day, uint16_t day_shift, uint32_t steps, uint16_t sleep_min)
+              driver_ble_setWeekData_values(current_day, day_shift, get_pedometer_days_steps(day_shift), get_pedometer_days_sleep(day_shift));
+              delay(20);
+              //debug("day_shift: " + String(day_shift) + " steps: " + get_pedometer_days_steps(day_shift));
+            }
+          #else
+            #ifdef DEBUG_DRIVER_BLE_PRINT_INCONNECT_OUTPUT
+              debug("Can't sync variant SYNC_VARIANTS_SET_PEDOMETER_WEEK_DATA_PER_DAY. Pedometer is not available on this device");
+            #endif
           #endif
         }
 
@@ -697,7 +717,7 @@ void driver_ble_setStepsAndSleep_values(uint32_t steps, uint16_t sleep_min, uint
 * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
 */
 
-void driver_ble_setWeekData_values(uint16_t year, uint8_t month, uint8_t day, uint8_t hour, uint32_t steps, uint16_t sleep_min){
+void driver_ble_setWeekData_values(uint8_t current_day, uint8_t day_shift, uint32_t steps, uint16_t sleep_min){
 
   BLERemoteCharacteristic* pRemoteCharacteristic = driver_ble_pRemoteService->getCharacteristic(driver_ble_week_data_per_day_characteristic_UUID);
   if(pRemoteCharacteristic==nullptr) return;
@@ -709,16 +729,10 @@ void driver_ble_setWeekData_values(uint16_t year, uint8_t month, uint8_t day, ui
 
   byte sleep_1 = (sleep_min&0xFF00)>>(8*1);
   byte sleep_2 = (sleep_min&0x00FF);
-
-  byte year_1 = (year&0xFF00)>>(8*1);
-  byte year_2 = (year&0x00FF);
   
   pRemoteCharacteristic->writeValue({
-    year_1,
-    year_2,
-    month,
-    day,
-    hour,
+    current_day,
+    day_shift,
     step_1,
     step_2,
     step_3,
@@ -728,11 +742,11 @@ void driver_ble_setWeekData_values(uint16_t year, uint8_t month, uint8_t day, ui
   });
 
   #ifdef DEBUG_DRIVER_BLE_PRINT_INCONNECT_OUTPUT
-    debug("Week data sended");
+    //debug("Week data sended");
   #endif
 }
 
-void driver_ble_setDayData_values(uint16_t year, uint8_t month, uint8_t day, uint8_t hour, uint32_t steps, uint16_t sleep_min){
+void driver_ble_setDayData_values(uint8_t current_day, uint8_t current_hour, uint8_t hour, uint32_t steps, uint16_t sleep_min){
 
   BLERemoteCharacteristic* pRemoteCharacteristic = driver_ble_pRemoteService->getCharacteristic(driver_ble_day_date_per_hour_characteristic_UUID);
   if(pRemoteCharacteristic==nullptr) return;
@@ -744,15 +758,10 @@ void driver_ble_setDayData_values(uint16_t year, uint8_t month, uint8_t day, uin
 
   byte sleep_1 = (sleep_min&0xFF00)>>(8*1);
   byte sleep_2 = (sleep_min&0x00FF);
-
-  byte year_1 = (year&0xFF00)>>(8*1);
-  byte year_2 = (year&0x00FF);
   
   pRemoteCharacteristic->writeValue({
-    year_1,
-    year_2,
-    month,
-    day,
+    current_day,
+    current_hour,
     hour,
     step_1,
     step_2,
@@ -763,6 +772,6 @@ void driver_ble_setDayData_values(uint16_t year, uint8_t month, uint8_t day, uin
   });
 
   #ifdef DEBUG_DRIVER_BLE_PRINT_INCONNECT_OUTPUT
-    debug("Day data sentded");
+    //debug("Day data sentded");
   #endif
 }

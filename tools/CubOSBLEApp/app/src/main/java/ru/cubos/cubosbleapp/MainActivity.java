@@ -4,19 +4,26 @@ import androidx.appcompat.app.AppCompatActivity;
 import android.bluetooth.BluetoothAdapter;
 import android.content.Intent;
 import android.content.IntentFilter;
-import android.icu.text.DateFormat;
-import android.icu.text.SimpleDateFormat;
 import android.os.Bundle;
 import android.view.View;
 import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.TextView;
 
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
 import java.util.Date;
+import java.util.GregorianCalendar;
+import java.util.HashMap;
+import java.util.List;
 import java.util.Locale;
 
 import ru.cubos.cubosbleapp.ble.BLEServer;
 import ru.cubos.cubosbleapp.customUI.CircleCart;
+import ru.cubos.cubosbleapp.data.DBSleepStepsData;
+import ru.cubos.cubosbleapp.helpers.Common;
+import ru.cubos.cubosbleapp.helpers.DBHelper;
 import ru.cubos.cubosbleapp.helpers.Preferences;
 
 
@@ -38,6 +45,8 @@ public class MainActivity extends AppCompatActivity {
     TextView sleep_min_percents_label;
     TextView calories_label;
 
+    public DBHelper dbHelper;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -56,7 +65,10 @@ public class MainActivity extends AppCompatActivity {
         //mLocalTimeView = (TextView) findViewById(R.id.logText);
         // Devices with a display should not go to sleep
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
-        CommonObjects.mainActivity = this;
+        MainActivity.mainActivity = this;
+
+        dbHelper = new DBHelper(getBaseContext());
+
 
         lastTimeSync = findViewById(R.id.lastTimeSync);
 
@@ -86,6 +98,9 @@ public class MainActivity extends AppCompatActivity {
                 MainActivity.this.startActivity(intent);
             }
         });
+
+        //Intent intent = new Intent(this, ActivityScreen.class);
+        //this.startActivity(intent);
     }
 
     /*
@@ -164,7 +179,7 @@ public class MainActivity extends AppCompatActivity {
 
         float k; if(sleepTimeLimits==0) k = 0; else k = (float)sleepTime/(float)sleepTimeLimits;
 
-        sleep_min_percents_label.setText("" +  (int)(k*100) + "% steps");
+        sleep_min_percents_label.setText("" +  (int)(k*100) + "% sleep time");
         sleepstepchart.setCurrentSleepTimeK(k);
     }
 
@@ -172,6 +187,7 @@ public class MainActivity extends AppCompatActivity {
         Date currentDate = new Date();
         DateFormat dateFormat = new SimpleDateFormat("dd.MM.yyyy HH:mm:ss", Locale.getDefault());
         String lastSyncDate_string = dateFormat.format(currentDate);
+
         preferences.putString("lastSyncDate_string", lastSyncDate_string);
 
         updateLastSyncFromMemory();

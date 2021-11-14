@@ -2,8 +2,6 @@ package ru.cubos.cubosbleapp.ble;
 
 import static android.content.Context.BLUETOOTH_SERVICE;
 
-import static ru.cubos.cubosbleapp.CommonObjects.mainActivity;
-
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
 import android.bluetooth.BluetoothGatt;
@@ -26,11 +24,16 @@ import android.content.pm.PackageManager;
 import android.os.ParcelUuid;
 import android.util.Log;
 
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.UUID;
 
 import ru.cubos.cubosbleapp.MainActivity;
+import ru.cubos.cubosbleapp.helpers.Common;
 
 public class BLEServer extends BluetoothGattServerCallback {
 
@@ -359,47 +362,98 @@ public class BLEServer extends BluetoothGattServerCallback {
             int steps_limit = ((value[6]&0xFF)<<8) | (value[7]&0xFF);
             int sleep_limit = ((value[8]&0xFF)<<8) | (value[9]&0xFF);
 
-            if(mainActivity!=null) {
-                mainActivity.setCurrentSteps(day_steps, steps_limit);
-                mainActivity.setCurrentSleepTime(sleep_minutes, sleep_limit);
+            if(MainActivity.mainActivity!=null) {
+                MainActivity.mainActivity.setCurrentSteps(day_steps, steps_limit);
+                MainActivity.mainActivity.setCurrentSleepTime(sleep_minutes, sleep_limit);
             }
 
         }
         else if(BLEServer.WEEK_DATA_PER_DAYS.equals(characteristic.getUuid())){
+            /*
+            current_day,
+            day_shift,
+            step_1,
+            step_2,
+            step_3,
+            step_4,
+            sleep_1,
+            sleep_2,
+            */
 
-            int year = ((value[0]&0xFF)<<8) | (value[1]&0xFF);
-            int month = (value[2]&0xFF);
-            int day = (value[3]&0xFF);
-            int hour = (value[4]&0xFF);
+            int current_day = (value[0]&0xFF);
+            int day_shift = (value[1]&0xFF);
 
-            int steps = ((value[5]&0xFF)<<24) | ((value[6]&0xFF)<<16) | ((value[7]&0xFF)<<8) | (value[8]&0xFF);
-            int sleep = ((value[9]&0xFF)<<8) | (value[10]&0xFF);
+            int steps = ((value[2]&0xFF)<<24) | ((value[3]&0xFF)<<16) | ((value[4]&0xFF)<<8) | (value[5]&0xFF);
+            int sleep = ((value[6]&0xFF)<<8) | (value[7]&0xFF);
 
+            boolean checkDay = Common.isDateInACurrentDay(current_day);
+            if(checkDay){
+                Date logDate = Common.shiftDate(Common.getStartOfDay(new Date()), -day_shift, 0);
+                DateFormat df = new SimpleDateFormat("yyyy-MM-dd-HH");
+                String string_user = df.format(logDate);
+
+                Log.d("BLE_log", "DAY_DATA_PER_HOURS current_day: " + current_day);
+                MainActivity.mainActivity.dbHelper.insert_day_pedometer_data(string_user, steps, sleep);
+            }else{
+                //TODO: Show alert to sync time
+            }
+
+
+            //MainActivity.mainActivity.dbHelper.insert_day_pedometer_data("2021-11-" + Common.fillZero(thisDay, 2) + "-00", 10, (int) (0.1*60));
+            //MainActivity.mainActivity.dbHelper.insert_hour_pedometer_data("2021-11-" + Common.fillZero((thisDay - 2), 2) + "-04", 30, (int) (0.5*60));
+            /*
             StepSleepHistory.addWeekData(
                 StepSleepHistory.getDateHash(year, month, day, hour, 0, 0),
                 StepSleepHistory.getDate(year, month, day, hour, 0, 0),
                 sleep,
                 steps
-            );
+            );*/
 
             //Log.d("BLE_log", "DataGot " + (new String(value)));
         }
         else if(BLEServer.DAY_DATA_PER_HOURS.equals(characteristic.getUuid())){
 
-            int year = ((value[0]&0xFF)<<8) | (value[1]&0xFF);
-            int month = (value[2]&0xFF);
-            int day = (value[3]&0xFF);
-            int hour = (value[4]&0xFF);
+            /*
+            0: current_day,
+            1: current_hour,
+            2: hour,
+            3: step_1,
+            4: step_2,
+            5: step_3,
+            6: step_4,
+            7: sleep_1,
+            8: sleep_2,
+            */
 
-            int steps = ((value[5]&0xFF)<<24) | ((value[6]&0xFF)<<16) | ((value[7]&0xFF)<<8) | (value[8]&0xFF);
-            int sleep = ((value[9]&0xFF)<<8) | (value[10]&0xFF);
+            int current_day = (value[0]&0xFF);
+            int current_hour = (value[1]&0xFF);
+            int hour_shift = (value[2]&0xFF);
 
+            int steps = ((value[3]&0xFF)<<24) | ((value[4]&0xFF)<<16) | ((value[5]&0xFF)<<8) | (value[6]&0xFF);
+            int sleep = ((value[7]&0xFF)<<8) | (value[8]&0xFF);
+
+            boolean checkDay = Common.isDateInACurrentDay(current_day);
+            if(checkDay){
+                Date current_date = Common.getStartOfDay(new Date());
+                current_date.setHours(current_hour);
+                Date logDate = Common.shiftDate(current_date, 0, -hour_shift);
+
+                DateFormat df = new SimpleDateFormat("yyyy-MM-dd-HH");
+                String string_user = df.format(logDate);
+
+                Log.d("BLE_log", "DAY_DATA_PER_HOURS hour_shift: " + hour_shift);
+                MainActivity.mainActivity.dbHelper.insert_hour_pedometer_data(string_user, steps, sleep);
+            }else{
+                //TODO: Show alert to sync time
+            }
+            /*
             StepSleepHistory.addDayData(
                     StepSleepHistory.getDateHash(year, month, day, hour, 0, 0),
                     StepSleepHistory.getDate(year, month, day, hour, 0, 0),
                     sleep,
                     steps
             );
+            */
 
             //Log.d("BLE_log", "DataGot " + (new String(value)));
         }

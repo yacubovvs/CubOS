@@ -33,9 +33,9 @@
 //#define toDefaultApp_onLeftLongPress
 
 #define STARTING_APP_NUMM   -1    // for Mainmenu (default app)
-//#define STARTING_APP_NUMM    2 // Pedometer
+#define STARTING_APP_NUMM    0 // Watch
 
-//#define STARTING_APP_NUMM    1 // BLE sync
+#define STARTING_APP_NUMM    1 // BLE sync
 //#define STARTING_APP_NUMM    3 // Settings
 
 #define FONT_SIZE_DEFAULT   1
@@ -113,8 +113,13 @@
 //#define DEBUG_PEDOMETER_TIMING
 //#define DEBUG_WAKEUP
 //#define DEBUG_DRIVER_BATTERY
-
+//#define APP_BLEE_SYNC_DEBUG
 //#define SLEEP_VALUE_DEBUG
+#define DEBUG_DRIVER_BLE_PRINT_INCONNECT_OUTPUT // for exchange debug
+
+#define ON_SETUP_FINISHED_CUSTOM_FUNCTION_CALL if(getWakeUpReason()==0x02){ debug("Starting sync app on wakeup");currentApp = getApp(1);}
+
+
 /*
     ############################################################################################
     #                                                                                          #

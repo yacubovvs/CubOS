@@ -189,14 +189,18 @@ void appNameClass::drawActivity(byte activity){
 void appNameClass::drawActivity(bool draw, byte activity){
 
     if(draw){
-        debug("Drawing activity " + String(activity));
+        #ifdef APP_BLEE_SYNC_DEBUG
+            debug("Drawing activity " + String(activity));
+        #endif
         this->drawActivity(false, this->currentActivity);
         this->currentActivity = activity;
 
         if(this->currentActivity==ACTIVITY_SYNCING){
             this->preventInAppSleep    = true;
+            this->preventSleep         = true;
         }else{
             this->preventInAppSleep    = false;
+            this->preventSleep         = false;
         }
     }
 
@@ -206,15 +210,12 @@ void appNameClass::drawActivity(bool draw, byte activity){
             //this->draw_charging_plug(draw, false, IMAGE_NOT_CONNECTED_COLOR_R, IMAGE_NOT_CONNECTED_COLOR_G, IMAGE_NOT_CONNECTED_COLOR_B);
 
             if(draw){
-                //debug("DRAWING ACTIVITY_CONNECT_TO_CHARGE");
                 setDrawColor_ContrastColor();
                 drawString_centered("Connect the", SCREEN_WIDTH/2, STYLE_STATUSBAR_HEIGHT + 10*2, FONT_SIZE_DEFAULT);
                 drawString_centered("charging", SCREEN_WIDTH/2, STYLE_STATUSBAR_HEIGHT + 10*3, FONT_SIZE_DEFAULT);
                 drawString_centered("to sync", SCREEN_WIDTH/2, STYLE_STATUSBAR_HEIGHT + 10*4, FONT_SIZE_DEFAULT);
                 setDrawColor_ContrastColor();
             }else{
-
-                //debug("CLEARING ACTIVITY_CONNECT_TO_CHARGE");
                 setDrawColor_BackGroundColor();
                 clearString_centered("Connect the", SCREEN_WIDTH/2, STYLE_STATUSBAR_HEIGHT + 10*2, FONT_SIZE_DEFAULT);
                 clearString_centered("charging", SCREEN_WIDTH/2, STYLE_STATUSBAR_HEIGHT + 10*3, FONT_SIZE_DEFAULT);
@@ -320,7 +321,7 @@ void appNameClass::drawActivity(bool draw, byte activity){
 
 void appNameClass::onCreate(){
 
-    this->preventSleep         = true;
+    this->preventSleep         = false;
     this->preventInAppSleep    = false;
 
     DRAW_LIMITS_setEnable(true);
@@ -337,7 +338,6 @@ void appNameClass::onCreate(){
 void appNameClass::onLoop(){
     if(this->currentActivity==ACTIVITY_SYNCING){
         if(get_core_ble_is_syncing()){
-            //debug("Is syncing - onLoop")
             this->drawSyncIconAnimation(true, true);
         }else{
             if(get_core_ble_sync_error()){
@@ -360,7 +360,6 @@ void appNameClass::onDestroy(){
 void appNameClass::onEvent(unsigned char event, int val1, int val2, int val3, int val4, int val5){
 
     if(event==EVENT_ON_BATTERY_VALUE_CHANGE){
-        //debug("EVENT_ON_BATTERY_VALUE_CHANGE " + String(val1) + " " + String(val2));        
     }else if(event==EVENT_ON_BATTERY_CHARGING_CHANGE){
         this->checkCharging();
     }
@@ -381,10 +380,18 @@ void appNameClass::onEvent(unsigned char event, int val1, int val2, int val3, in
             }else if(event==EVENT_BUTTON_LONG_PRESS){
                 if(val1==BUTTON_SELECT){
                     if(this->currentActivity==ACTIVITY_SYNC_SUCCESS || this->currentActivity==ACTIVITY_SYNC_FAILED){
-                        debug("Long press select button");
+                        #ifdef APP_BLEE_SYNC_DEBUG
+                            debug("Switch from success or fail to sync");
+                        #endif
                         //this->currentActivity = ACTIVITY_NONE;
                         this->drawActivity(ACTIVITY_NONE);
                         this->checkCharging();
+                    }else if(this->currentActivity==ACTIVITY_CONNECT_TO_CHARGE){
+                        #ifdef APP_BLEE_SYNC_DEBUG
+                            debug("Switch from charge to sync");
+                        #endif
+                        core_ble_sync_start();
+                        this->drawActivity(ACTIVITY_SYNCING);
                     }
                 }else if(val1==BUTTON_BACK){
                     startApp(-1);

@@ -230,6 +230,7 @@
 
 #define PEDOMETER_DO_NOT_USER_PEDOMETER_WHILE_CONNECTED_TO_USB
 //#define USE_NUMBERS_MAIN_MENU_IN_ACTIVE_PAGES
+
 /*
     ############################################################################################
     #                                                                                          #
@@ -273,9 +274,9 @@
 //#define toDefaultApp_onLeftLongPress
 
 #define STARTING_APP_NUMM   -1    // for Mainmenu (default app)
-//#define STARTING_APP_NUMM    2 // Pedometer
+#define STARTING_APP_NUMM    0 // Watch
 
-//#define STARTING_APP_NUMM    1 // BLE sync
+#define STARTING_APP_NUMM    1 // BLE sync
 //#define STARTING_APP_NUMM    3 // Settings
 
 #define FONT_SIZE_DEFAULT   1
@@ -353,8 +354,13 @@
 //#define DEBUG_PEDOMETER_TIMING
 //#define DEBUG_WAKEUP
 //#define DEBUG_DRIVER_BATTERY
-
+//#define APP_BLEE_SYNC_DEBUG
 //#define SLEEP_VALUE_DEBUG
+#define DEBUG_DRIVER_BLE_PRINT_INCONNECT_OUTPUT // for exchange debug
+
+#define ON_SETUP_FINISHED_CUSTOM_FUNCTION_CALL if(getWakeUpReason()==0x02){ debug("Starting sync app on wakeup");currentApp = getApp(1);}
+
+
 /*
     ############################################################################################
     #                                                                                          #
@@ -429,6 +435,11 @@ Application* currentApp;
     ############################################################################################
 */
 
+#ifdef POWERSAVE_ENABLE
+  unsigned char wakeUpReason = 0x00;
+  unsigned char getWakeUpReason(){return wakeUpReason;}
+#endif
+
 void setup(){   
 
   #ifdef CORE_SETUP_INIT
@@ -446,7 +457,7 @@ void setup(){
   #ifdef RUN_BACKGROUND_AFTER_RESTART_MCU
     #ifdef POWERSAVE_ENABLE
       #ifdef CPU_SLEEP_ENABLE
-        unsigned char wakeUpReason = core_powersave_wakeup_reason();
+        wakeUpReason = core_powersave_wakeup_reason();
         if(wakeUpReason==WAKE_UP_REASON_TIMER){
           #ifdef DEBUG_WAKEUP
             debug("DEBUG_WAKEUP: Background start " + String(millis()));
@@ -496,14 +507,16 @@ void setup(){
           #endif
         }else{
           #ifdef DEBUG_WAKEUP
-            debug("DEBUG_WAKEUP: Not background start", 10);
+            //delay(1000);
+            debug("DEBUG_WAKEUP: Not background start. Reason: " + String(wakeUpReason), 10);
           #endif
         }
       #endif
     #endif
   #else
     #ifdef DEBUG_WAKEUP
-      debug("DEBUG_WAKEUP: Not background start", 10);
+      //delay(1000);
+      debug("DEBUG_WAKEUP: Not background start. Reason: " + String(wakeUpReason), 10);
     #endif
   #endif
   //debug("**** Main app start", 10);
@@ -565,6 +578,9 @@ void setup(){
     //core_ble_sync_setup(); // Will be setted up only if needed
   #endif
   
+  #ifdef ON_SETUP_FINISHED_CUSTOM_FUNCTION_CALL
+    ON_SETUP_FINISHED_CUSTOM_FUNCTION_CALL
+  #endif
 }
 
 bool isInSleep = false;

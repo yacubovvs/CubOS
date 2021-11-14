@@ -76,7 +76,7 @@
                         android:id="@+id/sleep_min_percents_label"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:text="90% sleep"
+                        android:text="90% sleep time"
                         android:textAlignment="center" />
 
                     <LinearLayout

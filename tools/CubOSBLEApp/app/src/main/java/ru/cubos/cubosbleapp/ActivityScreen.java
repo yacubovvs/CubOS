@@ -9,11 +9,21 @@ import androidx.navigation.ui.AppBarConfiguration;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.time.LocalDate;
+import java.time.ZoneId;
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.GregorianCalendar;
+import java.util.HashMap;
 import java.util.List;
 
 import ru.cubos.cubosbleapp.customUI.DataSetRecycleViewSet;
 import ru.cubos.cubosbleapp.customUI.RecycleViewStatsAdapter;
+import ru.cubos.cubosbleapp.data.DBSleepStepsData;
+import ru.cubos.cubosbleapp.helpers.Common;
 
 public class ActivityScreen extends AppCompatActivity {
 
@@ -35,36 +45,35 @@ public class ActivityScreen extends AppCompatActivity {
         // # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 
         List<DataSetRecycleViewSet> activityPerHourList = new ArrayList<>();
-        activityPerHourList.add(new DataSetRecycleViewSet(1747, "21:00"));
-        activityPerHourList.add(new DataSetRecycleViewSet(6789, "22:00"));
-        activityPerHourList.add(new DataSetRecycleViewSet(12378, "23:00"));
-        activityPerHourList.add(new DataSetRecycleViewSet(20334, "00:00"));
-        activityPerHourList.add(new DataSetRecycleViewSet(7543, "01:00"));
-        activityPerHourList.add(new DataSetRecycleViewSet(246, "02:00"));
-        activityPerHourList.add(new DataSetRecycleViewSet(9364, "03:00"));
-        activityPerHourList.add(new DataSetRecycleViewSet(1747, "04:00"));
-        activityPerHourList.add(new DataSetRecycleViewSet(6789, "05:00"));
-        activityPerHourList.add(new DataSetRecycleViewSet(7543, "06:00"));
-        activityPerHourList.add(new DataSetRecycleViewSet(246, "07:00"));
-        activityPerHourList.add(new DataSetRecycleViewSet(9364, "08:00"));
-        activityPerHourList.add(new DataSetRecycleViewSet(1747, "07:00"));
-        activityPerHourList.add(new DataSetRecycleViewSet(6789, "08:00"));
-        activityPerHourList.add(new DataSetRecycleViewSet(12378, "09:00"));
-        activityPerHourList.add(new DataSetRecycleViewSet(20334, "10:00"));
-        activityPerHourList.add(new DataSetRecycleViewSet(7543, "11:00"));
-        activityPerHourList.add(new DataSetRecycleViewSet(246, "12:00"));
-        activityPerHourList.add(new DataSetRecycleViewSet(9364, "13:00"));
-        activityPerHourList.add(new DataSetRecycleViewSet(1747, "14:00"));
-        activityPerHourList.add(new DataSetRecycleViewSet(6789, "15:00"));
-        activityPerHourList.add(new DataSetRecycleViewSet(12378, "16:00"));
-        activityPerHourList.add(new DataSetRecycleViewSet(20334, "17:00"));
-        activityPerHourList.add(new DataSetRecycleViewSet(7543, "18:00"));
-        activityPerHourList.add(new DataSetRecycleViewSet(246, "19:00"));
-        activityPerHourList.add(new DataSetRecycleViewSet(9364, "20:00"));
-        activityPerHourList.add(new DataSetRecycleViewSet(1747, "21:00"));
-        activityPerHourList.add(new DataSetRecycleViewSet(6789, "22:00"));
-        activityPerHourList.add(new DataSetRecycleViewSet(12378, "23:00"));
-        activityPerHourList.add(new DataSetRecycleViewSet(20334, "00:00"));
+        List<DataSetRecycleViewSet> sleepPerHourList = new ArrayList<>();
+
+        HashMap<String, DBSleepStepsData> hourData = MainActivity.mainActivity.dbHelper.getLastHoursData(48);
+
+        int hoursInChart = 48;
+        Date currentDateTime = Common.getStartOfHour(new Date());
+        for(int i=0; i<hoursInChart; i++){
+
+            Calendar cal = Calendar.getInstance();
+            cal.setTime(currentDateTime);
+            cal.add(Calendar.HOUR, -i);
+            Date hashDate = cal.getTime();
+
+            //DateFormat df = new SimpleDateFormat("yyyy.MM.dd HH:mm:ss");
+            DateFormat df = new SimpleDateFormat("HH:mm");
+            String string_user = df.format(hashDate);
+
+            //Date hashSearch = ;
+
+            DBSleepStepsData dbSleepStepsData = hourData.get(Common.dateToHashString(hashDate));
+            if(dbSleepStepsData==null){
+                activityPerHourList.add(new DataSetRecycleViewSet(0, string_user));
+                sleepPerHourList.add(new DataSetRecycleViewSet(0, string_user));
+            }else{
+                activityPerHourList.add(new DataSetRecycleViewSet(dbSleepStepsData.steps, string_user));
+                sleepPerHourList.add(new DataSetRecycleViewSet(dbSleepStepsData.sleep_min, string_user));
+            }
+
+        }
 
 
         RecyclerView recyclerView_activityPerHour = findViewById(R.id.recycleView_activityPerHour);
@@ -77,37 +86,7 @@ public class ActivityScreen extends AppCompatActivity {
         // # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
         // # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 
-        List<DataSetRecycleViewSet> sleepPerHourList = new ArrayList<>();
-        sleepPerHourList.add(new DataSetRecycleViewSet(1747, "21:00"));
-        sleepPerHourList.add(new DataSetRecycleViewSet(6789, "22:00"));
-        sleepPerHourList.add(new DataSetRecycleViewSet(12378, "23:00"));
-        sleepPerHourList.add(new DataSetRecycleViewSet(20334, "00:00"));
-        sleepPerHourList.add(new DataSetRecycleViewSet(7543, "01:00"));
-        sleepPerHourList.add(new DataSetRecycleViewSet(246, "02:00"));
-        sleepPerHourList.add(new DataSetRecycleViewSet(9364, "03:00"));
-        sleepPerHourList.add(new DataSetRecycleViewSet(1747, "04:00"));
-        sleepPerHourList.add(new DataSetRecycleViewSet(6789, "05:00"));
-        sleepPerHourList.add(new DataSetRecycleViewSet(7543, "06:00"));
-        sleepPerHourList.add(new DataSetRecycleViewSet(246, "07:00"));
-        sleepPerHourList.add(new DataSetRecycleViewSet(9364, "08:00"));
-        sleepPerHourList.add(new DataSetRecycleViewSet(1747, "07:00"));
-        sleepPerHourList.add(new DataSetRecycleViewSet(6789, "08:00"));
-        sleepPerHourList.add(new DataSetRecycleViewSet(12378, "09:00"));
-        sleepPerHourList.add(new DataSetRecycleViewSet(20334, "10:00"));
-        sleepPerHourList.add(new DataSetRecycleViewSet(7543, "11:00"));
-        sleepPerHourList.add(new DataSetRecycleViewSet(246, "12:00"));
-        sleepPerHourList.add(new DataSetRecycleViewSet(9364, "13:00"));
-        sleepPerHourList.add(new DataSetRecycleViewSet(1747, "14:00"));
-        sleepPerHourList.add(new DataSetRecycleViewSet(6789, "15:00"));
-        sleepPerHourList.add(new DataSetRecycleViewSet(12378, "16:00"));
-        sleepPerHourList.add(new DataSetRecycleViewSet(20334, "17:00"));
-        sleepPerHourList.add(new DataSetRecycleViewSet(7543, "18:00"));
-        sleepPerHourList.add(new DataSetRecycleViewSet(246, "19:00"));
-        sleepPerHourList.add(new DataSetRecycleViewSet(9364, "20:00"));
-        sleepPerHourList.add(new DataSetRecycleViewSet(1747, "21:00"));
-        sleepPerHourList.add(new DataSetRecycleViewSet(6789, "22:00"));
-        sleepPerHourList.add(new DataSetRecycleViewSet(12378, "23:00"));
-        sleepPerHourList.add(new DataSetRecycleViewSet(20334, "00:00"));
+
 
 
         RecyclerView recyclerView_sleepPerHours = findViewById(R.id.recycleView_sleepPerHour );
@@ -118,28 +97,38 @@ public class ActivityScreen extends AppCompatActivity {
         // # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
         // # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 
+        HashMap<String, DBSleepStepsData> dayData = MainActivity.mainActivity.dbHelper.getLastDaysData(10);
         List<DataSetRecycleViewSet> activityPerDayList = new ArrayList<>();
-        activityPerDayList.add(new DataSetRecycleViewSet(7543, "30 nov"));
-        activityPerDayList.add(new DataSetRecycleViewSet(246, "29 nov"));
-        activityPerDayList.add(new DataSetRecycleViewSet(9364, "28 nov"));
-        activityPerDayList.add(new DataSetRecycleViewSet(1747, "27 nov"));
-        activityPerDayList.add(new DataSetRecycleViewSet(6789, "26 nov"));
-        activityPerDayList.add(new DataSetRecycleViewSet(12378, "25 nov"));
-        activityPerDayList.add(new DataSetRecycleViewSet(20334, "24 nov"));
-        activityPerDayList.add(new DataSetRecycleViewSet(7543, "23 nov"));
-        activityPerDayList.add(new DataSetRecycleViewSet(246, "22 nov"));
-        activityPerDayList.add(new DataSetRecycleViewSet(9364, "21 nov"));
-        activityPerDayList.add(new DataSetRecycleViewSet(1747, "20 nov"));
-        activityPerDayList.add(new DataSetRecycleViewSet(6789, "19 nov"));
-        activityPerDayList.add(new DataSetRecycleViewSet(12378, "18 nov"));
-        activityPerDayList.add(new DataSetRecycleViewSet(20334, "17 nov"));
-        activityPerDayList.add(new DataSetRecycleViewSet(7543, "16 nov"));
-        activityPerDayList.add(new DataSetRecycleViewSet(246, "15 nov"));
-        activityPerDayList.add(new DataSetRecycleViewSet(9364, "14 nov"));
-        activityPerDayList.add(new DataSetRecycleViewSet(1747, "13 nov"));
-        activityPerDayList.add(new DataSetRecycleViewSet(6789, "12 nov"));
-        activityPerDayList.add(new DataSetRecycleViewSet(12378, "11 nov"));
-        activityPerDayList.add(new DataSetRecycleViewSet(20334, "10 nov"));
+        List<DataSetRecycleViewSet> sleepPerDayList = new ArrayList<>();
+
+        int daysInChart = 20;
+        Date currentDate = Common.getStartOfDay(new Date());
+        for(int i=0; i<daysInChart; i++){
+
+            Calendar cal = Calendar.getInstance();
+            cal.setTime(currentDate);
+            cal.add(Calendar.DATE, -i);
+            Date hashDate = cal.getTime();
+
+            //DateFormat df = new SimpleDateFormat("yyyy.MM.dd HH:mm:ss");
+            DateFormat df = new SimpleDateFormat("dd.MM");
+            String string_user = df.format(hashDate);
+
+            //Date hashSearch = ;
+
+            DBSleepStepsData dbSleepStepsData = dayData.get(Common.dateToHashString(hashDate));
+            if(dbSleepStepsData==null){
+                activityPerDayList.add(new DataSetRecycleViewSet(0, string_user));
+                sleepPerDayList.add(new DataSetRecycleViewSet(0, string_user));
+            }else{
+                activityPerDayList.add(new DataSetRecycleViewSet(dbSleepStepsData.steps, string_user));
+                sleepPerDayList.add(new DataSetRecycleViewSet(dbSleepStepsData.sleep_min, string_user));
+            }
+
+        }
+
+
+        //activityPerDayList.add(new DataSetRecycleViewSet(246, "29 nov"));
 
         RecyclerView recyclerView_activityPerDay = findViewById(R.id.recycleView_stepsPerDay);
         recyclerView_activityPerDay.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, true));
@@ -149,33 +138,13 @@ public class ActivityScreen extends AppCompatActivity {
         // # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
         // # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 
-        List<DataSetRecycleViewSet> sleepPerDayList = new ArrayList<>();
-        sleepPerDayList.add(new DataSetRecycleViewSet(7543, "30 nov"));
-        sleepPerDayList.add(new DataSetRecycleViewSet(246, "29 nov"));
-        sleepPerDayList.add(new DataSetRecycleViewSet(9364, "28 nov"));
-        sleepPerDayList.add(new DataSetRecycleViewSet(1747, "27 nov"));
-        sleepPerDayList.add(new DataSetRecycleViewSet(6789, "26 nov"));
-        sleepPerDayList.add(new DataSetRecycleViewSet(12378, "25 nov"));
-        sleepPerDayList.add(new DataSetRecycleViewSet(20334, "24 nov"));
-        sleepPerDayList.add(new DataSetRecycleViewSet(7543, "23 nov"));
-        sleepPerDayList.add(new DataSetRecycleViewSet(246, "22 nov"));
-        sleepPerDayList.add(new DataSetRecycleViewSet(9364, "21 nov"));
-        sleepPerDayList.add(new DataSetRecycleViewSet(1747, "20 nov"));
-        sleepPerDayList.add(new DataSetRecycleViewSet(6789, "19 nov"));
-        sleepPerDayList.add(new DataSetRecycleViewSet(12378, "18 nov"));
-        sleepPerDayList.add(new DataSetRecycleViewSet(20334, "17 nov"));
-        sleepPerDayList.add(new DataSetRecycleViewSet(7543, "16 nov"));
-        sleepPerDayList.add(new DataSetRecycleViewSet(246, "15 nov"));
-        sleepPerDayList.add(new DataSetRecycleViewSet(9364, "14 nov"));
-        sleepPerDayList.add(new DataSetRecycleViewSet(1747, "13 nov"));
-        sleepPerDayList.add(new DataSetRecycleViewSet(6789, "12 nov"));
-        sleepPerDayList.add(new DataSetRecycleViewSet(12378, "11 nov"));
-        sleepPerDayList.add(new DataSetRecycleViewSet(20334, "10 nov"));
+
+
+        //sleepPerDayList.add(new DataSetRecycleViewSet(246, "29 nov"));
 
         RecyclerView recyclerView_sleepPerDay = findViewById(R.id.recycleView_sleepPerDay);
         recyclerView_sleepPerDay.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, true));
         recyclerView_sleepPerDay.setAdapter(new RecycleViewStatsAdapter(this, sleepPerDayList, RecycleViewStatsAdapter.TYPE_SLEEP));
-
     }
 
     @Override

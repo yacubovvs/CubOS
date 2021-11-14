@@ -20,21 +20,50 @@
         RTC_DATA_ATTR uint16_t pedometer_days_sleep[PEDOMETER_DAYS_HISTORY] = {430,550,230,500,349,765,234};
         RTC_DATA_ATTR uint16_t pedometer_hours_steps[24] = {0,   0,  0,  0,  0,  0, 120, 300, 1232, 10, 23, 43, 1230, 900, 534, 230, 890, 600, 200, 100, 10,  0, 10, 0};
         RTC_DATA_ATTR uint8_t pedometer_hours_sleep[24] =  {60, 60, 60, 58, 60, 34, 0,   0,   0,    0,  0,  0,  0,    0,   0,   0,   0,   0,   0,   0,   0,   0, 0, 23};
+
+        PEDOMETER_DAY_VALUE_TYPE get_pedometer_days_steps(unsigned char day){ 
+            pedometer_days_steps[0] = 8340; pedometer_days_steps[1] = 12234; pedometer_days_steps[2] = 7654; pedometer_days_steps[3] = 23593;
+            pedometer_days_steps[4] = 5633; pedometer_days_steps[5] = 1290; pedometer_days_steps[6] = 430;
+
+            return pedometer_days_steps[day];
+        }
+        uint16_t get_pedometer_days_sleep(unsigned char day){ 
+            pedometer_days_sleep[0] = 430; pedometer_days_sleep[1] = 550; pedometer_days_sleep[2] = 230; pedometer_days_sleep[3] = 500;
+            pedometer_days_sleep[4] = 349; pedometer_days_sleep[5] = 765; pedometer_days_sleep[6] = 234;
+
+            return pedometer_days_sleep[day];
+        }
+        uint16_t get_pedometer_hours_steps(unsigned char hour){ 
+            pedometer_hours_steps[0] = 0; pedometer_hours_steps[1] = 0; pedometer_hours_steps[2] = 0;  pedometer_hours_steps[3] = 0; pedometer_hours_steps[4] = 0;
+            pedometer_hours_steps[5] = 0; pedometer_hours_steps[6] = 120; pedometer_hours_steps[7] = 300; pedometer_hours_steps[8] = 1232; pedometer_hours_steps[9] = 10;
+            pedometer_hours_steps[10] = 23; pedometer_hours_steps[11] = 43; pedometer_hours_steps[12] = 1230; pedometer_hours_steps[13] = 900; pedometer_hours_steps[14] = 534;
+            pedometer_hours_steps[15] = 230; pedometer_hours_steps[16] = 890; pedometer_hours_steps[17] = 600; pedometer_hours_steps[18] = 200; pedometer_hours_steps[19] = 100;
+            pedometer_hours_steps[20] = 10; pedometer_hours_steps[21] = 0; pedometer_hours_steps[22] = 10; pedometer_hours_steps[23] = 0; 
+            return pedometer_hours_steps[hour];
+        }
+        uint8_t get_pedometer_hours_sleep(unsigned char hour){ 
+            pedometer_hours_sleep[0] = 60; pedometer_hours_sleep[1] = 60; pedometer_hours_sleep[2] = 60; pedometer_hours_sleep[3] = 58; pedometer_hours_sleep[4] = 60; 
+            pedometer_hours_sleep[5] = 34; pedometer_hours_sleep[6] = 0; pedometer_hours_sleep[7] = 0; pedometer_hours_sleep[8] = 0; pedometer_hours_sleep[9] = 0;  
+            pedometer_hours_sleep[10] = 0; pedometer_hours_sleep[11] = 0; pedometer_hours_sleep[12] = 0; pedometer_hours_sleep[13] = 0; pedometer_hours_sleep[14] = 0;   
+            pedometer_hours_sleep[15] = 0; pedometer_hours_sleep[16] = 0; pedometer_hours_sleep[17] = 0; pedometer_hours_sleep[18] = 0; pedometer_hours_sleep[19] = 0;   
+            pedometer_hours_sleep[20] = 0; pedometer_hours_sleep[21] = 0; pedometer_hours_sleep[22] = 0; pedometer_hours_sleep[23] = 23; 
+            return pedometer_hours_sleep[hour];
+        }
     #else
+        
         RTC_DATA_ATTR PEDOMETER_DAY_VALUE_TYPE pedometer_days_steps[PEDOMETER_DAYS_HISTORY] = {0,0,0,0,0,0,0};
         RTC_DATA_ATTR uint16_t pedometer_days_sleep[PEDOMETER_DAYS_HISTORY] = {0,0,0,0,0,0,0};
         // Steps in every hour
         RTC_DATA_ATTR uint16_t pedometer_hours_steps[24] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
         // Sleep minutes in every hour
         RTC_DATA_ATTR uint8_t pedometer_hours_sleep[24] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
+
+        PEDOMETER_DAY_VALUE_TYPE get_pedometer_days_steps(unsigned char day){ return pedometer_days_steps[day];}
+        uint16_t get_pedometer_days_sleep(unsigned char day){ return pedometer_days_sleep[day];}
+        uint16_t get_pedometer_hours_steps(unsigned char hour){ return pedometer_hours_steps[hour];}
+        uint8_t get_pedometer_hours_sleep(unsigned char hour){ return pedometer_hours_sleep[hour];}
     #endif
 
-    PEDOMETER_DAY_VALUE_TYPE get_pedometer_days_steps(unsigned char day){ return pedometer_days_steps[day];}
-    
-    
-    uint16_t get_pedometer_hours_steps(unsigned char hour){ return pedometer_hours_steps[hour];}
-    uint8_t get_pedometer_hours_sleep(unsigned char hour){ return pedometer_hours_sleep[hour];}
-    uint16_t get_pedometer_days_sleep(unsigned char day){ return pedometer_days_sleep[day];}
     float get_pedometer_days_sleep_hours(unsigned char day){ return (((float)(((int)pedometer_days_sleep[day])*100/60))/100.0);}
 
     #ifdef PEDOMETER_EMULATOR

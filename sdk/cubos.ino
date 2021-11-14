@@ -66,6 +66,11 @@ Application* currentApp;
     ############################################################################################
 */
 
+#ifdef POWERSAVE_ENABLE
+  unsigned char wakeUpReason = 0x00;
+  unsigned char getWakeUpReason(){return wakeUpReason;}
+#endif
+
 void setup(){   
 
   #ifdef CORE_SETUP_INIT
@@ -83,7 +88,7 @@ void setup(){
   #ifdef RUN_BACKGROUND_AFTER_RESTART_MCU
     #ifdef POWERSAVE_ENABLE
       #ifdef CPU_SLEEP_ENABLE
-        unsigned char wakeUpReason = core_powersave_wakeup_reason();
+        wakeUpReason = core_powersave_wakeup_reason();
         if(wakeUpReason==WAKE_UP_REASON_TIMER){
           #ifdef DEBUG_WAKEUP
             debug("DEBUG_WAKEUP: Background start " + String(millis()));
@@ -133,14 +138,16 @@ void setup(){
           #endif
         }else{
           #ifdef DEBUG_WAKEUP
-            debug("DEBUG_WAKEUP: Not background start", 10);
+            //delay(1000);
+            debug("DEBUG_WAKEUP: Not background start. Reason: " + String(wakeUpReason), 10);
           #endif
         }
       #endif
     #endif
   #else
     #ifdef DEBUG_WAKEUP
-      debug("DEBUG_WAKEUP: Not background start", 10);
+      //delay(1000);
+      debug("DEBUG_WAKEUP: Not background start. Reason: " + String(wakeUpReason), 10);
     #endif
   #endif
   //debug("**** Main app start", 10);
@@ -202,6 +209,9 @@ void setup(){
     //core_ble_sync_setup(); // Will be setted up only if needed
   #endif
   
+  #ifdef ON_SETUP_FINISHED_CUSTOM_FUNCTION_CALL
+    ON_SETUP_FINISHED_CUSTOM_FUNCTION_CALL
+  #endif
 }
 
 bool isInSleep = false;

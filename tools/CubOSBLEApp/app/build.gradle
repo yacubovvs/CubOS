@@ -7,7 +7,7 @@ android {
 
     defaultConfig {
         applicationId "ru.cubos.cubosbleapp"
-        minSdk 24
+        minSdk 22
         targetSdk 31
         versionCode 1
         versionName "1.0"
