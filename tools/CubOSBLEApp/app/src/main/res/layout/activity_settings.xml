@@ -41,7 +41,7 @@
                     android:text="Steps in a day:" />
 
                 <TextView
-                    android:id="@+id/textView10"
+                    android:id="@+id/label_stepsLimit"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginLeft="10dp"
@@ -50,7 +50,7 @@
             </LinearLayout>
 
             <SeekBar
-                android:id="@+id/seekBar"
+                android:id="@+id/seekBar_stepsLimit"
                 android:layout_width="match_parent"
                 android:layout_height="40dp" />
 
@@ -68,17 +68,17 @@
                     android:text="Sleep time:" />
 
                 <TextView
-                    android:id="@+id/textView12"
+                    android:id="@+id/label_sleepLimit"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginLeft="10dp"
                     android:layout_marginBottom="10dp"
                     android:layout_weight="1"
-                    android:text="7 hours 30 min" />
+                    android:text="2 hours" />
             </LinearLayout>
 
             <SeekBar
-                android:id="@+id/seekBar2"
+                android:id="@+id/seekBar_sleepLimit"
                 android:layout_width="match_parent"
                 android:layout_height="40dp" />
 
@@ -126,18 +126,18 @@
                     android:text="Switch off after:" />
 
                 <TextView
-                    android:id="@+id/textView121"
+                    android:id="@+id/label_screenOffTime"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginLeft="10dp"
                     android:layout_marginBottom="10dp"
                     android:layout_weight="1"
-                    android:text="10 sec" />
+                    android:text="1 second" />
 
             </LinearLayout>
 
             <SeekBar
-                android:id="@+id/seekBar3"
+                android:id="@+id/seekBar_screenOffTime"
                 android:layout_width="match_parent"
                 android:layout_height="40dp" />
 
@@ -155,18 +155,18 @@
                     android:text="Show time for:" />
 
                 <TextView
-                    android:id="@+id/textView1212"
+                    android:id="@+id/label_screenOffClock"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    android:layout_marginLeft="10dp"
                     android:layout_marginBottom="10dp"
                     android:layout_weight="1"
-                    android:text="3 sec"
-                    android:layout_marginLeft="10dp" />
+                    android:text="1 second" />
 
             </LinearLayout>
 
             <SeekBar
-                android:id="@+id/seekBar4"
+                android:id="@+id/seekBar_screenOffClock"
                 android:layout_width="match_parent"
                 android:layout_height="40dp" />
 
