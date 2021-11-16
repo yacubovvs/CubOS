@@ -100,7 +100,7 @@
 //#define COREPEDOMETER_CENTRALWIGHT_SLEEP_VALUE_MIN      0.05f
 //#define COREPEDOMETER_DELTA_SLEEP_VALUE_MIN_100         3 // acceletometer sensitivity/100*G for sleep detection
 
-#define APP_CLOCK_POWER_AFTER_SECONDS           4
+#define APP_CLOCK_POWER_AFTER_SECONDS_DEFAULT           4
 
 //#define PEDOMETER_EMULATOR
 //#define DEBUG_SERIAL

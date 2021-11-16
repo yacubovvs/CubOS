@@ -2,8 +2,8 @@
 #define appNameClass    ClockApp          // App name without spaces
 #define appName         "Clock"              // App name with spaces 
 
-#ifndef APP_CLOCK_POWER_AFTER_SECONDS
-    #define APP_CLOCK_POWER_AFTER_SECONDS 0 
+#ifndef APP_CLOCK_POWER_AFTER_SECONDS_DEFAULT
+    #define APP_CLOCK_POWER_AFTER_SECONDS_DEFAULT 0 
 #endif
 
 #define APP_CLOCK_BIG_SCREEN_CIRCLE_RING_OFFSET 20

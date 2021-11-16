@@ -127,6 +127,7 @@ void driver_ble_BleEsp32SyncTask( void * pvParameters ){
           #ifdef DEBUG_DRIVER_BLE_PRINT_INCONNECT_OUTPUT
             debug("Sync variant SYNC_VARIANTS_GET_SETTINGS");
           #endif
+          driver_ble_getSettings();
         }
 
         if(current_sync_variant&SYNC_VARIANTS_GET_CURRENT_TIME){
@@ -402,11 +403,53 @@ void driver_ble_getSettings(){
   if(pRemoteCharacteristic==nullptr) return;
   
   std::string readValue = pRemoteCharacteristic->readValue();
+  
+  /*
+    (byte) (pedometerOn?0x01:0x00),  // - 0x00 - pedometer off, 0x01 - pedometer on
+    (byte) (syncTime?0x01:0x00),
+    (byte) (autosyncOnCharge?0x01:0x00),
+    stepsLimit_1,
+    stepsLimit_2,
+    sleepLimit_1,
+    sleepLimit_2,
+    screenOffTime,
+    screenOffClock
+  */
 
+  bool pedometer_enable     = readValue[0];
+  bool syncTime_enable      = readValue[1];
+  bool syncOnCharge_enable  = readValue[2];
+  int steps_limit = readValue[3]|(readValue[4]<<8);
+  int sleep_limit = readValue[5]|(readValue[6]<<8);
+  uint8_t screen_off_time = readValue[7];
+  uint8_t screen_off_time_clock = readValue[8];
+
+  #ifdef PEDOMETER_ENABLE
+    core_pedometer_setEnable(pedometer_enable);
+    set_pedometer_days_steps_min_limit(steps_limit);
+    set_pedometer_days_sleep_min_limit(sleep_limit);
+  #endif
+
+  set_core_ble_sync_time(syncTime_enable);
+  set_core_ble_auto_sync_on_charge(syncOnCharge_enable);
+
+  set_core_display_time_delay_to_poweroff(screen_off_time);
+  set_core_display_time_delay_to_poweroff_clock_app(screen_off_time_clock);
 
   #ifdef DEBUG_DRIVER_BLE_PRINT_INCONNECT_OUTPUT
-    debug("Pedometer is enable: ");
-    //debug((int)pedometer_enable );
+    if (pedometer_enable)debug("* BLE got settings: Pedometer is enable");
+    else debug("* BLE got settings: Pedometer not is enable");
+
+    if (syncTime_enable) debug("* BLE got settings: Sync time is enable");
+    else debug("* BLE got settings: Sync time not is enable");
+
+    if (syncOnCharge_enable) debug("* BLE got settings: Sync on charge is enable");
+    else debug("* BLE got settings: Sync on charge not is enable");
+
+    debug("* BLE got settings: step limit: " + String(steps_limit));
+    debug("* BLE got settings: sleep limit: " + String(sleep_limit));
+    debug("* BLE got settings: screen off time: " + String(screen_off_time));
+    debug("* BLE got settings: screen off time clock: " + String(screen_off_time_clock));
   #endif
 }
 

@@ -91,7 +91,7 @@ public class Settings extends AppCompatActivity {
 
     void setLabelScreenOffClock(int screenOffClock){
         if(screenOffClock==0){
-            label_screenOffTime.setText("Never");
+            label_screenOffTime.setText("Default");
         } else {
             int seconds = screenOffClock%60;
             int minutes = (screenOffClock - seconds)/60;

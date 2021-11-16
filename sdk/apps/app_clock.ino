@@ -2,10 +2,6 @@
 #define appNameClass    ClockApp          // App name without spaces
 #define appName         "Clock"              // App name with spaces 
 
-#ifndef APP_CLOCK_POWER_AFTER_SECONDS
-    #define APP_CLOCK_POWER_AFTER_SECONDS 0 
-#endif
-
 #define APP_CLOCK_BIG_SCREEN_CIRCLE_RING_OFFSET 20
 #define APP_CLOCK_CIRCLE_COLOR 48
 #define APP_CLOCK_BIG_SCREEN_FADE_SIZE 23 // temporary not used
@@ -133,7 +129,7 @@ void appNameClass::onCreate(){
         this->drawStepsCircle(true);
     #endif
 
-    this->sleep_device_after = APP_CLOCK_POWER_AFTER_SECONDS;
+    this->sleep_device_after = get_core_display_time_delay_to_poweroff_clock_app();
 
 }
 

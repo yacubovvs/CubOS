@@ -35,7 +35,7 @@
 #define STARTING_APP_NUMM   -1    // for Mainmenu (default app)
 #define STARTING_APP_NUMM    0 // Watch
 
-#define STARTING_APP_NUMM    1 // BLE sync
+//#define STARTING_APP_NUMM    1 // BLE sync
 //#define STARTING_APP_NUMM    3 // Settings
 
 #define FONT_SIZE_DEFAULT   1
@@ -105,7 +105,7 @@
 #define COREPEDOMETER_CENTRALWIGHT_SLEEP_VALUE_MIN      0.05f
 #define COREPEDOMETER_DELTA_SLEEP_VALUE_MIN_100         3 // acceletometer sensitivity/100*G for sleep detection
 
-#define APP_CLOCK_POWER_AFTER_SECONDS           4
+#define APP_CLOCK_POWER_AFTER_SECONDS_DEFAULT           4
 
 #define PEDOMETER_EMULATOR
 #define DEBUG_SERIAL
@@ -117,7 +117,7 @@
 //#define SLEEP_VALUE_DEBUG
 #define DEBUG_DRIVER_BLE_PRINT_INCONNECT_OUTPUT // for exchange debug
 
-#define ON_SETUP_FINISHED_CUSTOM_FUNCTION_CALL if(getWakeUpReason()==0x02){ debug("Starting sync app on wakeup");currentApp = getApp(1);}
+#define ON_SETUP_FINISHED_CUSTOM_FUNCTION_CALL if(getWakeUpReason()==0x02 && get_core_ble_auto_sync_on_charge()){ debug("Starting sync app on wakeup");currentApp = getApp(1);}
 
 
 /*

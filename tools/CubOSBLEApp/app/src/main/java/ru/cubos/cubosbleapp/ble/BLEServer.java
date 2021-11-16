@@ -33,6 +33,7 @@ import java.util.Set;
 import java.util.UUID;
 
 import ru.cubos.cubosbleapp.MainActivity;
+import ru.cubos.cubosbleapp.R;
 import ru.cubos.cubosbleapp.helpers.Common;
 
 public class BLEServer extends BluetoothGattServerCallback {
@@ -214,14 +215,31 @@ public class BLEServer extends BluetoothGattServerCallback {
              //device.
         }
         else if (BLEServer.SETTINGS.equals(characteristic.getUuid())){
+
+            boolean pedometerOn         = MainActivity.mainActivity.preferences.getBoolean("switch_usePedometer", true);
+            boolean syncTime            = MainActivity.mainActivity.preferences.getBoolean("switch_syncTime", true);
+            boolean autosyncOnCharge    = MainActivity.mainActivity.preferences.getBoolean("switch_autosyncOnCharge", true);
+            int stepsLimit = MainActivity.mainActivity.preferences.getInt("last_stepsLimits", 7000);
+            int sleepLimit = MainActivity.mainActivity.preferences.getInt("last_sleepLimits", 480);
+            byte screenOffTime = (byte) MainActivity.mainActivity.preferences.getInt("last_screenOffTime", 10);
+            byte screenOffClock = (byte) MainActivity.mainActivity.preferences.getInt("last_screenOffClock", 3);
+
+            byte stepsLimit_1 = (byte) (stepsLimit&0xFF);
+            byte stepsLimit_2 = (byte) (stepsLimit>>8&0xFF);
+            byte sleepLimit_1 = (byte) (sleepLimit&0xFF);
+            byte sleepLimit_2 = (byte) (sleepLimit>>8&0xFF);
+
             mBluetoothGattServer.sendResponse(device, requestId, BluetoothGatt.GATT_SUCCESS, 0,
-                    // Structure:
                     new byte[]{
-                            0x01,  // - 0x00 - pedometer off, 0x01 - pedometer on
-                            0x00,
-                            0x00,
-                            0x00,
-                            0x00,
+                            (byte) (pedometerOn?0x01:0x00),  // - 0x00 - pedometer off, 0x01 - pedometer on
+                            (byte) (syncTime?0x01:0x00),
+                            (byte) (autosyncOnCharge?0x01:0x00),
+                            stepsLimit_1,
+                            stepsLimit_2,
+                            sleepLimit_1,
+                            sleepLimit_2,
+                            screenOffTime,
+                            screenOffClock
                     }
             );
         }

@@ -106,7 +106,7 @@ public class MainActivity extends AppCompatActivity {
             int sleepTime           = preferences.getInt("last_sleepTime", 0);
             int sleepTimeLimits     = preferences.getInt("last_sleepTimeLimits", 0);
             int steps               = preferences.getInt("last_steps", 0);
-            int stepsLimits         = preferences.getInt("last_stepsLimits", 0);
+            int stepsLimits         = preferences.getInt("last_stepsLimit", 0);
 
             setCurrentSleepTime(sleepTime, sleepTimeLimits);
             setCurrentSteps(steps, stepsLimits);
@@ -174,7 +174,7 @@ public class MainActivity extends AppCompatActivity {
 
     public void setCurrentSteps(int steps, int stepsLimits){
         preferences.putInt("last_steps", steps);
-        preferences.putInt("last_stepsLimits", stepsLimits);
+        preferences.putInt("last_stepsLimit", stepsLimits);
 
         steps_labels.setText("" + steps + "/" + stepsLimits + " steps");
         calories_label.setText("" + (int)((float)steps*0.033f) + " kcal");

@@ -304,7 +304,13 @@ unsigned char core_display_brightness             = DEFAULT_SCREEN_BRIGHTNESS;
   unsigned char core_display_brightness_fade        = DEFAULT_FADE_BRIGHTNES;
   unsigned char core_display_time_delay_to_fade     = DEFAULT_DELAY_TO_FADE_DISPLAY;
 #endif
-unsigned char core_display_time_delay_to_poweroff = DEFAULT_TIME_TO_POWEROFF_DISPLAY;
+unsigned char core_display_time_delay_to_poweroff             = DEFAULT_TIME_TO_POWEROFF_DISPLAY;
+
+#ifdef APP_CLOCK_POWER_AFTER_SECONDS_DEFAULT
+  unsigned char core_display_time_delay_to_poweroff_clock_app   = APP_CLOCK_POWER_AFTER_SECONDS_DEFAULT;
+#else
+  unsigned char core_display_time_delay_to_poweroff_clock_app   = 0;
+#endif
 
 #ifdef DISPLAY_BACKLIGHT_CONTROL_ENABLE
   void set_core_display_brightness(unsigned char value){ 
@@ -332,12 +338,19 @@ void set_core_display_time_delay_to_poweroff(unsigned char value){
   core_display_time_delay_to_poweroff = value;
 }
 
+void set_core_display_time_delay_to_poweroff_clock_app(unsigned char value){ 
+  if(value==0) value = 1;
+  if(value>240) value = 240;
+  core_display_time_delay_to_poweroff_clock_app = value;
+}
+
 unsigned char get_core_display_brightness(){return core_display_brightness; }
 #ifdef DISPLAY_BACKLIGHT_FADE_CONTROL_ENABLE
   unsigned char get_core_display_brightness_fade(){return core_display_brightness_fade; }
   unsigned char get_core_display_time_delay_to_fade(){return core_display_time_delay_to_fade; }
 #endif
 unsigned char get_core_display_time_delay_to_poweroff(){return core_display_time_delay_to_poweroff; }
+unsigned char get_core_display_time_delay_to_poweroff_clock_app(){return core_display_time_delay_to_poweroff_clock_app; }
 
 /*
 * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * 
