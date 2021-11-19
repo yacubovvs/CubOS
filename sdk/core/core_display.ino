@@ -304,13 +304,23 @@ unsigned char core_display_brightness             = DEFAULT_SCREEN_BRIGHTNESS;
   unsigned char core_display_brightness_fade        = DEFAULT_FADE_BRIGHTNES;
   unsigned char core_display_time_delay_to_fade     = DEFAULT_DELAY_TO_FADE_DISPLAY;
 #endif
-unsigned char core_display_time_delay_to_poweroff             = DEFAULT_TIME_TO_POWEROFF_DISPLAY;
 
-#ifdef APP_CLOCK_POWER_AFTER_SECONDS_DEFAULT
-  unsigned char core_display_time_delay_to_poweroff_clock_app   = APP_CLOCK_POWER_AFTER_SECONDS_DEFAULT;
+#ifdef PLATFORM_ESP32
+  RTC_DATA_ATTR unsigned char core_display_time_delay_to_poweroff             = DEFAULT_TIME_TO_POWEROFF_DISPLAY;
 #else
-  unsigned char core_display_time_delay_to_poweroff_clock_app   = 0;
+  unsigned char core_display_time_delay_to_poweroff             = DEFAULT_TIME_TO_POWEROFF_DISPLAY;
 #endif
+
+#ifndef APP_CLOCK_POWER_AFTER_SECONDS_DEFAULT
+  #define APP_CLOCK_POWER_AFTER_SECONDS_DEFAULT 0
+#endif
+
+#ifdef PLATFORM_ESP32
+  RTC_DATA_ATTR unsigned char core_display_time_delay_to_poweroff_clock_app   = APP_CLOCK_POWER_AFTER_SECONDS_DEFAULT;
+#else
+  unsigned char core_display_time_delay_to_poweroff_clock_app   = APP_CLOCK_POWER_AFTER_SECONDS_DEFAULT;
+#endif
+
 
 #ifdef DISPLAY_BACKLIGHT_CONTROL_ENABLE
   void set_core_display_brightness(unsigned char value){ 

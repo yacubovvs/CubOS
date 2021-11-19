@@ -107,16 +107,17 @@
 
 #define APP_CLOCK_POWER_AFTER_SECONDS_DEFAULT           4
 
-#define PEDOMETER_EMULATOR
-#define DEBUG_SERIAL
+//#define PEDOMETER_EMULATOR
+//#define DEBUG_SERIAL
 //#define DEBUG_PEDOMETER
 //#define DEBUG_PEDOMETER_TIMING
 //#define DEBUG_WAKEUP
 //#define DEBUG_DRIVER_BATTERY
 //#define APP_BLEE_SYNC_DEBUG
 //#define SLEEP_VALUE_DEBUG
-#define DEBUG_DRIVER_BLE_PRINT_INCONNECT_OUTPUT // for exchange debug
+//#define DEBUG_DRIVER_BLE_PRINT_INCONNECT_OUTPUT // for exchange debug
 
+#define SYNC_APP_NUM 1
 #define ON_SETUP_FINISHED_CUSTOM_FUNCTION_CALL if(getWakeUpReason()==0x02 && get_core_ble_auto_sync_on_charge()){ debug("Starting sync app on wakeup");currentApp = getApp(1);}
 
 

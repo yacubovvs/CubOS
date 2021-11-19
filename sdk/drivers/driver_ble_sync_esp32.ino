@@ -99,6 +99,9 @@ bool driver_ble_connectToServer() {
 
 void driver_ble_BleEsp32SyncTask( void * pvParameters ){
     // This is running on Core0
+    #ifdef DEBUG_DRIVER_BLE_PRINT_INCONNECT_OUTPUT
+      long start_time = millis();
+    #endif 
     core_ble_set_syncStatus(SYNC_STATUS_CONNECTING);
     debug("Task started");
     driver_ble_pRemoteService = nullptr;  
@@ -131,10 +134,16 @@ void driver_ble_BleEsp32SyncTask( void * pvParameters ){
         }
 
         if(current_sync_variant&SYNC_VARIANTS_GET_CURRENT_TIME){
-          #ifdef DEBUG_DRIVER_BLE_PRINT_INCONNECT_OUTPUT
-            debug("Sync variant SYNC_VARIANTS_GET_CURRENT_TIME");
-          #endif
-          driver_ble_getCurrentTime();
+          if(get_core_ble_sync_time()){
+            #ifdef DEBUG_DRIVER_BLE_PRINT_INCONNECT_OUTPUT
+              debug("Sync variant SYNC_VARIANTS_GET_CURRENT_TIME");
+            #endif
+            driver_ble_getCurrentTime();
+          }else{
+            #ifdef DEBUG_DRIVER_BLE_PRINT_INCONNECT_OUTPUT
+              debug("** Time will not be syncing by sync settings");
+            #endif
+          }
         }
 
         if(current_sync_variant&SYNC_VARIANTS_GET_PEDOMETER_DAY_STEPS_SLEEP_LIMITS){
@@ -166,7 +175,6 @@ void driver_ble_BleEsp32SyncTask( void * pvParameters ){
             uint8_t current_day = core_time_getDate();
             uint8_t current_hour = core_time_getHours_byte();
             for(int hour=0; hour<24; hour++){
-              //driver_ble_setDayData_values(uint16_t current_day, uint16_t hour, uint32_t steps, uint16_t sleep_min)
               driver_ble_setDayData_values(current_day, current_hour, hour, get_pedometer_hours_steps(hour), get_pedometer_hours_sleep(hour));
               delay(20);
             }
@@ -186,10 +194,8 @@ void driver_ble_BleEsp32SyncTask( void * pvParameters ){
           #ifdef PEDOMETER_ENABLE
             uint8_t current_day = core_time_getDate();
             for(uint16_t day_shift=0; day_shift<PEDOMETER_DAYS_HISTORY; day_shift++){
-              //driver_ble_setWeekData_values(uint16_t current_day, uint16_t day_shift, uint32_t steps, uint16_t sleep_min)
               driver_ble_setWeekData_values(current_day, day_shift, get_pedometer_days_steps(day_shift), get_pedometer_days_sleep(day_shift));
               delay(20);
-              //debug("day_shift: " + String(day_shift) + " steps: " + get_pedometer_days_steps(day_shift));
             }
           #else
             #ifdef DEBUG_DRIVER_BLE_PRINT_INCONNECT_OUTPUT
@@ -231,6 +237,11 @@ void driver_ble_BleEsp32SyncTask( void * pvParameters ){
     driver_ble_myDevice = nullptr;
 
     set_core_ble_is_syncing(false);
+
+    #ifdef DEBUG_DRIVER_BLE_PRINT_INCONNECT_OUTPUT
+      debug("##### SYNC TOOK " + String(millis()-start_time) + "ms");
+    #endif
+
     vTaskDelete(NULL);
 }
 /*
@@ -438,13 +449,13 @@ void driver_ble_getSettings(){
 
   #ifdef DEBUG_DRIVER_BLE_PRINT_INCONNECT_OUTPUT
     if (pedometer_enable)debug("* BLE got settings: Pedometer is enable");
-    else debug("* BLE got settings: Pedometer not is enable");
+    else debug("* BLE got settings: Pedometer is not enable");
 
     if (syncTime_enable) debug("* BLE got settings: Sync time is enable");
     else debug("* BLE got settings: Sync time not is enable");
 
     if (syncOnCharge_enable) debug("* BLE got settings: Sync on charge is enable");
-    else debug("* BLE got settings: Sync on charge not is enable");
+    else debug("* BLE got settings: Sync on charge is not enable");
 
     debug("* BLE got settings: step limit: " + String(steps_limit));
     debug("* BLE got settings: sleep limit: " + String(sleep_limit));

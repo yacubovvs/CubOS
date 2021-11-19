@@ -357,6 +357,22 @@ void appNameClass::onEvent(unsigned char event, int val1, int val2, int val3, in
   BUTTON_POWER
   */
 
+  /*
+  #ifdef BLE_ENABLED
+  #ifdef SYNC_ON_CHARGE
+  #ifdef SYNC_APP_NUM
+    if(event==EVENT_ON_BATTERY_CHARGING_CHANGE){
+      if(get_core_ble_auto_sync_on_charge()){
+        //currentApp = getApp(1);
+        //return;
+        //debug("### STARTINGSYNC APP");
+      }
+    }
+  #endif
+  #endif
+  #endif
+  */
+
   #if (DRIVER_CONTROLS_TOTALBUTTONS == 1 || DRIVER_CONTROLS_TOTALBUTTONS == 2)
     if(event==EVENT_BUTTON_PRESSED){
       
