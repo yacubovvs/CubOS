@@ -104,6 +104,7 @@
     void driver_accelerometer_setup(){
         //IMU.initMPU9250();
         setupMPU9250();
+        //delay(100);
     }
 
     void driver_accelerometer_loop(){
@@ -111,6 +112,7 @@
 
     void driver_accelerometer_wakeup(){
         IMU.setSleepEnabled(false);
+        delay(50);
     }
 
     void driver_accelerometer_sleep(){

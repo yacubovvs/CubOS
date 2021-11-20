@@ -244,7 +244,6 @@
                     ){
                         core_pedometer_step_detection_arrays[core_pedometer_current_step_detection-1] = 1;
                         core_pedometer_current_step_detection--;
-                        // Testnig for detecting noise n103
                     }*/
 
                     if(core_pedometer_current_step_detection==PEDOMETER_MESURES_IN_STEP_DETECTION_PERIOD){

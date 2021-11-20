@@ -17,7 +17,7 @@ void core_ble_sync_setup(){
 */
 
 RTC_DATA_ATTR bool core_ble_sync_time = true;
-RTC_DATA_ATTR bool core_ble_auto_sync_on_charge = true;
+RTC_DATA_ATTR bool core_ble_auto_sync_on_charge = false;
 
 bool get_core_ble_sync_time(){return core_ble_sync_time;}
 bool get_core_ble_auto_sync_on_charge(){return core_ble_auto_sync_on_charge;}

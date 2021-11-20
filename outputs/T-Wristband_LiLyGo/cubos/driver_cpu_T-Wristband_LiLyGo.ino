@@ -58,24 +58,16 @@ void driver_cpu_sleep(unsigned char sleepType, long timeout){
             digitalWrite(27, 0);
             //esp_sleep_enable_ext0_wakeup(TOUCH_SCREEN_INTERRUPT_PIN, LOW);
             driver_display_setBrightness(0);
-            #ifdef ACCELEROMETER_ENABLE
-                driver_accelerometer_sleep();
-            #endif
 
             esp_light_sleep_start();
 
-            #ifdef ACCELEROMETER_ENABLE
-                driver_accelerometer_wakeup();
-            #endif
             driver_display_setBrightness(100);
 
             esp_light_sleep_start();
 
             digitalWrite(27, 1);
             esp_sleep_enable_ext0_wakeup(GPIO_NUM_33, HIGH);
-            #ifdef ACCELEROMETER_ENABLE
-                driver_accelerometer_sleep();
-            #endif
+
             break;
 
         case SLEEP_LIGHT:

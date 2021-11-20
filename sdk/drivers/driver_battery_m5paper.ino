@@ -3,7 +3,6 @@
 #include <M5EPD.h>
 
 void driver_battery_setup(){
-    //begin(bool LCDEnable, bool PowerEnable, bool SerialEnable){ // temp n103
     #ifdef DEBUG_DRIVER_BATTERY
         debug("DEBUG_DRIVER_BATTERY: Battery is setted up");
     #endif

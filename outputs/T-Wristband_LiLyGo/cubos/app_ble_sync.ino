@@ -331,7 +331,6 @@ void appNameClass::onCreate(){
     setBackgroundColor(0,0,0);
     setContrastColor(255, 255, 255);
 
-    //this->drawActivity(ACTIVITY_SYNC_SUCCESS); // for tests n103
     this->checkCharging();
 }
 

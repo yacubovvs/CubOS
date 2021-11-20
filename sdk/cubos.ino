@@ -81,7 +81,6 @@ void setup(){
     #ifndef DO_NOT_INIT_SERIAL
       DEBUG_SERIAL_PORT.begin(115200);
     #endif
-    delay(500);
     debug("\n\nSerial debug started " + String(millis()));
   #endif
 

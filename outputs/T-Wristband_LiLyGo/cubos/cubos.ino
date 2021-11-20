@@ -296,6 +296,7 @@
 
 #define STYLE_STATUSBAR_HEIGHT  20
 #define PEDOMETER_DO_NOT_USE_PEDOMETER_WHILE_CONNECTED_TO_USB
+//#undef PEDOMETER_DO_NOT_USE_PEDOMETER_WHILE_CONNECTED_TO_USB
 #define SMOOTH_ANIMATION
 #define NARROW_SCREEN
 
@@ -451,7 +452,6 @@ void setup(){
     #ifndef DO_NOT_INIT_SERIAL
       DEBUG_SERIAL_PORT.begin(115200);
     #endif
-    delay(500);
     debug("\n\nSerial debug started " + String(millis()));
   #endif
 

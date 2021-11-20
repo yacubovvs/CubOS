@@ -11,14 +11,11 @@
 void driver_cpu_setup(){
     //M5.begin();
 
-    //begin(bool LCDEnable, bool PowerEnable, bool SerialEnable){ // temp n103
     M5.begin(false, false, false);
     
     esp_sleep_enable_ext0_wakeup(GPIO_NUM_37, LOW);
     set_core_powersave_lastUserAction();
 
-    //M5.Axp.ClearAllIRQ();     // temp n103
-    //M5.Axp.DisableAllIRQ();  // temp n103
 }
 
 void driver_cpu_wakeup(){}
