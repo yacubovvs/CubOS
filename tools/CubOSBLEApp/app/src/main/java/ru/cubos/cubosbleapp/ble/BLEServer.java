@@ -197,15 +197,23 @@ public class BLEServer extends BluetoothGattServerCallback {
             currentCall_current_position_message = 0;
             currentCall_message = null;
 
+            byte message[] = new byte[]{
+                    0x01, 0x02,  // - notification hash code
+                    0x02, 0x02,  // - missed calls hash code
+                    0x01,       // - current call hash
+                    0x03,       // - settings changed flag
+                    0x04,       // - alarms hash
+                    0,
+                    0
+            };
+
+            byte hash[] = HashSum.getHashSum(message[0] + message[2] + message[4] + message[6] , message[1] + message[3] + message[5]);
+
+            message[7] = hash[0];
+            message[8] = hash[1];
+
             mBluetoothGattServer.sendResponse(device, requestId, BluetoothGatt.GATT_SUCCESS, 0,
-                    // Structure:
-                    // byte[0xFF, 0xFF, 0xFF, 0xFF] - random bytes
-                    new byte[]{
-                            0x01, 0x02,  // - notification hash code
-                            0x02, 0x02,  // - missed calls hash code
-                            0x01,       // - current call hash
-                            0x03,       // - settings changed flag
-                    }
+                    message
             );
 
             MainActivity.mainActivity.preferences.putInt("last_DateUpdate", (new Date()).getDate());
@@ -229,19 +237,26 @@ public class BLEServer extends BluetoothGattServerCallback {
             byte sleepLimit_1 = (byte) (sleepLimit&0xFF);
             byte sleepLimit_2 = (byte) (sleepLimit>>8&0xFF);
 
-            mBluetoothGattServer.sendResponse(device, requestId, BluetoothGatt.GATT_SUCCESS, 0,
-                    new byte[]{
-                            (byte) (pedometerOn?0x01:0x00),  // - 0x00 - pedometer off, 0x01 - pedometer on
-                            (byte) (syncTime?0x01:0x00),
-                            (byte) (autosyncOnCharge?0x01:0x00),
-                            stepsLimit_1,
-                            stepsLimit_2,
-                            sleepLimit_1,
-                            sleepLimit_2,
-                            screenOffTime,
-                            screenOffClock
-                    }
-            );
+            byte message[] = new byte[]{
+                    (byte) (pedometerOn?0x01:0x00),  // - 0x00 - pedometer off, 0x01 - pedometer on
+                    (byte) (syncTime?0x01:0x00),
+                    (byte) (autosyncOnCharge?0x01:0x00),
+                    stepsLimit_1,
+                    stepsLimit_2,
+                    sleepLimit_1,
+                    sleepLimit_2,
+                    screenOffTime,
+                    screenOffClock,
+                    0,
+                    0
+            };
+
+            byte hash[] = HashSum.getHashSum(message[0]+message[2]+message[4]+message[6]+message[8], message[1]+message[3]+message[5]+message[7]);
+
+            message[9] = hash[0];
+            message[10] = hash[1];
+
+            mBluetoothGattServer.sendResponse(device, requestId, BluetoothGatt.GATT_SUCCESS, 0, message);
         }
         else if (BLEServer.IS_CALLING.equals(characteristic.getUuid())) {
             //currentCall_current_position_message = 0;
