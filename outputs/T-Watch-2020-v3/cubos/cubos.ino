@@ -25,6 +25,39 @@
 
 /*
 ############################################################################
+#                                SYNC STATUS                               #
+############################################################################
+*/
+
+#define SYNC_STATUS_NOT_STARTED                     0x01
+#define SYNC_STATUS_CONNECTING                      0x02
+#define SYNC_STATUS_IN_PROGRESS                     0x03
+#define SYNC_STATUS_FINISHED                        0x04
+#define SYNC_STATUS_ERROR_SERVER_NOT_FOUND          0x05
+#define SYNC_STATUS_ERROR_DIFFERENT_API_VERSIONS    0x06
+#define SYNC_STATUS_ERROR_EXCHANGE_FAILED           0x07
+#define SYNC_STATUS_ERROR_UNKNOWN                   0x08
+
+/*
+############################################################################
+#                               SYNC VARIANTS                              #
+############################################################################
+*/
+
+#define SYNC_VARIANTS_GET_API_VERSION                           0b0000000000000001
+#define SYNC_VARIANTS_GET_SETTINGS                              0b0000000000000010
+#define SYNC_VARIANTS_GET_CURRENT_TIME                          0b0000000000000100
+#define SYNC_VARIANTS_GET_PEDOMETER_DAY_STEPS_SLEEP_LIMITS      0b0000000000001000
+#define SYNC_VARIANTS_SET_PEDOMETER_CURRENT_DAY_STEPS_SLEEP     0b0000000000010000
+#define SYNC_VARIANTS_SET_PEDOMETER_DAY_DATA_PER_HOUR           0b0000000000100000
+#define SYNC_VARIANTS_SET_PEDOMETER_WEEK_DATA_PER_DAY           0b0000000001000000
+#define SYNC_VARIANTS_GET_NOTIFICATIONS                         0b0000000010000000
+#define SYNC_VARIANTS_GET_CURRENT_CALL                          0b0000000100000000
+#define SYNC_VARIANTS_GET_MISSED_CALLS                          0b0000001000000000
+#define SYNC_VARIANTS_GET_DATA_HASH                             0b0000010000000000
+
+/*
+############################################################################
 #                                 EVENTS +                                 #
 ############################################################################
 */
@@ -56,6 +89,9 @@
 #define EVENT_ON_HOUR_CHANGED               0x14
 #define EVENT_ON_DATE_CHANGED               0x15
 
+#define EVENT_ON_BATTERY_VALUE_CHANGE       0x1A
+#define EVENT_ON_BATTERY_CHARGING_CHANGE    0x1B
+
 #define EVENT_ON_TOUCH_QUICK_SWIPE_TO_LEFT      0x16
 #define EVENT_ON_TOUCH_QUICK_SWIPE_TO_RIGHT     0x17
 #define EVENT_ON_TOUCH_QUICK_SWIPE_TO_TOP       0x18
@@ -85,12 +121,12 @@
 #define SLEEP_LIGHT                         0x03
 #define SLEEP_MODEM                         0x04
 #define SLEEP_DISPLAY                       0x05
-#define SLEEP_HIBERNATE                     0x03
-#define WAKE_MODEM                          0x06
-#define WAKE_DISPLAY                        0x07
-#define WAKE                                0x08
-#define SLEEP_LIGHT_SCREEN_OFF              0x09
-#define SLEEP_LIGHT_ACCELEROMETER_SLEEP     0x0A
+#define SLEEP_HIBERNATE                     0x06
+#define WAKE_MODEM                          0x07
+#define WAKE_DISPLAY                        0x08
+#define WAKE                                0x09
+#define SLEEP_LIGHT_SCREEN_OFF              0x0A
+#define SLEEP_LIGHT_ACCELEROMETER_SLEEP     0x0B
 
 
 #define IN_APP_SLEEP_TYPE       SLEEP_LIGHT
@@ -190,10 +226,11 @@
 #define COREPEDOMETER_DELTA_SLEEP_VALUE_MIN_100     3 // acceletometer sensitivity/100*G for sleep detection
 #define COREPEDOMETER_CENTRALWIGHT_SLEEP_VALUE_MIN      0.05f
 
-#define APP_CLOCK_POWER_AFTER_SECONDS           4
+#define APP_CLOCK_POWER_AFTER_SECONDS_DEFAULT           4
 
 #define PEDOMETER_DO_NOT_USER_PEDOMETER_WHILE_CONNECTED_TO_USB
 //#define USE_NUMBERS_MAIN_MENU_IN_ACTIVE_PAGES
+
 /*
     ############################################################################################
     #                                                                                          #
@@ -241,6 +278,7 @@
 #define TOUCH_SCREEN_ENABLE
 
 #define COLOR_SCREEN                     // Screen is colored                     
+//#define USE_PRIMITIVE_HARDWARE_DRAW_ACCELERATION
 
 //#define toDefaultApp_onLeftLongPress
 
@@ -273,8 +311,9 @@
 //#define DEFAULT_SCREEN_BRIGHTNESS 10
 
 #define DEFAULT_TIME_TO_POWEROFF_DISPLAY 10
-//#define APP_CLOCK_POWER_AFTER_SECONDS 15
+//#define APP_CLOCK_POWER_AFTER_SECONDS_DEFAULT 15
 //#define DEFAULT_DELAY_TO_FADE_DISPLAY 0
+#define BLE_ENABLED
 
 #define STYLE_STATUSBAR_HEIGHT  30 
 #define DRIVER_CONTROLS_TOTALBUTTONS 1
@@ -315,7 +354,7 @@
 #define COREPEDOMETER_CENTRALWIGHT_SLEEP_VALUE_MIN      0.05f
 #define COREPEDOMETER_DELTA_SLEEP_VALUE_MIN_100         6 // acceletometer sensitivity/100*G for sleep detection
 
-#define APP_CLOCK_POWER_AFTER_SECONDS           4
+#define APP_CLOCK_POWER_AFTER_SECONDS_DEFAULT           4
 #define APP_BATTERY_FONT_SIZE                   1
 //#define DEBUG_CPU_CONTROLL_ENABLE
 //#define DEBUG_CORE_POWERSAVE
@@ -353,6 +392,7 @@
 
 // PREDEFINITION
 void core_views_statusBar_draw();
+void core_views_draw_active_page(bool draw, int y0, unsigned char pages_quantity, unsigned char position);
 #ifdef SOFTWARE_BUTTONS_ENABLE
   void core_views_softwareButtons_draw();
 #endif
@@ -381,7 +421,11 @@ class Application{
 
     virtual void onLoop()     = 0;
     virtual void onDestroy()  = 0;
-    virtual void onEvent(unsigned char event, int val1, int val2) = 0;
+    virtual void onEvent(unsigned char event, int val1, int val2, int val3, int val4, int val5) = 0;
+
+    void onEvent(unsigned char event, int val1, int val2){
+      onEvent(event, val1, val2, 0, 0, 0);
+    }
 
     void super_onCreate(){
       this->preventSleep = false;
@@ -405,22 +449,28 @@ Application* currentApp;
     ############################################################################################
 */
 
-void setup(){   
+#ifdef POWERSAVE_ENABLE
+  unsigned char wakeUpReason = 0x00;
+  unsigned char getWakeUpReason(){return wakeUpReason;}
+#endif
 
-  #ifdef DEBUG_SERIAL
-      DEBUG_SERIAL_PORT.begin(115200);
-      delay(100);
-      debug("\n\nSerial debug started " + String(millis()));
-  #endif
+void setup(){   
 
   #ifdef CORE_SETUP_INIT
     core_setup_driver();
   #endif
 
+  #ifdef DEBUG_SERIAL
+    #ifndef DO_NOT_INIT_SERIAL
+      DEBUG_SERIAL_PORT.begin(115200);
+    #endif
+    debug("\n\nSerial debug started " + String(millis()));
+  #endif
+
   #ifdef RUN_BACKGROUND_AFTER_RESTART_MCU
     #ifdef POWERSAVE_ENABLE
       #ifdef CPU_SLEEP_ENABLE
-        unsigned char wakeUpReason = core_powersave_wakeup_reason();
+        wakeUpReason = core_powersave_wakeup_reason();
         if(wakeUpReason==WAKE_UP_REASON_TIMER){
           #ifdef DEBUG_WAKEUP
             debug("DEBUG_WAKEUP: Background start " + String(millis()));
@@ -470,14 +520,16 @@ void setup(){
           #endif
         }else{
           #ifdef DEBUG_WAKEUP
-            debug("DEBUG_WAKEUP: Not background start", 10);
+            //delay(1000);
+            debug("DEBUG_WAKEUP: Not background start. Reason: " + String(wakeUpReason), 10);
           #endif
         }
       #endif
     #endif
   #else
     #ifdef DEBUG_WAKEUP
-      debug("DEBUG_WAKEUP: Not background start", 10);
+      //delay(1000);
+      debug("DEBUG_WAKEUP: Not background start. Reason: " + String(wakeUpReason), 10);
     #endif
   #endif
   //debug("**** Main app start", 10);
@@ -530,7 +582,18 @@ void setup(){
     currentApp = getApp(STARTING_APP_NUMM);
     currentAppSetted = true;
   #endif
+
+  #ifdef TOUCH_SCREEN_ENABLE
+    setup_touchScreenCore();
+  #endif
+
+  #ifdef BLE_ENABLED
+    //core_ble_sync_setup(); // Will be setted up only if needed
+  #endif
   
+  #ifdef ON_SETUP_FINISHED_CUSTOM_FUNCTION_CALL
+    ON_SETUP_FINISHED_CUSTOM_FUNCTION_CALL
+  #endif
 }
 
 bool isInSleep = false;
@@ -586,6 +649,10 @@ void loop(){
     core_pedometer_loop(false);
   #endif
 
+  #ifdef BLE_ENABLED
+    //core_ble_sync_loop();
+  #endif
+
 }
 
 void debug(String string){
@@ -607,6 +674,7 @@ void debug(String string, int delaytime){
 
     #ifdef DEBUG_SERIAL
       Serial.println(string);
+      Serial.flush();
       delay(delaytime);
     #endif
 
@@ -683,13 +751,14 @@ void debug(String string, int delaytime){
 */
 
 #define APP_MENU_APPLICATIONS_0             ClockApp
-#define APP_MENU_APPLICATIONS_1             SettingsApp
-#define APP_MENU_APPLICATIONS_2             PedometerApp
-#define APP_MENU_APPLICATIONS_3             PedometerAppTest
-#define APP_MENU_APPLICATIONS_4             BatteryApp
-#define APP_MENU_APPLICATIONS_5             I2CScannerApp
-#define APP_MENU_APPLICATIONS_6             TestApplicationApp
-#define APP_MENU_APPLICATIONS_7             SoftResetApp
+#define APP_MENU_APPLICATIONS_1             BleSync
+#define APP_MENU_APPLICATIONS_2             SettingsApp
+#define APP_MENU_APPLICATIONS_3             PedometerApp
+#define APP_MENU_APPLICATIONS_4             PedometerAppTest
+#define APP_MENU_APPLICATIONS_5             BatteryApp
+#define APP_MENU_APPLICATIONS_6             I2CScannerApp
+#define APP_MENU_APPLICATIONS_7             TestApplicationApp
+#define APP_MENU_APPLICATIONS_8             SoftResetApp
 
 /*
     # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #

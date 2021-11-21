@@ -20,6 +20,7 @@ cp sdk/apps/app_i2c_scanner.ino     outputs/T-Watch-2020-v3/cubos/
 cp sdk/apps/app_settings.ino        outputs/T-Watch-2020-v3/cubos/
 cp sdk/apps/app_test.ino            outputs/T-Watch-2020-v3/cubos/
 cp sdk/apps/app_clock.ino           outputs/T-Watch-2020-v3/cubos/
+cp sdk/apps/app_ble_sync.ino        outputs/T-Watch-2020-v3/cubos/
 #cp sdk/apps/app_touchTest.ino       outputs/T-Watch-2020-v3/cubos/
 cp sdk/apps/app_pedometer_test.ino  outputs/T-Watch-2020-v3/cubos/
 cp sdk/apps/app_pedometer.ino       outputs/T-Watch-2020-v3/cubos/
@@ -35,6 +36,7 @@ cp sdk/apps/app_z_menu_watch.ino    outputs/T-Watch-2020-v3/cubos/
 
 # Drivers
 #cp sdk/drivers/driver_battery_m5stickC.ino                  outputs/T-Watch-2020-v3/cubos/     
+cp sdk/drivers/driver_ble_sync_esp32.ino                    outputs/T-Watch-2020-v3/cubos/  
 cp sdk/drivers/driver_setup_ttgo_watch2020v3.ino            outputs/T-Watch-2020-v3/cubos/
 cp sdk/drivers/driver_display_ST7789_ttwatch_spi.ino        outputs/T-Watch-2020-v3/cubos/
 cp sdk/drivers/driver_touchscreen_ttwatch.ino               outputs/T-Watch-2020-v3/cubos/     
@@ -58,5 +60,6 @@ cp sdk/core/core_powersave.ino          outputs/T-Watch-2020-v3/cubos/
 cp sdk/core/core_background.ino         outputs/T-Watch-2020-v3/cubos/ 
 cp sdk/core/core_touchscreen.ino        outputs/T-Watch-2020-v3/cubos/  
 cp sdk/core/core_pedometer.ino          outputs/T-Watch-2020-v3/cubos/ 
+cp sdk/core/core_ble_sync.ino           outputs/T-Watch-2020-v3/cubos/  
 
 echo Finished

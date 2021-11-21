@@ -4,15 +4,15 @@
     int TOUCH_SCREEN_X = 0;
     int TOUCH_SCREEN_Y = 0;
 
-    bool getTOUCH_SCREEN_isTouching(){
+    bool getTOUCH_SCREEN_isTouching(unsigned char finger){
         return TOUCH_SCREEN_isTouching;
     }
 
-    int getTOUCH_SCREEN_X(){
+    int getTOUCH_SCREEN_X(unsigned char finger){
         return TOUCH_SCREEN_X;
     }
 
-    int getTOUCH_SCREEN_Y(){
+    int getTOUCH_SCREEN_Y(unsigned char finger){
         return TOUCH_SCREEN_Y;
     }
 

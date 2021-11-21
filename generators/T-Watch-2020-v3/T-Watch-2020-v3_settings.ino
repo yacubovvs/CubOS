@@ -37,6 +37,7 @@
 #define TOUCH_SCREEN_ENABLE
 
 #define COLOR_SCREEN                     // Screen is colored                     
+//#define USE_PRIMITIVE_HARDWARE_DRAW_ACCELERATION
 
 //#define toDefaultApp_onLeftLongPress
 
@@ -71,6 +72,7 @@
 #define DEFAULT_TIME_TO_POWEROFF_DISPLAY 10
 //#define APP_CLOCK_POWER_AFTER_SECONDS_DEFAULT 15
 //#define DEFAULT_DELAY_TO_FADE_DISPLAY 0
+#define BLE_ENABLED
 
 #define STYLE_STATUSBAR_HEIGHT  30 
 #define DRIVER_CONTROLS_TOTALBUTTONS 1

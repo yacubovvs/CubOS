@@ -189,7 +189,7 @@ void appNameClass::drawActivity(byte activity){
 void appNameClass::drawActivity(bool draw, byte activity){
 
     if(draw){
-        #ifdef APP_BLE_SYNC_DEBUG
+        #ifdef APP_BLEE_SYNC_DEBUG
             debug("Drawing activity " + String(activity));
         #endif
         this->drawActivity(false, this->currentActivity);
@@ -379,14 +379,14 @@ void appNameClass::onEvent(unsigned char event, int val1, int val2, int val3, in
             }else if(event==EVENT_BUTTON_LONG_PRESS){
                 if(val1==BUTTON_SELECT){
                     if(this->currentActivity==ACTIVITY_SYNC_SUCCESS || this->currentActivity==ACTIVITY_SYNC_FAILED){
-                        #ifdef APP_BLE_SYNC_DEBUG
+                        #ifdef APP_BLEE_SYNC_DEBUG
                             debug("Switch from success or fail to sync");
                         #endif
                         //this->currentActivity = ACTIVITY_NONE;
                         this->drawActivity(ACTIVITY_NONE);
                         this->checkCharging();
                     }else if(this->currentActivity==ACTIVITY_CONNECT_TO_CHARGE){
-                        #ifdef APP_BLE_SYNC_DEBUG
+                        #ifdef APP_BLEE_SYNC_DEBUG
                             debug("Switch from charge to sync");
                         #endif
                         core_ble_sync_start();

@@ -1,5 +1,9 @@
 #include "NimBLEDevice.h"
 
+#ifndef SYNC_ATTEMPTS_TO_CONNECT_ON_HASHSUM_ERROR
+  #define SYNC_ATTEMPTS_TO_CONNECT_ON_HASHSUM_ERROR 3
+#endif
+
 // The server service:
 static BLEUUID driver_ble_serviceUUID("000a1805-0000-1000-8000-00805f9b34fb");
 
@@ -103,13 +107,14 @@ void driver_ble_BleEsp32SyncTask( void * pvParameters ){
       long start_time = millis();
     #endif 
     core_ble_set_syncStatus(SYNC_STATUS_CONNECTING);
-    debug("Task started");
+    
+    //debug("Task started");
     driver_ble_pRemoteService = nullptr;  
-    debug("Task started--1");
+    //debug("Task started--1");
     driver_ble_pBLEScan->start(5, false);
-    debug("Task started--2");
+    //debug("Task started--2");
     driver_ble_connected = driver_ble_connectToServer();
-    debug("Task started--3");
+    //debug("Task started--3");
     if (driver_ble_connected) {
         core_ble_set_syncStatus(SYNC_STATUS_IN_PROGRESS);
 
@@ -138,7 +143,7 @@ void driver_ble_BleEsp32SyncTask( void * pvParameters ){
             #ifdef DEBUG_DRIVER_BLE_PRINT_INCONNECT_OUTPUT
               debug("Sync variant SYNC_VARIANTS_GET_CURRENT_TIME");
             #endif
-            driver_ble_getCurrentTime();
+            driver_ble_getCurrentTime(0);
           }else{
             #ifdef DEBUG_DRIVER_BLE_PRINT_INCONNECT_OUTPUT
               debug("** Time will not be syncing by sync settings");
@@ -346,9 +351,11 @@ void driver_ble_init_BLE_SCAN(){
 */
 
 
-void driver_ble_getCurrentTime(){
+bool driver_ble_getCurrentTime(unsigned char attemptNum){
+    if(attemptNum>=SYNC_ATTEMPTS_TO_CONNECT_ON_HASHSUM_ERROR) return false;
+
     BLERemoteCharacteristic* pRemoteCharacteristic = driver_ble_pRemoteService->getCharacteristic(driver_ble_currentTime_characteristic_UUID);
-    if(pRemoteCharacteristic==nullptr) return;
+    if(pRemoteCharacteristic==nullptr) return false;
     
     std::string readValue = pRemoteCharacteristic->readValue();
 
@@ -358,8 +365,12 @@ void driver_ble_getCurrentTime(){
     unsigned char server_hours      = readValue[5];
     unsigned char server_minutes    = readValue[6];
     unsigned char server_seconds    = readValue[7];
+    unsigned char hashSum1          = readValue[8];
+    unsigned char hashSum2          = readValue[9];
 
     int server_year = readValue[0]|(readValue[1]<<8);
+
+    bool hashCheck = driver_ble_checkgetHashSum( (unsigned char)(readValue[0] + readValue[2] + readValue[4] + readValue[6]), (unsigned char)(readValue[1] + readValue[3] + readValue[5] + readValue[7]), (unsigned char)hashSum1, (unsigned char)hashSum2);
 
     #ifdef DEBUG_DRIVER_BLE_PRINT_INCONNECT_OUTPUT
       debug("Getting current time: ");
@@ -377,21 +388,40 @@ void driver_ble_getCurrentTime(){
       debug(String((byte)server_minutes));
       debug("seconds: ");
       debug(String((byte)server_seconds));
+
+      if(hashCheck) debug("### driver_ble_getCurrentTime CHECKSUM CHECK SUCCESS");
+      else{
+        debug("# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #");
+        debug("#                                  ERROR!!!                                   #");
+        debug("#               driver_ble_getCurrentTime CHECKSUM CHECK FAILED               #");
+        debug("# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #");
+      }
+
     #endif
     
-    core_time_setHours(server_hours);
-    core_time_setMinutes(server_minutes);
-    core_time_setSeconds(server_seconds);
-    core_time_setYear(server_year);
-    core_time_setMonth(server_month);
-    core_time_setDate(server_date);
-    core_time_setWeekDay( (server_dayOfWeek-1+7)%7);
+    if(!hashCheck){
+      delay(20); // Just in case
+      return driver_ble_getCurrentTime(attemptNum + 1);
+    }else{
+      core_time_setHours(server_hours);
+      core_time_setMinutes(server_minutes);
+      core_time_setSeconds(server_seconds);
+      core_time_setYear(server_year);
+      core_time_setMonth(server_month);
+      core_time_setDate(server_date);
+      core_time_setWeekDay( (server_dayOfWeek-1+7)%7);
+    }
+    
+    /*
     #ifdef DEBUG_DRIVER_BLE_PRINT_INCONNECT_OUTPUT
         debug("###########################################################");
         debug("Server day of week " + String(server_dayOfWeek));
         debug("Cubos day of week " + String(core_time_getWeekDay()));
         debug("Day of week string " + core_time_getWeekDay_stringShort());
     #endif
+    */
+
+    return true;
 
 }
 
@@ -829,3 +859,40 @@ void driver_ble_setDayData_values(uint8_t current_day, uint8_t current_hour, uin
     //debug("Day data sentded");
   #endif
 }
+
+
+/*
+        # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #  
+      # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #  
+    # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
+    # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
+    # # # # #                                                                                                     # # # # #
+    # # # #                                                                                                         # # # #
+    # # # #                                                 HELPERS!                                                # # # #
+    # # # #                                                                                                         # # # #
+    # # # # #                                                                                                     # # # # #
+    # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
+    # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
+      # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #  
+        # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #   
+*/
+
+bool driver_ble_checkgetHashSum(unsigned char hashByte1, unsigned char hashByte2, unsigned char checkHashByte1, unsigned char checkHashByte2){
+  if(
+    hashByte1==checkHashByte1
+    && hashByte2==checkHashByte2
+  ) return true;
+  else return false;
+}
+
+bool driver_ble_checkgetHashSum(uint16_t val1, uint16_t val2){
+  if(val1==val2) return true;
+  else return false;
+}
+
+bool driver_ble_checkgetHashSum(int val, unsigned char hashByte1, unsigned char hashByte2){
+  unsigned char checkHashByte1 = ((val>>8)&0xff);
+  unsigned char checkHashByte2 = ((val)&0xff);
+  return driver_ble_checkgetHashSum(hashByte1, hashByte2, checkHashByte1, checkHashByte2);
+}
+

@@ -23,6 +23,11 @@
   #endif
 #endif
 
+unsigned char get_16GrayscaleColor(unsigned char red, unsigned char green, unsigned char blue){
+  int grayColor = ((int)red + (int)green + (int)blue)/3/16;
+  //debug("#### COLOR " + String(red) + " " + String(green) + " " + String(blue) + " - " + grayColor);
+  return 15 - (unsigned char)grayColor;
+}
 
 uint16_t get_uint16Color(unsigned char red, unsigned char green, unsigned char blue){
   #ifdef SCREEN_INVERT_COLORS
@@ -299,7 +304,23 @@ unsigned char core_display_brightness             = DEFAULT_SCREEN_BRIGHTNESS;
   unsigned char core_display_brightness_fade        = DEFAULT_FADE_BRIGHTNES;
   unsigned char core_display_time_delay_to_fade     = DEFAULT_DELAY_TO_FADE_DISPLAY;
 #endif
-unsigned char core_display_time_delay_to_poweroff = DEFAULT_TIME_TO_POWEROFF_DISPLAY;
+
+#ifdef PLATFORM_ESP32
+  RTC_DATA_ATTR unsigned char core_display_time_delay_to_poweroff             = DEFAULT_TIME_TO_POWEROFF_DISPLAY;
+#else
+  unsigned char core_display_time_delay_to_poweroff             = DEFAULT_TIME_TO_POWEROFF_DISPLAY;
+#endif
+
+#ifndef APP_CLOCK_POWER_AFTER_SECONDS_DEFAULT
+  #define APP_CLOCK_POWER_AFTER_SECONDS_DEFAULT 0
+#endif
+
+#ifdef PLATFORM_ESP32
+  RTC_DATA_ATTR unsigned char core_display_time_delay_to_poweroff_clock_app   = APP_CLOCK_POWER_AFTER_SECONDS_DEFAULT;
+#else
+  unsigned char core_display_time_delay_to_poweroff_clock_app   = APP_CLOCK_POWER_AFTER_SECONDS_DEFAULT;
+#endif
+
 
 #ifdef DISPLAY_BACKLIGHT_CONTROL_ENABLE
   void set_core_display_brightness(unsigned char value){ 
@@ -327,12 +348,19 @@ void set_core_display_time_delay_to_poweroff(unsigned char value){
   core_display_time_delay_to_poweroff = value;
 }
 
+void set_core_display_time_delay_to_poweroff_clock_app(unsigned char value){ 
+  if(value==0) value = 1;
+  if(value>240) value = 240;
+  core_display_time_delay_to_poweroff_clock_app = value;
+}
+
 unsigned char get_core_display_brightness(){return core_display_brightness; }
 #ifdef DISPLAY_BACKLIGHT_FADE_CONTROL_ENABLE
   unsigned char get_core_display_brightness_fade(){return core_display_brightness_fade; }
   unsigned char get_core_display_time_delay_to_fade(){return core_display_time_delay_to_fade; }
 #endif
 unsigned char get_core_display_time_delay_to_poweroff(){return core_display_time_delay_to_poweroff; }
+unsigned char get_core_display_time_delay_to_poweroff_clock_app(){return core_display_time_delay_to_poweroff_clock_app; }
 
 /*
 * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * 
@@ -367,6 +395,14 @@ void setContrastColor(unsigned char r, unsigned char g, unsigned char b){
   contrast_green  = g;
   contrast_blue   = b;
 } 
+
+void core_display_poweroff(){
+  powerOff_displayDriver();
+}
+
+void core_display_poweron(){
+  powerOn_displayDriver();
+}
 
 void setDrawColor_BackGroundColor(){
   setDrawColor(getBackgroundColor_red(), getBackgroundColor_green(), getBackgroundColor_blue());
@@ -773,7 +809,7 @@ void drawString_centered(char * dString, int x, int y){
 }
 
 void clearString_centered(String dString, int x, int y, unsigned char fontSize){
-  clearString(dString, x - dString.length()*fontSize*FONT_CHAR_WIDTH/2, y, fontSize);  
+  clearString(dString, x - dString.length()*fontSize*FONT_CHAR_WIDTH/2 + fontSize/2, y, fontSize);  
 }
 
 void clearString_centered(char * dString, int x, int y){
@@ -789,11 +825,7 @@ void drawString_centered(String dString, int x, int y){
 }
 
 void drawString_centered(String dString, int x, int y, unsigned char fontSize){
-  drawString(dString, x - dString.length()*FONT_CHAR_WIDTH*fontSize/2, y, fontSize);  
-}
-
-void drawString_centered_fontSize(String dString, uint16_t y, unsigned char fontSize){
-  drawString(dString, (SCREEN_WIDTH - dString.length()*(FONT_CHAR_WIDTH)*fontSize)/2 + (int)(fontSize/2), y, fontSize);
+  drawString(dString, x - dString.length()*FONT_CHAR_WIDTH*fontSize/2 + fontSize/2, y, fontSize);  
 }
 
 void drawString_rightAlign(String dString, int x, int y){

@@ -1,11 +1,15 @@
 #define appNameClass    PedometerAppTest         // App name without spaces
 #define appName         "Pedometer"              // App name with spaces 
 
+#ifndef PEDOMETER_APP_TEST_FONT_SIZE
+    #define PEDOMETER_APP_TEST_FONT_SIZE FONT_SIZE_DEFAULT
+#endif
+
 class appNameClass: public Application{
     public:
         virtual void onLoop() override;
         virtual void onDestroy() override;
-        virtual void onEvent(unsigned char event, int val1, int val2) override;
+        virtual void onEvent(unsigned char event, int val1, int val2, int val3, int val4, int val5) override;
 
         void onCreate();
         appNameClass(){ 
@@ -21,11 +25,25 @@ class appNameClass: public Application{
               default: return (unsigned char*)""; }
         };
         const static unsigned char icon[] PROGMEM;
-        void drawStringOnScreen(String stringToPrint);
+        void drawStringOnScreen(bool draw, String stringToPrint);
         int currentPrintScreenString = 0;
         float acceleration_max = 0;
         float acceleration_min = 0;
       
+        String step_app_pedometr_test = "-";
+        String sleep_app_pedometr_test = "-";
+        String mesures_ms_app_pedometr_test = "-";
+        String mesures_app_pedometr_test = "-";
+
+        String accel_x_app_pedometr_test = "-";
+        String accel_y_app_pedometr_test = "-";
+        String accel_z_app_pedometr_test = "-";
+
+        String accel_total_app_pedometr_test = "-";
+
+        String delta_app_pedometr_test = "-";
+        String central_weight_app_pedometr_test = "-";
+        String mesure_delay_app_pedometr_test = "-";
 };
 
 void appNameClass::onCreate(){
@@ -47,84 +65,111 @@ void appNameClass::onCreate(){
     //core_pedometer_start_step_detection();
 }
 
-void appNameClass::drawStringOnScreen(String stringToPrint){
-    setDrawColor_ContrastColor();
-    drawString(stringToPrint, 5, STYLE_STATUSBAR_HEIGHT + currentPrintScreenString*10*FONT_SIZE_DEFAULT + 10, FONT_SIZE_DEFAULT);
-    currentPrintScreenString ++;
+void appNameClass::drawStringOnScreen(bool draw, String stringToPrint){
+
+    if(draw) setDrawColor_ContrastColor();
+    else setDrawColor_BackGroundColor();
+
+    #ifdef ROUND_SCREEN
+        drawString_centered(stringToPrint, SCREEN_WIDTH/2, STYLE_STATUSBAR_HEIGHT + currentPrintScreenString*10*PEDOMETER_APP_TEST_FONT_SIZE + 10, PEDOMETER_APP_TEST_FONT_SIZE);
+    #else
+        drawString(stringToPrint, 5, STYLE_STATUSBAR_HEIGHT + currentPrintScreenString*10*PEDOMETER_APP_TEST_FONT_SIZE + 10, PEDOMETER_APP_TEST_FONT_SIZE);
+    #endif
+    
+    if(draw)currentPrintScreenString ++;
 }
+
 
 void appNameClass::onLoop(){
     /*
         Write you code onLoop here
     */
-    #ifdef ACCELEROMETER_ENABLE
-        //core_pedometer_loop(false);
-        //driver_accelerometer_update_accelerometer();
-          #ifdef PEDOMETER_ENABLE
-            //core_pedometer_loop(false);
-        #endif
-    #endif
-   
-    currentPrintScreenString = 0;
-    setDrawColor_BackGroundColor();
-    drawRect(0,0, SCREEN_WIDTH, SCREEN_HEIGHT, true);
+       currentPrintScreenString = 0;
+
+    //drawRect(0,0, SCREEN_WIDTH, SCREEN_HEIGHT, true);
 
     #ifdef ACCELEROMETER_ENABLE
         driver_accelerometer_update_accelerometer();
 
-        drawStringOnScreen("Steps: ");
         #ifdef PEDOMETER_ENABLE
-            drawStringOnScreen(String(get_pedometer_days_steps()));
-        #else 
-            drawStringOnScreen("-");
-        #endif
+            if(this->step_app_pedometr_test != String(get_pedometer_days_steps())){
+                drawStringOnScreen(false, "Steps: " + step_app_pedometr_test);
+                this->step_app_pedometr_test = String(get_pedometer_days_steps());
+                drawStringOnScreen(true, "Steps: " + step_app_pedometr_test);
+            }else currentPrintScreenString ++;
+            
 
-        drawStringOnScreen("Sleep: ");
-        #ifdef PEDOMETER_ENABLE
-        drawStringOnScreen(String(get_pedometer_days_sleep()));
-        #else 
-            drawStringOnScreen("-");
-        #endif
+            if(this->sleep_app_pedometr_test != String(get_pedometer_days_sleep())){
+                drawStringOnScreen(false, "Sleep: " + sleep_app_pedometr_test);
+                this->sleep_app_pedometr_test = String(get_pedometer_days_sleep());
+                drawStringOnScreen(true, "Sleep: " + sleep_app_pedometr_test);
+            }else currentPrintScreenString ++;
+            
+            if(this->mesures_ms_app_pedometr_test != String(get_corePedometer_currentsleep_between_mesures())){
+                drawStringOnScreen(false, "Mesures ms: " + mesures_ms_app_pedometr_test);
+                this->mesures_ms_app_pedometr_test = String(get_corePedometer_currentsleep_between_mesures());
+                drawStringOnScreen(true, "Mesures ms: " + mesures_ms_app_pedometr_test);
+            }else currentPrintScreenString ++;
+            
+            if(this->mesures_app_pedometr_test != String(getPedometr_mesurings_in_a_day())){
+                drawStringOnScreen(false, "Mesures: " + mesures_app_pedometr_test);
+                this->mesures_app_pedometr_test = String(getPedometr_mesurings_in_a_day());
+                drawStringOnScreen(true, "Mesures: " + mesures_app_pedometr_test);
+            }else currentPrintScreenString ++;
+            
+            drawStringOnScreen(true, "");
+            drawStringOnScreen(true, "Accels X Y Z:");
+            if(this->accel_x_app_pedometr_test != String(get_driver_accelerometer_x())){
+                drawStringOnScreen(false, accel_x_app_pedometr_test);
+                this->accel_x_app_pedometr_test = String(get_driver_accelerometer_x());
+                drawStringOnScreen(true, accel_x_app_pedometr_test);
+            }else currentPrintScreenString ++;
+            
+            if(this->accel_y_app_pedometr_test != String(get_driver_accelerometer_y())){
+                drawStringOnScreen(false, accel_y_app_pedometr_test);
+                this->accel_y_app_pedometr_test = String(get_driver_accelerometer_y());
+                drawStringOnScreen(true, accel_y_app_pedometr_test);
+            }else currentPrintScreenString ++;
+            
+            if(this->accel_z_app_pedometr_test != String(get_driver_accelerometer_z())){
+                drawStringOnScreen(false, accel_z_app_pedometr_test);
+                this->accel_z_app_pedometr_test = String(get_driver_accelerometer_z());
+                drawStringOnScreen(true, accel_z_app_pedometr_test);
+            }else currentPrintScreenString ++;
+            
+            if(this->accel_total_app_pedometr_test != String(driver_accelerometer_get_accel_total())){
+                drawStringOnScreen(false, "Accerometer total: " + accel_total_app_pedometr_test);
+                this->accel_total_app_pedometr_test = String(driver_accelerometer_get_accel_total());
+                drawStringOnScreen(true, "Accerometer total: " + accel_total_app_pedometr_test);
+            }else currentPrintScreenString ++;
+            
+            #ifdef DEBUG_PEDOMETER
+                drawStringOnScreen(true, " ");
+                if(this->delta_app_pedometr_test != String(get_analysis_delta_value())){
+                    drawStringOnScreen(false, "Delta: " + delta_app_pedometr_test);
+                    this->delta_app_pedometr_test = String(get_analysis_delta_value());
+                    drawStringOnScreen(true, "Delta: " + delta_app_pedometr_test);
+                }else currentPrintScreenString ++;
+            
+            
+                drawStringOnScreen(true, "Central weight: ");
+                if(this->central_weight_app_pedometr_test != String(get_analysis_central_weight_value())){
+                    drawStringOnScreen(false, central_weight_app_pedometr_test);
+                    this->central_weight_app_pedometr_test = String(get_analysis_central_weight_value());
+                    drawStringOnScreen(true, central_weight_app_pedometr_test);
+                }else currentPrintScreenString ++;
 
-        drawStringOnScreen("Mesures: ");
-        #ifdef PEDOMETER_ENABLE
-        drawStringOnScreen(String(getPedometr_mesurings_in_a_day()));
-        #else 
-            drawStringOnScreen("-");
-        #endif
-        //drawStringOnScreen("");
-        drawStringOnScreen("Mesures ms: ");
-        #ifdef PEDOMETER_ENABLE
-            drawStringOnScreen(String(get_corePedometer_currentsleep_between_mesures()));
-        #else 
-            drawStringOnScreen("-");
+            #endif
+            drawStringOnScreen(true, "");
+            drawStringOnScreen(true, "Mesure delay: ");
+            if(this->mesure_delay_app_pedometr_test != String(get_corePedometer_currentsleep_between_mesures())){
+                drawStringOnScreen(false, mesure_delay_app_pedometr_test);
+                this->mesure_delay_app_pedometr_test = String(get_corePedometer_currentsleep_between_mesures());
+                drawStringOnScreen(true, mesure_delay_app_pedometr_test);
+            }else currentPrintScreenString ++;
+            
         #endif
         
-        /*
-        #ifdef PEDOMETER_ENABLE
-            drawStringOnScreen("");
-            drawStringOnScreen("Accels X Y Z:");
-            drawStringOnScreen(String(get_driver_accelerometer_x()));
-            drawStringOnScreen(String(get_driver_accelerometer_y()));
-            drawStringOnScreen(String(get_driver_accelerometer_z()));
-        #endif
-        */    
-
-        //drawStringOnScreen("Accerometer: ");
-        //drawStringOnScreen(String(driver_accelerometer_get_accel_total()));
-    #endif
-
-    #ifdef DEBUG_PEDOMETER
-        #ifdef PEDOMETER_ENABLE
-            drawStringOnScreen(" ");
-            drawStringOnScreen("Delta: ");
-            drawStringOnScreen(String(get_analysis_delta_value()));
-            drawStringOnScreen("Central weight: ");
-            drawStringOnScreen(String(get_analysis_central_weight_value()));
-            drawStringOnScreen("");
-            drawStringOnScreen("Mesure delay: ");
-            drawStringOnScreen(String(get_corePedometer_currentsleep_between_mesures()));
-        #endif
     #endif
     
 }
@@ -137,7 +182,7 @@ void appNameClass::onDestroy(){
     
 }
 
-void appNameClass::onEvent(unsigned char event, int val1, int val2){
+void appNameClass::onEvent(unsigned char event, int val1, int val2, int val3, int val4, int val5){
     
      #ifdef TOUCH_SCREEN_ENABLE
 

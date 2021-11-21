@@ -187,7 +187,7 @@ public class BLEServer extends BluetoothGattServerCallback {
         if (BLEServer.CURRENT_TIME.equals(characteristic.getUuid())) {
             long now = System.currentTimeMillis();
             mBluetoothGattServer.sendResponse(device, requestId, BluetoothGatt.GATT_SUCCESS, 0,
-                    Time.getExactTime(now, Time.ADJUST_NONE)
+                    Time.getExactTime(now)
             );
         } else if (BLEServer.DATA_HASH.equals(characteristic.getUuid())) {
             missed_calls_current_position_message = 0;
@@ -669,7 +669,7 @@ public class BLEServer extends BluetoothGattServerCallback {
         if (mRegisteredDevices.isEmpty()) {
             return;
         }
-        byte[] exactTime = Time.getExactTime(timestamp, adjustReason);
+        byte[] exactTime = Time.getExactTime(timestamp);
 
         for (BluetoothDevice device : mRegisteredDevices) {
             BluetoothGattCharacteristic timeCharacteristic = mBluetoothGattServer

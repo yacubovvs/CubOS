@@ -42,7 +42,7 @@ public class Time {
      * Construct the field values for a Current Time characteristic
      * from the given epoch timestamp and adjustment reason.
      */
-    public static byte[] getExactTime(long timestamp, byte adjustReason) {
+    public static byte[] getExactTime(long timestamp) {
         Calendar time = Calendar.getInstance();
         time.setTimeInMillis(timestamp);
 
@@ -58,11 +58,12 @@ public class Time {
         field[5] = (byte) time.get(Calendar.HOUR_OF_DAY);               // Hour
         field[6] = (byte) time.get(Calendar.MINUTE);                    // Minutes
         field[7] = (byte) time.get(Calendar.SECOND);                    // Seconds
-        // Day of Week (1-7)
-        // Fractions256
-        //field[4] = (byte) time.get(Calendar.HOUR_OF_DAY);
-        //field[8] = (byte) (time.get(Calendar.MILLISECOND) / 256);
-        //field[9] = adjustReason;
+
+        byte hash[] = HashSum.getHashSum(field[0] + field[2] + field[4] + field[6], field[1] + field[3] + field[5] + field[7]);
+
+        field[8] = hash[0];
+        field[9] = hash[1];
+
         return field;
     }
 

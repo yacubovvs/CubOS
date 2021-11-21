@@ -5,6 +5,8 @@
 void driver_cpu_setup(){
 }
 
+void driver_cpu_poweroff(){}
+
 void driver_cpu_wakeup(){
 }
 

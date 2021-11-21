@@ -114,7 +114,7 @@ public class MainActivity extends AppCompatActivity {
 
         updateLastSyncFromMemory();
 
-        Intent intent = new Intent(this, Settings.class);
+        Intent intent = new Intent(this, ActivityScreen.class);
         this.startActivity(intent);
     }
 
