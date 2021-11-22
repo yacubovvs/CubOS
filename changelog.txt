@@ -46,3 +46,6 @@
 2021-11-12
     Added wakeup on charge for T-Wristband. 
     Success exchange of pedometer data with android app via BLE
+
+2021-11-22
+    Added hash sum for exchange data via BLE
