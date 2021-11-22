@@ -19,7 +19,6 @@ static BLEUUID  driver_ble_day_set_steps_sleep_characteristic_UUID   ("020a2a2b-
 static BLEUUID  driver_ble_settings_characteristic_UUID              ("030a2a2b-0000-1000-8000-00805f9b34fb");
 static BLEUUID  driver_ble_day_date_per_hour_characteristic_UUID     ("040a2a2b-0000-1000-8000-00805f9b34fb");
 static BLEUUID  driver_ble_week_data_per_day_characteristic_UUID     ("060a2a2b-0000-1000-8000-00805f9b34fb");
-static BLEUUID  driver_ble_day_steps_sleep_limit_characteristic_UUID ("080a2a2b-0000-1000-8000-00805f9b34fb");
 
 static boolean driver_ble_connected = false;
 static boolean driver_ble_doScan = false;
@@ -181,7 +180,7 @@ void driver_ble_BleEsp32SyncTask( void * pvParameters ){
             uint8_t current_hour = core_time_getHours_byte();
             for(int hour=0; hour<24; hour++){
               driver_ble_setDayData_values(current_day, current_hour, hour, get_pedometer_hours_steps(hour), get_pedometer_hours_sleep(hour));
-              delay(20);
+              delay(50);
             }
             
           #else
@@ -200,7 +199,7 @@ void driver_ble_BleEsp32SyncTask( void * pvParameters ){
             uint8_t current_day = core_time_getDate();
             for(uint16_t day_shift=0; day_shift<PEDOMETER_DAYS_HISTORY; day_shift++){
               driver_ble_setWeekData_values(current_day, day_shift, get_pedometer_days_steps(day_shift), get_pedometer_days_sleep(day_shift));
-              delay(20);
+              delay(50);
             }
           #else
             #ifdef DEBUG_DRIVER_BLE_PRINT_INCONNECT_OUTPUT
@@ -425,18 +424,41 @@ bool driver_ble_getCurrentTime(unsigned char attemptNum){
 
 }
 
-void driver_ble_getAPIVersion(){
+bool driver_ble_getAPIVersion(unsigned char attemptNum){
+
+  if(attemptNum>=SYNC_ATTEMPTS_TO_CONNECT_ON_HASHSUM_ERROR) return false;
+
   BLERemoteCharacteristic* pRemoteCharacteristic = driver_ble_pRemoteService->getCharacteristic(driver_ble_apiVersion_characteristic_UUID);
-  if(pRemoteCharacteristic==nullptr) return;
+  if(pRemoteCharacteristic==nullptr) return false;
   
   std::string readValue = pRemoteCharacteristic->readValue();
 
   int api_version = readValue[0]|(readValue[1]<<8);
+  unsigned char hashSum1          = readValue[2];
+  unsigned char hashSum2          = readValue[3];
+
+  bool hashCheck = driver_ble_checkgetHashSum( (unsigned char)(readValue[0]), (unsigned char)(readValue[1]), (unsigned char)hashSum1, (unsigned char)hashSum2);
 
   #ifdef DEBUG_DRIVER_BLE_PRINT_INCONNECT_OUTPUT
     debug("Getting server API version: ");
     debug(String((int)api_version));
+    if(hashCheck) debug("### driver_ble_getSettings CHECKSUM CHECK SUCCESS");
+    else{
+      debug("# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #");
+      debug("#                                  ERROR!!!                                   #");
+      debug("#                 driver_ble_getSettings CHECKSUM CHECK FAILED                #");
+      debug("# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #");
+    }
   #endif
+
+  if(!hashCheck){
+    delay(20);
+    return driver_ble_getAPIVersion(attemptNum + 1);
+  }else{
+    //TODO
+  }
+
+  return true;
 }
 
 bool driver_ble_getSettings(unsigned char attemptNum){
@@ -530,10 +552,11 @@ bool driver_ble_getDataHash(unsigned char attemptNum){
   uint8_t currentcall_hash        = readValue[4];
   uint8_t settings_changed        = readValue[5];
   uint8_t alarms_changed          = readValue[6];
-  unsigned char hashSum1          = readValue[7];
-  unsigned char hashSum2          = readValue[8];
+  uint8_t weather_changed         = readValue[7];
+  unsigned char hashSum1          = readValue[8];
+  unsigned char hashSum2          = readValue[9];
 
-  bool hashCheck = driver_ble_checkgetHashSum( (unsigned char)(readValue[0] + readValue[2] + readValue[4] + readValue[6]), (unsigned char)(readValue[1] + readValue[3] + readValue[5]), (unsigned char)hashSum1, (unsigned char)hashSum2);
+  bool hashCheck = driver_ble_checkgetHashSum( (unsigned char)(readValue[0] + readValue[2] + readValue[4] + readValue[6]), (unsigned char)(readValue[1] + readValue[3] + readValue[5] + readValue[7]), (unsigned char)hashSum1, (unsigned char)hashSum2);
 
   #ifdef DEBUG_DRIVER_BLE_PRINT_INCONNECT_OUTPUT
     debug("Getting notification hash: ");
@@ -762,39 +785,6 @@ void driver_ble_getCurrentCall(){
   driver_ble_read_currentbyte = 0;
 }
 
-/*
-* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
-* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
-* *                                                                               * *
-* *                          DAY STEP AND SLEEP LIMITS                            * *
-* *                                                                               * *
-* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
-* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
-*/
-
-void driver_ble_getStepSleepLimits(){
-  BLERemoteCharacteristic* pRemoteCharacteristic = driver_ble_pRemoteService->getCharacteristic(driver_ble_day_steps_sleep_limit_characteristic_UUID);
-  if(pRemoteCharacteristic==nullptr) return;
-  
-  std::string readValue  = pRemoteCharacteristic->readValue();
-
-  byte step_limits_enable = readValue[0];
-  byte sleep_limits_enable = readValue[1];
-
-  int step_limits = readValue[2]|(readValue[3]<<8);
-  int sleep_limits = readValue[4]|(readValue[5]<<8);
-
-  #ifdef DEBUG_DRIVER_BLE_PRINT_INCONNECT_OUTPUT
-    if(step_limits_enable) debug("Step limits on: ");
-    else debug("Step limits off:");
-    debug(String((int)step_limits) + " steps");
-
-  
-    if(sleep_limits_enable) debug("Sleep limits on: ");
-    else debug("Sleep limits off: ");
-    debug(String((int)sleep_limits) + " minutes");
-  #endif
-}
 
 /*
 * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
@@ -824,13 +814,26 @@ void driver_ble_setStepsAndSleep_values(uint32_t steps, uint16_t sleep_min, uint
   byte sleep_min_limits_1 = (sleep_min_limits&0x0000FF00)>>(8*1);
   byte sleep_min_limits_2 = (sleep_min_limits&0x000000FF);
 
-  //std::string string = "" + (byte)step_1 + (byte)step_2 + (byte)step_3 + (byte)step_4 + (byte)sleep_1 + (byte)sleep_2;
-  
+  unsigned char hashSum1 = (unsigned char)(step_1 + step_3 + sleep_1 + steps_limits_1 + sleep_min_limits_1);
+  unsigned char hashSum2 = (unsigned char)(step_2 + step_4 + sleep_2 + steps_limits_2 + sleep_min_limits_2);
+
   pRemoteCharacteristic->writeValue({
-    step_1,step_2,step_3,step_4,
-    sleep_1,sleep_2, 
-    steps_limits_1, steps_limits_2, 
-    sleep_min_limits_1, sleep_min_limits_2, 
+    step_1,   // 0
+    step_2,   // 1
+    step_3,   // 2
+    step_4,   // 3
+
+    sleep_1,  // 4
+    sleep_2,  // 5
+
+    steps_limits_1, // 6
+    steps_limits_2, // 7
+
+    sleep_min_limits_1, // 8
+    sleep_min_limits_2, // 9
+
+    hashSum1, // 10
+    hashSum2, // 11
   });
 
   #ifdef DEBUG_DRIVER_BLE_PRINT_INCONNECT_OUTPUT
@@ -860,6 +863,9 @@ void driver_ble_setWeekData_values(uint8_t current_day, uint8_t day_shift, uint3
 
   byte sleep_1 = (sleep_min&0xFF00)>>(8*1);
   byte sleep_2 = (sleep_min&0x00FF);
+
+  unsigned char hashSum1 = (unsigned char)(current_day + step_1 + step_3 + sleep_1);
+  unsigned char hashSum2 = (unsigned char)(day_shift + step_2 + step_4 + sleep_2);
   
   pRemoteCharacteristic->writeValue({
     current_day,
@@ -870,6 +876,8 @@ void driver_ble_setWeekData_values(uint8_t current_day, uint8_t day_shift, uint3
     step_4,
     sleep_1,
     sleep_2,
+    hashSum1,
+    hashSum2,
   });
 
   #ifdef DEBUG_DRIVER_BLE_PRINT_INCONNECT_OUTPUT
@@ -889,6 +897,9 @@ void driver_ble_setDayData_values(uint8_t current_day, uint8_t current_hour, uin
 
   byte sleep_1 = (sleep_min&0xFF00)>>(8*1);
   byte sleep_2 = (sleep_min&0x00FF);
+
+  unsigned char hashSum1 = (unsigned char)(current_day + hour + step_2 + step_4 + sleep_2);
+  unsigned char hashSum2 = (unsigned char)(current_hour + step_1 + step_3 + sleep_1);
   
   pRemoteCharacteristic->writeValue({
     current_day,
@@ -900,6 +911,8 @@ void driver_ble_setDayData_values(uint8_t current_day, uint8_t current_hour, uin
     step_4,
     sleep_1,
     sleep_2,
+    hashSum1,
+    hashSum2,
   });
 
   #ifdef DEBUG_DRIVER_BLE_PRINT_INCONNECT_OUTPUT

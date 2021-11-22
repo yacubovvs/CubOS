@@ -85,7 +85,6 @@ public class BLEServer extends BluetoothGattServerCallback {
     public static UUID DAY_SET_STEPS_SLEEP      = UUID.fromString("020a2a2b-0000-1000-8000-00805f9b34fb");
     public static UUID DAY_DATA_PER_HOURS       = UUID.fromString("040a2a2b-0000-1000-8000-00805f9b34fb");
     public static UUID WEEK_DATA_PER_DAYS       = UUID.fromString("060a2a2b-0000-1000-8000-00805f9b34fb");
-    public static UUID DAY_STEPS_SLEEP_LIMIT    = UUID.fromString("080a2a2b-0000-1000-8000-00805f9b34fb");
     public static UUID DISCONNECT               = UUID.fromString("090a2a2b-0000-1000-8000-00805f9b34fb");
 
 
@@ -114,9 +113,6 @@ public class BLEServer extends BluetoothGattServerCallback {
 
         BluetoothGattCharacteristic apiVersion = new BluetoothGattCharacteristic(API_VERSION, BluetoothGattCharacteristic.PROPERTY_READ, BluetoothGattCharacteristic.PERMISSION_READ);
         service.addCharacteristic(apiVersion);
-
-        BluetoothGattCharacteristic stepSleepLimits = new BluetoothGattCharacteristic(DAY_STEPS_SLEEP_LIMIT, BluetoothGattCharacteristic.PROPERTY_READ, BluetoothGattCharacteristic.PERMISSION_READ);
-        service.addCharacteristic(stepSleepLimits);
 
         BluetoothGattCharacteristic dayStepsSleep = new BluetoothGattCharacteristic(DAY_SET_STEPS_SLEEP, BluetoothGattCharacteristic.PROPERTY_WRITE, BluetoothGattCharacteristic.PERMISSION_WRITE);
         service.addCharacteristic(dayStepsSleep);
@@ -203,14 +199,15 @@ public class BLEServer extends BluetoothGattServerCallback {
                     0x01,       // - current call hash
                     0x03,       // - settings changed flag
                     0x04,       // - alarms hash
+                    0x04,       // - weather hash
                     0,
                     0
             };
 
-            byte hash[] = HashSum.getHashSum(message[0] + message[2] + message[4] + message[6] , message[1] + message[3] + message[5]);
+            byte hash[] = HashSum.getHashSum(message[0] + message[2] + message[4] + message[6] , message[1] + message[3] + message[5] + message[7]);
 
-            message[7] = hash[0];
-            message[8] = hash[1];
+            message[8] = hash[0];
+            message[9] = hash[1];
 
             mBluetoothGattServer.sendResponse(device, requestId, BluetoothGatt.GATT_SUCCESS, 0,
                     message
@@ -347,10 +344,19 @@ public class BLEServer extends BluetoothGattServerCallback {
 
         }
         else if (BLEServer.API_VERSION.equals(characteristic.getUuid())) {
+
+            byte apiByte1 = 0x01;
+            byte apiByte2 = 0x00;
+            byte hash[] = HashSum.getHashSum(apiByte1, apiByte2);
             mBluetoothGattServer.sendResponse(device, requestId, BluetoothGatt.GATT_SUCCESS, 0,
                     // Structure:
                     // byte[0x00, 0x01] - version
-                    new byte[]{0x01,0x00} // version 1
+                    new byte[]{
+                            0x01,
+                            0x00,
+                            hash[0],
+                            hash[1],
+                    } // version 1
             );
         }
         else if (BLEServer.ALARMS.equals(characteristic.getUuid())) {
@@ -358,13 +364,6 @@ public class BLEServer extends BluetoothGattServerCallback {
                     // Structure:
                     // byte[0x00, 0x01] - version
                     new byte[]{0x01,0x02,0x0a}
-            );
-        }
-        else if (BLEServer.DAY_STEPS_SLEEP_LIMIT.equals(characteristic.getUuid())) {
-            mBluetoothGattServer.sendResponse(device, requestId, BluetoothGatt.GATT_SUCCESS, 0,
-                    // Structure:
-                    // byte[0x00, 0x01] - version
-                    DayLimits.getDayLimits()
             );
         }
         else{
@@ -396,9 +395,19 @@ public class BLEServer extends BluetoothGattServerCallback {
             int steps_limit = ((value[6]&0xFF)<<8) | (value[7]&0xFF);
             int sleep_limit = ((value[8]&0xFF)<<8) | (value[9]&0xFF);
 
-            if(MainActivity.mainActivity!=null) {
-                MainActivity.mainActivity.setCurrentSteps(day_steps, steps_limit);
-                MainActivity.mainActivity.setCurrentSleepTime(sleep_minutes, sleep_limit);
+            int hashSum1 = (int)(value[0]&0xFF) + (int)(value[2]&0xFF) + (int)(value[4]&0xFF) + (int)(value[6]&0xFF) + (int)(value[8]&0xFF);
+            int hashSum2 = (int)(value[1]&0xFF) + (int)(value[3]&0xFF) + (int)(value[5]&0xFF) + (int)(value[7]&0xFF) + (int)(value[9]&0xFF);
+
+            boolean hashSumCheck = HashSum.checkHashSum(hashSum1, hashSum2, value[10], value[11]);
+
+            if(hashSumCheck) {
+                if (MainActivity.mainActivity != null) {
+                    MainActivity.mainActivity.setCurrentSteps(day_steps, steps_limit);
+                    MainActivity.mainActivity.setCurrentSleepTime(sleep_minutes, sleep_limit);
+                }
+                Log.d("BLE_log", "DAY_SET_STEPS_SLEEP checkSum SUCCESS!");
+            }else{
+                Log.d("BLE_log", "DAY_SET_STEPS_SLEEP checkSum FAILED!");
             }
 
         }
@@ -420,32 +429,29 @@ public class BLEServer extends BluetoothGattServerCallback {
             int steps = ((value[2]&0xFF)<<24) | ((value[3]&0xFF)<<16) | ((value[4]&0xFF)<<8) | (value[5]&0xFF);
             int sleep = ((value[6]&0xFF)<<8) | (value[7]&0xFF);
 
-            boolean checkDay = Common.isDateInACurrentDay(current_day);
-            if(checkDay){
-                Date logDate = Common.shiftDate(Common.getStartOfDay(new Date()), -day_shift, 0);
-                DateFormat df = new SimpleDateFormat("yyyy-MM-dd-HH");
-                String string_user = df.format(logDate);
+            int hashSum1 = (int)(value[0]&0xFF) + (int)(value[2]&0xFF) + (int)(value[4]&0xFF) + (int)(value[6]&0xFF);
+            int hashSum2 = (int)(value[1]&0xFF) + (int)(value[3]&0xFF) + (int)(value[5]&0xFF) + (int)(value[7]&0xFF);
+            boolean hashSumCheck = HashSum.checkHashSum(hashSum1, hashSum2, value[8], value[9]);
 
-                Log.d("BLE_log", "DAY_DATA_PER_HOURS current_day: " + current_day);
-                MainActivity.mainActivity.dbHelper.insert_day_pedometer_data(string_user, steps, sleep);
+            boolean checkDay = Common.isDateInACurrentDay(current_day);
+
+            if(hashSumCheck){
+                if(checkDay){
+                    Date logDate = Common.shiftDate(Common.getStartOfDay(new Date()), -day_shift, 0);
+                    DateFormat df = new SimpleDateFormat("yyyy-MM-dd-HH");
+                    String string_user = df.format(logDate);
+
+                    Log.d("BLE_log", "WEEK_DATA_PER_DAYS current_day: " + current_day);
+                    MainActivity.mainActivity.dbHelper.insert_day_pedometer_data(string_user, steps, sleep);
+                }else{
+                    //TODO: Show alert to sync time
+                }
+                Log.d("BLE_log", "WEEK_DATA_PER_DAYS checkSum SUCCESS!");
             }else{
-                //TODO: Show alert to sync time
+                Log.d("BLE_log", "WEEK_DATA_PER_DAYS checkSum FAILED!");
             }
 
-
-            //MainActivity.mainActivity.dbHelper.insert_day_pedometer_data("2021-11-" + Common.fillZero(thisDay, 2) + "-00", 10, (int) (0.1*60));
-            //MainActivity.mainActivity.dbHelper.insert_hour_pedometer_data("2021-11-" + Common.fillZero((thisDay - 2), 2) + "-04", 30, (int) (0.5*60));
-            /*
-            StepSleepHistory.addWeekData(
-                StepSleepHistory.getDateHash(year, month, day, hour, 0, 0),
-                StepSleepHistory.getDate(year, month, day, hour, 0, 0),
-                sleep,
-                steps
-            );*/
-
-            //Log.d("BLE_log", "DataGot " + (new String(value)));
-        }
-        else if(BLEServer.DAY_DATA_PER_HOURS.equals(characteristic.getUuid())){
+        }else if(BLEServer.DAY_DATA_PER_HOURS.equals(characteristic.getUuid())){
 
             /*
             0: current_day,
@@ -466,19 +472,28 @@ public class BLEServer extends BluetoothGattServerCallback {
             int steps = ((value[3]&0xFF)<<24) | ((value[4]&0xFF)<<16) | ((value[5]&0xFF)<<8) | (value[6]&0xFF);
             int sleep = ((value[7]&0xFF)<<8) | (value[8]&0xFF);
 
+            int hashSum1 = (int)(value[0]&0xFF) + (int)(value[2]&0xFF) + (int)(value[4]&0xFF) + (int)(value[6]&0xFF + (int)(value[8]&0xFF));
+            int hashSum2 = (int)(value[1]&0xFF) + (int)(value[3]&0xFF) + (int)(value[5]&0xFF) + (int)(value[7]&0xFF);
+            boolean hashSumCheck = HashSum.checkHashSum(hashSum1, hashSum2, value[9], value[10]);
+
             boolean checkDay = Common.isDateInACurrentDay(current_day);
-            if(checkDay){
-                Date current_date = Common.getStartOfDay(new Date());
-                current_date.setHours(current_hour);
-                Date logDate = Common.shiftDate(current_date, 0, -hour_shift);
+            if(hashSumCheck){
+                if(checkDay){
+                    Date current_date = Common.getStartOfDay(new Date());
+                    current_date.setHours(current_hour);
+                    Date logDate = Common.shiftDate(current_date, 0, -hour_shift);
 
-                DateFormat df = new SimpleDateFormat("yyyy-MM-dd-HH");
-                String string_user = df.format(logDate);
+                    DateFormat df = new SimpleDateFormat("yyyy-MM-dd-HH");
+                    String string_user = df.format(logDate);
 
-                Log.d("BLE_log", "DAY_DATA_PER_HOURS hour_shift: " + hour_shift);
-                MainActivity.mainActivity.dbHelper.insert_hour_pedometer_data(string_user, steps, sleep);
+                    Log.d("BLE_log", "DAY_DATA_PER_HOURS hour_shift: " + hour_shift);
+                    MainActivity.mainActivity.dbHelper.insert_hour_pedometer_data(string_user, steps, sleep);
+                }else{
+                    //TODO: Show alert to sync time
+                }
+                Log.d("BLE_log", "DAY_DATA_PER_HOURS checkSum SUCCESS!");
             }else{
-                //TODO: Show alert to sync time
+                Log.d("BLE_log", "DAY_DATA_PER_HOURS checkSum FAILED!");
             }
             /*
             StepSleepHistory.addDayData(

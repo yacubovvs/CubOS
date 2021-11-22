@@ -16,4 +16,8 @@ public class HashSum {
         };
         return hashB;
     }
+
+    static boolean checkHashSum(int val1, int val2, int hashVal1, int hashVal2){
+        return ((val1&0xff)==(hashVal1&0xff) && (val2&0xff)==(hashVal2&0xff));
+    }
 }
