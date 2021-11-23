@@ -28,9 +28,11 @@ public class RecycleViewStatsAdapter extends RecyclerView.Adapter<RecycleViewSta
 
     private float max_value = 0;
     private int type;
+    private Context context;
 
     // data is passed into the constructor
     public RecycleViewStatsAdapter(Context context, List<DataSetRecycleViewSet> data, int type) {
+        this.context = context;
         this.mInflater = LayoutInflater.from(context);
         this.mData = data;
 
@@ -60,12 +62,24 @@ public class RecycleViewStatsAdapter extends RecyclerView.Adapter<RecycleViewSta
         holder.valueTextView.setText("" + dataElement.value);
         holder.labelTextView.setText(dataElement.label);
 
-        holder.green_guideline.setGuidelinePercent(1f-((float)dataElement.value/max_value));
+        if(max_value==0) holder.green_guideline.setGuidelinePercent(1f);
+        else holder.green_guideline.setGuidelinePercent(1f-((float)dataElement.value/max_value));
 
         if(this.type==TYPE_SLEEP){
             holder.greenLayout.setBackgroundColor(R.color.predark_blue);
         }else if(this.type==TYPE_SLEEP){
             holder.greenLayout.setBackgroundColor(R.color.predark_green);
+        }
+
+
+        final float scale = context.getResources().getDisplayMetrics().density;
+
+        if(position==mData.size()-1){
+            holder.blacklayout.setPadding((int) (40 * scale), 0, 0, 0);
+        }else if(position==0){
+            holder.blacklayout.setPadding(0, 0, (int) (40 * scale), 0);
+        }else{
+            holder.blacklayout.setPadding(0, 0, 0, 0);
         }
     }
 
@@ -82,6 +96,7 @@ public class RecycleViewStatsAdapter extends RecyclerView.Adapter<RecycleViewSta
         TextView valueTextView;
         Guideline green_guideline;
         LinearLayout greenLayout;
+        ConstraintLayout blacklayout;
 
         ViewHolder(View itemView) {
             super(itemView);
@@ -89,6 +104,7 @@ public class RecycleViewStatsAdapter extends RecyclerView.Adapter<RecycleViewSta
             labelTextView = itemView.findViewById(R.id.recycleView_element_label);
             green_guideline = itemView.findViewById(R.id.green_guideline);
             greenLayout = itemView.findViewById(R.id.greenLayout);
+            blacklayout = itemView.findViewById(R.id.blacklayout);
 
             itemView.setOnClickListener(this);
         }

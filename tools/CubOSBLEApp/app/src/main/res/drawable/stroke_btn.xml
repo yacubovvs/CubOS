@@ -6,11 +6,9 @@
     </item>
 
     <item android:drawable="@android:color/transparent">
-        <shape>
-            <stroke android:color="@color/primary_1" />
-        </shape>
+
         <corners android:radius="@dimen/abc_control_corner_material" />
-        <solid android:color="@android:color/white" />
+        <solid android:color="@color/white_10per" />
 
     </item>
 </selector>

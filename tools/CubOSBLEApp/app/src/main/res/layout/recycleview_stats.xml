@@ -6,7 +6,12 @@
     android:layout_width="wrap_content"
     android:layout_height="match_parent"
     android:layout_margin="0dp"
-    android:background="@color/black">
+    android:layout_marginStart="0dp"
+    android:layout_marginEnd="0dp"
+    android:layout_marginRight="0dp"
+    android:layout_marginBottom="0dp"
+    android:background="@color/black"
+    app:layout_marginBaseline="0dp">
 
     <LinearLayout
         android:id="@+id/greenLayout"
@@ -35,12 +40,13 @@
 
     <ru.cubos.cubosbleapp.customUI.VerticalTextView
         android:id="@+id/recycleView_element_value"
-        android:layout_width="match_parent"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="4dp"
         android:layout_marginEnd="4dp"
         android:layout_marginBottom="8dp"
         android:text="10000"
+        android:textAlignment="viewEnd"
         android:textColor="@color/white"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"

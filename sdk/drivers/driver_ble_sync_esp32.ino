@@ -402,12 +402,12 @@ bool driver_ble_getCurrentTime(unsigned char attemptNum){
       delay(20); // Just in case
       return driver_ble_getCurrentTime(attemptNum + 1);
     }else{
-      core_time_setHours(server_hours);
-      core_time_setMinutes(server_minutes);
-      core_time_setSeconds(server_seconds);
       core_time_setYear(server_year);
       core_time_setMonth(server_month);
       core_time_setDate(server_date);
+      core_time_setHours(server_hours);
+      core_time_setMinutes(server_minutes);
+      core_time_setSeconds(server_seconds);
       core_time_setWeekDay( (server_dayOfWeek-1+7)%7);
     }
     

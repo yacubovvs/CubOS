@@ -10,13 +10,16 @@
         <entry key="app/src/main/res/drawable-v24/ic_launcher_background.xml" value="0.22923076923076924" />
         <entry key="app/src/main/res/drawable-v24/ic_launcher_foreground.xml" value="0.21614583333333334" />
         <entry key="app/src/main/res/drawable/btn_stroke_style.xml" value="0.13148148148148148" />
+        <entry key="app/src/main/res/drawable/ic_baseline_arrow_back_ios_24.xml" value="0.3953125" />
+        <entry key="app/src/main/res/drawable/ic_baseline_arrow_back_ios_new_24.xml" value="0.3953125" />
+        <entry key="app/src/main/res/drawable/ic_baseline_arrow_forward_ios_24.xml" value="0.3953125" />
         <entry key="app/src/main/res/drawable/ic_baseline_settings_24.xml" value="0.21302083333333333" />
         <entry key="app/src/main/res/drawable/stroke_btn.xml" value="0.13148148148148148" />
         <entry key="app/src/main/res/layout/activity_activity.xml" value="0.16485507246376813" />
-        <entry key="app/src/main/res/layout/activity_activityscreen.xml" value="0.33242753623188404" />
+        <entry key="app/src/main/res/layout/activity_activityscreen.xml" value="0.5" />
         <entry key="app/src/main/res/layout/activity_main.xml" value="0.33" />
         <entry key="app/src/main/res/layout/activity_settings.xml" value="0.2873900293255132" />
-        <entry key="app/src/main/res/layout/recycleview_stats.xml" value="0.5" />
+        <entry key="app/src/main/res/layout/recycleview_stats.xml" value="0.33" />
         <entry key="app/src/main/res/menu/main.xml" value="0.337037037037037" />
         <entry key="app/src/main/res/menu/mainactivity.xml" value="0.196875" />
       </map>

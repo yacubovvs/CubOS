@@ -277,7 +277,7 @@
 #define STARTING_APP_NUMM   -1    // for Mainmenu (default app)
 #define STARTING_APP_NUMM    0 // Watch
 
-#define STARTING_APP_NUMM    1 // BLE sync
+//#define STARTING_APP_NUMM    1 // BLE sync
 //#define STARTING_APP_NUMM    3 // Settings
 
 #define FONT_SIZE_DEFAULT   1
@@ -350,15 +350,15 @@
 
 #define APP_CLOCK_POWER_AFTER_SECONDS_DEFAULT           4
 
-#define PEDOMETER_EMULATOR
-#define DEBUG_SERIAL
+//#define PEDOMETER_EMULATOR
+//#define DEBUG_SERIAL
 //#define DEBUG_PEDOMETER
 //#define DEBUG_PEDOMETER_TIMING
 //#define DEBUG_WAKEUP
 //#define DEBUG_DRIVER_BATTERY
 //#define APP_BLE_SYNC_DEBUG
 //#define SLEEP_VALUE_DEBUG
-#define DEBUG_DRIVER_BLE_PRINT_INCONNECT_OUTPUT // for exchange debug
+//#define DEBUG_DRIVER_BLE_PRINT_INCONNECT_OUTPUT // for exchange debug
 
 #define SYNC_APP_NUM 1
 #define ON_SETUP_FINISHED_CUSTOM_FUNCTION_CALL if(getWakeUpReason()==0x02 && get_core_ble_auto_sync_on_charge()){ debug("Starting sync app on wakeup");currentApp = getApp(1);}
@@ -741,11 +741,11 @@ void debug(String string, int delaytime){
 
 #define APP_MENU_APPLICATIONS_0             ClockApp
 #define APP_MENU_APPLICATIONS_1             BleSync
-#define APP_MENU_APPLICATIONS_2             PedometerApp
-//#define APP_MENU_APPLICATIONS_3             PedometerAppTest
-#define APP_MENU_APPLICATIONS_3             SettingsApp
-#define APP_MENU_APPLICATIONS_4             BatteryApp
-#define APP_MENU_APPLICATIONS_5             I2CScannerApp
+#define APP_MENU_APPLICATIONS_2             TestApplicationApp
+#define APP_MENU_APPLICATIONS_3             PedometerApp
+#define APP_MENU_APPLICATIONS_4             SettingsApp
+#define APP_MENU_APPLICATIONS_5             BatteryApp
+#define APP_MENU_APPLICATIONS_6             I2CScannerApp
 
 
 /*

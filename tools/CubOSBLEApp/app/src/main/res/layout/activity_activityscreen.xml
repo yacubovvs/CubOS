@@ -37,11 +37,46 @@
                     android:text="Steps per hours"
                     android:textSize="18sp" />
 
-                <androidx.recyclerview.widget.RecyclerView
-                    android:id="@+id/recycleView_activityPerHour"
+                <androidx.constraintlayout.widget.ConstraintLayout
                     android:layout_width="match_parent"
-                    android:layout_height="200dp"
-                    android:background="@color/not_very_black" />
+                    android:layout_height="200dp">
+
+                    <androidx.recyclerview.widget.RecyclerView
+                        android:id="@+id/recycleView_activityPerHour"
+                        android:layout_width="0dp"
+                        android:layout_height="200dp"
+                        android:layout_weight="1"
+                        android:background="@color/not_very_black"
+                        app:layout_constraintBottom_toBottomOf="parent"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toTopOf="parent">
+
+                    </androidx.recyclerview.widget.RecyclerView>
+
+                    <ImageButton
+                        android:id="@+id/activityPerHour_back_btn"
+                        android:layout_width="35dp"
+                        android:layout_height="0dp"
+                        android:layout_weight="0"
+                        android:background="#33FFFFFF"
+                        app:layout_constraintBottom_toBottomOf="parent"
+                        app:layout_constraintStart_toStartOf="@+id/recycleView_activityPerHour"
+                        app:layout_constraintTop_toTopOf="@+id/recycleView_activityPerHour"
+                        app:srcCompat="@drawable/ic_baseline_arrow_back_ios_new_24" />
+
+                    <ImageButton
+                        android:id="@+id/activityPerHour_next_btn"
+                        android:layout_width="35dp"
+                        android:layout_height="0dp"
+                        android:layout_weight="0"
+                        android:background="#33FFFFFF"
+                        app:layout_constraintBottom_toBottomOf="parent"
+                        app:layout_constraintEnd_toEndOf="@+id/recycleView_activityPerHour"
+                        app:layout_constraintTop_toTopOf="@+id/recycleView_activityPerHour"
+                        app:srcCompat="@drawable/ic_baseline_arrow_forward_ios_24" />
+
+                </androidx.constraintlayout.widget.ConstraintLayout>
 
             </LinearLayout>
 
@@ -59,11 +94,45 @@
                     android:text="Sleep per hours"
                     android:textSize="18sp" />
 
-                <androidx.recyclerview.widget.RecyclerView
-                    android:id="@+id/recycleView_sleepPerHour"
+                <androidx.constraintlayout.widget.ConstraintLayout
                     android:layout_width="match_parent"
-                    android:layout_height="200dp"
-                    android:background="@color/not_very_black" />
+                    android:layout_height="200dp">
+
+                    <androidx.recyclerview.widget.RecyclerView
+                        android:id="@+id/recycleView_sleepPerHour"
+                        android:layout_width="match_parent"
+                        android:layout_height="200dp"
+                        android:background="@color/not_very_black"
+                        app:layout_constraintBottom_toBottomOf="parent"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toTopOf="parent" />
+
+                    <ImageButton
+                        android:id="@+id/sleepPerHour_back_btn"
+                        android:layout_width="35dp"
+                        android:layout_height="0dp"
+                        android:layout_weight="0"
+                        android:background="#33FFFFFF"
+                        app:layout_constraintBottom_toBottomOf="parent"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toTopOf="@+id/recycleView_sleepPerHour"
+                        app:srcCompat="@drawable/ic_baseline_arrow_back_ios_new_24"
+                        tools:ignore="TouchTargetSizeCheck,SpeakableTextPresentCheck" />
+
+                    <ImageButton
+                        android:id="@+id/sleepPerHour_next_btn"
+                        android:layout_width="35dp"
+                        android:layout_height="0dp"
+                        android:layout_weight="0"
+                        android:background="#33FFFFFF"
+                        app:layout_constraintBottom_toBottomOf="parent"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintTop_toTopOf="parent"
+                        app:srcCompat="@drawable/ic_baseline_arrow_forward_ios_24"
+                        tools:ignore="SpeakableTextPresentCheck,TouchTargetSizeCheck" />
+
+                </androidx.constraintlayout.widget.ConstraintLayout>
 
             </LinearLayout>
 
@@ -81,11 +150,45 @@
                     android:text="Steps per days"
                     android:textSize="18sp" />
 
-                <androidx.recyclerview.widget.RecyclerView
-                    android:id="@+id/recycleView_stepsPerDay"
+                <androidx.constraintlayout.widget.ConstraintLayout
                     android:layout_width="match_parent"
-                    android:layout_height="200dp"
-                    android:background="@color/not_very_black" />
+                    android:layout_height="200dp">
+
+                    <androidx.recyclerview.widget.RecyclerView
+                        android:id="@+id/recycleView_stepsPerDay"
+                        android:layout_width="match_parent"
+                        android:layout_height="200dp"
+                        android:background="@color/not_very_black"
+                        app:layout_constraintBottom_toBottomOf="parent"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toTopOf="parent" />
+
+                    <ImageButton
+                        android:id="@+id/stepsPerDay_back_btn"
+                        android:layout_width="35dp"
+                        android:layout_height="0dp"
+                        android:layout_weight="0"
+                        android:background="#33FFFFFF"
+                        app:layout_constraintBottom_toBottomOf="parent"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toTopOf="parent"
+                        app:srcCompat="@drawable/ic_baseline_arrow_back_ios_new_24"
+                        tools:ignore="SpeakableTextPresentCheck,TouchTargetSizeCheck" />
+
+                    <ImageButton
+                        android:id="@+id/stepsPerDay_next_btn"
+                        android:layout_width="35dp"
+                        android:layout_height="0dp"
+                        android:layout_weight="0"
+                        android:background="#33FFFFFF"
+                        app:layout_constraintBottom_toBottomOf="parent"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintTop_toTopOf="parent"
+                        app:srcCompat="@drawable/ic_baseline_arrow_forward_ios_24"
+                        tools:ignore="SpeakableTextPresentCheck,TouchTargetSizeCheck" />
+
+                </androidx.constraintlayout.widget.ConstraintLayout>
 
             </LinearLayout>
 
@@ -104,11 +207,45 @@
                     android:text="Sleep per days"
                     android:textSize="18sp" />
 
-                <androidx.recyclerview.widget.RecyclerView
-                    android:id="@+id/recycleView_sleepPerDay"
+                <androidx.constraintlayout.widget.ConstraintLayout
                     android:layout_width="match_parent"
-                    android:layout_height="200dp"
-                    android:background="@color/not_very_black" />
+                    android:layout_height="200dp">
+
+                    <androidx.recyclerview.widget.RecyclerView
+                        android:id="@+id/recycleView_sleepPerDay"
+                        android:layout_width="match_parent"
+                        android:layout_height="200dp"
+                        android:background="@color/not_very_black"
+                        app:layout_constraintBottom_toBottomOf="parent"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toTopOf="parent" />
+
+                    <ImageButton
+                        android:id="@+id/sleepPerDay_back_btn"
+                        android:layout_width="35dp"
+                        android:layout_height="0dp"
+                        android:layout_weight="0"
+                        android:background="#33FFFFFF"
+                        app:layout_constraintBottom_toBottomOf="parent"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toTopOf="@+id/recycleView_sleepPerDay"
+                        app:srcCompat="@drawable/ic_baseline_arrow_back_ios_new_24"
+                        tools:ignore="SpeakableTextPresentCheck,TouchTargetSizeCheck" />
+
+                    <ImageButton
+                        android:id="@+id/sleepPerDay_next_btn"
+                        android:layout_width="35dp"
+                        android:layout_height="0dp"
+                        android:layout_weight="0"
+                        android:background="#33FFFFFF"
+                        app:layout_constraintBottom_toBottomOf="parent"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintTop_toTopOf="parent"
+                        app:srcCompat="@drawable/ic_baseline_arrow_forward_ios_24"
+                        tools:ignore="SpeakableTextPresentCheck,TouchTargetSizeCheck" />
+
+                </androidx.constraintlayout.widget.ConstraintLayout>
 
             </LinearLayout>
         </LinearLayout>

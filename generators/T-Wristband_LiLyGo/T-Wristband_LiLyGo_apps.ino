@@ -8,11 +8,11 @@
 
 #define APP_MENU_APPLICATIONS_0             ClockApp
 #define APP_MENU_APPLICATIONS_1             BleSync
-#define APP_MENU_APPLICATIONS_2             PedometerApp
-//#define APP_MENU_APPLICATIONS_3             PedometerAppTest
-#define APP_MENU_APPLICATIONS_3             SettingsApp
-#define APP_MENU_APPLICATIONS_4             BatteryApp
-#define APP_MENU_APPLICATIONS_5             I2CScannerApp
+#define APP_MENU_APPLICATIONS_2             TestApplicationApp
+#define APP_MENU_APPLICATIONS_3             PedometerApp
+#define APP_MENU_APPLICATIONS_4             SettingsApp
+#define APP_MENU_APPLICATIONS_5             BatteryApp
+#define APP_MENU_APPLICATIONS_6             I2CScannerApp
 
 
 /*
