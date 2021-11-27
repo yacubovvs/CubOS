@@ -138,7 +138,7 @@ void setup(){
         }else{
           #ifdef DEBUG_WAKEUP
             //delay(1000);
-            debug("DEBUG_WAKEUP: Not background start. Reason: " + String(wakeUpReason), 10);
+            debug("DEBUG_WAKEUP: Not background start 1. Reason: " + String(wakeUpReason), 10);
           #endif
         }
       #endif
@@ -146,7 +146,7 @@ void setup(){
   #else
     #ifdef DEBUG_WAKEUP
       //delay(1000);
-      debug("DEBUG_WAKEUP: Not background start. Reason: " + String(wakeUpReason), 10);
+      debug("DEBUG_WAKEUP: Not background start 2. Reason: " + String(wakeUpReason), 10);
     #endif
   #endif
   //debug("**** Main app start", 10);

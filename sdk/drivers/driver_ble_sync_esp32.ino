@@ -414,7 +414,8 @@ bool driver_ble_getCurrentTime(unsigned char attemptNum){
       return driver_ble_getCurrentTime(attemptNum + 1);
     }else{
       unsigned char wdt_settingsTime = 0;
-
+      core_time_settings_lastDay_currentDate();
+      
       // Fixed some bugs in RTC
       while(
         core_time_getYear()!=server_year ||
@@ -424,6 +425,8 @@ bool driver_ble_getCurrentTime(unsigned char attemptNum){
         core_time_getMinutes_byte()!=server_minutes ||
         core_time_getSeconds_byte()!=server_seconds
       ){
+        core_time_driver_RTC_refresh(true);
+
         core_time_setYear(server_year);
         core_time_setMonth(server_month);
         core_time_setDate(server_date);
@@ -433,6 +436,10 @@ bool driver_ble_getCurrentTime(unsigned char attemptNum){
         core_time_setWeekDay( (server_dayOfWeek-1+7)%7);
 
         wdt_settingsTime++;
+
+        #ifdef RTC_ENABLE 
+          core_time_settings_lastDay_currentDate();
+        #endif
 
         #ifdef DEBUG_DRIVER_BLE_PRINT_INCONNECT_OUTPUT
           if(wdt_settingsTime>0){

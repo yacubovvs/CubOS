@@ -76,7 +76,9 @@ class appNameClass: public Application{
             //#ifdef PEDOMETER_EMULATOR
             //    int grad_i = 260;
             //#else
-            int grad_i = (long)360 * (long)get_pedometer_days_steps() / (long)get_pedometer_days_steps_min_limit();
+            int grad_i;
+            if(get_pedometer_days_steps_min_limit()!=0) grad_i = (long)360 * (long)get_pedometer_days_steps() / (long)get_pedometer_days_steps_min_limit();
+            else grad_i = 0;
             //#endif
 
             if(grad_i>360) grad_i = 360;
@@ -94,6 +96,9 @@ class appNameClass: public Application{
 #endif
 
 void appNameClass::onCreate(){
+
+    debug("Start 210");
+
     DRAW_LIMITS_setEnable(true);
     DRAW_LIMIT_reset();
     
