@@ -472,7 +472,7 @@ public class BLEServer extends BluetoothGattServerCallback {
             int steps = ((value[3]&0xFF)<<24) | ((value[4]&0xFF)<<16) | ((value[5]&0xFF)<<8) | (value[6]&0xFF);
             int sleep = ((value[7]&0xFF)<<8) | (value[8]&0xFF);
 
-            int hashSum1 = (int)(value[0]&0xFF) + (int)(value[2]&0xFF) + (int)(value[4]&0xFF) + (int)(value[6]&0xFF + (int)(value[8]&0xFF));
+            int hashSum1 = (int)(value[0]&0xFF) + (int)(value[2]&0xFF) + (int)(value[4]&0xFF) + (int)(value[6]&0xFF) + (int)(value[8]&0xFF);
             int hashSum2 = (int)(value[1]&0xFF) + (int)(value[3]&0xFF) + (int)(value[5]&0xFF) + (int)(value[7]&0xFF);
             boolean hashSumCheck = HashSum.checkHashSum(hashSum1, hashSum2, value[9], value[10]);
 
@@ -486,7 +486,7 @@ public class BLEServer extends BluetoothGattServerCallback {
                     DateFormat df = new SimpleDateFormat("yyyy-MM-dd-HH");
                     String string_user = df.format(logDate);
 
-                    Log.d("BLE_log", "DAY_DATA_PER_HOURS hour_shift: " + hour_shift);
+                    //Log.d("BLE_log", "DAY_DATA_PER_HOURS hour_shift: " + hour_shift);
                     MainActivity.mainActivity.dbHelper.insert_hour_pedometer_data(string_user, steps, sleep);
                 }else{
                     //TODO: Show alert to sync time
@@ -494,6 +494,7 @@ public class BLEServer extends BluetoothGattServerCallback {
                 Log.d("BLE_log", "DAY_DATA_PER_HOURS checkSum SUCCESS!");
             }else{
                 Log.d("BLE_log", "DAY_DATA_PER_HOURS checkSum FAILED!");
+                Log.d("BLE_log", "DAY_DATA_PER_HOURS hash: " + hashSum1 + " " + hashSum2 + " --- " + value[9] + " " + value[10]);
             }
             /*
             StepSleepHistory.addDayData(

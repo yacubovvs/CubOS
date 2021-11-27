@@ -35,6 +35,7 @@ void appNameClass::onCreate(){
     setDrawColor(255,255,255);
     //drawString(appName, 5, STYLE_STATUSBAR_HEIGHT + 10, 1);
 
+/*
     set_pedometer_hours_steps(0, 30);
     set_pedometer_hours_steps(1, 156);
     set_pedometer_hours_steps(2, 201);
@@ -84,7 +85,121 @@ void appNameClass::onCreate(){
     set_pedometer_hours_sleep(21, 0);
     set_pedometer_hours_sleep(22, 0);
     set_pedometer_hours_sleep(23, 0);
+    */
+    
+    /*
+    core_time_setYear(0);
+    core_time_setMonth(0);
+    core_time_setDate(0);
+    core_time_setHours(0);
+    core_time_setMinutes(0);
+    core_time_setSeconds(0);
+    core_time_setWeekDay(0);
+    */
 
+    
+    set_pedometer_hours_steps(0, 0*2);
+    set_pedometer_hours_steps(1, 1*2);
+    set_pedometer_hours_steps(2, 2*2);
+    set_pedometer_hours_steps(3, 3*2);
+    set_pedometer_hours_steps(4, 4*2);
+    set_pedometer_hours_steps(5, 5*2);
+    set_pedometer_hours_steps(6, 6*2);
+    set_pedometer_hours_steps(7, 7*2);
+    set_pedometer_hours_steps(8, 8*2);
+    set_pedometer_hours_steps(9, 9*2);
+    set_pedometer_hours_steps(10, 10*2);
+    set_pedometer_hours_steps(11, 11*2);
+    set_pedometer_hours_steps(12, 12*2);
+    set_pedometer_hours_steps(13, 13*2);
+    set_pedometer_hours_steps(14, 14*2);
+    set_pedometer_hours_steps(15, 15*2);
+    set_pedometer_hours_steps(16, 16*2);
+    set_pedometer_hours_steps(17, 17*2);
+    set_pedometer_hours_steps(18, 18*2);
+    set_pedometer_hours_steps(19, 19*2);
+    set_pedometer_hours_steps(20, 20*2);
+    set_pedometer_hours_steps(21, 21*2);
+    set_pedometer_hours_steps(22, 22*2);
+    set_pedometer_hours_steps(23, 23*2);
+
+    set_pedometer_hours_steps_lastDay(0, 24*2);
+    set_pedometer_hours_steps_lastDay(1, 25*2);
+    set_pedometer_hours_steps_lastDay(2, 26*2);
+    set_pedometer_hours_steps_lastDay(3, 27*2);
+    set_pedometer_hours_steps_lastDay(4, 28*2);
+    set_pedometer_hours_steps_lastDay(5, 29*2);
+    set_pedometer_hours_steps_lastDay(6, 30*2);
+    set_pedometer_hours_steps_lastDay(7, 31*2);
+    set_pedometer_hours_steps_lastDay(8, 32*2);
+    set_pedometer_hours_steps_lastDay(9, 33*2);
+    set_pedometer_hours_steps_lastDay(10, 34*2);
+    set_pedometer_hours_steps_lastDay(11, 35*2);
+    set_pedometer_hours_steps_lastDay(12, 36*2);
+    set_pedometer_hours_steps_lastDay(13, 37*2);
+    set_pedometer_hours_steps_lastDay(14, 38*2);
+    set_pedometer_hours_steps_lastDay(15, 39*2);
+    set_pedometer_hours_steps_lastDay(16, 40*2);
+    set_pedometer_hours_steps_lastDay(17, 41*2);
+    set_pedometer_hours_steps_lastDay(18, 42*2);
+    set_pedometer_hours_steps_lastDay(19, 43*2);
+    set_pedometer_hours_steps_lastDay(20, 44*2);
+    set_pedometer_hours_steps_lastDay(21, 45*2);
+    set_pedometer_hours_steps_lastDay(22, 46*2);
+    set_pedometer_hours_steps_lastDay(23, 47*2);
+
+    set_pedometer_hours_sleep(0, 0*2+1);
+    set_pedometer_hours_sleep(1, 1*2+1);
+    set_pedometer_hours_sleep(2, 2*2+1);
+    set_pedometer_hours_sleep(3, 3*2+1);
+    set_pedometer_hours_sleep(4, 4*2+1);
+    set_pedometer_hours_sleep(5, 5*2+1);
+    set_pedometer_hours_sleep(6, 6*2+1);
+    set_pedometer_hours_sleep(7, 7*2+1);
+    set_pedometer_hours_sleep(8, 8*2+1);
+    set_pedometer_hours_sleep(9, 9*2+1);
+    set_pedometer_hours_sleep(10, 10*2+1);
+    set_pedometer_hours_sleep(11, 11*2+1);
+    set_pedometer_hours_sleep(12, 12*2+1);
+    set_pedometer_hours_sleep(13, 13*2+1);
+    set_pedometer_hours_sleep(14, 14*2+1);
+    set_pedometer_hours_sleep(15, 15*2+1);
+    set_pedometer_hours_sleep(16, 16*2+1);
+    set_pedometer_hours_sleep(17, 17*2+1);
+    set_pedometer_hours_sleep(18, 18*2+1);
+    set_pedometer_hours_sleep(19, 19*2+1);
+    set_pedometer_hours_sleep(20, 20*2+1);
+    set_pedometer_hours_sleep(21, 21*2+1);
+    set_pedometer_hours_sleep(22, 22*2+1);
+    set_pedometer_hours_sleep(23, 23*2+1);
+
+    set_pedometer_hours_sleep_lastDay(0, 24*2 + 1);
+    set_pedometer_hours_sleep_lastDay(1, 25*2 + 1);
+    set_pedometer_hours_sleep_lastDay(2, 26*2 + 1);
+    set_pedometer_hours_sleep_lastDay(3, 27*2 + 1);
+    set_pedometer_hours_sleep_lastDay(4, 28*2 + 1);
+    set_pedometer_hours_sleep_lastDay(5, 29*2 + 1);
+    set_pedometer_hours_sleep_lastDay(6, 30*2 + 1);
+    set_pedometer_hours_sleep_lastDay(7, 31*2 + 1);
+    set_pedometer_hours_sleep_lastDay(8, 32*2 + 1);
+    set_pedometer_hours_sleep_lastDay(9, 33*2 + 1);
+    set_pedometer_hours_sleep_lastDay(10, 34*2 + 1);
+    set_pedometer_hours_sleep_lastDay(11, 35*2 + 1);
+    set_pedometer_hours_sleep_lastDay(12, 36*2 + 1);
+    set_pedometer_hours_sleep_lastDay(13, 37*2 + 1);
+    set_pedometer_hours_sleep_lastDay(14, 38*2 + 1);
+    set_pedometer_hours_sleep_lastDay(15, 39*2 + 1);
+    set_pedometer_hours_sleep_lastDay(16, 40*2 + 1);
+    set_pedometer_hours_sleep_lastDay(17, 41*2 + 1);
+    set_pedometer_hours_sleep_lastDay(18, 42*2 + 1);
+    set_pedometer_hours_sleep_lastDay(19, 43*2 + 1);
+    set_pedometer_hours_sleep_lastDay(20, 44*2 + 1);
+    set_pedometer_hours_sleep_lastDay(21, 45*2 + 1);
+    set_pedometer_hours_sleep_lastDay(22, 46*2 + 1);
+    set_pedometer_hours_sleep_lastDay(23, 47*2 + 1);
+
+
+    /*
     set_pedometer_days_steps(0, 7654);
     set_pedometer_days_steps(1, 6543);
     set_pedometer_days_steps(2, 4356);
@@ -100,6 +215,23 @@ void appNameClass::onCreate(){
     set_pedometer_days_sleep(4, 8*60-24);
     set_pedometer_days_sleep(5, 8*60-15);
     set_pedometer_days_sleep(6, 8*60-45);
+    */
+
+    set_pedometer_days_steps(0, 100);
+    set_pedometer_days_steps(1, 200);
+    set_pedometer_days_steps(2, 300);
+    set_pedometer_days_steps(3, 400);
+    set_pedometer_days_steps(4, 500);
+    set_pedometer_days_steps(5, 600);
+    set_pedometer_days_steps(6, 700);
+
+    set_pedometer_days_sleep(0, 25);
+    set_pedometer_days_sleep(1, 50);
+    set_pedometer_days_sleep(2, 75);
+    set_pedometer_days_sleep(3, 125);
+    set_pedometer_days_sleep(4, 150);
+    set_pedometer_days_sleep(5, 175);
+    set_pedometer_days_sleep(6, 225);
 
     drawString("Pedometer", 5, STYLE_STATUSBAR_HEIGHT + 10, 1);
     drawString("data setted", 5, STYLE_STATUSBAR_HEIGHT + 10*2, 1);

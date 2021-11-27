@@ -178,8 +178,19 @@ void driver_ble_BleEsp32SyncTask( void * pvParameters ){
           #ifdef PEDOMETER_ENABLE
             uint8_t current_day = core_time_getDate();
             uint8_t current_hour = core_time_getHours_byte();
+            //for(int hour=0; hour<24; hour++){
+            for(int hour=current_hour; hour>=0; hour--){
+              driver_ble_setDayData_values(current_day, current_hour, current_hour-hour, get_pedometer_hours_steps(hour), get_pedometer_hours_sleep(hour));
+              delay(50);
+            }
+
+            // yesterday data of steps and sleep
             for(int hour=0; hour<24; hour++){
-              driver_ble_setDayData_values(current_day, current_hour, hour, get_pedometer_hours_steps(hour), get_pedometer_hours_sleep(hour));
+              /*
+              uint16_t get_pedometer_hours_steps_lastDay(unsigned char hour){ return pedometer_hours_steps_lastDay[hour];}
+              uint8_t get_pedometer_hours_sleep_lastDay(unsigned char hour){ return pedometer_hours_sleep_lastDay[hour];}
+              */
+              driver_ble_setDayData_values(current_day, current_hour, current_hour-hour+24, get_pedometer_hours_steps_lastDay(hour), get_pedometer_hours_sleep_lastDay(hour));
               delay(50);
             }
             
@@ -402,13 +413,38 @@ bool driver_ble_getCurrentTime(unsigned char attemptNum){
       delay(20); // Just in case
       return driver_ble_getCurrentTime(attemptNum + 1);
     }else{
-      core_time_setYear(server_year);
-      core_time_setMonth(server_month);
-      core_time_setDate(server_date);
-      core_time_setHours(server_hours);
-      core_time_setMinutes(server_minutes);
-      core_time_setSeconds(server_seconds);
-      core_time_setWeekDay( (server_dayOfWeek-1+7)%7);
+      unsigned char wdt_settingsTime = 0;
+
+      // Fixed some bugs in RTC
+      while(
+        core_time_getYear()!=server_year ||
+        core_time_getMonth()!=server_month ||
+        core_time_getDate()!=server_date ||
+        core_time_getHours_byte()!=server_hours ||
+        core_time_getMinutes_byte()!=server_minutes ||
+        core_time_getSeconds_byte()!=server_seconds
+      ){
+        core_time_setYear(server_year);
+        core_time_setMonth(server_month);
+        core_time_setDate(server_date);
+        core_time_setHours(server_hours);
+        core_time_setMinutes(server_minutes);
+        core_time_setSeconds(server_seconds);
+        core_time_setWeekDay( (server_dayOfWeek-1+7)%7);
+
+        wdt_settingsTime++;
+
+        #ifdef DEBUG_DRIVER_BLE_PRINT_INCONNECT_OUTPUT
+          if(wdt_settingsTime>0){
+            debug("# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #");
+            debug("#                                RTC ERROR!!!                                 #");
+            debug("#                            RTC BUG SETTING TIME!                            #");
+            debug("# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #");
+          }
+        #endif
+
+        if(wdt_settingsTime>=5) break;
+      }
     }
     
     /*

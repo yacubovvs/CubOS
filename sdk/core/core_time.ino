@@ -35,6 +35,10 @@ long getCurrentSystemTime(){
     
     unsigned long driver_RTC_lastTimeRefresh = 0;
     
+    void core_time_settings_lastDay_currentDate(){
+        lastDay = core_time_getDate();
+    }
+    
     void core_time_driver_RTC_refresh(bool hard){
         if(hard || (millis() - driver_RTC_lastTimeRefresh>=UPDATE_RTC_EVERY)){
             driver_RTC_refresh(hard);

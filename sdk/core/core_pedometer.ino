@@ -19,7 +19,10 @@
         RTC_DATA_ATTR PEDOMETER_DAY_VALUE_TYPE pedometer_days_steps[PEDOMETER_DAYS_HISTORY] = {8340,12234,7654,23593,5633,1290,430};
         RTC_DATA_ATTR uint16_t pedometer_days_sleep[PEDOMETER_DAYS_HISTORY] = {430,550,230,500,349,765,234};
         RTC_DATA_ATTR uint16_t pedometer_hours_steps[24] = {0,   0,  0,  0,  0,  0, 120, 300, 1232, 10, 23, 43, 1230, 900, 534, 230, 890, 600, 200, 100, 10,  0, 10, 0};
+        RTC_DATA_ATTR uint16_t pedometer_hours_steps_lastDay[24] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
+
         RTC_DATA_ATTR uint8_t pedometer_hours_sleep[24] =  {60, 60, 60, 58, 60, 34, 0,   0,   0,    0,  0,  0,  0,    0,   0,   0,   0,   0,   0,   0,   0,   0, 0, 23};
+        RTC_DATA_ATTR uint8_t pedometer_hours_sleep_lastDay[24] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
 
         PEDOMETER_DAY_VALUE_TYPE get_pedometer_days_steps(unsigned char day){ 
             pedometer_days_steps[0] = 8340; pedometer_days_steps[1] = 12234; pedometer_days_steps[2] = 7654; pedometer_days_steps[3] = 23593;
@@ -55,14 +58,22 @@
         RTC_DATA_ATTR uint16_t pedometer_days_sleep[PEDOMETER_DAYS_HISTORY] = {0,0,0,0,0,0,0};
         // Steps in every hour
         RTC_DATA_ATTR uint16_t pedometer_hours_steps[24] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
+        RTC_DATA_ATTR uint16_t pedometer_hours_steps_lastDay[24] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
         // Sleep minutes in every hour
         RTC_DATA_ATTR uint8_t pedometer_hours_sleep[24] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
+        RTC_DATA_ATTR uint8_t pedometer_hours_sleep_lastDay[24] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
 
         PEDOMETER_DAY_VALUE_TYPE get_pedometer_days_steps(unsigned char day){ return pedometer_days_steps[day];}
         uint16_t get_pedometer_days_sleep(unsigned char day){ return pedometer_days_sleep[day];}
         uint16_t get_pedometer_hours_steps(unsigned char hour){ return pedometer_hours_steps[hour];}
         uint8_t get_pedometer_hours_sleep(unsigned char hour){ return pedometer_hours_sleep[hour];}
     #endif
+
+    uint16_t get_pedometer_hours_steps_lastDay(unsigned char hour){ return pedometer_hours_steps_lastDay[hour];}
+    uint8_t get_pedometer_hours_sleep_lastDay(unsigned char hour){ return pedometer_hours_sleep_lastDay[hour];}
+
+    void set_pedometer_hours_steps_lastDay(unsigned char hour, uint16_t value){ pedometer_hours_steps_lastDay[hour] = value;}
+    void set_pedometer_hours_sleep_lastDay(unsigned char hour, uint8_t value){ pedometer_hours_sleep_lastDay[hour] = value;}
 
     float get_pedometer_days_sleep_hours(unsigned char day){ return (((float)(((int)pedometer_days_sleep[day])*100/60))/100.0);}
 
@@ -97,16 +108,26 @@
 
 
     void core_pedometer_newDate(){
+
+        debug("*****************************************************************");
+        debug("*                           NEW DATE                            *");
+        debug("*****************************************************************");
+
         for(unsigned char i=PEDOMETER_DAYS_HISTORY-1; i>0; i--){
             pedometer_days_steps[i] = pedometer_days_steps[i-1];
             pedometer_days_sleep[i] = pedometer_days_sleep[i-1];
         }
+
+        // TODO: Trying to sync before clear data
+        
         //debug("new date");
         set_pedometer_days_steps(0, 0);
         set_pedometer_days_sleep(0, 0);
         //get_pedometer_hours_sleep = 0;
 
         for(unsigned char i=0; i<24; i++){
+            pedometer_hours_steps_lastDay[i] = pedometer_hours_steps[i];
+            pedometer_hours_sleep_lastDay[i] = pedometer_hours_sleep[i];
             pedometer_hours_steps[i] = 0;
             pedometer_hours_sleep[i] = 0;
         }
