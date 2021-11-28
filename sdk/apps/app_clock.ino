@@ -234,7 +234,9 @@ void appNameClass::draw_current_time(bool draw){
         else seconds_draw = 1;
         
         this->last_seconds = core_time_getSeconds_byte();
-        for(char i_predrawSeconds=0; i_predrawSeconds<seconds_draw; i_predrawSeconds++) this->drawSecondsCircle(draw, this->last_seconds-i_predrawSeconds);
+        for(char i_predrawSeconds=0; i_predrawSeconds<seconds_draw; i_predrawSeconds++){
+            this->drawSecondsCircle(draw, this->last_seconds-i_predrawSeconds);
+        }
 
         setDrawColor_ContrastColor();
 
@@ -254,7 +256,7 @@ void appNameClass::draw_current_time(bool draw){
         #endif 
     }else{
         if(this->last_seconds>core_time_getSeconds_byte()){
-            // if munutes changed
+            // if munutes changed, clearing secongs circle
             setDrawColor_BackGroundColor();  
             for(int isecond=0; isecond<60; isecond++){
                 drawSecondsCircle(draw, isecond);
@@ -289,14 +291,16 @@ void appNameClass::draw_current_time(bool draw){
                 // Big screens as 240x240 
                 clearString_centered(core_time_getWeekDay_string(), SCREEN_WIDTH/2, STRINGS_OFFSET_Y + SECONDS_CIRCLE_Y + CLOCK_MARGIN + 35, FONT_SIZE_DEFAULT);
             #endif 
+
+            #if defined(PEDOMETER_ENABLE) || defined(PEDOMETER_EMULATOR)
+                this->drawStepsCircle(true);
+            #endif
         }
 
     }
 
-
     // BATTERY
     #ifdef BATTERY_ENABLE
-
         
         if(draw){        
             last_battery            = driver_battery_getPercent();
