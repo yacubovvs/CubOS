@@ -14,7 +14,7 @@
 
 ## Android APP
 Android apk file: https://github.com/yacubovvs/CubOS/tree/main/tools/CubOSBLEApp/releases <br>
-Android apk source: https://github.com/yacubovvs/CubOS/tree/main/tools/CubOSBLEApp
+Android app source: https://github.com/yacubovvs/CubOS/tree/main/tools/CubOSBLEApp
 <img alt="CubOS android app screenshot" src="images\screenshots\android_app_screenshot.png" max-width="600">
 
 ## Controls
