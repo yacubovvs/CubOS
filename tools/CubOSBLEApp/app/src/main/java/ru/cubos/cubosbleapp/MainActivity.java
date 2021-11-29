@@ -97,16 +97,17 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
+        int sleepTimeLimits     = preferences.getInt("last_sleepLimit", 400);
+        int stepsLimits         = preferences.getInt("last_stepsLimit_bg", 7500);
+
         int lastDateUpdate = preferences.getInt("last_DateUpdate", 0);
         int currentDate = (new Date()).getDate();
         if(lastDateUpdate!=currentDate){
-            setCurrentSleepTime(0, 0);
-            setCurrentSteps(0, 0);
+            setCurrentSteps(0, stepsLimits);
+            setCurrentSleepTime(0, sleepTimeLimits);
         }else{
             int sleepTime           = preferences.getInt("last_sleepTime", 0);
-            int sleepTimeLimits     = preferences.getInt("last_sleepTimeLimits", 0);
             int steps               = preferences.getInt("last_steps", 0);
-            int stepsLimits         = preferences.getInt("last_stepsLimit", 0);
 
             setCurrentSleepTime(sleepTime, sleepTimeLimits);
             setCurrentSteps(steps, stepsLimits);
@@ -174,7 +175,7 @@ public class MainActivity extends AppCompatActivity {
 
     public void setCurrentSteps(int steps, int stepsLimits){
         preferences.putInt("last_steps", steps);
-        preferences.putInt("last_stepsLimit", stepsLimits);
+        preferences.putInt("last_stepsLimit_bg", stepsLimits);
 
         steps_labels.setText("" + steps + "/" + stepsLimits + " steps");
         calories_label.setText("" + (int)((float)steps*0.033f) + " kcal");
@@ -187,7 +188,7 @@ public class MainActivity extends AppCompatActivity {
 
     public void setCurrentSleepTime(int sleepTime, int sleepTimeLimits){
         preferences.putInt("last_sleepTime",  sleepTime);
-        preferences.putInt("last_sleepTimeLimits", sleepTimeLimits);
+        preferences.putInt("last_sleepLimit", sleepTimeLimits);
 
         int minutes = sleepTime%60;
         int hours = (sleepTime - minutes)/60;

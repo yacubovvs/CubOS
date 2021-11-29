@@ -53,8 +53,6 @@ public class Settings extends AppCompatActivity {
         label_screenOffTime = findViewById(R.id.label_screenOffTime);
         label_screenOffClock = findViewById(R.id.label_screenOffClock);
 
-        //MainActivity.mainActivity.preferences.putInt("last_stepsLimit", stepLimit);
-
         //setLabelStepsLimit(stepLimit);
 
         setListeners();
@@ -139,7 +137,7 @@ public class Settings extends AppCompatActivity {
                 int min = 1000;
                 int stepLimit = ((max - min)  * progress /100 + min)/500*500;
 
-                MainActivity.mainActivity.preferences.putInt("last_stepsLimit", stepLimit);
+                MainActivity.mainActivity.preferences.putInt("last_stepsLimit_bg", stepLimit);
                 MainActivity.mainActivity.preferences.putInt("last_progress_stepsLimit", progress);
                 setLabelStepsLimit(stepLimit);
             }

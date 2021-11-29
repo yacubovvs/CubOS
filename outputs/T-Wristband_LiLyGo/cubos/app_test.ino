@@ -97,7 +97,7 @@ void appNameClass::onCreate(){
     core_time_setWeekDay(0);
     */
 
-    
+    /*
     set_pedometer_hours_steps(0, 0*2);
     set_pedometer_hours_steps(1, 1*2);
     set_pedometer_hours_steps(2, 2*2);
@@ -197,7 +197,27 @@ void appNameClass::onCreate(){
     set_pedometer_hours_sleep_lastDay(21, 45*2 + 1);
     set_pedometer_hours_sleep_lastDay(22, 46*2 + 1);
     set_pedometer_hours_sleep_lastDay(23, 47*2 + 1);
+    */
 
+
+
+    set_pedometer_days_steps(0, 3500);
+    /*
+    set_pedometer_days_steps(1, 200);
+    set_pedometer_days_steps(2, 300);
+    set_pedometer_days_steps(3, 400);
+    set_pedometer_days_steps(4, 500);
+    set_pedometer_days_steps(5, 600);
+    set_pedometer_days_steps(6, 700);*/
+
+    set_pedometer_days_sleep(0, 6*60);
+    /*
+    set_pedometer_days_sleep(1, 50);
+    set_pedometer_days_sleep(2, 75);
+    set_pedometer_days_sleep(3, 125);
+    set_pedometer_days_sleep(4, 150);
+    set_pedometer_days_sleep(5, 175);
+    set_pedometer_days_sleep(6, 225);*/
 
     /*
     set_pedometer_days_steps(0, 7654);
@@ -216,22 +236,6 @@ void appNameClass::onCreate(){
     set_pedometer_days_sleep(5, 8*60-15);
     set_pedometer_days_sleep(6, 8*60-45);
     */
-
-    set_pedometer_days_steps(0, 3500);
-    set_pedometer_days_steps(1, 200);
-    set_pedometer_days_steps(2, 300);
-    set_pedometer_days_steps(3, 400);
-    set_pedometer_days_steps(4, 500);
-    set_pedometer_days_steps(5, 600);
-    set_pedometer_days_steps(6, 700);
-
-    set_pedometer_days_sleep(0, 6*60);
-    set_pedometer_days_sleep(1, 50);
-    set_pedometer_days_sleep(2, 75);
-    set_pedometer_days_sleep(3, 125);
-    set_pedometer_days_sleep(4, 150);
-    set_pedometer_days_sleep(5, 175);
-    set_pedometer_days_sleep(6, 225);
 
     drawString("Pedometer", 5, STYLE_STATUSBAR_HEIGHT + 10, 1);
     drawString("data setted", 5, STYLE_STATUSBAR_HEIGHT + 10*2, 1);

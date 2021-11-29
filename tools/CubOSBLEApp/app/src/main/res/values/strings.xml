@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">CubOSBLEApp</string>
+    <string name="app_name">CubOS BLE</string>
     <string name="title_activity_settings">Settings</string>
     <string name="activity_history">Activity history</string>
     <string name="settings">Settings</string>

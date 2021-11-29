@@ -415,7 +415,7 @@ bool driver_ble_getCurrentTime(unsigned char attemptNum){
     }else{
       unsigned char wdt_settingsTime = 0;
       core_time_settings_lastDay_currentDate();
-      
+
       // Fixed some bugs in RTC
       while(
         core_time_getYear()!=server_year ||
@@ -447,10 +447,12 @@ bool driver_ble_getCurrentTime(unsigned char attemptNum){
             debug("#                                RTC ERROR!!!                                 #");
             debug("#                            RTC BUG SETTING TIME!                            #");
             debug("# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #");
+
+            delay(50);
           }
         #endif
 
-        if(wdt_settingsTime>=5) break;
+        if(wdt_settingsTime>=10)break;
       }
     }
     

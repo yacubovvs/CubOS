@@ -224,7 +224,7 @@ public class BLEServer extends BluetoothGattServerCallback {
             boolean pedometerOn         = MainActivity.mainActivity.preferences.getBoolean("switch_usePedometer", true);
             boolean syncTime            = MainActivity.mainActivity.preferences.getBoolean("switch_syncTime", true);
             boolean autosyncOnCharge    = MainActivity.mainActivity.preferences.getBoolean("switch_autosyncOnCharge", true);
-            int stepsLimit = MainActivity.mainActivity.preferences.getInt("last_stepsLimit", 7000);
+            int stepsLimit = MainActivity.mainActivity.preferences.getInt("last_stepsLimit_bg", 7000);
             int sleepLimit = MainActivity.mainActivity.preferences.getInt("last_sleepLimit", 480);
             byte screenOffTime = (byte) MainActivity.mainActivity.preferences.getInt("last_screenOffTime", 10);
             byte screenOffClock = (byte) MainActivity.mainActivity.preferences.getInt("last_screenOffClock", 3);
