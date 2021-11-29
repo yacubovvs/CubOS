@@ -49,7 +49,10 @@ long getCurrentSystemTime(){
                 debug("!!!!!!!!!!!!!!! CURRENT DATE: " + String(core_time_getDate()));
                 debug("!!!!!!!!!!!!!!! lastDay: " + String(lastDay));
 
-                core_time_onNewDate();
+                if(abs(lastDay - core_time_getDate())==1){
+                    core_time_onNewDate();
+                }
+                
                 lastDay = core_time_getDate();
             }
 

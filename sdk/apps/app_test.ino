@@ -201,7 +201,7 @@ void appNameClass::onCreate(){
 
 
 
-    set_pedometer_days_steps(0, 3500);
+    //set_pedometer_days_steps(0, 3500);
     /*
     set_pedometer_days_steps(1, 200);
     set_pedometer_days_steps(2, 300);
@@ -210,7 +210,7 @@ void appNameClass::onCreate(){
     set_pedometer_days_steps(5, 600);
     set_pedometer_days_steps(6, 700);*/
 
-    set_pedometer_days_sleep(0, 6*60);
+    //set_pedometer_days_sleep(0, 6*60);
     /*
     set_pedometer_days_sleep(1, 50);
     set_pedometer_days_sleep(2, 75);

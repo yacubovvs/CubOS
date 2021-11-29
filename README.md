@@ -16,6 +16,7 @@ Feel free to contact me at yacubovvs@yandex.ru
 
 ## CubOS on wristbands
 <img alt="CubOS watch screenshot" src="documentation/images/screenshots/CubOS_wristband/wristband_preview.png " max-width="500" width="403">
+<img alt="CubOS watch screenshot" src="documentation/images/screenshots/CubOS_ble_app/android_app_screenshot.png " max-width="700">
 
 ## CubOS on smartwatch
 <img alt="CubOS watch screenshot" src="documentation/images/screenshots/CubOS_smartwatch/smartwatch_preview.png " max-width="500">

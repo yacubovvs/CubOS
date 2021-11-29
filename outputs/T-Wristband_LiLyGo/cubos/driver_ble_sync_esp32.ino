@@ -425,8 +425,9 @@ bool driver_ble_getCurrentTime(unsigned char attemptNum){
         core_time_getMinutes_byte()!=server_minutes ||
         core_time_getSeconds_byte()!=server_seconds
       ){
-        core_time_driver_RTC_refresh(true);
 
+        #define RTC_BUG_DELAY_TIME 8
+        core_time_driver_RTC_refresh(true);
         core_time_setYear(server_year);
         core_time_setMonth(server_month);
         core_time_setDate(server_date);
@@ -441,6 +442,8 @@ bool driver_ble_getCurrentTime(unsigned char attemptNum){
           core_time_settings_lastDay_currentDate();
         #endif
 
+        delay(30);
+
         #ifdef DEBUG_DRIVER_BLE_PRINT_INCONNECT_OUTPUT
           if(wdt_settingsTime>0){
             debug("# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #");
@@ -448,11 +451,15 @@ bool driver_ble_getCurrentTime(unsigned char attemptNum){
             debug("#                            RTC BUG SETTING TIME!                            #");
             debug("# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #");
 
-            delay(50);
+            //delay(30);
           }
         #endif
 
         if(wdt_settingsTime>=10)break;
+        
+        delay(RTC_BUG_DELAY_TIME);
+        core_time_driver_RTC_refresh(true);
+        delay(RTC_BUG_DELAY_TIME);
       }
     }
     

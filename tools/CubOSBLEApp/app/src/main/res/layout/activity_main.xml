@@ -89,19 +89,22 @@
                             android:id="@+id/imageView2"
                             android:layout_width="27dp"
                             android:layout_height="27dp"
+                            android:layout_marginLeft="30dp"
                             android:layout_marginTop="10dp"
                             android:layout_weight="0"
                             app:srcCompat="@drawable/calories_64" />
 
                         <TextView
                             android:id="@+id/calories_label"
-                            android:layout_width="wrap_content"
+                            android:layout_width="match_parent"
                             android:layout_height="match_parent"
                             android:layout_marginLeft="10dp"
                             android:layout_marginTop="10dp"
+                            android:layout_marginRight="30dp"
                             android:layout_weight="0"
                             android:gravity="center_vertical"
-                            android:text="- kcal          " />
+                            android:text="- kcal"
+                            android:textAlignment="textEnd" />
                     </LinearLayout>
                 </LinearLayout>
 

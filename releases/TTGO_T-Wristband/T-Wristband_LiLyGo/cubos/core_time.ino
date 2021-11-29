@@ -35,11 +35,24 @@ long getCurrentSystemTime(){
     
     unsigned long driver_RTC_lastTimeRefresh = 0;
     
+    void core_time_settings_lastDay_currentDate(){
+        debug("& & & & & & & Setting current last day: " + String(core_time_getDate()));
+        lastDay = core_time_getDate();
+        core_time_driver_RTC_refresh(true);
+    }
+    
     void core_time_driver_RTC_refresh(bool hard){
         if(hard || (millis() - driver_RTC_lastTimeRefresh>=UPDATE_RTC_EVERY)){
             driver_RTC_refresh(hard);
+            
             if(core_time_getDate()!=lastDay){
-                core_time_onNewDate();
+                debug("!!!!!!!!!!!!!!! CURRENT DATE: " + String(core_time_getDate()));
+                debug("!!!!!!!!!!!!!!! lastDay: " + String(lastDay));
+
+                if(abs(lastDay - core_time_getDate())==1){
+                    core_time_onNewDate();
+                }
+                
                 lastDay = core_time_getDate();
             }
 
@@ -318,10 +331,19 @@ void core_time_loop(){
     long currentTime = millis()/ON_TIME_CHANGE_EVERY_MS;
     if(currentTime!=lastTimeChange){
         #ifdef CLOCK_ENABLE
-            if(currentApp->showStatusBar==true){
-                core_views_statusBar_draw_time(false);
-                core_views_statusBar_draw_time(true);
-            }
+            #ifdef ROUND_SCREEN 
+                // Do not show time on round displays
+            #else
+                if(currentApp->showStatusBar==true){
+                    bool needToUpdateTime = core_views_statusBar_draw_time(false);
+                    if(needToUpdateTime){
+                        core_views_statusBar_draw_time(true);
+                        #ifdef PARTIAL_DISPLAY_DRAWING
+                            driver_display_partial_loop();
+                        #endif
+                    }
+                }
+            #endif
         #endif
         #ifdef RTC_ENABLE
             core_time_driver_RTC_refresh();

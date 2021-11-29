@@ -20,7 +20,7 @@ cp sdk/apps/app_battery.ino         outputs/T-Wristband_LiLyGo/cubos/
 cp sdk/apps/app_ble_sync.ino        outputs/T-Wristband_LiLyGo/cubos/
 cp sdk/apps/app_i2c_scanner.ino     outputs/T-Wristband_LiLyGo/cubos/
 cp sdk/apps/app_settings.ino        outputs/T-Wristband_LiLyGo/cubos/
-cp sdk/apps/app_test.ino            outputs/T-Wristband_LiLyGo/cubos/
+#cp sdk/apps/app_test.ino            outputs/T-Wristband_LiLyGo/cubos/
 #cp sdk/apps/app_barometer.ino       outputs/T-Wristband_LiLyGo/cubos/
 cp sdk/apps/app_clock.ino           outputs/T-Wristband_LiLyGo/cubos/
 #cp sdk/apps/app_filemanager.ino     outputs/T-Wristband_LiLyGo/cubos/
