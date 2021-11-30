@@ -48,14 +48,14 @@ public class DBHelper extends SQLiteOpenHelper {
     }
 
     public void insert_day_pedometer_data(String date, int steps, int sleep_min){
-        if(steps!=0 && sleep_min!=0) {
+        if(steps!=0 || sleep_min!=0) {
             db.execSQL("DELETE FROM DaysData WHERE date_d = \"" + date + "\";");
             db.execSQL("INSERT INTO DaysData (date_d, steps, sleep_min) VALUES( \"" + date + "\", " + steps + ", " + sleep_min + ");");
         }
     }
 
     public void insert_hour_pedometer_data(String date, int steps, int sleep_min){
-        if(steps!=0 && sleep_min!=0) {
+        if(steps!=0 || sleep_min!=0) {
             db.execSQL("DELETE FROM HoursData WHERE date_d = \"" + date + "\";");
             db.execSQL("INSERT INTO HoursData (date_d, steps, sleep_min) VALUES( \"" + date + "\", " + steps + ", " + sleep_min + ");");
         }
