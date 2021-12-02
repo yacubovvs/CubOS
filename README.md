@@ -56,6 +56,7 @@ More builds at [outputs/](outputs/)
 - Lilygo T-Watch-2020 v2
 - Arduino Mega2560
 - Arduino ADK
+- Arduino DUE
 - ATmega128L
 - STM32F103
 - Esp8266
