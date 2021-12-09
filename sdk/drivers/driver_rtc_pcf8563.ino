@@ -88,7 +88,8 @@ unsigned char driver_RTC_getMonth(){
 }
 
 void driver_RTC_setMonth(unsigned char month){
-	month = month%12;
+	if(month==0) month++;
+	month = month%13;
 
 	driver_rtc_dateTime.month = month;
 	rtc.setDateTime(driver_rtc_dateTime);
