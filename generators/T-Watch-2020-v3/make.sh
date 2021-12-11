@@ -18,7 +18,7 @@ cat generators/T-Watch-2020-v3/T-Watch-2020-v3_apps.ino                 >> outpu
 cp sdk/apps/app_battery.ino         outputs/T-Watch-2020-v3/cubos/
 cp sdk/apps/app_i2c_scanner.ino     outputs/T-Watch-2020-v3/cubos/
 cp sdk/apps/app_settings.ino        outputs/T-Watch-2020-v3/cubos/
-cp sdk/apps/app_test.ino            outputs/T-Watch-2020-v3/cubos/
+#cp sdk/apps/app_test.ino            outputs/T-Watch-2020-v3/cubos/
 cp sdk/apps/app_clock.ino           outputs/T-Watch-2020-v3/cubos/
 cp sdk/apps/app_ble_sync.ino        outputs/T-Watch-2020-v3/cubos/
 #cp sdk/apps/app_touchTest.ino       outputs/T-Watch-2020-v3/cubos/

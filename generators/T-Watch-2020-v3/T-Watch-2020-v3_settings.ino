@@ -120,7 +120,7 @@
 
 #define pedometer_days_steps_IN_SEC                          1.68f
 
-#define DEBUG_SERIAL
+//#define DEBUG_SERIAL
 #define PEDOMETER_ENABLE_ON_START true
 //#define DEBUG_CORE_DISPLAY
 //#define CORE_TOUCH_DEBUG
