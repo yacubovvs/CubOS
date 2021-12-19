@@ -9,10 +9,21 @@
 
 // PREDEFINITION
 void core_views_statusBar_draw();
+void setup_touchScreenCore();
 void core_views_draw_active_page(bool draw, int y0, unsigned char pages_quantity, unsigned char position);
 #ifdef SOFTWARE_BUTTONS_ENABLE
   void core_views_softwareButtons_draw();
 #endif
+
+#ifdef SOFTWARE_KEYBOARD_ENABLE
+  void core_software_keyboard_show();
+#endif
+
+#ifdef RTC_ENABLE
+  void core_time_driver_RTC_refresh(bool hard);
+  void core_time_driver_RTC_refresh();
+#endif
+
 class Application;
 Application *getApp(unsigned char i);
 

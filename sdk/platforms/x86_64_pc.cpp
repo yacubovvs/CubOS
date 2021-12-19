@@ -109,7 +109,7 @@ void fillScreen(unsigned char red, unsigned char green, unsigned char blue);
 bool DRAW_LIMITS_getEnable();
 uint16_t get_uint16Color(unsigned char red, unsigned char green, unsigned char blue);
 void DRAW_LIMITS_setEnable(bool enabled);
-void core_views_statusBar_draw_time(bool draw);
+bool core_views_statusBar_draw_time(bool draw);
 bool core_views_draw_statusbar_battery(bool draw, unsigned char batteryCharge);
 void drawBatteryIcon(int x, int y, unsigned char charge, bool isCharging, bool draw);
 unsigned char core_time_getHours_byte();

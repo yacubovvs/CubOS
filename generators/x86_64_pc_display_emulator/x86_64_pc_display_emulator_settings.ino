@@ -46,7 +46,7 @@
 //#define toDefaultApp_onLeftLongPress
 
 #define STARTING_APP_NUMM   -1    // for Mainmenu (default app)
-#define STARTING_APP_NUMM   1
+//#define STARTING_APP_NUMM   1
 
 #undef CPU_SLEEP_ENABLE
 #undef POWERSAVE_ENABLE
@@ -90,7 +90,7 @@
 //#undef NARROW_SCREEN 
 //#undef USE_NUMBERS_MAIN_MENU_IN_ACTIVE_PAGES
 
-//#define SOFTWARE_KEYBOARD_ENABLE
+#define SOFTWARE_KEYBOARD_ENABLE
 #define PEDOMETER_ENABLE_ON_START true
 #define USE_XL_MENU_IMAGES
 //#define FRAMEBUFFER_ENABLE
