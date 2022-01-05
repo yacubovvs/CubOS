@@ -33,6 +33,23 @@ void appNameClass::onCreate(){
     DRAW_LIMITS_setEnable(STYLE_STATUSBAR_HEIGHT, -1, -1, -1);
 
     setDrawColor(255,255,255);
+
+
+    
+    long timer = millis();
+    for(byte i=0; i<10; i++){
+        fillScreen(0, 0, 0);
+        core_display_loop();
+        fillScreen(255, 255, 255);
+        core_display_loop();
+    }
+
+    timer = millis() - timer;
+
+    setDrawColor(0,0,0);
+    drawString(String(timer), 5, STYLE_STATUSBAR_HEIGHT + 10, 2);
+    
+
     //drawString(appName, 5, STYLE_STATUSBAR_HEIGHT + 10, 1);
 
 /*
@@ -237,8 +254,8 @@ void appNameClass::onCreate(){
     set_pedometer_days_sleep(6, 8*60-45);
     */
 
-    drawString("Pedometer", 5, STYLE_STATUSBAR_HEIGHT + 10, 1);
-    drawString("data setted", 5, STYLE_STATUSBAR_HEIGHT + 10*2, 1);
+    //drawString("Pedometer", 5, STYLE_STATUSBAR_HEIGHT + 10, 1);
+    //drawString("data setted", 5, STYLE_STATUSBAR_HEIGHT + 10*2, 1);
 
     //startApp(-1);
     /* * /

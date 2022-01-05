@@ -37,7 +37,7 @@
 #define TOUCH_SCREEN_ENABLE
 
 #define COLOR_SCREEN                     // Screen is colored                     
-//#define USE_PRIMITIVE_HARDWARE_DRAW_ACCELERATION
+#define USE_PRIMITIVE_HARDWARE_DRAW_ACCELERATION
 
 //#define toDefaultApp_onLeftLongPress
 
@@ -120,7 +120,7 @@
 
 #define pedometer_days_steps_IN_SEC                          1.68f
 
-//#define DEBUG_SERIAL
+#define DEBUG_SERIAL
 #define PEDOMETER_ENABLE_ON_START true
 //#define DEBUG_CORE_DISPLAY
 //#define CORE_TOUCH_DEBUG

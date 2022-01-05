@@ -246,6 +246,14 @@ void core_driver_fillScreen(uint16_t fillColor){
     ttgo->tft->fillScreen(fillColor);
 }
 
+void core_driver_ttgo_drawFastVLine(uint16_t x, uint16_t y, uint16_t length, uint16_t color){
+    ttgo->tft->drawFastVLine(x, y, length, color);
+}
+
+void core_driver_ttgo_drawFastHLine(uint16_t x, uint16_t y, uint16_t length, uint16_t color){
+    ttgo->tft->drawFastHLine(x, y, length, color);
+}
+
 void core_driver_drawPixel(int x, int y, uint16_t color){
     ttgo->tft->drawPixel(x, y, color);
 }

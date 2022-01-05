@@ -35,11 +35,24 @@ long getCurrentSystemTime(){
     
     unsigned long driver_RTC_lastTimeRefresh = 0;
     
+    void core_time_settings_lastDay_currentDate(){
+        //debug("& & & & & & & Setting current last day: " + String(core_time_getDate()));
+        lastDay = core_time_getDate();
+        core_time_driver_RTC_refresh(true);
+    }
+    
     void core_time_driver_RTC_refresh(bool hard){
         if(hard || (millis() - driver_RTC_lastTimeRefresh>=UPDATE_RTC_EVERY)){
             driver_RTC_refresh(hard);
+            
             if(core_time_getDate()!=lastDay){
-                core_time_onNewDate();
+                //debug("!!!!!!!!!!!!!!! CURRENT DATE: " + String(core_time_getDate()));
+                //debug("!!!!!!!!!!!!!!! lastDay: " + String(lastDay));
+
+                if(abs(lastDay - core_time_getDate())==1){
+                    core_time_onNewDate();
+                }
+                
                 lastDay = core_time_getDate();
             }
 

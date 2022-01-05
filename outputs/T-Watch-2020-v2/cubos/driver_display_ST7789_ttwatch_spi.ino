@@ -1,19 +1,12 @@
-#define LILYGO_WATCH_2020_V3 
-#include <LilyGoWatch.h>
-
-TTGOClass *ttgo;
 
 uint16_t current_drawColor;
+unsigned char driver_display_screenBrightness = 100;
 
-uint16_t get_uint16Color(unsigned char red, unsigned char green, unsigned char blue){
-  return ((red*31/255) <<11)|( (green*31/255) <<6)|( (blue*31/255) <<0);
-}
-
-void setDrawColor(unsigned char red, unsigned char green, unsigned char blue){
+void driver_display_setDrawColor(unsigned char red, unsigned char green, unsigned char blue){
   current_drawColor = get_uint16Color(red, green, blue);
 }
 
-void setDrawColor(uint16_t color){
+void driver_display_setDrawColor(uint16_t color){
   current_drawColor = color;
 }
 
@@ -22,10 +15,7 @@ uint16_t getDrawColor(){
 }
 
 void driver_display_setup(){
-    ttgo = TTGOClass::getWatch();
-    ttgo->begin();
-    ttgo->openBL();
-    //ttgo->tft->fillScreen(BLACK);
+  core_driver_openBL();
 }
 
 void sleep_displayDriver(){}
@@ -34,31 +24,35 @@ void powerOff_displayDriver(){}
 void powerOn_displayDriver(){}
 void driver_display_loop(){}
 
-void fillScreen(unsigned char red, unsigned char green, unsigned char blue){
-  ttgo->tft->fillScreen(get_uint16Color(red, green, blue));
-}
-
-void setPixel(int x, int y){
-  #if defined(SCREEN_ROTATION_90)
-    ttgo->tft->drawPixel(SCREEN_WIDTH-x, SCREEN_HEIGHT-y, current_drawColor);
-  #elif defined(SCREEN_ROTATION_180)
-    ttgo->tft->drawPixel(SCREEN_WIDTH-x, SCREEN_HEIGHT-y, current_drawColor);
-  #elif defined(SCREEN_ROTATION_270)
-    ttgo->tft->drawPixel(SCREEN_WIDTH-x, SCREEN_HEIGHT-y, current_drawColor);
-  #else
-    ttgo->tft->drawPixel(x, y, current_drawColor);
+void deriver_displayfillScreen(unsigned char red, unsigned char green, unsigned char blue){
+  uint16_t fillColor = get_uint16Color(red, green, blue);
+  core_driver_fillScreen(fillColor);
+  #ifdef FRAMEBUFFER_ENABLE
+    FRAMEBUFFER_fill(fillColor);
   #endif
 }
 
-void setPixel(int x, int y, uint16_t color){
+void display_driver_setPixel(int x, int y){
   #if defined(SCREEN_ROTATION_90)
-    ttgo->tft->drawPixel(SCREEN_WIDTH-x, SCREEN_HEIGHT-y, color);
+    core_driver_drawPixel(SCREEN_WIDTH-x, SCREEN_HEIGHT-y, current_drawColor);
   #elif defined(SCREEN_ROTATION_180)
-    ttgo->tft->drawPixel(SCREEN_WIDTH-x, SCREEN_HEIGHT-y, color);
+    core_driver_drawPixel(SCREEN_WIDTH-x, SCREEN_HEIGHT-y, current_drawColor);
   #elif defined(SCREEN_ROTATION_270)
-    ttgo->tft->drawPixel(SCREEN_WIDTH-x, SCREEN_HEIGHT-y, color);
+    core_driver_drawPixel(SCREEN_WIDTH-x, SCREEN_HEIGHT-y, current_drawColor);
   #else
-    ttgo->tft->drawPixel(x, y, color);
+    core_driver_drawPixel(x, y, current_drawColor);
+  #endif
+}
+
+void display_driver_setPixel(int x, int y, uint16_t color){
+  #if defined(SCREEN_ROTATION_90)
+    core_driver_drawPixel(SCREEN_WIDTH-x, SCREEN_HEIGHT-y, color);
+  #elif defined(SCREEN_ROTATION_180)
+    core_driver_drawPixel(SCREEN_WIDTH-x, SCREEN_HEIGHT-y, color);
+  #elif defined(SCREEN_ROTATION_270)
+    core_driver_drawPixel(SCREEN_WIDTH-x, SCREEN_HEIGHT-y, color);
+  #else
+    core_driver_drawPixel(x, y, color);
   #endif
 }
 
@@ -101,3 +95,28 @@ void setPixel(int x, int y, uint16_t color){
   }
 
 #endif
+
+
+unsigned char driver_display_getBrightness(){
+  return driver_display_screenBrightness;
+}
+
+void driver_display_setBrightness(unsigned int brightness){
+  #ifdef DEBUG_BACKLIGHT
+      debug("DEBUG_BACKLIGHT: Setting backlight to " + String(brightness));
+  #endif
+
+  #ifdef DISPLAY_BACKLIGHT_CONTROL_ENABLE  
+    driver_display_screenBrightness = brightness;
+    #ifdef DEBUG_BACKLIGHT
+        //debug("DEBUG_BACKLIGHT: Backlight convert to " + String(driver_display_screenBrightness), 20);
+    #endif
+    core_driver_setBrigtness((unsigned char)(((int)driver_display_screenBrightness)*255/100));
+  #else
+    if(brightness==0) core_driver_setBrigtness(0);
+    else core_driver_setBrigtness(255);
+    
+
+    //core_driver_setBrigtness(128);
+  #endif
+}

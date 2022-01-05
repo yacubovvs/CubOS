@@ -67,6 +67,7 @@ void display_driver_setPixel(int x, int y, uint16_t color){
       //tft.drawFastVLine(SCREEN_WIDTH-x, SCREEN_HEIGHT-y, h+1, current_drawColor);
     #else
       //tft.drawFastVLine(x, y, h+1, current_drawColor);
+      core_driver_ttgo_drawFastVLine(x, y, h+1, current_drawColor);
     #endif
   }
 
@@ -79,6 +80,7 @@ void display_driver_setPixel(int x, int y, uint16_t color){
       //tft.drawFastHLine(SCREEN_WIDTH-x, SCREEN_HEIGHT-y, h+1, current_drawColor);
     #else
       //tft.drawFastHLine(x, y, h+1, current_drawColor);
+      core_driver_ttgo_drawFastHLine(x, y, h+1, current_drawColor);
     #endif
   }
 

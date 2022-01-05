@@ -278,7 +278,7 @@
 #define TOUCH_SCREEN_ENABLE
 
 #define COLOR_SCREEN                     // Screen is colored                     
-//#define USE_PRIMITIVE_HARDWARE_DRAW_ACCELERATION
+#define USE_PRIMITIVE_HARDWARE_DRAW_ACCELERATION
 
 //#define toDefaultApp_onLeftLongPress
 
@@ -392,10 +392,21 @@
 
 // PREDEFINITION
 void core_views_statusBar_draw();
+void setup_touchScreenCore();
 void core_views_draw_active_page(bool draw, int y0, unsigned char pages_quantity, unsigned char position);
 #ifdef SOFTWARE_BUTTONS_ENABLE
   void core_views_softwareButtons_draw();
 #endif
+
+#ifdef SOFTWARE_KEYBOARD_ENABLE
+  void core_software_keyboard_show();
+#endif
+
+#ifdef RTC_ENABLE
+  void core_time_driver_RTC_refresh(bool hard);
+  void core_time_driver_RTC_refresh();
+#endif
+
 class Application;
 Application *getApp(unsigned char i);
 
@@ -521,7 +532,7 @@ void setup(){
         }else{
           #ifdef DEBUG_WAKEUP
             //delay(1000);
-            debug("DEBUG_WAKEUP: Not background start. Reason: " + String(wakeUpReason), 10);
+            debug("DEBUG_WAKEUP: Not background start 1. Reason: " + String(wakeUpReason), 10);
           #endif
         }
       #endif
@@ -529,7 +540,7 @@ void setup(){
   #else
     #ifdef DEBUG_WAKEUP
       //delay(1000);
-      debug("DEBUG_WAKEUP: Not background start. Reason: " + String(wakeUpReason), 10);
+      debug("DEBUG_WAKEUP: Not background start 2. Reason: " + String(wakeUpReason), 10);
     #endif
   #endif
   //debug("**** Main app start", 10);

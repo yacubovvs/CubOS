@@ -300,8 +300,8 @@
                         /* */
                         //for 8 colors
                         
-                        var kr = 64;
-                        var kg = 64;
+                        var kr = 128;
+                        var kg = 128;
                         var kb = 64;
                         var redPx = Math.floor(redPx/kr + 0)*kr;
                         var greenPx = Math.floor(greenPx/kg + 0)*kg;
@@ -318,7 +318,7 @@
                         bluePx = redPx;
                         /* */
 
-                        /* * /
+                        /* */
                         // For Blue
                         redPx = (redPx + greenPx)/2;
                         greenPx = redPx;
@@ -331,7 +331,8 @@
                         }
 
                         // Background to transparent
-                        if(redPx== 255 && greenPx == 255 && bluePx == 255){
+                        //if(redPx== 255 && greenPx == 255 && bluePx == 255){
+                        if(redPx== 0 && greenPx == 0 && bluePx == 0){
                             position++;
                             continue;
                         }
@@ -339,7 +340,7 @@
                         
                         
                         // For grayScale
-                        /* */
+                        /* * /
                         var k = 2;
                         var gray_px = (redPx + greenPx + bluePx + 3)/3;
                         gray_px = Math.floor(gray_px/k - 1)*k;
