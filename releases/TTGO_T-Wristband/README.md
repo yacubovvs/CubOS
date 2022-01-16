@@ -1,6 +1,6 @@
 # Release CubOS for TTGO Wristband 2021-11-29
 
-<img alt="CubOS onM5StickC view" src="images\image_photo.png" max-width="600">
+<img alt="CubOS onM5StickC view" src="images\image_photo.png" max-width="400">
 
 ## Features
 * RTC
@@ -15,7 +15,7 @@
 ## Android APP
 Android apk file: https://github.com/yacubovvs/CubOS/tree/main/tools/CubOSBLEApp/releases <br>
 Android app source: https://github.com/yacubovvs/CubOS/tree/main/tools/CubOSBLEApp
-<img alt="CubOS android app screenshot" src="images\screenshots\android_app_screenshot.png" max-width="450">
+<img alt="CubOS android app screenshot" src="images\screenshots\android_app_screenshot.png" max-width="600">
 
 ## Controls
 <img alt="CubOS onM5StickC view" src="images\ttgo_wristband_scheme.png" width="250">
