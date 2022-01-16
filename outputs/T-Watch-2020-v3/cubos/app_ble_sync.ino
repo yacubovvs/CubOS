@@ -119,7 +119,11 @@ void appNameClass::drawSyncIconAnimation(bool draw, bool onlyBgDraw){
             0xFE,0x7F,0xF3,0xFE,0x3F,0xF7,0xFC,0x3F,0xFF,0xFC,0x1F,0xFF,0xF8,0x07,0xFF,0xE0,0x00,0xFF,0x00,
         };
 
-        drawImage(draw, sync_process_icon, SCREEN_WIDTH/2 - 12, STYLE_STATUSBAR_HEIGHT + 38);
+        #ifdef DIVICE_LILYGO_T_WRISTBAND
+            drawImage(draw, sync_process_icon, SCREEN_WIDTH/2 - 12, STYLE_STATUSBAR_HEIGHT + 38);
+        #else
+            drawImage(draw, sync_process_icon, SCREEN_WIDTH/2 - 12, SCREEN_HEIGHT/2 - 8);
+        #endif
     }else{
         const unsigned char sync_process_icon[] PROGMEM = {
             0x02,0x01,0x02,0x18,0x02,0x18,0x04,0x00,0x66,0xff,0x00,0xFF,0x00,0x07,0xFF,0xE0,0x1F,0xFF,0xF8,0x3F,0xFF,
@@ -132,7 +136,13 @@ void appNameClass::drawSyncIconAnimation(bool draw, bool onlyBgDraw){
             0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,
         };
 
-        drawImage(draw, sync_process_icon, SCREEN_WIDTH/2 - 12, STYLE_STATUSBAR_HEIGHT + 38);
+        
+
+        #ifdef DIVICE_LILYGO_T_WRISTBAND
+            drawImage(draw, sync_process_icon, SCREEN_WIDTH/2 - 12, STYLE_STATUSBAR_HEIGHT + 38);
+        #else
+            drawImage(draw, sync_process_icon, SCREEN_WIDTH/2 - 12, SCREEN_HEIGHT/2 - 8);
+        #endif
     }
     
 }
@@ -250,9 +260,11 @@ void appNameClass::drawActivity(bool draw, byte activity){
             if(draw){
                 setDrawColor_ContrastColor();
                 drawString_centered("Syncing", SCREEN_WIDTH/2, STYLE_STATUSBAR_HEIGHT + 10*2, FONT_SIZE_DEFAULT);
+                this->drawSyncIconAnimation(draw, false);
             }else{
                 setDrawColor_BackGroundColor();
                 clearString_centered("Syncing", SCREEN_WIDTH/2, STYLE_STATUSBAR_HEIGHT + 10*2, FONT_SIZE_DEFAULT);
+                this->drawSyncIconAnimation(draw, false);
             }
         #endif 
         
@@ -280,8 +292,19 @@ void appNameClass::drawActivity(bool draw, byte activity){
             if(draw){
                 setDrawColor_ContrastColor();
                 drawString_centered("Success", SCREEN_WIDTH/2, STYLE_STATUSBAR_HEIGHT + 15, FONT_SIZE_DEFAULT);
+
+                setDrawColor(0,0x90,0);
+                drawCircle(SCREEN_WIDTH/2, SCREEN_HEIGHT/2, 15, true);
+
+                const unsigned char sync_success_icon[] PROGMEM = {
+                    0x02,0x01,0x02,0x10,0x02,0x10,0x04,0xff,0xff,0xff,0x00,0x01,0x00,0x07,0x00,0x0E,0x00,0x1C,0x00,0x38,0x00,0x70,0x00,0xE0,0x81,0xE0,0xE3,0xC0,0x73,0xC0,0x3F,0x80,0x1F,0x80,0x1F,0x00,0x0F,0x00,0x06,0x00,0x06,0x00,
+                };
+
+                drawImage(draw, sync_success_icon, SCREEN_WIDTH/2 - 8, SCREEN_HEIGHT/2 - 8);
+                setDrawColor_ContrastColor();
             }else{
                 setDrawColor_BackGroundColor();
+                drawCircle(SCREEN_WIDTH/2, 70, 15, true);
                 clearString_centered("Success", SCREEN_WIDTH/2, STYLE_STATUSBAR_HEIGHT + 15, FONT_SIZE_DEFAULT);
             }
         #endif 
@@ -310,8 +333,18 @@ void appNameClass::drawActivity(bool draw, byte activity){
             if(draw){
                 setDrawColor_ContrastColor();
                 drawString_centered("Failed", SCREEN_WIDTH/2, STYLE_STATUSBAR_HEIGHT + 15, FONT_SIZE_DEFAULT);
+                setDrawColor(0x90,0,0);
+                drawCircle(SCREEN_WIDTH/2, SCREEN_HEIGHT/2, 15, true);
+
+                const unsigned char sync_failed_icon[] PROGMEM = {
+                    0x02,0x01,0x02,0x10,0x02,0x10,0x04,0xff,0xff,0xff,0x00,0x00,0x20,0x04,0x70,0x0E,0x38,0x1C,0x1C,0x38,0x0E,0x70,0x07,0xE0,0x03,0xC0,0x03,0xC0,0x07,0xE0,0x0E,0x70,0x1C,0x38,0x38,0x1C,0x70,0x0E,0x20,0x04,0x00,0x00,
+                };
+
+                drawImage(draw, sync_failed_icon, SCREEN_WIDTH/2 - 8, SCREEN_HEIGHT/2 - 8);
+                setDrawColor_ContrastColor();
             }else{
                 setDrawColor_BackGroundColor();
+                drawCircle(SCREEN_WIDTH/2, SCREEN_HEIGHT/2, 15, true);
                 clearString_centered("Failed", SCREEN_WIDTH/2, STYLE_STATUSBAR_HEIGHT + 15, FONT_SIZE_DEFAULT);
             }
         #endif 
@@ -331,7 +364,12 @@ void appNameClass::onCreate(){
     setBackgroundColor(0,0,0);
     setContrastColor(255, 255, 255);
 
-    this->checkCharging();
+    #ifdef SYNC_WITHOUT_CHARGE
+        this->drawActivity(ACTIVITY_SYNCING);
+        core_ble_sync_start();
+    #else
+        this->checkCharging();
+    #endif
 }
 
 void appNameClass::onLoop(){

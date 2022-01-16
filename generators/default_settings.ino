@@ -56,6 +56,7 @@
 #define SYNC_VARIANTS_GET_MISSED_CALLS                          0b0000001000000000
 #define SYNC_VARIANTS_GET_DATA_HASH                             0b0000010000000000
 
+#define SYNC_WITHOUT_CHARGE
 /*
 ############################################################################
 #                                 EVENTS +                                 #
@@ -77,12 +78,6 @@
 #define EVENT_ON_TOUCH_LONG_PRESS           0x0C
 #define EVENT_ON_TOUCH_DRAG                 0x0D
 #define EVENT_ON_TOUCH_DOUBLE_PRESS         0x0E
-/*
-#define EVENT_ON_TOUCH_SWIPE_FROM_LEFT      0x0F
-#define EVENT_ON_TOUCH_SWIPE_FROM_RIGHT     0x10
-#define EVENT_ON_TOUCH_SWIPE_FROM_TOP       0x11
-#define EVENT_ON_TOUCH_SWIPE_FROM_BOTTOM    0x12
-*/
 
 #define EVENT_ON_TIME_CHANGED               0x06
 #define EVENT_ON_MINUTE_CHANGED             0x13
@@ -95,7 +90,7 @@
 #define EVENT_ON_TOUCH_QUICK_SWIPE_TO_LEFT      0x16
 #define EVENT_ON_TOUCH_QUICK_SWIPE_TO_RIGHT     0x17
 #define EVENT_ON_TOUCH_QUICK_SWIPE_TO_TOP       0x18
-#define EVENT_ON_TOUCH_QUICK_SWIPE_TO_BOTTOM      0x19
+#define EVENT_ON_TOUCH_QUICK_SWIPE_TO_BOTTOM    0x19
 
 // WAKEUP REASONS
 #define WAKE_UP_REASON_EXTERNAL_RTC_IO      0x01
