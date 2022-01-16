@@ -1,6 +1,6 @@
 # Release CubOS for TTGO Wristband 2021-11-29
 
-<img alt="CubOS onM5StickC view" src="images\image_photo.png" height="600">
+<img alt="CubOS onM5StickC view" src="images\image_photo.png" max-width="600">
 
 ## Features
 * RTC
