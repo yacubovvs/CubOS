@@ -1,6 +1,10 @@
 #define appNameClass    PedometerAppTest         // App name without spaces
 #define appName         "Pedometer"              // App name with spaces 
 
+#ifndef PEDOMETER_APP_TEST_FONT_SIZE
+    #define PEDOMETER_APP_TEST_FONT_SIZE FONT_SIZE_DEFAULT
+#endif
+
 class appNameClass: public Application{
     public:
         virtual void onLoop() override;
@@ -65,10 +69,6 @@ void appNameClass::drawStringOnScreen(bool draw, String stringToPrint){
 
     if(draw) setDrawColor_ContrastColor();
     else setDrawColor_BackGroundColor();
-
-    #ifndef PEDOMETER_APP_TEST_FONT_SIZE
-        PEDOMETER_APP_TEST_FONT_SIZE FONT_SIZE_DEFAULT
-    #endif
 
     #ifdef ROUND_SCREEN
         drawString_centered(stringToPrint, SCREEN_WIDTH/2, STYLE_STATUSBAR_HEIGHT + currentPrintScreenString*10*PEDOMETER_APP_TEST_FONT_SIZE + 10, PEDOMETER_APP_TEST_FONT_SIZE);
@@ -143,20 +143,23 @@ void appNameClass::onLoop(){
                 drawStringOnScreen(true, "Accerometer total: " + accel_total_app_pedometr_test);
             }else currentPrintScreenString ++;
             
-            drawStringOnScreen(true, " ");
-            if(this->delta_app_pedometr_test != String(get_analysis_delta_value())){
-                drawStringOnScreen(false, "Delta: " + delta_app_pedometr_test);
-                this->delta_app_pedometr_test = String(get_analysis_delta_value());
-                drawStringOnScreen(true, "Delta: " + delta_app_pedometr_test);
-            }else currentPrintScreenString ++;
+            #ifdef DEBUG_PEDOMETER
+                drawStringOnScreen(true, " ");
+                if(this->delta_app_pedometr_test != String(get_analysis_delta_value())){
+                    drawStringOnScreen(false, "Delta: " + delta_app_pedometr_test);
+                    this->delta_app_pedometr_test = String(get_analysis_delta_value());
+                    drawStringOnScreen(true, "Delta: " + delta_app_pedometr_test);
+                }else currentPrintScreenString ++;
             
-            drawStringOnScreen(true, "Central weight: ");
-            if(this->central_weight_app_pedometr_test != String(get_analysis_central_weight_value())){
-                drawStringOnScreen(false, central_weight_app_pedometr_test);
-                this->central_weight_app_pedometr_test = String(get_analysis_central_weight_value());
-                drawStringOnScreen(true, central_weight_app_pedometr_test);
-            }else currentPrintScreenString ++;
             
+                drawStringOnScreen(true, "Central weight: ");
+                if(this->central_weight_app_pedometr_test != String(get_analysis_central_weight_value())){
+                    drawStringOnScreen(false, central_weight_app_pedometr_test);
+                    this->central_weight_app_pedometr_test = String(get_analysis_central_weight_value());
+                    drawStringOnScreen(true, central_weight_app_pedometr_test);
+                }else currentPrintScreenString ++;
+
+            #endif
             drawStringOnScreen(true, "");
             drawStringOnScreen(true, "Mesure delay: ");
             if(this->mesure_delay_app_pedometr_test != String(get_corePedometer_currentsleep_between_mesures())){

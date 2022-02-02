@@ -25,6 +25,40 @@
 
 /*
 ############################################################################
+#                                SYNC STATUS                               #
+############################################################################
+*/
+
+#define SYNC_STATUS_NOT_STARTED                     0x01
+#define SYNC_STATUS_CONNECTING                      0x02
+#define SYNC_STATUS_IN_PROGRESS                     0x03
+#define SYNC_STATUS_FINISHED                        0x04
+#define SYNC_STATUS_ERROR_SERVER_NOT_FOUND          0x05
+#define SYNC_STATUS_ERROR_DIFFERENT_API_VERSIONS    0x06
+#define SYNC_STATUS_ERROR_EXCHANGE_FAILED           0x07
+#define SYNC_STATUS_ERROR_UNKNOWN                   0x08
+
+/*
+############################################################################
+#                               SYNC VARIANTS                              #
+############################################################################
+*/
+
+#define SYNC_VARIANTS_GET_API_VERSION                           0b0000000000000001
+#define SYNC_VARIANTS_GET_SETTINGS                              0b0000000000000010
+#define SYNC_VARIANTS_GET_CURRENT_TIME                          0b0000000000000100
+#define SYNC_VARIANTS_GET_PEDOMETER_DAY_STEPS_SLEEP_LIMITS      0b0000000000001000
+#define SYNC_VARIANTS_SET_PEDOMETER_CURRENT_DAY_STEPS_SLEEP     0b0000000000010000
+#define SYNC_VARIANTS_SET_PEDOMETER_DAY_DATA_PER_HOUR           0b0000000000100000
+#define SYNC_VARIANTS_SET_PEDOMETER_WEEK_DATA_PER_DAY           0b0000000001000000
+#define SYNC_VARIANTS_GET_NOTIFICATIONS                         0b0000000010000000
+#define SYNC_VARIANTS_GET_CURRENT_CALL                          0b0000000100000000
+#define SYNC_VARIANTS_GET_MISSED_CALLS                          0b0000001000000000
+#define SYNC_VARIANTS_GET_DATA_HASH                             0b0000010000000000
+
+#define SYNC_WITHOUT_CHARGE
+/*
+############################################################################
 #                                 EVENTS +                                 #
 ############################################################################
 */
@@ -44,22 +78,19 @@
 #define EVENT_ON_TOUCH_LONG_PRESS           0x0C
 #define EVENT_ON_TOUCH_DRAG                 0x0D
 #define EVENT_ON_TOUCH_DOUBLE_PRESS         0x0E
-/*
-#define EVENT_ON_TOUCH_SWIPE_FROM_LEFT      0x0F
-#define EVENT_ON_TOUCH_SWIPE_FROM_RIGHT     0x10
-#define EVENT_ON_TOUCH_SWIPE_FROM_TOP       0x11
-#define EVENT_ON_TOUCH_SWIPE_FROM_BOTTOM    0x12
-*/
 
 #define EVENT_ON_TIME_CHANGED               0x06
 #define EVENT_ON_MINUTE_CHANGED             0x13
 #define EVENT_ON_HOUR_CHANGED               0x14
 #define EVENT_ON_DATE_CHANGED               0x15
 
+#define EVENT_ON_BATTERY_VALUE_CHANGE       0x1A
+#define EVENT_ON_BATTERY_CHARGING_CHANGE    0x1B
+
 #define EVENT_ON_TOUCH_QUICK_SWIPE_TO_LEFT      0x16
 #define EVENT_ON_TOUCH_QUICK_SWIPE_TO_RIGHT     0x17
 #define EVENT_ON_TOUCH_QUICK_SWIPE_TO_TOP       0x18
-#define EVENT_ON_TOUCH_QUICK_SWIPE_TO_BOTTOM      0x19
+#define EVENT_ON_TOUCH_QUICK_SWIPE_TO_BOTTOM    0x19
 
 // WAKEUP REASONS
 #define WAKE_UP_REASON_EXTERNAL_RTC_IO      0x01
@@ -190,10 +221,11 @@
 #define COREPEDOMETER_DELTA_SLEEP_VALUE_MIN_100     3 // acceletometer sensitivity/100*G for sleep detection
 #define COREPEDOMETER_CENTRALWIGHT_SLEEP_VALUE_MIN      0.05f
 
-#define APP_CLOCK_POWER_AFTER_SECONDS           4
+#define APP_CLOCK_POWER_AFTER_SECONDS_DEFAULT           4
 
 #define PEDOMETER_DO_NOT_USER_PEDOMETER_WHILE_CONNECTED_TO_USB
 //#define USE_NUMBERS_MAIN_MENU_IN_ACTIVE_PAGES
+
 /*
     ############################################################################################
     #                                                                                          #
@@ -314,7 +346,7 @@
 #define COREPEDOMETER_CENTRALWIGHT_SLEEP_VALUE_MIN      0.05f
 #define COREPEDOMETER_DELTA_SLEEP_VALUE_MIN_100         3 // acceletometer sensitivity/100*G for sleep detection
 
-#define APP_CLOCK_POWER_AFTER_SECONDS           5
+#define APP_CLOCK_POWER_AFTER_SECONDS_DEFAULT           5
 
 
 #define PEDOMETER_APP_TEST_FONT_SIZE 1
@@ -352,9 +384,21 @@
 
 // PREDEFINITION
 void core_views_statusBar_draw();
+void setup_touchScreenCore();
+void core_views_draw_active_page(bool draw, int y0, unsigned char pages_quantity, unsigned char position);
 #ifdef SOFTWARE_BUTTONS_ENABLE
   void core_views_softwareButtons_draw();
 #endif
+
+#ifdef SOFTWARE_KEYBOARD_ENABLE
+  void core_software_keyboard_show();
+#endif
+
+#ifdef RTC_ENABLE
+  void core_time_driver_RTC_refresh(bool hard);
+  void core_time_driver_RTC_refresh();
+#endif
+
 class Application;
 Application *getApp(unsigned char i);
 
@@ -408,6 +452,11 @@ Application* currentApp;
     ############################################################################################
 */
 
+#ifdef POWERSAVE_ENABLE
+  unsigned char wakeUpReason = 0x00;
+  unsigned char getWakeUpReason(){return wakeUpReason;}
+#endif
+
 void setup(){   
 
   #ifdef CORE_SETUP_INIT
@@ -418,14 +467,13 @@ void setup(){
     #ifndef DO_NOT_INIT_SERIAL
       DEBUG_SERIAL_PORT.begin(115200);
     #endif
-    delay(500);
     debug("\n\nSerial debug started " + String(millis()));
   #endif
 
   #ifdef RUN_BACKGROUND_AFTER_RESTART_MCU
     #ifdef POWERSAVE_ENABLE
       #ifdef CPU_SLEEP_ENABLE
-        unsigned char wakeUpReason = core_powersave_wakeup_reason();
+        wakeUpReason = core_powersave_wakeup_reason();
         if(wakeUpReason==WAKE_UP_REASON_TIMER){
           #ifdef DEBUG_WAKEUP
             debug("DEBUG_WAKEUP: Background start " + String(millis()));
@@ -475,14 +523,16 @@ void setup(){
           #endif
         }else{
           #ifdef DEBUG_WAKEUP
-            debug("DEBUG_WAKEUP: Not background start", 10);
+            //delay(1000);
+            debug("DEBUG_WAKEUP: Not background start 1. Reason: " + String(wakeUpReason), 10);
           #endif
         }
       #endif
     #endif
   #else
     #ifdef DEBUG_WAKEUP
-      debug("DEBUG_WAKEUP: Not background start", 10);
+      //delay(1000);
+      debug("DEBUG_WAKEUP: Not background start 2. Reason: " + String(wakeUpReason), 10);
     #endif
   #endif
   //debug("**** Main app start", 10);
@@ -539,7 +589,14 @@ void setup(){
   #ifdef TOUCH_SCREEN_ENABLE
     setup_touchScreenCore();
   #endif
+
+  #ifdef BLE_ENABLED
+    //core_ble_sync_setup(); // Will be setted up only if needed
+  #endif
   
+  #ifdef ON_SETUP_FINISHED_CUSTOM_FUNCTION_CALL
+    ON_SETUP_FINISHED_CUSTOM_FUNCTION_CALL
+  #endif
 }
 
 bool isInSleep = false;
@@ -593,6 +650,10 @@ void loop(){
 
   #ifndef RUN_BACKGROUND_AFTER_RESTART_MCU
     core_pedometer_loop(false);
+  #endif
+
+  #ifdef BLE_ENABLED
+    //core_ble_sync_loop();
   #endif
 
 }

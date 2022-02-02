@@ -297,6 +297,12 @@ void core_views_statusBar_draw(){
 
         setBackgroundColor(STYLE_STATUSBAR_BACKGROUND_RED, STYLE_STATUSBAR_BACKGROUND_GREEN, STYLE_STATUSBAR_BACKGROUND_BLUE);
         if(draw){
+
+            if(currentApp!=nullptr){
+                if(batteryCharge_last!=batteryCharge) currentApp->onEvent(EVENT_ON_BATTERY_VALUE_CHANGE, batteryCharge, batteryCharge_last, 0, 0, 0);
+                if(batteryCharge_last_wasCharging!=driver_battery_isCharging()) currentApp->onEvent(EVENT_ON_BATTERY_CHARGING_CHANGE, driver_battery_isCharging(), batteryCharge_last_wasCharging, 0, 0, 0);
+            }
+
             batteryCharge_last = batteryCharge;
             batteryCharge_last_wasCharging = driver_battery_isCharging();
         }

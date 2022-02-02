@@ -2,10 +2,6 @@
 #define appNameClass    ClockApp          // App name without spaces
 #define appName         "Clock"              // App name with spaces 
 
-#ifndef APP_CLOCK_POWER_AFTER_SECONDS
-    #define APP_CLOCK_POWER_AFTER_SECONDS 0 
-#endif
-
 #define APP_CLOCK_BIG_SCREEN_CIRCLE_RING_OFFSET 20
 #define APP_CLOCK_CIRCLE_COLOR 48
 #define APP_CLOCK_BIG_SCREEN_FADE_SIZE 23 // temporary not used
@@ -80,7 +76,9 @@ class appNameClass: public Application{
             //#ifdef PEDOMETER_EMULATOR
             //    int grad_i = 260;
             //#else
-            int grad_i = (long)360 * (long)get_pedometer_days_steps() / (long)get_pedometer_days_steps_min_limit();
+            int grad_i;
+            if(get_pedometer_days_steps_min_limit()!=0) grad_i = (long)360 * (long)get_pedometer_days_steps() / (long)get_pedometer_days_steps_min_limit();
+            else grad_i = 0;
             //#endif
 
             if(grad_i>360) grad_i = 360;
@@ -98,6 +96,7 @@ class appNameClass: public Application{
 #endif
 
 void appNameClass::onCreate(){
+
     DRAW_LIMITS_setEnable(true);
     DRAW_LIMIT_reset();
     
@@ -133,7 +132,7 @@ void appNameClass::onCreate(){
         this->drawStepsCircle(true);
     #endif
 
-    this->sleep_device_after = APP_CLOCK_POWER_AFTER_SECONDS;
+    this->sleep_device_after = get_core_display_time_delay_to_poweroff_clock_app();
 
 }
 
@@ -235,7 +234,9 @@ void appNameClass::draw_current_time(bool draw){
         else seconds_draw = 1;
         
         this->last_seconds = core_time_getSeconds_byte();
-        for(char i_predrawSeconds=0; i_predrawSeconds<seconds_draw; i_predrawSeconds++) this->drawSecondsCircle(draw, this->last_seconds-i_predrawSeconds);
+        for(char i_predrawSeconds=0; i_predrawSeconds<seconds_draw; i_predrawSeconds++){
+            this->drawSecondsCircle(draw, this->last_seconds-i_predrawSeconds);
+        }
 
         setDrawColor_ContrastColor();
 
@@ -255,7 +256,7 @@ void appNameClass::draw_current_time(bool draw){
         #endif 
     }else{
         if(this->last_seconds>core_time_getSeconds_byte()){
-            // if munutes changed
+            // if munutes changed, clearing secongs circle
             setDrawColor_BackGroundColor();  
             for(int isecond=0; isecond<60; isecond++){
                 drawSecondsCircle(draw, isecond);
@@ -290,14 +291,16 @@ void appNameClass::draw_current_time(bool draw){
                 // Big screens as 240x240 
                 clearString_centered(core_time_getWeekDay_string(), SCREEN_WIDTH/2, STRINGS_OFFSET_Y + SECONDS_CIRCLE_Y + CLOCK_MARGIN + 35, FONT_SIZE_DEFAULT);
             #endif 
+
+            #if defined(PEDOMETER_ENABLE) || defined(PEDOMETER_EMULATOR)
+                this->drawStepsCircle(true);
+            #endif
         }
 
     }
 
-
     // BATTERY
     #ifdef BATTERY_ENABLE
-
         
         if(draw){        
             last_battery            = driver_battery_getPercent();

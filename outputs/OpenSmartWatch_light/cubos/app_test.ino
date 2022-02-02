@@ -32,7 +32,232 @@ void appNameClass::onCreate(){
     DRAW_LIMIT_reset();
     DRAW_LIMITS_setEnable(STYLE_STATUSBAR_HEIGHT, -1, -1, -1);
 
-    drawString(appName, 5, STYLE_STATUSBAR_HEIGHT + 10, 3);
+    setDrawColor(255,255,255);
+
+
+    
+    long timer = millis();
+    for(byte i=0; i<10; i++){
+        fillScreen(0, 0, 0);
+        core_display_loop();
+        fillScreen(255, 255, 255);
+        core_display_loop();
+    }
+
+    timer = millis() - timer;
+
+    setDrawColor(0,0,0);
+    drawString(String(timer), 5, STYLE_STATUSBAR_HEIGHT + 10, 2);
+    
+
+    //drawString(appName, 5, STYLE_STATUSBAR_HEIGHT + 10, 1);
+
+/*
+    set_pedometer_hours_steps(0, 30);
+    set_pedometer_hours_steps(1, 156);
+    set_pedometer_hours_steps(2, 201);
+    set_pedometer_hours_steps(3, 89);
+    set_pedometer_hours_steps(4, 122);
+    set_pedometer_hours_steps(5, 12);
+    set_pedometer_hours_steps(6, 214);
+    set_pedometer_hours_steps(7, 34);
+    set_pedometer_hours_steps(8, 64);
+    set_pedometer_hours_steps(9, 230);
+    set_pedometer_hours_steps(10, 20);
+    set_pedometer_hours_steps(11, 0);
+    set_pedometer_hours_steps(12, 0);
+    set_pedometer_hours_steps(13, 0);
+    set_pedometer_hours_steps(14, 0);
+    set_pedometer_hours_steps(15, 0);
+    set_pedometer_hours_steps(16, 0);
+    set_pedometer_hours_steps(17, 0);
+    set_pedometer_hours_steps(18, 0);
+    set_pedometer_hours_steps(19, 0);
+    set_pedometer_hours_steps(20, 10);
+    set_pedometer_hours_steps(21, 120);
+    set_pedometer_hours_steps(22, 215);
+    set_pedometer_hours_steps(23, 200);
+
+    set_pedometer_hours_sleep(0, 0);
+    set_pedometer_hours_sleep(1, 0);
+    set_pedometer_hours_sleep(2, 0);
+    set_pedometer_hours_sleep(3, 0);
+    set_pedometer_hours_sleep(4, 0);
+    set_pedometer_hours_sleep(5, 0);
+    set_pedometer_hours_sleep(6, 0);
+    set_pedometer_hours_sleep(7, 0);
+    set_pedometer_hours_sleep(8, 0);
+    set_pedometer_hours_sleep(9, 0);
+    set_pedometer_hours_sleep(10, 10);
+    set_pedometer_hours_sleep(11, 60);
+    set_pedometer_hours_sleep(12, 60);
+    set_pedometer_hours_sleep(13, 60);
+    set_pedometer_hours_sleep(14, 60);
+    set_pedometer_hours_sleep(15, 60);
+    set_pedometer_hours_sleep(16, 60);
+    set_pedometer_hours_sleep(17, 60);
+    set_pedometer_hours_sleep(18, 60);
+    set_pedometer_hours_sleep(19, 30);
+    set_pedometer_hours_sleep(20, 5);
+    set_pedometer_hours_sleep(21, 0);
+    set_pedometer_hours_sleep(22, 0);
+    set_pedometer_hours_sleep(23, 0);
+    */
+    
+    /*
+    core_time_setYear(0);
+    core_time_setMonth(0);
+    core_time_setDate(0);
+    core_time_setHours(0);
+    core_time_setMinutes(0);
+    core_time_setSeconds(0);
+    core_time_setWeekDay(0);
+    */
+
+    /*
+    set_pedometer_hours_steps(0, 0*2);
+    set_pedometer_hours_steps(1, 1*2);
+    set_pedometer_hours_steps(2, 2*2);
+    set_pedometer_hours_steps(3, 3*2);
+    set_pedometer_hours_steps(4, 4*2);
+    set_pedometer_hours_steps(5, 5*2);
+    set_pedometer_hours_steps(6, 6*2);
+    set_pedometer_hours_steps(7, 7*2);
+    set_pedometer_hours_steps(8, 8*2);
+    set_pedometer_hours_steps(9, 9*2);
+    set_pedometer_hours_steps(10, 10*2);
+    set_pedometer_hours_steps(11, 11*2);
+    set_pedometer_hours_steps(12, 12*2);
+    set_pedometer_hours_steps(13, 13*2);
+    set_pedometer_hours_steps(14, 14*2);
+    set_pedometer_hours_steps(15, 15*2);
+    set_pedometer_hours_steps(16, 16*2);
+    set_pedometer_hours_steps(17, 17*2);
+    set_pedometer_hours_steps(18, 18*2);
+    set_pedometer_hours_steps(19, 19*2);
+    set_pedometer_hours_steps(20, 20*2);
+    set_pedometer_hours_steps(21, 21*2);
+    set_pedometer_hours_steps(22, 22*2);
+    set_pedometer_hours_steps(23, 23*2);
+
+    set_pedometer_hours_steps_lastDay(0, 24*2);
+    set_pedometer_hours_steps_lastDay(1, 25*2);
+    set_pedometer_hours_steps_lastDay(2, 26*2);
+    set_pedometer_hours_steps_lastDay(3, 27*2);
+    set_pedometer_hours_steps_lastDay(4, 28*2);
+    set_pedometer_hours_steps_lastDay(5, 29*2);
+    set_pedometer_hours_steps_lastDay(6, 30*2);
+    set_pedometer_hours_steps_lastDay(7, 31*2);
+    set_pedometer_hours_steps_lastDay(8, 32*2);
+    set_pedometer_hours_steps_lastDay(9, 33*2);
+    set_pedometer_hours_steps_lastDay(10, 34*2);
+    set_pedometer_hours_steps_lastDay(11, 35*2);
+    set_pedometer_hours_steps_lastDay(12, 36*2);
+    set_pedometer_hours_steps_lastDay(13, 37*2);
+    set_pedometer_hours_steps_lastDay(14, 38*2);
+    set_pedometer_hours_steps_lastDay(15, 39*2);
+    set_pedometer_hours_steps_lastDay(16, 40*2);
+    set_pedometer_hours_steps_lastDay(17, 41*2);
+    set_pedometer_hours_steps_lastDay(18, 42*2);
+    set_pedometer_hours_steps_lastDay(19, 43*2);
+    set_pedometer_hours_steps_lastDay(20, 44*2);
+    set_pedometer_hours_steps_lastDay(21, 45*2);
+    set_pedometer_hours_steps_lastDay(22, 46*2);
+    set_pedometer_hours_steps_lastDay(23, 47*2);
+
+    set_pedometer_hours_sleep(0, 0*2+1);
+    set_pedometer_hours_sleep(1, 1*2+1);
+    set_pedometer_hours_sleep(2, 2*2+1);
+    set_pedometer_hours_sleep(3, 3*2+1);
+    set_pedometer_hours_sleep(4, 4*2+1);
+    set_pedometer_hours_sleep(5, 5*2+1);
+    set_pedometer_hours_sleep(6, 6*2+1);
+    set_pedometer_hours_sleep(7, 7*2+1);
+    set_pedometer_hours_sleep(8, 8*2+1);
+    set_pedometer_hours_sleep(9, 9*2+1);
+    set_pedometer_hours_sleep(10, 10*2+1);
+    set_pedometer_hours_sleep(11, 11*2+1);
+    set_pedometer_hours_sleep(12, 12*2+1);
+    set_pedometer_hours_sleep(13, 13*2+1);
+    set_pedometer_hours_sleep(14, 14*2+1);
+    set_pedometer_hours_sleep(15, 15*2+1);
+    set_pedometer_hours_sleep(16, 16*2+1);
+    set_pedometer_hours_sleep(17, 17*2+1);
+    set_pedometer_hours_sleep(18, 18*2+1);
+    set_pedometer_hours_sleep(19, 19*2+1);
+    set_pedometer_hours_sleep(20, 20*2+1);
+    set_pedometer_hours_sleep(21, 21*2+1);
+    set_pedometer_hours_sleep(22, 22*2+1);
+    set_pedometer_hours_sleep(23, 23*2+1);
+
+    set_pedometer_hours_sleep_lastDay(0, 24*2 + 1);
+    set_pedometer_hours_sleep_lastDay(1, 25*2 + 1);
+    set_pedometer_hours_sleep_lastDay(2, 26*2 + 1);
+    set_pedometer_hours_sleep_lastDay(3, 27*2 + 1);
+    set_pedometer_hours_sleep_lastDay(4, 28*2 + 1);
+    set_pedometer_hours_sleep_lastDay(5, 29*2 + 1);
+    set_pedometer_hours_sleep_lastDay(6, 30*2 + 1);
+    set_pedometer_hours_sleep_lastDay(7, 31*2 + 1);
+    set_pedometer_hours_sleep_lastDay(8, 32*2 + 1);
+    set_pedometer_hours_sleep_lastDay(9, 33*2 + 1);
+    set_pedometer_hours_sleep_lastDay(10, 34*2 + 1);
+    set_pedometer_hours_sleep_lastDay(11, 35*2 + 1);
+    set_pedometer_hours_sleep_lastDay(12, 36*2 + 1);
+    set_pedometer_hours_sleep_lastDay(13, 37*2 + 1);
+    set_pedometer_hours_sleep_lastDay(14, 38*2 + 1);
+    set_pedometer_hours_sleep_lastDay(15, 39*2 + 1);
+    set_pedometer_hours_sleep_lastDay(16, 40*2 + 1);
+    set_pedometer_hours_sleep_lastDay(17, 41*2 + 1);
+    set_pedometer_hours_sleep_lastDay(18, 42*2 + 1);
+    set_pedometer_hours_sleep_lastDay(19, 43*2 + 1);
+    set_pedometer_hours_sleep_lastDay(20, 44*2 + 1);
+    set_pedometer_hours_sleep_lastDay(21, 45*2 + 1);
+    set_pedometer_hours_sleep_lastDay(22, 46*2 + 1);
+    set_pedometer_hours_sleep_lastDay(23, 47*2 + 1);
+    */
+
+
+
+    //set_pedometer_days_steps(0, 3500);
+    /*
+    set_pedometer_days_steps(1, 200);
+    set_pedometer_days_steps(2, 300);
+    set_pedometer_days_steps(3, 400);
+    set_pedometer_days_steps(4, 500);
+    set_pedometer_days_steps(5, 600);
+    set_pedometer_days_steps(6, 700);*/
+
+    //set_pedometer_days_sleep(0, 6*60);
+    /*
+    set_pedometer_days_sleep(1, 50);
+    set_pedometer_days_sleep(2, 75);
+    set_pedometer_days_sleep(3, 125);
+    set_pedometer_days_sleep(4, 150);
+    set_pedometer_days_sleep(5, 175);
+    set_pedometer_days_sleep(6, 225);*/
+
+    /*
+    set_pedometer_days_steps(0, 7654);
+    set_pedometer_days_steps(1, 6543);
+    set_pedometer_days_steps(2, 4356);
+    set_pedometer_days_steps(3, 8065);
+    set_pedometer_days_steps(4, 12433);
+    set_pedometer_days_steps(5, 10242);
+    set_pedometer_days_steps(6, 6980);
+
+    set_pedometer_days_sleep(0, 8*60-108);
+    set_pedometer_days_sleep(1, 8*60-43);
+    set_pedometer_days_sleep(2, 8*60-34);
+    set_pedometer_days_sleep(3, 8*60+54);
+    set_pedometer_days_sleep(4, 8*60-24);
+    set_pedometer_days_sleep(5, 8*60-15);
+    set_pedometer_days_sleep(6, 8*60-45);
+    */
+
+    //drawString("Pedometer", 5, STYLE_STATUSBAR_HEIGHT + 10, 1);
+    //drawString("data setted", 5, STYLE_STATUSBAR_HEIGHT + 10*2, 1);
+
+    //startApp(-1);
     /* * /
     long time_finish;
     long time_start;
@@ -250,6 +475,13 @@ void appNameClass::onEvent(unsigned char event, int val1, int val2, int val3, in
     }else if(event==EVENT_ON_TIME_CHANGED){
     }else if(event==EVENT_ON_GOING_TO_SLEEP){
     }else if(event==EVENT_ON_WAKE_UP){
+    }else if(event==EVENT_BUTTON_DOUBLE_PRESS){
+        #if (DRIVER_CONTROLS_TOTALBUTTONS == 1)
+            if(val1==BUTTON_SELECT){
+                startApp(-1);
+            }
+        #else
+        #endif
     }
     
 }

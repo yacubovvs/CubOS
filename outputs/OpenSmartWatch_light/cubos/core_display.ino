@@ -180,12 +180,12 @@ void setDrawColor(uint16_t color){
     }
 
     void FRAMEBUFFER_new_setPixel(uint16_t x, uint16_t y, uint16_t color){
-      long position = y * (SCREEN_WIDTH-1) + x;
+      long position = y * (SCREEN_WIDTH) + x;
       FRAMEBUFFER_newFrame[position] = FRAMEBUFFER_16bitColor_to_framebufferColor(color);
     }
 
     void FRAMEBUFFER_current_setPixel(uint16_t x, uint16_t y, uint16_t color){
-      long position = y * (SCREEN_WIDTH-1) + x;
+      long position = y * (SCREEN_WIDTH) + x;
       FRAMEBUFFER_currentFrame[position] = FRAMEBUFFER_16bitColor_to_framebufferColor(color);
     }
 
@@ -194,7 +194,7 @@ void setDrawColor(uint16_t color){
     }
 
     uint16_t FRAMEBUFFER_new_getPixel(uint16_t x, uint16_t y){
-      long position = y * (SCREEN_WIDTH-1) + x;
+      long position = y * (SCREEN_WIDTH) + x;
       return FRAMEBUFFER_framebufferColor_to_16bitColor(FRAMEBUFFER_newFrame[position]);
     }
 
@@ -203,7 +203,7 @@ void setDrawColor(uint16_t color){
     }
 
     uint16_t FRAMEBUFFER_current_getPixel(uint16_t x, uint16_t y){
-      long position = y * (SCREEN_WIDTH-1) + x;
+      long position = y * (SCREEN_WIDTH) + x;
       return FRAMEBUFFER_framebufferColor_to_16bitColor(FRAMEBUFFER_currentFrame[position]);
     }
 
@@ -304,7 +304,23 @@ unsigned char core_display_brightness             = DEFAULT_SCREEN_BRIGHTNESS;
   unsigned char core_display_brightness_fade        = DEFAULT_FADE_BRIGHTNES;
   unsigned char core_display_time_delay_to_fade     = DEFAULT_DELAY_TO_FADE_DISPLAY;
 #endif
-unsigned char core_display_time_delay_to_poweroff = DEFAULT_TIME_TO_POWEROFF_DISPLAY;
+
+#ifdef PLATFORM_ESP32
+  RTC_DATA_ATTR unsigned char core_display_time_delay_to_poweroff             = DEFAULT_TIME_TO_POWEROFF_DISPLAY;
+#else
+  unsigned char core_display_time_delay_to_poweroff             = DEFAULT_TIME_TO_POWEROFF_DISPLAY;
+#endif
+
+#ifndef APP_CLOCK_POWER_AFTER_SECONDS_DEFAULT
+  #define APP_CLOCK_POWER_AFTER_SECONDS_DEFAULT 0
+#endif
+
+#ifdef PLATFORM_ESP32
+  RTC_DATA_ATTR unsigned char core_display_time_delay_to_poweroff_clock_app   = APP_CLOCK_POWER_AFTER_SECONDS_DEFAULT;
+#else
+  unsigned char core_display_time_delay_to_poweroff_clock_app   = APP_CLOCK_POWER_AFTER_SECONDS_DEFAULT;
+#endif
+
 
 #ifdef DISPLAY_BACKLIGHT_CONTROL_ENABLE
   void set_core_display_brightness(unsigned char value){ 
@@ -332,12 +348,19 @@ void set_core_display_time_delay_to_poweroff(unsigned char value){
   core_display_time_delay_to_poweroff = value;
 }
 
+void set_core_display_time_delay_to_poweroff_clock_app(unsigned char value){ 
+  if(value==0) value = 1;
+  if(value>240) value = 240;
+  core_display_time_delay_to_poweroff_clock_app = value;
+}
+
 unsigned char get_core_display_brightness(){return core_display_brightness; }
 #ifdef DISPLAY_BACKLIGHT_FADE_CONTROL_ENABLE
   unsigned char get_core_display_brightness_fade(){return core_display_brightness_fade; }
   unsigned char get_core_display_time_delay_to_fade(){return core_display_time_delay_to_fade; }
 #endif
 unsigned char get_core_display_time_delay_to_poweroff(){return core_display_time_delay_to_poweroff; }
+unsigned char get_core_display_time_delay_to_poweroff_clock_app(){return core_display_time_delay_to_poweroff_clock_app; }
 
 /*
 * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * 
@@ -675,42 +698,52 @@ void setStr(char * dString, int x, int y, unsigned char fontSize){
       for (unsigned char bit=0; bit<8; bit++){
 
         if (getBitInByte(char_part_element, bit)){
-          #ifdef USE_PRIMITIVE_HARDWARE_DRAW_ACCELERATION
-            unsigned char pixelsInLine=0;
-            for (unsigned char i=bit+1; i<8; i++){
-              if(getBitInByte(char_part_element, i)) {
-                pixelsInLine++;
-              }else{
-                break;
+          #ifndef FRAMEBUFFER_ENABLE
+            #ifdef USE_PRIMITIVE_HARDWARE_DRAW_ACCELERATION
+              unsigned char pixelsInLine=0;
+              for (unsigned char i=bit+1; i<8; i++){
+                if(getBitInByte(char_part_element, i)) {
+                  pixelsInLine++;
+                }else{
+                  break;
+                }
               }
-            }
+            #endif
           #endif
 
           if(fontSize>1){
             int x_r = x + char_part*fontSize + i*FONT_CHAR_WIDTH*fontSize;
             int y_r = y + bit*fontSize;
 
-            #ifdef USE_PRIMITIVE_HARDWARE_DRAW_ACCELERATION
-              if(pixelsInLine>0){
-                drawRect(x_r, y_r + (pixelsInLine)*fontSize, x_r + fontSize - 1, y_r - fontSize+1, true);
-                bit+=pixelsInLine;
-              }else{
+            #ifndef FRAMEBUFFER_ENABLE
+              #ifdef USE_PRIMITIVE_HARDWARE_DRAW_ACCELERATION
+                if(pixelsInLine>0){
+                  drawRect(x_r, y_r + (pixelsInLine)*fontSize, x_r + fontSize - 1, y_r - fontSize+1, true);
+                  bit+=pixelsInLine;
+                }else{
+                  drawRect(x_r, y_r, x_r + fontSize - 1, y_r - fontSize+1, true);
+                }
+              #else
                 drawRect(x_r, y_r, x_r + fontSize - 1, y_r - fontSize+1, true);
-              }
+              #endif
             #else
               drawRect(x_r, y_r, x_r + fontSize - 1, y_r - fontSize+1, true);
             #endif
             
           }else{
-            #ifdef USE_PRIMITIVE_HARDWARE_DRAW_ACCELERATION
-              
+            #ifndef FRAMEBUFFER_ENABLE
+              #ifdef USE_PRIMITIVE_HARDWARE_DRAW_ACCELERATION
+                
 
-              if(pixelsInLine>0){
-                driver_display_drawFastVLine(x +  char_part + i*FONT_CHAR_WIDTH, y + bit, pixelsInLine);
-                bit+=pixelsInLine;
-              }else{
+                if(pixelsInLine>0){
+                  driver_display_drawFastVLine(x +  char_part + i*FONT_CHAR_WIDTH, y + bit, pixelsInLine);
+                  bit+=pixelsInLine;
+                }else{
+                  drawPixel(x + char_part + i*FONT_CHAR_WIDTH, y + bit);
+                }
+              #else
                 drawPixel(x + char_part + i*FONT_CHAR_WIDTH, y + bit);
-              }
+              #endif
             #else
               drawPixel(x + char_part + i*FONT_CHAR_WIDTH, y + bit);
             #endif
@@ -753,10 +786,14 @@ void drawString_centered(char * dString, int y){
 }
 
 void clearString(char * dString, int x, int y, unsigned char fontSize){
-  #ifdef USE_PRIMITIVE_HARDWARE_DRAW_ACCELERATION
-    if(fontSize==0) fontSize = FONT_SIZE_DEFAULT;
-    int string_length = strlen(dString);
-    drawRect(x,y-fontSize, x+string_length*fontSize*FONT_CHAR_WIDTH, y+fontSize*(FONT_CHAR_HEIGHT-1),true);
+  #ifndef FRAMEBUFFER_ENABLE
+    #ifdef USE_PRIMITIVE_HARDWARE_DRAW_ACCELERATION
+      if(fontSize==0) fontSize = FONT_SIZE_DEFAULT;
+      int string_length = strlen(dString);
+      drawRect(x,y-fontSize, x+string_length*fontSize*FONT_CHAR_WIDTH, y+fontSize*(FONT_CHAR_HEIGHT-1),true);
+    #else
+      setStr(dString, x, y, fontSize);
+    #endif
   #else
     setStr(dString, x, y, fontSize);
   #endif
@@ -853,18 +890,63 @@ void core_display_loop(){
       if(getFRAMEBUFFER_isChanged()){
         bool shown = false;
 
+        #ifdef USE_PRIMITIVE_HARDWARE_DRAW_ACCELERATION
+          int graph_accel_x_start = 0;
+          uint16_t graph_accel_line_length = 0;
+          uint16_t graph_accel_color = 0;
+          //uint16_t pixels_deb = 0;
+          //uint16_t lines_deb = 0;
+        #endif
+
         for(int y=0; y<SCREEN_HEIGHT; y++){
           if(FRAMEBUFFER_pixelChanged_y[y]){
             for(int x=0; x<SCREEN_WIDTH; x++){
               if(FRAMEBUFFER_pixelChanged_x[x]){
-                long position = y * (SCREEN_WIDTH-1) + x;  
+                long position = y * (SCREEN_WIDTH) + x;  
                 if(FRAMEBUFFER_pixelChanged[position]==true){
                   uint16_t newColor = FRAMEBUFFER_new_getPixel(position);
-                  if(FRAMEBUFFER_current_getPixel(position)!=newColor){
-                    display_driver_setPixel(x, y, newColor);
-                    FRAMEBUFFER_current_setPixel(position, newColor);
-                    FRAMEBUFFER_pixelChanged[position] = false;
-                  }
+
+                  #ifdef USE_PRIMITIVE_HARDWARE_DRAW_ACCELERATION
+                    //if(FRAMEBUFFER_current_getPixel(position)!=newColor || true){
+                    //if(FRAMEBUFFER_current_getPixel(position)!=newColor || true){
+
+                      if(graph_accel_line_length==0){
+                        graph_accel_line_length=1;
+                        graph_accel_color = newColor;
+                        graph_accel_x_start = x;
+                      }
+
+                      if(
+                        false 
+                        || x==SCREEN_WIDTH-1
+                        || FRAMEBUFFER_pixelChanged[position+1] == false
+                        || FRAMEBUFFER_new_getPixel(position+1) != graph_accel_color
+                      ){
+                        if(graph_accel_line_length==1){
+                          display_driver_setPixel(x, y, graph_accel_color);
+                          //pixels_deb ++; 
+                        }else{
+                          //lines_deb ++;
+                          setDrawColor(graph_accel_color);
+                          driver_display_drawFastHLine(graph_accel_x_start, y, graph_accel_line_length-1);
+                        }
+
+                        graph_accel_line_length=0;
+                      }else{
+                        graph_accel_line_length++;
+                      }
+                      
+                      FRAMEBUFFER_current_setPixel(position, newColor);
+                      FRAMEBUFFER_pixelChanged[position] = false;
+                    //}    
+                  #else
+                    if(FRAMEBUFFER_current_getPixel(position)!=newColor){
+                      display_driver_setPixel(x, y, newColor);
+                      FRAMEBUFFER_current_setPixel(position, newColor);
+                      FRAMEBUFFER_pixelChanged[position] = false;
+                    }
+                  #endif
+                  
                 }
               }
             }
@@ -874,8 +956,10 @@ void core_display_loop(){
         for(int x=0; x<SCREEN_WIDTH; x++){ FRAMEBUFFER_pixelChanged_x[x] = false;}
         for(int y=0; y<SCREEN_HEIGHT; y++){ FRAMEBUFFER_pixelChanged_y[y] = false;}
 
-        //FRAMEBUFFER_pixelChanged[239 + (SCREEN_WIDTH-1)*239] = true;
-        //FRAMEBUFFER_new_setPixel(239,239, 65535);
+        #ifdef USE_PRIMITIVE_HARDWARE_DRAW_ACCELERATION
+          //debug("pixels_deb: " + String(pixels_deb) + "    lines_deb: " + String(lines_deb));
+        #endif
+
       }
       setFRAMEBUFFER_isChanged(false);
     #endif
@@ -894,13 +978,13 @@ void drawPixel(int x, int y){
     #ifdef FRAMEBUFFER_TWIN_FULL
       FRAMEBUFFER_new_setPixel(x, y, getDrawColor());
 
-      long position = x + (SCREEN_WIDTH-1)*y;
+      long position = x + (SCREEN_WIDTH)*y;
       if(position>=0 && position<=SCREEN_HEIGHT*SCREEN_WIDTH) FRAMEBUFFER_pixelChanged[position] = true;
 
       FRAMEBUFFER_pixelChanged_x[x] = true;
       FRAMEBUFFER_pixelChanged_y[y] = true;
 
-      if(!getFRAMEBUFFER_isChanged()) setFRAMEBUFFER_isChanged(true);
+      setFRAMEBUFFER_isChanged(true);
       
       //display_driver_setPixel(x, y);
     #endif
@@ -912,16 +996,18 @@ void drawPixel(int x, int y){
 
 void drawLine(int x0, int y0, int x1, int y1){
 
-  #ifdef USE_PRIMITIVE_HARDWARE_DRAW_ACCELERATION
-    if(x0==x1){
-      driver_display_drawFastVLine(x0, min(y0, y1), abs(y0-y1));
-      return;
-    }
+  #ifndef FRAMEBUFFER_ENABLE
+    #ifdef USE_PRIMITIVE_HARDWARE_DRAW_ACCELERATION
+      if(x0==x1){
+        driver_display_drawFastVLine(x0, min(y0, y1), abs(y0-y1));
+        return;
+      }
 
-    if(y0==y1){
-      driver_display_drawFastHLine(min(x0, x1), y0, abs(x0-x1));
-      return;
-    }
+      if(y0==y1){
+        driver_display_drawFastHLine(min(x0, x1), y0, abs(x0-x1));
+        return;
+      }
+    #endif
   #endif
 
   int dy = y1 - y0; // Difference between y0 and y1
@@ -988,9 +1074,30 @@ void drawRect(int x0, int y0, int x1, int y1, bool fill){
   // check if the rectangle is to be filled
   if (fill == 1)
   {
-    #ifdef USE_PRIMITIVE_HARDWARE_DRAW_ACCELERATION
-      driver_display_fillRect(min(x0, x1), min(y0, y1), abs(x0-x1), abs(y0-y1));
-      return;
+    #ifndef FRAMEBUFFER_ENABLE
+      #ifdef USE_PRIMITIVE_HARDWARE_DRAW_ACCELERATION
+        driver_display_fillRect(min(x0, x1), min(y0, y1), abs(x0-x1), abs(y0-y1));
+        return;
+      #else
+        int xDiff;
+
+        if(x0 > x1)
+          xDiff = x0 - x1; //Find the difference between the x vars
+        else
+          xDiff = x1 - x0;
+
+        while(xDiff >= 0)
+        {
+          drawLine(x0, y0, x0, y1);
+
+          if(x0 > x1)
+            x0--;
+          else
+            x0++;
+
+          xDiff--;
+        }
+      #endif
     #else
       int xDiff;
 
@@ -1009,7 +1116,7 @@ void drawRect(int x0, int y0, int x1, int y1, bool fill){
           x0++;
 
         xDiff--;
-      }
+      };
     #endif
   }else{
     // best way to draw an unfilled rectangle is to draw four lines
@@ -1216,9 +1323,11 @@ void drawImage(bool draw, const unsigned char* data, int x, int y){
 
   if(!draw){
     setDrawColor(getBackgroundColor_red(), getBackgroundColor_green(), getBackgroundColor_blue());
-    #ifdef USE_PRIMITIVE_HARDWARE_DRAW_ACCELERATION
-      drawRect(x, y, x+image_wigth, y+image_height, true);
-      return;
+    #ifndef FRAMEBUFFER_ENABLE
+      #ifdef USE_PRIMITIVE_HARDWARE_DRAW_ACCELERATION
+        drawRect(x, y, x+image_wigth, y+image_height, true);
+        return;
+      #endif
     #endif
   }
 
@@ -1259,25 +1368,29 @@ void drawImage(bool draw, const unsigned char* data, int x, int y){
               //if (currentBbyte&1<<(7-d)) drawPixel(x + icon_x, y + icon_y);
               //if (getBitInByte(currentBbyte, d)) drawPixel(x + icon_x, y + icon_y);
               if (getBitInByte(currentBbyte, 7-d)){
-                #ifdef USE_PRIMITIVE_HARDWARE_DRAW_ACCELERATION
-                  unsigned char pixelsInARow = 0;
-                  if(d!=7){
-                    for (unsigned char future_d=d+1; future_d<8; future_d++){
-                      if (getBitInByte(currentBbyte, 7-future_d)){
-                        pixelsInARow++;
-                      } else{
-                        break;
+                #ifndef FRAMEBUFFER_ENABLE
+                  #ifdef USE_PRIMITIVE_HARDWARE_DRAW_ACCELERATION
+                    unsigned char pixelsInARow = 0;
+                    if(d!=7){
+                      for (unsigned char future_d=d+1; future_d<8; future_d++){
+                        if (getBitInByte(currentBbyte, 7-future_d)){
+                          pixelsInARow++;
+                        } else{
+                          break;
+                        }
                       }
                     }
-                  }
 
-                  if(pixelsInARow>1){
-                    driver_display_drawFastHLine(x + icon_x, y + icon_y, pixelsInARow);
-                    d+=pixelsInARow;
-                    icon_x+=pixelsInARow;
-                  }else{
-                    drawPixel(x + icon_x, y + icon_y);  
-                  }
+                    if(pixelsInARow>1){
+                      driver_display_drawFastHLine(x + icon_x, y + icon_y, pixelsInARow);
+                      d+=pixelsInARow;
+                      icon_x+=pixelsInARow;
+                    }else{
+                      drawPixel(x + icon_x, y + icon_y);  
+                    }
+                  #else
+                    drawPixel(x + icon_x, y + icon_y);
+                  #endif
                 #else
                   drawPixel(x + icon_x, y + icon_y);
                 #endif
